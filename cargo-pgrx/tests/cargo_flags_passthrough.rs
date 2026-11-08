@@ -43,7 +43,7 @@ fn install_with(test_tag: &str, extra_args: &[&str], envs: &[(&str, &str)]) -> S
         cmd.env(k, v);
     }
     let output = cmd.output().expect("failed to spawn cargo-pgrx");
-    let mut combined = String::from_utf8_lossy(&output.stderr).into_owned();
+    let mut combined = String::from_utf8_lossy_owned(output.stderr);
     combined.push_str(&String::from_utf8_lossy(&output.stdout));
 
     let _ = std::fs::remove_dir_all(&dir);

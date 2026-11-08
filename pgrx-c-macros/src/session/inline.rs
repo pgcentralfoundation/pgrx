@@ -154,7 +154,7 @@ pub(super) fn expand_bodies(
     )?;
     for (name, root) in roots.iter_mut() {
         if let InlineRoot::Ready { body, .. } = root
-            && body.as_deref().is_some_and(&names_macro)
+            && body.as_deref().is_some_and(names_macro)
         {
             *body = match batch.results.get(name) {
                 Some(crate::ExpansionResult::Expanded { expansion }) => {

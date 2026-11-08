@@ -199,7 +199,7 @@ fn version_text(tokens: &[Token]) -> String {
         .iter()
         .skip(1)
         .filter(|token| token.kind == TokenKind::Literal)
-        .filter_map(|token| token.spelling.strip_prefix('"')?.strip_suffix('"'))
+        .filter_map(|token| token.spelling.strip_circumfix('"', '"'))
         .collect()
 }
 
@@ -461,11 +461,9 @@ fn check_layout(
             disagree(&format!("sizeof({name})"), size, actual);
         }
     }
-    if disagreements.is_empty() {
-        Ok(())
-    } else {
-        Err(ConfigurationError::Layout { target: target.into(), disagreements })
-    }
+    disagreements
+        .is_empty()
+        .ok_or_else(|| ConfigurationError::Layout { target: target.into(), disagreements })
 }
 
 #[cfg(test)]

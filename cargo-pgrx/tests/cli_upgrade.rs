@@ -18,8 +18,8 @@ const CARGO_PGRX: &str = env!("CARGO_BIN_EXE_cargo-pgrx");
 
 fn run(args: &[&str]) -> (bool, String, String) {
     let output = Command::new(CARGO_PGRX).args(args).output().expect("failed to spawn cargo-pgrx");
-    let stdout = String::from_utf8_lossy(&output.stdout).into_owned();
-    let stderr = String::from_utf8_lossy(&output.stderr).into_owned();
+    let stdout = String::from_utf8_lossy_owned(output.stdout);
+    let stderr = String::from_utf8_lossy_owned(output.stderr);
     (output.status.success(), stdout, stderr)
 }
 
@@ -95,8 +95,8 @@ fn upgrade(cargo_home: &Path, cwd: &Path, args: &[&str]) -> (bool, String, Strin
         .current_dir(cwd)
         .output()
         .expect("failed to spawn cargo-pgrx");
-    let stdout = String::from_utf8_lossy(&output.stdout).into_owned();
-    let stderr = String::from_utf8_lossy(&output.stderr).into_owned();
+    let stdout = String::from_utf8_lossy_owned(output.stdout);
+    let stderr = String::from_utf8_lossy_owned(output.stderr);
     (output.status.success(), stdout, stderr)
 }
 

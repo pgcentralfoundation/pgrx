@@ -168,7 +168,7 @@ pub trait FromDatum: Sized {
 /// Returns [`TryFromDatumError::IncompatibleTypes`] unless `T` can read a value of type
 /// `type_oid`, as [`FromDatum::try_from_datum`] describes.
 fn check_compatible<T: IntoDatum>(type_oid: pg_sys::Oid) -> Result<(), TryFromDatumError> {
-    if is_binary_coercible::<T>(type_oid) { Ok(()) } else { Err(incompatible::<T>(type_oid)) }
+    is_binary_coercible::<T>(type_oid).ok_or_else(|| incompatible::<T>(type_oid))
 }
 
 fn incompatible<T: IntoDatum>(type_oid: pg_sys::Oid) -> TryFromDatumError {
@@ -787,9 +787,6 @@ fn check_pgbox_layout<T>(type_oid: pg_sys::Oid) -> Result<(), TryFromDatumError>
     // SAFETY: get_typlenbyval takes the OID by value and writes both out-parameters. It raises
     // an ERROR for an OID that names no type, which check_compatible has already rejected.
     unsafe { pg_sys::get_typlenbyval(type_oid, &mut typlen, &mut typbyval) };
-    if <PgBox<T> as UnboxDatum>::can_unbox(typlen, typbyval) {
-        Ok(())
-    } else {
-        Err(incompatible::<PgBox<T>>(type_oid))
-    }
+    <PgBox<T> as UnboxDatum>::can_unbox(typlen, typbyval)
+        .ok_or_else(|| incompatible::<PgBox<T>>(type_oid))
 }

@@ -12,12 +12,12 @@ pub(crate) mod pg15 {
     //! agree with the installed headers and target inspected by this build.
 
     #![allow(nonstandard_style, unused_parens, unused_braces, unused_imports, clippy::all)]
-    #![allow(unknown_lints, unnecessary_transmutes)]
+    #![allow(unnecessary_transmutes)]
     include!(concat!(env!("OUT_DIR"), "/pg15.rs"));
 }
 /// Expose the stored PG15 binding snapshot solely for documentation builds.
 #[cfg(all(feature = "pg15", docsrs))]
-#[allow(unknown_lints, unnecessary_transmutes)]
+#[allow(unnecessary_transmutes)]
 #[allow(nonstandard_style, unused_parens, unused_braces, unused_imports, clippy::all)]
 pub(crate) mod pg15;
 
@@ -31,12 +31,12 @@ pub(crate) mod pg16 {
     //! agree with the installed headers and target inspected by this build.
 
     #![allow(nonstandard_style, unused_parens, unused_braces, unused_imports, clippy::all)]
-    #![allow(unknown_lints, unnecessary_transmutes)]
+    #![allow(unnecessary_transmutes)]
     include!(concat!(env!("OUT_DIR"), "/pg16.rs"));
 }
 /// Expose the stored PG16 binding snapshot solely for documentation builds.
 #[cfg(all(feature = "pg16", docsrs))]
-#[allow(unknown_lints, unnecessary_transmutes)]
+#[allow(unnecessary_transmutes)]
 #[allow(nonstandard_style, unused_parens, unused_braces, unused_imports, clippy::all)]
 pub(crate) mod pg16;
 
@@ -50,12 +50,12 @@ pub(crate) mod pg17 {
     //! agree with the installed headers and target inspected by this build.
 
     #![allow(nonstandard_style, unused_parens, unused_braces, unused_imports, clippy::all)]
-    #![allow(unknown_lints, unnecessary_transmutes)]
+    #![allow(unnecessary_transmutes)]
     include!(concat!(env!("OUT_DIR"), "/pg17.rs"));
 }
 /// Expose the stored PG17 binding snapshot solely for documentation builds.
 #[cfg(all(feature = "pg17", docsrs))]
-#[allow(unknown_lints, unnecessary_transmutes)]
+#[allow(unnecessary_transmutes)]
 #[allow(nonstandard_style, unused_parens, unused_braces, unused_imports, clippy::all)]
 pub(crate) mod pg17;
 
@@ -69,12 +69,12 @@ pub(crate) mod pg18 {
     //! agree with the installed headers and target inspected by this build.
 
     #![allow(nonstandard_style, unused_parens, unused_braces, unused_imports, clippy::all)]
-    #![allow(unknown_lints, unnecessary_transmutes)]
+    #![allow(unnecessary_transmutes)]
     include!(concat!(env!("OUT_DIR"), "/pg18.rs"));
 }
 /// Expose the stored PG18 binding snapshot solely for documentation builds.
 #[cfg(all(feature = "pg18", docsrs))]
-#[allow(unknown_lints, unnecessary_transmutes)]
+#[allow(unnecessary_transmutes)]
 #[allow(nonstandard_style, unused_parens, unused_braces, unused_imports, clippy::all)]
 pub(crate) mod pg18;
 
@@ -88,12 +88,12 @@ pub(crate) mod pg19 {
     //! agree with the installed headers and target inspected by this build.
 
     #![allow(nonstandard_style, unused_parens, unused_braces, unused_imports, clippy::all)]
-    #![allow(unknown_lints, unnecessary_transmutes)]
+    #![allow(unnecessary_transmutes)]
     include!(concat!(env!("OUT_DIR"), "/pg19.rs"));
 }
 /// Expose the stored PG19 binding snapshot solely for documentation builds.
 #[cfg(all(feature = "pg19", docsrs))]
-#[allow(unknown_lints, unnecessary_transmutes)]
+#[allow(unnecessary_transmutes)]
 #[allow(nonstandard_style, unused_parens, unused_braces, unused_imports, clippy::all)]
 pub(crate) mod pg19;
 

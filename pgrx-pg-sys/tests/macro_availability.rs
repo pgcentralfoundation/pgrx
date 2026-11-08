@@ -640,7 +640,7 @@ fn file_cfgs(source: &str) -> impl Iterator<Item = &str> {
         .lines()
         .map(str::trim)
         .take_while(|line| line.is_empty() || line.starts_with("//") || line.starts_with("#!["))
-        .filter_map(|line| line.strip_prefix("#![cfg(")?.strip_suffix(")]"))
+        .filter_map(|line| line.strip_circumfix("#![cfg(", ")]"))
 }
 
 /// Return the predicates of the single-line `#[cfg(...)]` attributes directly above a gate,
@@ -656,7 +656,7 @@ fn gate_cfgs(before: &str) -> impl Iterator<Item = &str> {
         .take_while(|line| {
             (line.starts_with("#[") && line.ends_with(']')) || line.starts_with("//")
         })
-        .filter_map(|line| line.strip_prefix("#[cfg(")?.strip_suffix(")]"))
+        .filter_map(|line| line.strip_circumfix("#[cfg(", ")]"))
 }
 
 /// Evaluate a `cfg` predicate for `build`. Only the predicates that these tests use are
@@ -689,7 +689,7 @@ fn cfg_value(predicate: &str, build: &Build) -> Option<bool> {
     }
     let value = |key: &str| {
         let (name, value) = predicate.split_once('=')?;
-        (name.trim() == key).then(|| value.trim().strip_prefix('"')?.strip_suffix('"')).flatten()
+        (name.trim() == key).then(|| value.trim().strip_circumfix('"', '"')).flatten()
     };
     if let Some(target_os) = value("target_os") {
         return Some(target_os == build.target_os);
@@ -705,7 +705,7 @@ fn cfg_value(predicate: &str, build: &Build) -> Option<bool> {
 
 /// Split `name(first, second, ...)` into its top-level predicates.
 fn cfg_arguments<'a>(predicate: &'a str, name: &str) -> Option<Vec<&'a str>> {
-    let inner = predicate.strip_prefix(name)?.trim_start().strip_prefix('(')?.strip_suffix(')')?;
+    let inner = predicate.strip_prefix(name)?.trim_start().strip_circumfix('(', ')')?;
     let mut arguments = Vec::new();
     let (mut depth, mut start) = (0_usize, 0);
     for (index, character) in inner.char_indices() {

@@ -227,7 +227,9 @@ fn value_body(source: &str, name: &str) -> String {
         })
         .unwrap();
     tokens
-        .chunks_exact(5)
+        .as_chunks::<5>()
+        .0
+        .iter()
         .find(|arm| arm[0].to_string().replace(' ', "").contains("@__pgrx_emit_value"))
         .expect("expression macros have a semantic value arm")[3]
         .to_string()

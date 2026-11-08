@@ -73,4 +73,4 @@ clippy.unnecessary_cast = "allow"
 clippy.needless_lifetimes = "allow"
 
 [lints.rust]
-unsafe-op-in-unsafe-fn = "allow" # repo-wide issue
+unsafe_op_in_unsafe_fn = "allow" # repo-wide issue

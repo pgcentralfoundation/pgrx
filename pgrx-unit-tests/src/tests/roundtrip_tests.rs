@@ -113,7 +113,7 @@ mod tests {
         };
     }
 
-    roundtrip!(rt_bytea, test_rt_bytea, &'a [u8], [b'a', b'b', b'c'].as_slice());
+    roundtrip!(rt_bytea, test_rt_bytea, &'a [u8], b"abc".as_slice());
     roundtrip!(rt_char_0, test_rt_char_0, char, 'a');
     roundtrip!(rt_char_1, test_rt_char_1, char, 'ß');
     roundtrip!(rt_char_2, test_rt_char_2, char, 'ℝ');
@@ -194,7 +194,7 @@ mod tests {
     //     Vec<Option<&[u8]>>,
     //     vec![
     //         None,
-    //         Some([b'a', b'b', b'c'].as_slice()),
+    //         Some(b"abc".as_slice()),
     //         Some([b'd', b'e', b'f'].as_slice()),
     //         None,
     //         Some([b'g', b'h', b'i'].as_slice()),

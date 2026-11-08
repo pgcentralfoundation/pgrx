@@ -1506,8 +1506,7 @@ fn parse_literal(spelling: &str) -> Result<IntegerLiteral, String> {
 /// Decode the bounded ordinary-string grammar; Clang remains responsible for preprocessing.
 fn parse_string_literal(spelling: &str) -> Result<Vec<u8>, String> {
     let body = spelling
-        .strip_prefix('"')
-        .and_then(|body| body.strip_suffix('"'))
+        .strip_circumfix('"', '"')
         .ok_or_else(|| "unterminated ordinary string literal".to_string())?;
     if !body.is_ascii() {
         return Err("non-ASCII ordinary strings require an execution-encoding contract".into());
@@ -1611,8 +1610,7 @@ fn string_parts(bytes: &[u8], parameters: &HashMap<&str, usize>) -> Vec<StringPa
 /// targets.
 fn parse_character_literal(spelling: &str) -> Result<IntegerLiteral, String> {
     let body = spelling
-        .strip_prefix('\'')
-        .and_then(|body| body.strip_suffix('\''))
+        .strip_circumfix('\'', '\'')
         .ok_or_else(|| "unterminated ordinary character constant".to_string())?;
     if !body.is_ascii() {
         return Err("non-ASCII ordinary character constants require an encoding contract".into());

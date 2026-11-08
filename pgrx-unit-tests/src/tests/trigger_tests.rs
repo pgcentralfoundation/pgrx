@@ -22,7 +22,6 @@ mod tests {
     #[pgrx::pg_schema]
     mod trigger_signature_compile_tests {
         use pgrx::heap_tuple::PgHeapTupleError;
-        use pgrx::prelude::*;
         use pgrx::{AllocatedByPostgres, AllocatedByRust};
 
         use super::*;

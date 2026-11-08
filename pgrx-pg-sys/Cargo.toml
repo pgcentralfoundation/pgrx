@@ -68,5 +68,5 @@ dead_code = "allow"
 non_upper_case_globals = "allow"
 improper_ctypes = "allow"
 
-unsafe-op-in-unsafe-fn = "allow" # repo-wide issue
-unused-braces = "allow"
+unsafe_op_in_unsafe_fn = "allow" # repo-wide issue
+unused_braces = "allow"

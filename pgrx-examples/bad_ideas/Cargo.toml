@@ -37,4 +37,4 @@ ureq = "3.3.0"
 pgrx-tests = { path = "../../pgrx-tests" }
 
 [lints.rust]
-unsafe-op-in-unsafe-fn = "allow"
+unsafe_op_in_unsafe_fn = "allow"

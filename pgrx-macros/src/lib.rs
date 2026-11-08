@@ -326,7 +326,8 @@ mod dsl {
 }
 ```
 
-File modules (like `mod name;`) aren't able to be supported due to [`rust/#54725`](https://github.com/rust-lang/rust/issues/54725).
+File modules (like `mod name;`) aren't supported: the attribute receives only the `mod name;`
+declaration, not the items in the module's file.
 
 */
 #[proc_macro_attribute]

@@ -188,12 +188,14 @@ fn original_c_parameter_names_survive_matchers_bodies_and_argument_normalization
         // matcher bindings when a C name collides with that bookkeeping.
         let tokens = item.mac.tokens.clone().into_iter().collect::<Vec<_>>();
         let has_value_arm = tokens
-            .chunks_exact(5)
+            .as_chunks::<5>()
+            .0
+            .iter()
             .any(|arm| arm[0].to_string().replace(' ', "").contains("@__pgrx_emit_value"));
         let mut semantic_arms = 0;
         let mut public_arms = 0;
         let mut evaluation_arms = 0;
-        for arm in tokens.chunks_exact(5) {
+        for arm in tokens.as_chunks::<5>().0 {
             let matcher = arm[0].to_string().replace(' ', "");
             if !matcher.contains("@__pgrx_emit_") {
                 continue;
