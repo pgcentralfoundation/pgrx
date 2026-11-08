@@ -57,6 +57,34 @@ pub use include::*;
 pub use node::PgNode;
 pub use port::*;
 
+// PostgreSQL defines these constants as casts to `Oid`, `RelFileNumber`,
+// `TransactionId` or `MultiXactId`, and the generated bindings declare them as
+// `u32`. These explicit items shadow that glob re-export with pgrx's wrapper
+// types. Generated macros still read the `u32` bindings through
+// `__pgrx_c_bindings`.
+
+/// `InvalidOid` from `postgres_ext.h`.
+pub const InvalidOid: Oid = Oid::INVALID;
+/// `InvalidRelFileNumber` from `common/relpath.h`.
+#[cfg(not(feature = "pg15"))]
+pub const InvalidRelFileNumber: RelFileNumber = InvalidOid;
+/// `InvalidTransactionId` from `access/transam.h`.
+pub const InvalidTransactionId: TransactionId = TransactionId::INVALID;
+/// `BootstrapTransactionId` from `access/transam.h`.
+pub const BootstrapTransactionId: TransactionId = TransactionId::BOOTSTRAP;
+/// `FrozenTransactionId` from `access/transam.h`.
+pub const FrozenTransactionId: TransactionId = TransactionId::FROZEN;
+/// `FirstNormalTransactionId` from `access/transam.h`.
+pub const FirstNormalTransactionId: TransactionId = TransactionId::FIRST_NORMAL;
+/// `MaxTransactionId` from `access/transam.h`.
+pub const MaxTransactionId: TransactionId = TransactionId::MAX;
+/// `InvalidMultiXactId` from `access/multixact.h`.
+pub const InvalidMultiXactId: MultiXactId = MultiXactId::from_inner(include::InvalidMultiXactId);
+/// `FirstMultiXactId` from `access/multixact.h`.
+pub const FirstMultiXactId: MultiXactId = MultiXactId::from_inner(include::FirstMultiXactId);
+/// `MaxMultiXactId` from `access/multixact.h`.
+pub const MaxMultiXactId: MultiXactId = MultiXactId::from_inner(include::MaxMultiXactId);
+
 // For postgres 18+, some functions will reexport when enabling `cshim` feature
 #[allow(ambiguous_glob_reexports)]
 pub use submodules::*;

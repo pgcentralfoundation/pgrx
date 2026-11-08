@@ -32,7 +32,7 @@ use pgrx_sql_entity_graph::metadata::{
 pub struct Oid(pub(crate) u32);
 
 impl Oid {
-    pub const INVALID: Oid = Oid(crate::InvalidOid);
+    pub const INVALID: Oid = Oid(crate::include::InvalidOid);
 
     /// Generate an Oid from an arbitrary u32.
     /// # Safety
