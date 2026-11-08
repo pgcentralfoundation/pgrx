@@ -36,7 +36,9 @@ It may assume familiarity with C and SQL work, but as long as you have written
 
 ## Table of Contents
 - [Working with PGRX](./extension.md)
+- [Upgrading Extensions](./upgrades.md)
 - [Basics of Postgres Internals](./pg-internal.md)
+- [FFI Error Handling](./ffi-error-handling.md)
 - [Contributing](./contributing.md)
 - [Articles](./articles.md)
 - [Design Decisions](./design-decisions.md)

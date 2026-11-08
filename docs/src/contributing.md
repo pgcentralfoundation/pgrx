@@ -36,7 +36,7 @@ cargo pgrx init # This might take a while. Consider getting a drink.
 - Tests are *expected* to pass before merging
 - PGRX tests PRs on rustfmt so please run `cargo fmt` before you submit
 - Diffs in Cargo.lock should be checked in
-- HOWEVER, diffs in the bindgen in `pgrx-pg-sys/src/pg*.rs` should **not** be checked in (this is a release task)
+- HOWEVER, diffs in the generated bindings in `pgrx-pg-sys/src/include/pg*.rs` should **not** be checked in (this is a release task)
 
 ### Small Diffs? Big PRs?
 
@@ -79,52 +79,10 @@ You do not need exceptional justification notes in your PR to justify a new depe
 
 ## Releases
 
-On a new PGRX release, *develop* will be merged to *master* via merge commit.
-<!-- it's somewhat ambiguous whether we do this for stable or also "release candidate" releases -->
-
-### Release Candidates AKA Betas
-PGRX prefers using `x.y.z-{alpha,beta}.n` format for naming release candidates,
-starting at `alpha.0` if the new release candidate does not seem "feature complete",
-or at `beta.0` if it is not expected to need new feature work. Remember that `beta` will supersede `alpha` in versions for users who don't pin a version.
-
-Publishing PGRX is somewhat fraught, as all the crates really are intended to be published together as a single unit. There's no way to do a "dry run" of publishing multiple crates. Thus, it may be a good idea, when going from `m.n.o` to `m.n.p`, to preferentially publish `m.n.p-beta.0` instead of `m.n.p`, even if you are reasonably confident that **nothing** will happen.
-
-### Checklist
-Do this *in order*:
-- [ ] Inform other maintainers of intent to publish a release
-- [ ] Assign an appropriate value to `NEW_RELEASE_VERSION`
-- [ ] Draft release notes for `${NEW_RELEASE_VERSION}`
-- [ ] On `x86_64-unknown-linux-gnu`, with every supported PostgreSQL version configured, run
-  `PGRX_PG_SYS_RELEASE_REQUIRE_ALL_VERSIONS=1 ./update-versions.sh "${NEW_RELEASE_VERSION}"`
-    - This will update the visible bindings of `pgrx-pg-sys/src/include/pg*.rs` and the C
-      macro documentation snapshot
-    - The visible bindings are for reference, [docs][pgrx@docs.rs], and tools
-    - Actual users of the library rebuild the bindings from scratch
-- [ ] Run `./upgrade-deps.sh`
-- [ ] Stage new snapshot files with `git add -A pgrx-pg-sys/src/include`, because
-  `git commit -a` skips untracked files
-- [ ] Push the resulting diffs to *develop*
-- [ ] Run `./publish.sh` to push the new version to [pgrx@crates.io]
-    - Off `x86_64-unknown-linux-gnu`, its docs.rs checks need that target's standard library
-      and a C compiler for it; see [Releases](./contributing/release.md)
-    - If there was an error during publishing:
-    - [ ] fix the error source
-    - [ ] push any resulting diffs to *develop*
-    - [ ] increment the patch version
-    - [ ] try again
-
-**Your work isn't done yet** just because it's on [crates.io], you also need to:
-- [ ] *Switch* to using **merge commits** in this PR
-- [ ] Merge
-- [ ] Publish release notes
-- [ ] Celebrate
+See [Releases](./contributing/release.md) for how to cut and publish a release.
 
 ## Licensing
 
 You agree that all code you submit in pull requests to https://github.com/pgcentralfoundation/pgrx/pulls
 is offered according to the MIT License, thus may be freely relicensed and sublicensed,
 and that you are satisfied with the existing copyright notice as of opening your PR.
-
-[crates.io]: https://crates.io
-[pgrx@crates.io]: https://crates.io/crates/pgrx
-[pgrx@docs.rs]: https://docs.rs/pgrx/latest/pgrx

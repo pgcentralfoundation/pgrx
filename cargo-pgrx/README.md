@@ -744,7 +744,7 @@ After bootstrapping, verify the test passes by running the full suite:
 $ cargo pgrx regress --resetdb
 ```
 
-Tests without expected output are **skipped** by default during normal runs. If you use `--test-filter` to target a test that hasn't been bootstrapped yet, you'll get a clear error directing you to use `--add` first.
+Tests without expected output are **skipped** by default during normal runs. If you name a test that hasn't been bootstrapped yet on the command line, you'll get a clear error directing you to use `--add` first.
 
 #### Updating expected output after code changes
 
@@ -762,7 +762,7 @@ When tests fail, the path to the `regression.diffs` file is always shown. Use `-
 
 - `setup.sql` is only executed when tests are run for the first time, or the `--resetdb` argument is used.  This includes when running a single test with `--resetdb` — `setup.sql` will always run first to establish the database schema and data before the filtered test executes.
 - The point of `setup.sql` is to perform some heavy-weight database object creation/data-loading _only_ when the test regression database is created.
-- tests are executed in alphabetical order
+- tests are executed in alphabetical order.  When you name tests on the command line, as in `cargo pgrx regress pg18 spi arrays`, they run in the order of the names: every test matching `spi`, then every test matching `arrays`
 - `.sql` files without a corresponding `expected/*.out` file are **skipped** during normal runs — use `--add <name>` to bootstrap new tests
 - pgrx creates a database named `$extname_regress` unless `--dbname` is used
 - Postgres' documentation for `pg_regress` [begins here](https://www.postgresql.org/docs/current/regress.html).  While pgrx does not support every knob and dial, its organization is largely compatible (PRs welcome to enhance features)

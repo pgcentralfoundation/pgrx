@@ -41,7 +41,12 @@ considerable custom FFI written by a programmer.
 
 ## pgrx-pg-sys
 
-This crate comes with an extensive `build.rs` to generate bindings for every Postgres version.
+The bindings to Postgres. Its `build.rs` uses `pgrx-bindgen` to generate bindings for the
+selected Postgres version, along with Rust versions of Postgres' C macros.
+
+## pgrx-bench
+
+Runtime support for `#[pg_bench]` benchmarks, which `cargo pgrx bench` runs inside Postgres.
 
 ## pgrx-macros
 
@@ -92,6 +97,17 @@ SQL objects by dependency, and writes the extension SQL file.
 The old `pgrx_embed` and `__pgrx_internals_*` symbol-scanning pipeline has been removed. If you
 want the background on that older design, see the historical article
 [Forging SQL from Rust](../articles/forging-sql-from-rust.md).
+
+## pgrx-bindgen
+
+The bindings generator behind the `build.rs` of pgrx-pg-sys. It finds the selected Postgres
+installation, runs bindgen against its headers, and compiles the native support archive that
+wraps Postgres' static inline functions.
+
+## pgrx-c-macros
+
+Discovers Postgres' C macros with libclang and translates them into Rust `macro_rules!` for
+pgrx-bindgen. Its `README.md` and `ARCHITECTURE.md` describe the translation in detail.
 
 ## pgrx-pg-config
 
