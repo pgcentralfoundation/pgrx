@@ -28,7 +28,8 @@
    + `cargo pgrx init`: Install new (or register existing) PostgreSQL installs
    + `cargo pgrx run`: Run your extension and interactively test it in `psql` (or `pgcli`)
    + `cargo pgrx test`: Unit-test your extension across multiple PostgreSQL versions
-   + `cargo pgrx package`: Create installation packages for your extension
+   + `cargo pgrx regress`: Run SQL regression tests and compare their output with expected files
+   + `cargo pgrx package`: Create installation packages for your extension, including RPM and DEB packages on Linux
    + `cargo pgrx migrate`: Optionally build upgrade scripts from one small SQL file per change
    + More in the [`README.md`](cargo-pgrx/README.md)!
 - **Target Multiple Postgres Versions**
@@ -41,9 +42,9 @@
    + SQL schemas generated automatically (or manually via `cargo pgrx schema`)
    + Include custom SQL with `extension_sql!` & `extension_sql_file!`
 - **Automatic PostgreSQL C Macro Translation**
-   + On verified target C profiles, pgrx automatically transpiles nearly all of PostgreSQL's function-style C `#define` macros into Rust `macro_rules!` macros during binding generation
-   + Use them through `pgrx::`, with C semantics determined by the selected PostgreSQL installation, compiler flags, and target
-   + Call macros with their original C names and `!`; handwritten function-style macro helpers have been removed
+   + During binding generation, pgrx transpiles nearly all of PostgreSQL's function-style C `#define` macros into Rust `macro_rules!` macros
+   + Call them through `pgrx::` with their original C names and `!`, such as `pgrx::VARSIZE_ANY!(ptr)`
+   + Their behavior follows the selected PostgreSQL installation, compiler flags, and target
    + See [Using PostgreSQL C macros](docs/src/extension/c-macros.md) for extension examples and the [transpiler architecture](pgrx-c-macros/ARCHITECTURE.md) for implementation details
 - **Safety First**
    + Translates Rust `panic!`s into Postgres `ERROR`s that abort the transaction, not the process
@@ -80,19 +81,11 @@
 PGRX has been tested to work on x86_64 Linux, aarch64 Linux, aarch64 macOS, and x86_64 Windows targets⹋.
 It is currently expected to work on other "Unix" OS with possible small changes, but those remain untested.
 
-The generated C macro runtime admits compiler-verified LP64, LLP64, and ILP32
-profiles with either byte order, subject to a recognized Rust architecture, OS,
-and ABI guard. See
+The generated C macros need a target whose C data model the compiler can verify
+as LP64, LLP64, or ILP32, and whose Rust architecture, OS, and ABI pgrx
+recognizes. See
 [target limits](docs/src/extension/c-macros.md#understand-refusals-and-runtime-limits).
-A cross build needs PostgreSQL server headers configured for the target, or a
-complete target bundle; pgrx refuses headers configured for another machine. See
-[Cross-compiling](#cross-compiling).
-
-Plain C `char` follows the inspected compiler's signedness, independently of
-Rust's native `core::ffi::c_char` alias. Generated bridges verify its one-byte
-storage while explicit `CChar` tags preserve plain-char identity and promotion.
-Raw `i8` and `u8` operands retain the distinct C signed-char and unsigned-char
-identities.
+A cross build has further requirements; see [Cross-compiling](#cross-compiling).
 
 - A Rust toolchain: `rustc`, `cargo`, and `rustfmt`. The recommended way to get these is from https://rustup.rs †
 - `git`
@@ -133,9 +126,9 @@ you will probably need these if you don't have them already:
 ```zsh
 brew install git icu4c pkg-config
 ```
-The config script that Postgres 17 uses in its build process does not automatically detect
-the Homebrew install directory. (Earlier versions of Postgres do not have this problem.)
-You may see this error:
+Postgres 16 and later build with ICU by default, and their config script does not automatically
+detect the Homebrew install directory. (Postgres 15 builds without ICU unless asked, so it does
+not have this problem.) You may see this error:
 
 ```configure: error: ICU library not found```
 
@@ -263,7 +256,21 @@ When building with a `pg_config` program, modify the standard build process in t
 
 ## Upgrading
 
-As new Postgres versions are supported by `pgrx`, you can re-run the `pgrx init` process to download and compile them:
+To move an extension to a new `pgrx` release, install the matching `cargo-pgrx`, then update
+your crate's `pgrx` dependencies:
+
+```bash
+cargo install cargo-pgrx --version <VERSION> --locked
+```
+
+```bash
+cargo pgrx upgrade
+```
+
+A release that needs code or build changes has a migration guide in the top level of this
+repository, such as the [v0.20.0 Migration Guide](v0.20.0-MIGRATION.md).
+
+As new Postgres versions are supported by `pgrx`, you can re-run `cargo pgrx init` to download and compile them:
 
 ```bash
 cargo pgrx init
@@ -280,7 +287,7 @@ cargo pgrx init
 | `smallint`                 | `i16`                                                   |
 | `integer`                  | `i32`                                                   |
 | `bigint`                   | `i64`                                                   |
-| `oid`                      | `u32`                                                   |
+| `oid`                      | `pgrx::pg_sys::Oid`                                     |
 | `real`                     | `f32`                                                   |
 | `double precision`         | `f64`                                                   |
 | `bool`                     | `bool`                                                  |
@@ -313,7 +320,7 @@ cargo pgrx init
 | `tsrange`                  | `pgrx::Range<pgrx::Timestamp>`                          |
 | `tstzrange`                | `pgrx::Range<pgrx::TimestampWithTimeZone>`              |
 | `NULL`                     | `Option::None`                                          |
-| `internal`                 | `pgrx::PgBox<T>` where `T` is any Rust/Postgres struct  |
+| `internal`                 | `pgrx::Internal`                                        |
 | `uuid`                     | `pgrx::Uuid([u8; 16])`                                  |
 
 There are also `IntoDatum` and `FromDatum` traits for implementing additional type conversions,
@@ -357,7 +364,7 @@ There are probably more issues than the ones listed here, but the primary ones o
 
 There are a few things on our immediate TODO list
 
- - Automatic extension schema upgrade scripts
+ - Automatic extension schema upgrade scripts (today, `cargo pgrx migrate` assembles them from hand-written SQL fragments)
  - Improved unit testing framework
  - Better/Safer API for Datum management
  - Improved generated bindings organization
@@ -403,20 +410,19 @@ time goes on.  Your feedback about what you'd like to be able to do with `pgrx` 
 
 ## Hacking
 
-If you're hacking on `pgrx` and want to ensure your test will run correctly, you need to have the current
-implementation of `cargo-pgrx` (from the revision you're working on) in your `PATH`.
+When you run tests in this repository, the `#[pg_test]` harness builds and runs the checkout's
+`cargo-pgrx` with `cargo run`, so tests always use the revision you're working on. Set
+`CARGO_PGRX` to the path of a `cargo-pgrx` binary to use a different one.
 
-An easy way would be to install [cargo-local-install](https://github.com/MaulingMonkey/cargo-local-install):
+Other commands, such as `cargo pgrx init`, also need a `cargo-pgrx` from the same revision.
+Install one from the checkout as described in
+[Contributing](docs/src/contributing.md#dev-environment-setup), or run it without installing,
+as in `cargo run -p cargo-pgrx -- pgrx init`.
 
-```shell
-cargo install cargo-local-install
-```
-
-and then run `cargo local-install` to install `cargo-pgrx` as specified in top-level's Cargo.toml.
-
-Don't forget to prepend `/path/to/pgrx/bin` to your `PATH`!
-
-This approach can also be used in extensions to ensure a matching version of `cargo-pgrx` is used.
+Extensions can pin a matching `cargo-pgrx` with
+[cargo-local-install](https://github.com/MaulingMonkey/cargo-local-install). This repository's
+`Cargo.toml` has a `[workspace.metadata.local-install]` entry for it as an example: `cargo local-install`
+installs that `cargo-pgrx` into `./bin`, which you then prepend to your `PATH`.
 
 ## License
 
