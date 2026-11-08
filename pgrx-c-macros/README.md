@@ -330,7 +330,10 @@ The runtime models C integer promotions, conversions, casts, comparisons, shifts
 and lazy logical and conditional operators on compiler-verified LP64, LLP64, and ILP32 targets.
 Emitted literals keep their radix and digit spelling. C suffixes, octal notation
 and character escapes are adjusted to Rust syntax without changing the inferred
-C type or value.
+C type or value. Microsoft sized suffixes such as `i32` and `ui64`, which MSVC's
+`<stdint.h>` uses, are translated when the compiler accepts them, as it does for
+MSVC targets. They take the type that both the compiler and libclang report, and
+a value that the compiler would truncate to the suffix's width is refused.
 
 Generated matchers and operands retain the original C formal parameter names.
 Verified casts name the corresponding Rust binding, such as `AclMode`, while

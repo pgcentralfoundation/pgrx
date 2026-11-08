@@ -69,9 +69,9 @@ pub use frontend::{
 /// Parse bounded source syntax while preserving formal holes, grouping, and structural operands.
 mod syntax;
 pub use syntax::{
-    BinaryOperator, Expression, ExpressionKind, ExpressionNode, IntegerLiteral, IntegerSuffix,
-    NodeId, OffsetComponent, OffsetRecord, Statement, StatementBody, StringPart, TokenRange,
-    UnaryOperator,
+    BinaryOperator, Expression, ExpressionKind, ExpressionNode, IntegerLiteral, IntegerSize,
+    IntegerSuffix, MicrosoftIntegerWidth, NodeId, OffsetComponent, OffsetRecord, Statement,
+    StatementBody, StringPart, TokenRange, UnaryOperator,
 };
 /// Describe symbolic C types and invocation contracts before Rust lowering claims support.
 mod analysis;

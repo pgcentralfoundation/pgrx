@@ -10,7 +10,9 @@
 //! proofs. FrontendOutput bundles the facts established by one inspection so downstream
 //! phases cannot casually mix environments.
 
-use crate::{MacroDefinition, MacroDependencyGraph, MacroInventory, SourceSpan};
+use crate::{
+    MacroDefinition, MacroDependencyGraph, MacroInventory, MicrosoftIntegerWidth, SourceSpan,
+};
 use serde::Serialize;
 use std::collections::BTreeMap;
 use std::path::PathBuf;
@@ -174,8 +176,38 @@ pub struct TargetFacts {
     pub c_standard: Option<u64>,
     /// Representation facts keyed by distinct fundamental C integer identities.
     pub integers: BTreeMap<IntegerKind, IntegerType>,
+    /// Types of literals with Microsoft sized suffixes such as `i32`, present when the compiler
+    /// accepts those suffixes. Clang accepts them only with Microsoft extensions, which MSVC
+    /// targets enable by default.
+    pub microsoft_integer_types: Option<MicrosoftIntegerTypes>,
     /// Agreed float representation and semantic modes used to gate ordinary Rust arithmetic.
     pub floating_point: FloatingPointFacts,
+}
+
+/// The C types that the compiler and libclang both give literals with Microsoft sized suffixes.
+///
+/// Clang gives `i8` plain `char` and gives every other suffix the first standard integer type
+/// of that width and signedness, so `i64` is `long long` on LLP64 targets and `long` on LP64
+/// targets. The frontend observes these types rather than computing them.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+pub struct MicrosoftIntegerTypes {
+    /// Types of `i8`, `i16`, `i32`, and `i64` literals, in that order.
+    pub signed: [IntegerKind; 4],
+    /// Types of `ui8`, `ui16`, `ui32`, and `ui64` literals, in that order.
+    pub unsigned: [IntegerKind; 4],
+}
+
+impl MicrosoftIntegerTypes {
+    /// The C type of a literal with this Microsoft suffix.
+    pub fn kind(&self, width: MicrosoftIntegerWidth, unsigned: bool) -> IntegerKind {
+        let index = match width {
+            MicrosoftIntegerWidth::Bits8 => 0,
+            MicrosoftIntegerWidth::Bits16 => 1,
+            MicrosoftIntegerWidth::Bits32 => 2,
+            MicrosoftIntegerWidth::Bits64 => 3,
+        };
+        if unsigned { self.unsigned[index] } else { self.signed[index] }
+    }
 }
 
 /// Layout of a native C function pointer, verified by libclang and the driver.

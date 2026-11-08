@@ -23,9 +23,9 @@ use crate::model::{
     IntegerKind, IntegerType, IntegerValue, SignedOverflow, TargetFacts, TypeCategory, TypeInfo,
 };
 use crate::syntax::{
-    BinaryOperator, Expression, ExpressionKind, IntegerLiteral, NodeId, OffsetComponent,
-    OffsetRecord, Statement, StringPart, SyntaxError, SyntaxErrorKind, TokenRange, UnaryOperator,
-    parse_expanded_replacement, parse_expression, parse_replacement,
+    BinaryOperator, Expression, ExpressionKind, IntegerLiteral, IntegerSize, NodeId,
+    OffsetComponent, OffsetRecord, Statement, StringPart, SyntaxError, SyntaxErrorKind, TokenRange,
+    UnaryOperator, parse_expanded_replacement, parse_expression, parse_replacement,
 };
 use crate::{MacroKind, SourceSpan, Token, TokenKind};
 use serde::Serialize;
@@ -1210,6 +1210,15 @@ fn analyze_types(
                         node.tokens,
                     ));
                 }
+                if matches!(literal.suffix.size, IntegerSize::Microsoft(_))
+                    && target.microsoft_integer_types.is_none()
+                {
+                    return Err((
+                        SkipReasonCode::UnsupportedLiteral,
+                        "Microsoft sized integer suffixes require a compiler profile that accepts them, such as an MSVC target".into(),
+                        node.tokens,
+                    ));
+                }
                 TypeExpression::Concrete { ty: literal_type(literal, target).ok_or_else(|| (
                     SkipReasonCode::LiteralOutOfRange,
                     "no standard C integer literal type in the target profile represents this magnitude/suffix".into(),
@@ -1989,18 +1998,27 @@ fn fundamental_kind(words: &[&str]) -> Option<IntegerKind> {
 /// order.
 fn literal_type(literal: &IntegerLiteral, target: &TargetFacts) -> Option<IntegerType> {
     use IntegerKind::{Int, Long, LongLong, UnsignedInt, UnsignedLong, UnsignedLongLong};
+    use IntegerSize::{Microsoft, Plain};
+    let unsigned = literal.suffix.unsigned;
     let decimal = literal.radix == 10;
-    let candidates: &[IntegerKind] = match (literal.suffix.unsigned, literal.suffix.long, decimal) {
-        (false, 0, true) => &[Int, Long, LongLong],
-        (false, 0, false) => &[Int, UnsignedInt, Long, UnsignedLong, LongLong, UnsignedLongLong],
-        (true, 0, _) => &[UnsignedInt, UnsignedLong, UnsignedLongLong],
-        (false, 1, true) => &[Long, LongLong],
-        (false, 1, false) => &[Long, UnsignedLong, LongLong, UnsignedLongLong],
-        (true, 1, _) => &[UnsignedLong, UnsignedLongLong],
-        (false, 2, true) => &[LongLong],
-        (false, 2, false) => &[LongLong, UnsignedLongLong],
-        (true, 2, _) => &[UnsignedLongLong],
-        _ => return None,
+    let candidates: &[IntegerKind] = match (unsigned, literal.suffix.size, decimal) {
+        (_, Microsoft(width), _) => {
+            // Clang truncates a value that does not fit this type without a diagnostic. Rust
+            // rejects such a literal, so refuse it rather than model the truncation.
+            let kind = target.microsoft_integer_types?.kind(width, unsigned);
+            return target.integers.get(&kind).filter(|ty| literal.value <= maximum(**ty)).copied();
+        }
+        (false, Plain, true) => &[Int, Long, LongLong],
+        (false, Plain, false) => {
+            &[Int, UnsignedInt, Long, UnsignedLong, LongLong, UnsignedLongLong]
+        }
+        (true, Plain, _) => &[UnsignedInt, UnsignedLong, UnsignedLongLong],
+        (false, IntegerSize::Long, true) => &[Long, LongLong],
+        (false, IntegerSize::Long, false) => &[Long, UnsignedLong, LongLong, UnsignedLongLong],
+        (true, IntegerSize::Long, _) => &[UnsignedLong, UnsignedLongLong],
+        (false, IntegerSize::LongLong, true) => &[LongLong],
+        (false, IntegerSize::LongLong, false) => &[LongLong, UnsignedLongLong],
+        (true, IntegerSize::LongLong, _) => &[UnsignedLongLong],
     };
     candidates
         .iter()
@@ -2131,17 +2149,24 @@ mod tests {
             byte_order: ByteOrder::Little,
             c_standard: Some(201710),
             integers,
+            microsoft_integer_types: None,
             floating_point: Default::default(),
         }
     }
 
     /// Parse one test literal with production token rules before checking its C type selection.
-    fn literal(spelling: &str, value: u128, radix: u8, unsigned: bool, long: u8) -> IntegerLiteral {
+    fn literal(
+        spelling: &str,
+        value: u128,
+        radix: u8,
+        unsigned: bool,
+        size: IntegerSize,
+    ) -> IntegerLiteral {
         IntegerLiteral {
             spelling: spelling.into(),
             value,
             radix,
-            suffix: crate::syntax::IntegerSuffix { unsigned, long },
+            suffix: crate::syntax::IntegerSuffix { unsigned, size },
         }
     }
 
@@ -2150,15 +2175,70 @@ mod tests {
     fn literal_types_follow_radix_suffix_and_target() {
         let lp64 = target(64);
         let llp64 = target(32);
-        let decimal = literal("2147483648", 2147483648, 10, false, 0);
+        let decimal = literal("2147483648", 2147483648, 10, false, IntegerSize::Plain);
         assert_eq!(literal_type(&decimal, &lp64).unwrap().kind, IntegerKind::Long);
         assert_eq!(literal_type(&decimal, &llp64).unwrap().kind, IntegerKind::LongLong);
-        let hex = literal("0x80000000", 0x80000000, 16, false, 0);
+        let hex = literal("0x80000000", 0x80000000, 16, false, IntegerSize::Plain);
         assert_eq!(literal_type(&hex, &lp64).unwrap().kind, IntegerKind::UnsignedInt);
-        let largest = literal("18446744073709551615", u128::from(u64::MAX), 10, false, 0);
+        let largest =
+            literal("18446744073709551615", u128::from(u64::MAX), 10, false, IntegerSize::Plain);
         assert!(literal_type(&largest, &lp64).is_none());
-        let largest = literal("18446744073709551615ULL", u128::from(u64::MAX), 10, true, 2);
+        let largest = literal(
+            "18446744073709551615ULL",
+            u128::from(u64::MAX),
+            10,
+            true,
+            IntegerSize::LongLong,
+        );
         assert_eq!(literal_type(&largest, &lp64).unwrap().kind, IntegerKind::UnsignedLongLong);
+    }
+
+    /// Microsoft suffixes take the types the frontend observed, and values that Clang would
+    /// truncate to the suffix's width are refused.
+    #[test]
+    fn microsoft_literal_types_follow_observed_types_and_refuse_truncation() {
+        use crate::MicrosoftIntegerWidth::{Bits8, Bits16, Bits32, Bits64};
+        use IntegerKind::{
+            Char, Int, Long, LongLong, Short, UnsignedChar, UnsignedInt, UnsignedLongLong,
+            UnsignedShort,
+        };
+        let microsoft = |spelling: &str, value: u128, unsigned, width| {
+            literal(spelling, value, 10, unsigned, IntegerSize::Microsoft(width))
+        };
+        let mut llp64 = target(32);
+        llp64.microsoft_integer_types = Some(crate::MicrosoftIntegerTypes {
+            signed: [Char, Short, Int, LongLong],
+            unsigned: [UnsignedChar, UnsignedShort, UnsignedInt, UnsignedLongLong],
+        });
+        let kind = |literal: &IntegerLiteral| literal_type(literal, &llp64).map(|ty| ty.kind);
+        assert_eq!(kind(&microsoft("127i8", 127, false, Bits8)), Some(Char));
+        assert_eq!(kind(&microsoft("255ui8", 255, true, Bits8)), Some(UnsignedChar));
+        assert_eq!(kind(&microsoft("32767i16", 32767, false, Bits16)), Some(Short));
+        assert_eq!(kind(&microsoft("65535ui16", 65535, true, Bits16)), Some(UnsignedShort));
+        assert_eq!(kind(&microsoft("2147483647i32", 2147483647, false, Bits32)), Some(Int));
+        let max = microsoft("4294967295ui32", u128::from(u32::MAX), true, Bits32);
+        assert_eq!(kind(&max), Some(UnsignedInt));
+        let max = microsoft("9223372036854775807i64", i64::MAX as u128, false, Bits64);
+        assert_eq!(kind(&max), Some(LongLong));
+        let max = microsoft("18446744073709551615ui64", u128::from(u64::MAX), true, Bits64);
+        assert_eq!(kind(&max), Some(UnsignedLongLong));
+        // Clang would wrap each of these to a different value of the suffix's type.
+        assert_eq!(kind(&microsoft("128i8", 128, false, Bits8)), None);
+        assert_eq!(kind(&microsoft("256ui8", 256, true, Bits8)), None);
+        assert_eq!(kind(&microsoft("2147483648i32", 2147483648, false, Bits32)), None);
+        assert_eq!(kind(&microsoft("4294967296ui32", 1 << 32, true, Bits32)), None);
+        assert_eq!(kind(&microsoft("9223372036854775808i64", 1 << 63, false, Bits64)), None);
+
+        // With -fms-extensions on an LP64 target, Clang gives `i64` the type `long`.
+        let mut lp64 = target(64);
+        lp64.microsoft_integer_types = Some(crate::MicrosoftIntegerTypes {
+            signed: [Char, Short, Int, Long],
+            unsigned: [UnsignedChar, UnsignedShort, UnsignedInt, crate::IntegerKind::UnsignedLong],
+        });
+        let one = microsoft("1i64", 1, false, Bits64);
+        assert_eq!(literal_type(&one, &lp64).map(|ty| ty.kind), Some(Long));
+        // A profile that rejects these suffixes gives them no type.
+        assert_eq!(literal_type(&one, &target(64)), None);
     }
 
     /// Checks promotions and common types preserve c identity.

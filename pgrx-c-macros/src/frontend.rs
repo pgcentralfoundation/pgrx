@@ -14,8 +14,8 @@ use crate::{
     ActiveMacro, ActiveProvenance, BuildInputs, ByteOrder, CompilationProfile, CompilerIdentity,
     DeclarationCatalog, Error, FloatingKind, FloatingPointFacts, FloatingType, FrontendOutput,
     IntegerConstant, IntegerKind, IntegerType, IntegerValue, MacroDefinition, MacroDependencyGraph,
-    MacroEnvironment, MacroInventory, MacroKind, MacroScanner, SignedOverflow, TargetFacts,
-    TokenKind, TypeCategory, TypeInfo,
+    MacroEnvironment, MacroInventory, MacroKind, MacroScanner, MicrosoftIntegerTypes,
+    MicrosoftIntegerWidth, SignedOverflow, TargetFacts, TokenKind, TypeCategory, TypeInfo,
 };
 use clang::{EntityKind, EntityVisitResult, TranslationUnit, Type, TypeKind};
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
@@ -1170,6 +1170,8 @@ struct VerifiedPredefines {
     offsetof_supported: bool,
     /// Whether supported ASCII characters and basic escapes match the bounded literal decoder.
     ascii_execution_charset: bool,
+    /// Microsoft integer suffix types agreed by the compiler and libclang, when both accept them.
+    microsoft_integer_types: Option<MicrosoftIntegerTypes>,
     /// Typed float representation facts awaiting semantic option reconciliation.
     floating_types: BTreeMap<FloatingKind, (u64, Option<u64>)>,
     /// The effective C floating evaluation mode, including excess-precision behavior.
@@ -1299,6 +1301,27 @@ __pgrx_c_offset_indexed = __builtin_offsetof(struct __pgrx_c_offset_probe, neste
         }
         Err(error) => return Err(error),
     };
+    // Clang accepts Microsoft sized integer suffixes only with Microsoft extensions. When the
+    // compiler accepts them, libclang reports each literal's type and the compiler checks it.
+    let microsoft_source = microsoft_literals()
+        .map(|(width, unsigned)| {
+            let literal = microsoft_literal(width, unsigned);
+            format!("typedef __typeof__({literal}) __pgrx_msvc_{literal};\n")
+        })
+        .collect::<String>();
+    let driver_microsoft =
+        match run_compiler_with_input(compiler, &probe, Some(microsoft_source.clone()), None) {
+            Ok(_) => true,
+            Err(FrontendError::CompilerFailed { diagnostics, .. })
+                if only_invalid_suffix_errors(&diagnostics) =>
+            {
+                false
+            }
+            Err(error) => return Err(error),
+        };
+    if driver_microsoft {
+        fundamental_source.push_str(&microsoft_source);
+    }
     let (
         inventory,
         (
@@ -1312,6 +1335,7 @@ __pgrx_c_offset_indexed = __builtin_offsetof(struct __pgrx_c_offset_probe, neste
             ptrdiff_type,
             preferred_alignments,
             offsetof,
+            microsoft_observed,
         ),
     ) = scanner.with_translation_unit(
         &header,
@@ -1332,7 +1356,18 @@ __pgrx_c_offset_indexed = __builtin_offsetof(struct __pgrx_c_offset_probe, neste
             let mut offsetof_values = BTreeMap::new();
             let mut offset_nested = None;
             let mut offset_record = None;
+            let mut microsoft_observed = BTreeMap::new();
             unit.get_entity().visit_children(|entity, _| {
+                if entity.get_kind() == EntityKind::TypedefDecl
+                    && let Some(name) = entity.get_name()
+                    && let Some(literal) = name.strip_prefix("__pgrx_msvc_")
+                    && let Some(ty) = entity.get_typedef_underlying_type()
+                {
+                    microsoft_observed.insert(
+                        literal.to_owned(),
+                        integer_kind(ty.get_canonical_type().get_kind()),
+                    );
+                }
                 if entity.get_kind() == EntityKind::EnumDecl {
                     entity.visit_children(|constant, _| {
                         if constant.get_name().as_deref() == Some("__pgrx_c_ascii") {
@@ -1490,6 +1525,7 @@ __pgrx_c_offset_indexed = __builtin_offsetof(struct __pgrx_c_offset_probe, neste
                     ptrdiff_type,
                     preferred_alignments,
                     offsetof,
+                    microsoft_observed,
                 ),
             ))
         },
@@ -1567,6 +1603,8 @@ __pgrx_c_offset_indexed = __builtin_offsetof(struct __pgrx_c_offset_probe, neste
             )));
         }
     };
+    let microsoft_integer_types =
+        driver_microsoft.then(|| microsoft_integer_types(&microsoft_observed)).transpose()?;
     let mut float_source = format!(
         "_Static_assert(__FLT_EVAL_METHOD__ == {evaluation_method}, \"pgrx_float_evaluation_method\");\n"
     );
@@ -1606,6 +1644,15 @@ __pgrx_c_offset_indexed = __builtin_offsetof(struct __pgrx_c_offset_probe, neste
     for (marker, spelling) in &alignment_probes {
         let observed = preferred_alignments[*marker];
         float_source.push_str(&format!("_Static_assert(_Alignof({spelling}) == {}, \"pgrx_preferred_scalar_alignment\");\n_Static_assert(_Alignof({spelling}[2]) == {}, \"pgrx_preferred_array_alignment\");\n_Static_assert(_Alignof({spelling}[2][2]) == {}, \"pgrx_preferred_nested_array_alignment\");\n", observed.scalar, observed.array, observed.array));
+    }
+    if let Some(types) = &microsoft_integer_types {
+        for (width, unsigned) in microsoft_literals() {
+            let literal = microsoft_literal(width, unsigned);
+            let spelling = crate::expansion::c_integer_name(types.kind(width, unsigned));
+            float_source.push_str(&format!(
+                "_Static_assert(__builtin_types_compatible_p(__typeof__({literal}), {spelling}), \"pgrx_microsoft_integer_type\");\n"
+            ));
+        }
     }
     if let Some(offsets) = offsetof {
         // Optional failures must be attributable to this final capability block.
@@ -1667,6 +1714,25 @@ __pgrx_c_offset_indexed = __builtin_offsetof(struct __pgrx_c_offset_probe, neste
         };
         integers.insert(kind, IntegerType { kind, bits, signed, rank });
     }
+    if let Some(types) = &microsoft_integer_types {
+        for (width, unsigned) in microsoft_literals() {
+            let kind = types.kind(width, unsigned);
+            let ty = integers.get(&kind);
+            // Clang gives `i8` plain char and every other suffix a type of the named
+            // signedness. Analysis relies on each type having the suffix's width.
+            let signedness_matches = if (width, unsigned) == (MicrosoftIntegerWidth::Bits8, false) {
+                kind == IntegerKind::Char
+            } else {
+                ty.is_some_and(|ty| ty.signed != unsigned)
+            };
+            if !signedness_matches || ty.is_none_or(|ty| ty.bits != width.bits()) {
+                return Err(FrontendError::Environment(format!(
+                    "Microsoft integer literal {} has type {kind:?}, which does not match its suffix",
+                    microsoft_literal(width, unsigned)
+                )));
+            }
+        }
+    }
     Ok(VerifiedPredefines {
         macros: predefines,
         integers,
@@ -1675,10 +1741,52 @@ __pgrx_c_offset_indexed = __builtin_offsetof(struct __pgrx_c_offset_probe, neste
         preferred_alignments,
         offsetof_supported,
         ascii_execution_charset: driver_ascii && library_ascii,
+        microsoft_integer_types,
         floating_types,
         evaluation_method,
         function_pointer,
     })
+}
+
+/// Spell the zero literal that probes one Microsoft integer suffix, such as `0ui64`.
+fn microsoft_literal(width: MicrosoftIntegerWidth, unsigned: bool) -> String {
+    format!("0{}{}", if unsigned { "u" } else { "" }, width.spelling())
+}
+
+/// Every Microsoft integer suffix width and signedness that the frontend probes.
+fn microsoft_literals() -> impl Iterator<Item = (MicrosoftIntegerWidth, bool)> {
+    MicrosoftIntegerWidth::ALL.into_iter().flat_map(|width| [(width, false), (width, true)])
+}
+
+/// Collect the types libclang reported for the Microsoft literal probes that the compiler accepted.
+fn microsoft_integer_types(
+    observed: &BTreeMap<String, Option<IntegerKind>>,
+) -> Result<MicrosoftIntegerTypes, FrontendError> {
+    let kinds = |unsigned: bool| -> Result<[IntegerKind; 4], FrontendError> {
+        let mut kinds = [IntegerKind::Int; 4];
+        for (kind, width) in kinds.iter_mut().zip(MicrosoftIntegerWidth::ALL) {
+            let literal = microsoft_literal(width, unsigned);
+            *kind = observed.get(&literal).copied().flatten().ok_or_else(|| {
+                FrontendError::Environment(format!(
+                    "the compiler accepts the Microsoft integer literal {literal}, but libclang did not establish its type"
+                ))
+            })?;
+        }
+        Ok(kinds)
+    };
+    Ok(MicrosoftIntegerTypes { signed: kinds(false)?, unsigned: kinds(true)? })
+}
+
+/// Recognize a probe that failed only because the compiler rejects Microsoft integer suffixes.
+fn only_invalid_suffix_errors(diagnostics: &str) -> bool {
+    let mut found = false;
+    for line in diagnostics.lines().filter(|line| line.contains("error:")) {
+        if !line.contains("error: invalid suffix '") || !line.ends_with("' on integer constant") {
+            return false;
+        }
+        found = true;
+    }
+    found
 }
 
 /// Allow an optional offsetof proof to fail only when diagnostics belong exclusively to that optional
@@ -1767,6 +1875,7 @@ fn target_facts(
         preferred_alignments,
         offsetof_supported,
         ascii_execution_charset,
+        microsoft_integer_types,
         floating_types,
         evaluation_method,
         function_pointer,
@@ -1901,6 +2010,7 @@ fn target_facts(
         byte_order,
         c_standard,
         integers,
+        microsoft_integer_types,
         floating_point,
     })
 }

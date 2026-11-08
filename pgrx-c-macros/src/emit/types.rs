@@ -1389,6 +1389,7 @@ mod tests {
             c_standard: Some(201710),
             integers: [(kind, crate::IntegerType { kind, bits: 32, signed: false, rank: 3 })]
                 .into(),
+            microsoft_integer_types: None,
             floating_point: Default::default(),
         };
         let integer = TypeInfo {

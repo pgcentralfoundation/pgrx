@@ -299,6 +299,7 @@ mod tests {
                     byte_order: ByteOrder::Little,
                     c_standard: Some(201710),
                     integers,
+                    microsoft_integer_types: None,
                     floating_point: Default::default(),
                 },
                 signed_overflow: SignedOverflow::Wrapping,
