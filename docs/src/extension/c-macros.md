@@ -68,10 +68,11 @@ that inspects it, not only on the PostgreSQL version. For example, `Assert` in
 an `--enable-cassert` build reports its file and line, so a body that uses it
 keeps the native call. A body that converts a pointer where C requires a cast
 keeps it too, as PostgreSQL's MSVC atomics do: they pass a pointer to `uint32`
-where `InterlockedExchange` takes a pointer to `LONG`. A call that needs no `unsafe` with one installation can
-therefore need it with another. When one call must build against several
-installations, keep its `unsafe` block and allow `unused_unsafe`, as [the
-`DatumGetInt32` example](#choose-the-c-identity-of-an-input) does.
+where `InterlockedExchange` takes a pointer to `LONG`. A call that needs no
+`unsafe` with one installation can therefore need it with another. When one call
+must build against several installations, keep its `unsafe` block and allow
+`unused_unsafe`, as [the `DatumGetInt32`
+example](#choose-the-c-identity-of-an-input) does.
 
 Every native call goes through pgrx's FFI guard, which checks the thread and
 calls `sigsetjmp` each time. Where PostgreSQL defines a static inline function
