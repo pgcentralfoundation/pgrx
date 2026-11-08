@@ -25,12 +25,21 @@ filtered runs. Check ownership before using any option that recreates a database
 ## Usage and options
 
 ```text
-cargo pgrx regress [OPTIONS] [PG_VERSION] [TESTNAME]
+cargo pgrx regress [OPTIONS] [PG_VERSION] [TESTNAME]...
 ```
 
-The optional version is `pg15` through `pg19`; the test selector is a substring
-filter. A lone non-version argument is a filter. With two arguments the version
-must come first. `PG_VERSION` can supply the positional default.
+The optional version is `pg15` through `pg19` and must come first; a supported
+version label in a later position is an error, not a filter. Each `TESTNAME` is
+a substring filter, and a test runs when its name contains any of them:
+`cargo pgrx regress pg18 arrays spi` runs every test whose name contains
+`arrays` or `spi`. Each filter must match at least one test, so a typo fails the
+run instead of silently selecting nothing. Selected tests run in command-line
+order: `cargo pgrx regress pg18 spi arrays` runs the `spi` matches before the
+`arrays` matches. Tests matching the same filter run in sorted file order, and
+a test matching several filters runs once, at its first match. `setup.sql`, when
+included, runs first. All selected tests share one database, so each sees what
+`setup.sql` and earlier selected tests left behind. `PG_VERSION` can supply the
+positional default.
 
 | Flag | Meaning |
 |------|---------|
@@ -54,15 +63,16 @@ must come first. `PG_VERSION` can supply the positional default.
 | `-v` | Print diff contents as well as their location |
 
 `--dry-run` still resolves Cargo metadata and may create missing regression
-directories. It is not a substitute for inspecting the selected manifest and
-database before an actual run. `--pgdata` does not isolate this command; choose
-the private `PGRX_HOME` explicitly.
+directories. It prints an error for a filter that matches no test but still
+exits successfully. It is not a substitute for inspecting the selected manifest
+and database before an actual run. `--pgdata` does not isolate this command;
+choose the private `PGRX_HOME` explicitly.
 
 ## Expected-output workflow
 
 ```bash
 cargo pgrx regress pg18 -v
-cargo pgrx regress pg18 search_basic
+cargo pgrx regress pg18 search_basic search_phrase
 cargo pgrx regress pg18 --add my_new_test
 cargo pgrx regress pg18 --auto
 cargo pgrx regress pg18 --resetdb --repeat 5

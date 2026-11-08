@@ -687,7 +687,6 @@ Key flags:
 |------|----------------------------------------------------------------------------------------------|
 | `--resetdb` | Drop and recreate the test database (recommended for reproducible runs)                      |
 | `--add <name>` | Bootstrap a new test — implies `--resetdb`, runs `setup.sql`, promotes output to `expected/` |
-| `-t` / `--test-filter <string>` | Only run tests whose names contain this string                                               |
 | `-a` / `--auto` | Overwrite expected output for failed tests with actual output                                |
 | `-v` / `--verbose` | Print regression diffs to stderr on failure                                                  |
 | `--dry-run` | Print what would happen without doing it                                                     |
@@ -696,6 +695,7 @@ Key flags:
 | `--no-assemble-unreleased` | Don't assemble unreleased SQL fragments into the installed extension |
 | `-p` / `--package <name>` | Package to build (auto-detected in workspaces with a single pgrx extension)                  |
 | `[PG_VERSION]` | Postgres version (e.g., `pg18`). Optional — defaults to Cargo.toml's default feature         |
+| `[TESTNAME]...` | Only run tests whose names contain any of these strings, in the order given; each must match at least one test |
 
 Regression tests are split into `*.sql` files and `*.out` files.  The files themselves are organized into separate directories rooted at `./tests/pg_regress`.
 

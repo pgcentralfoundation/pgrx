@@ -26,22 +26,22 @@ use std::process::{Command, ExitStatus, Stdio};
 #[derive(clap::Args, Debug, Clone)]
 #[clap(author)]
 pub(crate) struct Regress {
-    /// Positional arguments: [pgXX] [testname]
+    /// Positional arguments: [pgXX] [testname]...
     ///
     /// `cargo pgrx regress` — run all tests against the default pg version
-    /// `cargo pgrx regress <testname>` — run a specific test against the default pg version
+    /// `cargo pgrx regress <testname>...` — run the tests whose names contain any of the testnames, in that order
     /// `cargo pgrx regress pgXX` — run all tests against the specified pg version
-    /// `cargo pgrx regress pgXX <testname>` — run a specific test against the specified pg version
-    #[clap(env = "PG_VERSION")]
+    /// `cargo pgrx regress pgXX <testname>...` — run the matching tests against the specified pg version
+    #[clap(env = "PG_VERSION", verbatim_doc_comment)]
     pub(crate) args: Vec<String>,
 
     /// Resolved pg_version (not a CLI arg)
     #[clap(skip)]
     pub(crate) pg_version: Option<String>,
 
-    /// Resolved test_filter (not a CLI arg)
+    /// Resolved test name filters (not a CLI arg)
     #[clap(skip)]
-    pub(crate) test_filter: Option<String>,
+    pub(crate) test_filters: Vec<String>,
 
     /// If specified, use this database name instead of the auto-generated version of `$extname_regress`
     #[clap(long)]
@@ -419,28 +419,19 @@ impl CommandExecute for Regress {
             let mut test_files = self.list_sql_tests(&manifest_path, created_db)?;
             let output_files = self.list_expected_outputs(&manifest_path, created_db)?;
 
-            // filter tests
-            if let Some(test_filter) = self.test_filter.as_ref() {
-                test_files.retain(|entry| {
-                    let name = make_test_name(entry);
-                    // keep setup.sql when the database was just created — it needs to run
-                    // even when filtering to a specific test
-                    (created_db && name == "setup") || name.contains(test_filter)
-                });
-                if test_files.is_empty() {
-                    println!(
-                        "{} no tests matching filter `{test_filter}`",
-                        "       ERROR".bold().red()
-                    );
-                    std::process::exit(1);
+            let unmatched = filter_tests(&mut test_files, &self.test_filters, make_test_name);
+            if !unmatched.is_empty() {
+                for filter in unmatched {
+                    println!("{} no tests matching filter `{filter}`", "       ERROR".bold().red());
                 }
+                std::process::exit(1);
             }
 
             // tests skipped on this Postgres version are reported, not run, and don't need
             // expected output
             let (test_files, version_skipped) = partition_version_skipped(test_files, pg_major)?;
 
-            if self.test_filter.is_some() {
+            if !self.test_filters.is_empty() {
                 // When the user explicitly filters, error if any matched test
                 // has no expected output (they should use --add first)
                 let output_names = output_files.iter().map(make_test_name).collect::<HashSet<_>>();
@@ -485,17 +476,17 @@ impl CommandExecute for Regress {
 }
 
 impl Regress {
-    /// Resolve the positional `args` vec into `pg_version` and `test_filter`.
+    /// Resolve the positional `args` vec into `pg_version` and `test_filters`.
     ///
-    /// - `cargo pgrx regress` → both None
-    /// - `cargo pgrx regress my_test` → test_filter = Some("my_test")
+    /// - `cargo pgrx regress` → no version, no filters
+    /// - `cargo pgrx regress a b` → test_filters = ["a", "b"]
     /// - `cargo pgrx regress pg16` → pg_version = Some("pg16")
-    /// - `cargo pgrx regress pg16 my_test` → pg_version = Some("pg16"), test_filter = Some("my_test")
+    /// - `cargo pgrx regress pg16 a b` → pg_version = Some("pg16"), test_filters = ["a", "b"]
     fn resolve_args(&mut self) {
         match Self::parse_args(&self.args) {
-            Ok((pg_version, test_filter)) => {
+            Ok((pg_version, test_filters)) => {
                 self.pg_version = pg_version;
-                self.test_filter = test_filter;
+                self.test_filters = test_filters;
             }
             Err(message) => {
                 eprintln!("{} {message}", "       ERROR".bold().red());
@@ -504,28 +495,27 @@ impl Regress {
         }
     }
 
-    fn parse_args(args: &[String]) -> Result<(Option<String>, Option<String>), String> {
+    fn parse_args(args: &[String]) -> Result<(Option<String>, Vec<String>), String> {
         super::reject_removed_pg_version(args.first().map(String::as_str))
             .map_err(|err| err.to_string())?;
         fn is_supported_pg_version_label(label: &str) -> bool {
             parse_pg_major(label).is_some_and(is_supported_major_version)
         }
 
-        match args {
-            [] => Ok((None, None)),
-            [only] if is_supported_pg_version_label(only) => Ok((Some(only.clone()), None)),
-            [only] => Ok((None, Some(only.clone()))),
-            [first, second] if is_supported_pg_version_label(first) => {
-                Ok((Some(first.clone()), Some(second.clone())))
+        let (pg_version, test_filters) = match args {
+            [first, rest @ ..] if is_supported_pg_version_label(first) => {
+                (Some(first.clone()), rest)
             }
-            [first, _second] => Err(format!(
-                "first positional argument must be a PostgreSQL version (e.g., pg16), got `{first}`"
-            )),
-            _ => {
-                Err("too many positional arguments. Usage: cargo pgrx regress [pgXX] [testname]"
-                    .into())
-            }
+            _ => (None, args),
+        };
+        // A version label after the first position is almost certainly a misplaced version, not
+        // a test filter.
+        if let Some(label) = test_filters.iter().find(|arg| is_supported_pg_version_label(arg)) {
+            return Err(format!(
+                "only the first positional argument may be a PostgreSQL version, got `{label}`"
+            ));
         }
+        Ok((pg_version, test_filters.to_vec()))
     }
 
     /// Handle the --add flag: bootstrap a single new test.
@@ -679,7 +669,10 @@ impl Regress {
         };
 
         // List test files (without setup, then report)
-        let test_files = self.list_sql_tests(manifest_path, false)?;
+        let mut test_files = self.list_sql_tests(manifest_path, false)?;
+        for filter in filter_tests(&mut test_files, &self.test_filters, make_test_name) {
+            println!("{} no tests matching filter `{filter}`", "       ERROR".bold().red());
+        }
         let output_files = self.list_expected_outputs(manifest_path, false)?;
         let output_names = output_files.iter().map(make_test_name).collect::<HashSet<_>>();
 
@@ -688,11 +681,6 @@ impl Regress {
         let mut skipped = Vec::new();
         for entry in &test_files {
             let name = make_test_name(entry);
-            if let Some(ref filter) = self.test_filter
-                && !name.contains(filter)
-            {
-                continue;
-            }
             if let Some(pg_major) = pg_major
                 && let Some(directive) = read_version_directive(entry)?
                 && directive.skips(pg_major)
@@ -1112,6 +1100,43 @@ fn decorate_output(mut line: String) -> Option<(String, Option<TestResult>)> {
     Some((decorated, test_result))
 }
 
+/// Keep the tests whose names contain any of `filters`, and return the filters that matched no
+/// test.  Kept tests are ordered by the first filter each matches; tests matching the same filter
+/// keep their existing order.  Without filters, `tests` is unchanged.  `setup` is always kept and
+/// moved first: it is listed only when the database was just created, and the selected tests
+/// depend on it.
+fn filter_tests<'f, T>(
+    tests: &mut Vec<T>,
+    filters: &'f [String],
+    test_name: impl Fn(&T) -> String,
+) -> Vec<&'f str> {
+    if filters.is_empty() {
+        return Vec::new();
+    }
+    let mut matched = vec![false; filters.len()];
+    // `None` sorts before every `Some`, which puts `setup` ahead of the filtered tests
+    let mut selected: Vec<(Option<usize>, T)> = Vec::with_capacity(tests.len());
+    for test in tests.drain(..) {
+        let name = test_name(&test);
+        let mut first_match = None;
+        for (idx, filter) in filters.iter().enumerate() {
+            if name.contains(filter.as_str()) {
+                matched[idx] = true;
+                first_match.get_or_insert(idx);
+            }
+        }
+        if name == "setup" {
+            selected.push((None, test));
+        } else if let Some(idx) = first_match {
+            selected.push((Some(idx), test));
+        }
+    }
+    // must be a stable sort to keep the existing order among tests matching the same filter
+    selected.sort_by_key(|(first_match, _)| *first_match);
+    tests.extend(selected.into_iter().map(|(_, test)| test));
+    filters.iter().zip(matched).filter(|(_, matched)| !matched).map(|(f, _)| f.as_str()).collect()
+}
+
 fn make_test_name(entry: &DirEntry) -> String {
     let filename = entry.file_name();
     let filename = filename.to_str().unwrap_or_else(|| panic!("bogus file name: {entry:?}"));
@@ -1180,7 +1205,7 @@ fn is_git_repo(git: &Path) -> bool {
 
 #[cfg(test)]
 mod tests {
-    use super::{Regress, VersionDirective};
+    use super::{Regress, VersionDirective, filter_tests};
 
     #[test]
     fn version_directive_absent() {
@@ -1249,41 +1274,85 @@ mod tests {
     }
 
     #[test]
-    fn parse_args_treats_single_non_version_as_test_filter() {
-        let (pg_version, test_filter) = Regress::parse_args(&strings(&["cursor_coverage"]))
+    fn parse_args_treats_non_versions_as_test_filters() {
+        let (pg_version, test_filters) = Regress::parse_args(&strings(&["cursor_coverage"]))
             .expect("single test name should parse");
-
         assert_eq!(pg_version, None);
-        assert_eq!(test_filter.as_deref(), Some("cursor_coverage"));
+        assert_eq!(test_filters, strings(&["cursor_coverage"]));
+
+        let (pg_version, test_filters) =
+            Regress::parse_args(&strings(&["cursor_coverage", "spi", "arrays"]))
+                .expect("several test names should parse");
+        assert_eq!(pg_version, None);
+        assert_eq!(test_filters, strings(&["cursor_coverage", "spi", "arrays"]));
     }
 
     #[test]
-    fn parse_args_accepts_pg_version_then_test_filter() {
-        let (pg_version, test_filter) = Regress::parse_args(&strings(&["pg16", "cursor_coverage"]))
-            .expect("pg version plus test filter should parse");
-
+    fn parse_args_accepts_pg_version_then_test_filters() {
+        let (pg_version, test_filters) =
+            Regress::parse_args(&strings(&["pg16"])).expect("pg version alone should parse");
         assert_eq!(pg_version.as_deref(), Some("pg16"));
-        assert_eq!(test_filter.as_deref(), Some("cursor_coverage"));
+        assert!(test_filters.is_empty());
+
+        let (pg_version, test_filters) =
+            Regress::parse_args(&strings(&["pg16", "cursor_coverage", "spi"]))
+                .expect("pg version plus test filters should parse");
+        assert_eq!(pg_version.as_deref(), Some("pg16"));
+        assert_eq!(test_filters, strings(&["cursor_coverage", "spi"]));
     }
 
     #[test]
-    fn parse_args_rejects_test_filter_then_pg_version() {
-        let err = Regress::parse_args(&strings(&["cursor_coverage", "pg16"]))
-            .expect_err("reversed positional order should still fail");
-
-        assert_eq!(
-            err,
-            "first positional argument must be a PostgreSQL version (e.g., pg16), got `cursor_coverage`"
-        );
+    fn parse_args_rejects_pg_version_after_first_position() {
+        for args in [&["cursor_coverage", "pg16"][..], &["pg16", "spi", "pg17"]] {
+            let err = Regress::parse_args(&strings(args))
+                .expect_err("a version after the first position should fail");
+            assert_eq!(
+                err,
+                format!(
+                    "only the first positional argument may be a PostgreSQL version, got `{}`",
+                    args.last().unwrap()
+                )
+            );
+        }
     }
 
     #[test]
     fn parse_args_does_not_treat_unsupported_pg_label_as_version() {
-        let (pg_version, test_filter) = Regress::parse_args(&strings(&["pg99"]))
+        let (pg_version, test_filters) = Regress::parse_args(&strings(&["pg99", "pg16_compat"]))
             .expect("unsupported pg label should fall back to test filter");
 
         assert_eq!(pg_version, None);
-        assert_eq!(test_filter.as_deref(), Some("pg99"));
+        assert_eq!(test_filters, strings(&["pg99", "pg16_compat"]));
+    }
+
+    #[test]
+    fn filter_tests_orders_tests_by_first_matching_filter() {
+        let mut tests = strings(&["arrays", "cursor", "setup", "spi_cursor", "strings", "types"]);
+        // `spi_cursor` matches both `cursor` and `spi`; it runs once, at `cursor`
+        let filters = strings(&["str", "cursor", "spi", "arr"]);
+        let unmatched = filter_tests(&mut tests, &filters, String::clone);
+
+        assert!(unmatched.is_empty());
+        assert_eq!(tests, strings(&["setup", "strings", "cursor", "spi_cursor", "arrays"]));
+    }
+
+    #[test]
+    fn filter_tests_reports_each_unmatched_filter() {
+        let mut tests = strings(&["setup", "arrays", "cursor"]);
+        let filters = strings(&["arr", "typo", "cursr"]);
+        let unmatched = filter_tests(&mut tests, &filters, String::clone);
+
+        assert_eq!(unmatched, ["typo", "cursr"]);
+        assert_eq!(tests, strings(&["setup", "arrays"]));
+    }
+
+    #[test]
+    fn filter_tests_without_filters_keeps_everything() {
+        let mut tests = strings(&["setup", "arrays", "cursor"]);
+        let unmatched = filter_tests(&mut tests, &[], String::clone);
+
+        assert!(unmatched.is_empty());
+        assert_eq!(tests, strings(&["setup", "arrays", "cursor"]));
     }
 
     #[test]
