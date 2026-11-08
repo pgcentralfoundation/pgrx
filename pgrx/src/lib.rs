@@ -230,15 +230,14 @@ const _: () = {
 
 /// A macro for marking a library compatible with [`pgrx`][crate].
 ///
-/// <div class="example-wrap" style="display:inline-block">
-/// <pre class="ignore" style="white-space:normal;font:inherit;">
+/// <div class="warning">
 ///
 /// **Note**: Every [`pgrx`][crate] extension **must** have this macro called at top level
 /// (usually `src/lib.rs`) to be valid. You can use `pg_module_magic!()`,
 /// `pg_module_magic!(name, version)` or `pg_module_magic!(name = c"custom_name", version =
 /// c"1.0.0")`
 ///
-/// </pre></div>
+/// </div>
 ///
 /// This calls [`pg_magic_func!()`](pg_magic_func), which also records the extension that
 /// [`rust_regtypein`] looks the library's types up in. That extension is
@@ -253,13 +252,12 @@ macro_rules! pg_module_magic {
 
 /// Create the `Pg_magic_func` required by PGRX in extensions.
 ///
-/// <div class="example-wrap" style="display:inline-block">
-/// <pre class="ignore" style="white-space:normal;font:inherit;">
+/// <div class="warning">
 ///
 /// **Note**: Generally [`pg_module_magic`] is preferred, and results in this macro being called.
 /// This macro should only be directly called in advanced use cases.
 ///
-/// </pre></div>
+/// </div>
 ///
 /// Creates a “magic block” that describes the capabilities of the extension to
 /// Postgres at runtime. From the [Dynamic Loading] section of the upstream documentation:
