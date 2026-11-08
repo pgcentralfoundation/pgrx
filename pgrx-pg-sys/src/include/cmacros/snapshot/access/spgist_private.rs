@@ -2048,13 +2048,17 @@ macro_rules! SpGistBlockIsRoot {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
+///
+/// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! SpGistGetFillFactor {
     ($relation:expr $(,)?) => {
@@ -2154,13 +2158,17 @@ macro_rules! SpGistGetFillFactor {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
+///
+/// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Integer division/remainder rejects zero divisors and signed MIN / -1 overflow. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. Integer division/remainder rejects zero divisors and signed MIN / -1 overflow. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! SpGistGetTargetPageFreeSpace {
     ($relation:expr $(,)?) => {
@@ -2310,7 +2318,230 @@ macro_rules! SpGistGetTargetPageFreeSpace {
         )
     };
 }
-/// C macro SpGistPageGetFreeSpace from spgist_private.h:457 (PostgreSQL 15–18), spgist_private.h:459 (PostgreSQL 19)
+#[cfg(feature = "pg15")]
+/// C macro SpGistPageGetFreeSpace from spgist_private.h:457 (PostgreSQL 15)
+///
+/// ```text
+/// #define SpGistPageGetFreeSpace( p , n ) ( PageGetExactFreeSpace ( p ) + Min ( SpGistPageGetOpaque ( p ) -> nPlaceholder , n ) * ( SGDTSIZE + sizeof ( ItemIdData ) ) )
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
+///
+/// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! SpGistPageGetFreeSpace {
+    ($p:expr, $n:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$p;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                        $crate::__pgrx_c_macros::expression::add::<
+                            $crate::__pgrx_c_macros::Wrapping,
+                            _,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                        $crate::__pgrx_c_macros::CUnsignedLong,
+                                        usize
+                                    >>()
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                                $crate::__pgrx_c_macros::expression::mul::<
+                                    $crate::__pgrx_c_macros::Wrapping,
+                                    _,
+                                    _
+                                >(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            false,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::select(
+                                                if $crate::__pgrx_c_macros::expression::truth(
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        false,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                                            $crate::__pgrx_c_macros::CInt
+                                                        >()
+                                                    )
+                                                ) {
+                                                    $crate::__pgrx_c_macros::Either::Left(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                false,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::load(
+                                                                    $crate::__pgrx_c_macros::expression::project::<
+                                                                        $crate::__pgrx_c_generated::Field_nPlaceholder,
+                                                                        _,
+                                                                        _
+                                                                    >(
+                                                                        $crate::__pgrx_c_macros::expression::pointee(
+                                                                            (
+                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                    false,
+                                                                                    _
+                                                                                >(
+                                                                                    $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                                                $crate::__pgrx_c_bindings::SpGistPageOpaqueData
+                                                                                            >,
+                                                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                                                        >>()
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                } else {
+                                                    $crate::__pgrx_c_macros::Either::Right(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                false,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_operand!(
+                                                                    @value [false];
+                                                                    (@native [$n])
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                }
+                                            )
+                                        )
+                                    ),
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            false,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::add::<
+                                                $crate::__pgrx_c_macros::Wrapping,
+                                                _,
+                                                _
+                                            >(
+                                                (
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        false,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::expression::bitand(
+                                                            (
+                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                    false,
+                                                                    _
+                                                                >(
+                                                                    $crate::__pgrx_c_macros::expression::add::<
+                                                                        $crate::__pgrx_c_macros::Wrapping,
+                                                                        _,
+                                                                        _
+                                                                    >(
+                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                            false,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                $crate::__pgrx_c_types::uintptr_t
+                                                                            >()
+                                                                        ),
+                                                                        (
+                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                false,
+                                                                                _
+                                                                            >(
+                                                                                $crate::__pgrx_c_macros::expression::sub::<
+                                                                                    $crate::__pgrx_c_macros::Wrapping,
+                                                                                    _,
+                                                                                    _
+                                                                                >(
+                                                                                    (
+                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                            false,
+                                                                                            _
+                                                                                        >(
+                                                                                            $crate::__pgrx_c_macros::CValue::<
+                                                                                                $crate::__pgrx_c_macros::CInt
+                                                                                            >::new(
+                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
+                                                                                            )
+                                                                                        )
+                                                                                    ),
+                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                        false,
+                                                                                        _
+                                                                                    >(
+                                                                                        $crate::__pgrx_c_macros::CValue::<
+                                                                                            $crate::__pgrx_c_macros::CInt
+                                                                                        >::new(1i32)
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                            ),
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                false,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::bitnot(
+                                                                    (
+                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                            false,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                $crate::__pgrx_c_types::uintptr_t
+                                                                            >()
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                ),
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    false,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::type_witness::<
+                                                        $crate::__pgrx_c_macros::CSize
+                                                    >()
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
+    };
+}
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
+/// C macro SpGistPageGetFreeSpace from spgist_private.h:457 (PostgreSQL 16–18), spgist_private.h:459 (PostgreSQL 19)
 ///
 /// ```text
 /// #define SpGistPageGetFreeSpace( p , n ) ( PageGetExactFreeSpace ( p ) + Min ( SpGistPageGetOpaque ( p ) -> nPlaceholder , n ) * ( SGDTSIZE + sizeof ( ItemIdData ) ) )
@@ -2570,13 +2801,17 @@ macro_rules! SpGistPageGetMeta {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
+///
+/// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! SpGistPageGetOpaque {
     ($page:expr $(,)?) => {
@@ -2642,13 +2877,17 @@ macro_rules! SpGistPageGetOpaque {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
+///
+/// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! SpGistPageIsDeleted {
     ($page:expr $(,)?) => {
@@ -2766,13 +3005,17 @@ macro_rules! SpGistPageIsDeleted {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
+///
+/// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! SpGistPageIsLeaf {
     ($page:expr $(,)?) => {
@@ -2890,13 +3133,17 @@ macro_rules! SpGistPageIsLeaf {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
+///
+/// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! SpGistPageIsMeta {
     ($page:expr $(,)?) => {
@@ -3014,13 +3261,17 @@ macro_rules! SpGistPageIsMeta {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
+///
+/// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! SpGistPageStoresNulls {
     ($page:expr $(,)?) => {

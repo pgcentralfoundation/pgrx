@@ -27,10 +27,6 @@ pub use nodeFuncs::*;
 mod nodes;
 #[allow(unused_imports)]
 pub use nodes::*;
-#[path = "parsenodes.rs"]
-mod parsenodes;
-#[allow(unused_imports)]
-pub use parsenodes::*;
 #[path = "pathnodes.rs"]
 mod pathnodes;
 #[allow(unused_imports)]

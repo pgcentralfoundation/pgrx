@@ -325,7 +325,7 @@ macro_rules! ExecProcNode {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// Typed call adapter for C inline function ExecProject from executor.h:367 (PostgreSQL 15), executor.h:378 (PostgreSQL 16), executor.h:379 (PostgreSQL 17)
+/// C inline function ExecProject from executor.h:367 (PostgreSQL 15), executor.h:378 (PostgreSQL 16), executor.h:379 (PostgreSQL 17)
 ///
 /// ```c
 /// static inline TupleTableSlot *
@@ -357,7 +357,7 @@ macro_rules! ExecProcNode {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -365,22 +365,20 @@ macro_rules! ExecProcNode {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! ExecProject {
     ($projInfo:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$projInfo;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CRecord<
-                                $crate::__pgrx_c_bindings::TupleTableSlot
-                            >,
-                            $crate::__pgrx_c_macros::expression::ReadWrite
-                        >>()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_macros::expression::CPointer<
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::TupleTableSlot
+                        >,
+                        $crate::__pgrx_c_macros::expression::ReadWrite
+                    >>()
             }
         )
     };
@@ -494,7 +492,7 @@ macro_rules! ExecQual {
         )
     };
 }
-/// Typed call adapter for C inline function ExecQualAndReset from executor.h:431 (PostgreSQL 15), executor.h:442 (PostgreSQL 16), executor.h:443 (PostgreSQL 17), executor.h:541 (PostgreSQL 18), executor.h:553 (PostgreSQL 19)
+/// C inline function ExecQualAndReset from executor.h:431 (PostgreSQL 15), executor.h:442 (PostgreSQL 16), executor.h:443 (PostgreSQL 17), executor.h:541 (PostgreSQL 18), executor.h:553 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -509,7 +507,7 @@ macro_rules! ExecQual {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -525,11 +523,7 @@ macro_rules! ExecQualAndReset {
             @value {
                 let _ = &$state;
                 let _ = &$econtext;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
