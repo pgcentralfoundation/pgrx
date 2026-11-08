@@ -97,10 +97,10 @@ function adapter evaluates each argument once, while a C macro keeps its
 original argument repetition. Generated docs distinguish the two and show the
 original definition. Genuine signature changes can still require caller changes.
 
-Generated macros are runtime code. The removed `const fn` ports
-`pg_sys::TYPEALIGN` and `pg_sys::MAXALIGN` have no `const` replacement; in a
-constant, compute the alignment in Rust, for example
-`len.next_multiple_of(pg_sys::MAXIMUM_ALIGNOF as usize)`.
+Generated macros are runtime code. In place of the removed `const fn` ports
+`pg_sys::TYPEALIGN` and `pg_sys::MAXALIGN`, use `pg_sys::typealign` and
+`pg_sys::maxalign` in a constant. They and the rest of `pg_sys::align`, such as
+`maxalign_down` and `bufferalign`, take and return `usize` and are `const fn`.
 
 ### Other removed helpers
 
