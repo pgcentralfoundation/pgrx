@@ -122,3 +122,13 @@ pub use pg19::*;
 mod snapshot;
 #[cfg(docsrs)]
 pub use snapshot::*;
+
+/// Stand in for the generated macro that defines Rust functions for translated static
+/// inline functions. Snapshots generate no functions, so the guarded bindings of the
+/// same names keep their documentation.
+#[cfg(docsrs)]
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_inline_functions {
+    () => {};
+}

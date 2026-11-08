@@ -363,9 +363,14 @@ fn gated_names(build: &Build) -> BTreeMap<String, Vec<PathBuf>> {
     gated
 }
 
+/// Generated support macros that pgrx calls. They translate no C macro, so the report never
+/// lists them; every build that generates macros emits them.
+const SUPPORT_MACROS: &[&str] = &["__pgrx_c_inline_functions"];
+
 /// Map each generated macro that pgrx, or pgrx-macros' output templates, calls as
 /// `pg_sys::NAME!` or `pgrx_pg_sys::NAME!` in code `build` compiles to the files that call it.
-/// pgrx-pg-sys's own exported macros, such as `error!`, are not generated and are left out.
+/// pgrx-pg-sys's own exported macros, such as `error!`, are not generated and are left out,
+/// as are the generated support macros.
 fn called_names(build: &Build) -> BTreeMap<String, Vec<PathBuf>> {
     let workspace = Path::new(env!("CARGO_MANIFEST_DIR")).parent().unwrap();
     let handwritten = exported_macros(&workspace.join("pgrx-pg-sys/src"));
@@ -379,7 +384,9 @@ fn called_names(build: &Build) -> BTreeMap<String, Vec<PathBuf>> {
             let found = file_calls(&source, directory, build);
             calls_found += found.names.len();
             let relative = file.strip_prefix(workspace).unwrap().to_owned();
-            for name in found.names.into_iter().filter(|name| !handwritten.contains(name)) {
+            for name in found.names.into_iter().filter(|name| {
+                !handwritten.contains(name) && !SUPPORT_MACROS.contains(&name.as_str())
+            }) {
                 let users = called.entry(name).or_default();
                 if !users.contains(&relative) {
                     users.push(relative.clone());

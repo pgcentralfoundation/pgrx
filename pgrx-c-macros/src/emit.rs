@@ -75,6 +75,8 @@ mod statements;
 mod typed;
 /// Shared reconciliation of compiler C identity with fresh Rust binding storage.
 mod types;
+/// Rust functions that run translated static inline functions under their binding names.
+mod wrappers;
 
 /// Names and values in the defining Rust crate, supplied by its binding generator.
 ///
@@ -110,6 +112,12 @@ pub struct BindingCatalog {
     /// Optional crate-relative guard for native adapters that may call PostgreSQL.
     #[serde(skip)]
     pub ffi_boundary: Option<Vec<String>>,
+    /// Optional crate-relative function that panics off the thread allowed to call
+    /// PostgreSQL. When it and [`Self::ffi_boundary`] are set, batch generation also renders
+    /// [`MacroGeneration::functions`], which replace guarded bindings and run this check
+    /// before a translation that reads or writes a C global.
+    #[serde(skip)]
+    pub thread_check: Option<Vec<String>>,
 }
 
 impl BindingCatalog {
@@ -749,6 +757,13 @@ pub struct MacroGeneration {
     pub macros: Vec<MacroEmission>,
     /// Only the shared Rust and native C support retained by successful roots.
     pub support: MacroSupportArtifact,
+    /// An exported macro, `__pgrx_c_inline_functions!()`, whose expansion defines a Rust
+    /// function for each translated static inline function, with its binding's name and
+    /// signature. Empty unless [`BindingCatalog::thread_check`] and
+    /// [`BindingCatalog::ffi_boundary`] are set. Include it with the
+    /// macros, and invoke it from a dependent crate, in a module that glob-imports the
+    /// bindings: a crate cannot expand its own `include!`-generated exported macros by path.
+    pub functions: String,
 }
 
 /// Prepare the selected macros and their shared capabilities from one trusted session.
@@ -799,11 +814,12 @@ pub fn generate_with_bindings(
         // Marker identities depend on C/ABI facts, not the requested root set.
         adapters = generated_adapters(session, &final_requests, bindings)?;
     }
+    let functions = wrappers::render(session, &macros, bindings, &adapters)?;
     let mut support = render_adapters(adapters, &macros)?;
     if let Ok(alignment) = crate::support_alignment_profile(session.frontend().profile()) {
         support.rust.push_str(&alignment);
     }
-    Ok(MacroGeneration { macros, support })
+    Ok(MacroGeneration { macros, support, functions })
 }
 
 /// Generate the complete batch and return its mutually consistent support artifacts.
