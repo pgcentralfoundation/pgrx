@@ -530,6 +530,7 @@
 #include "utils/sortsupport.h"
 #include "utils/spccache.h"
 #include "utils/syscache.h"
+#include "utils/timeout.h"
 #include "utils/tuplesort.h"
 #include "utils/tuplestore.h"
 #include "utils/typcache.h"
