@@ -140,6 +140,29 @@ impl From<CExpression<CValue<CSize>>> for usize {
         value.get_usize()
     }
 }
+/// Convert an integer result to a Rust integer type, checking that the value fits.
+impl<K: CInteger> CExpression<CValue<K>> {
+    /// Extract this integer result as `T`, panicking if the value does not fit.
+    ///
+    /// Use this where a result's C type differs between PostgreSQL versions, such as
+    /// `PageGetMaxOffsetNumber`, whose result is `size_t` on PG15 and `OffsetNumber` on PG16
+    /// and later. `.get() as T` builds against both but truncates without a check, and Clippy
+    /// reports it as an unnecessary cast where the types already match.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the value does not fit in `T`.
+    #[track_caller]
+    pub fn get_as<T: TryFrom<K::Repr>>(self) -> T {
+        let value = self.0.get();
+        match T::try_from(value) {
+            Ok(converted) => converted,
+            Err(_) => {
+                panic!("C macro result {value:?} does not fit in {}", core::any::type_name::<T>())
+            }
+        }
+    }
+}
 /// Convert a scalar result to a Rust condition using C's zero/null test.
 impl<V: Truth> CExpression<V> {
     /// Test this already evaluated scalar without repeating its operands.
@@ -256,6 +279,21 @@ mod tests {
         assert_eq!(finish(input(usize::MAX)).get_usize(), usize::MAX);
         assert_eq!(finish(input(0_usize)).get_usize(), 0);
         assert_eq!(usize::from(finish(input(33_usize))), 33);
+    }
+
+    /// Integer results convert to any Rust integer type that holds the value.
+    #[test]
+    fn integer_results_extract_as_any_type_that_fits() {
+        assert_eq!(finish(input(300_i32)).get_as::<u16>(), 300);
+        assert_eq!(finish(input(-1_i32)).get_as::<i64>(), -1);
+        assert_eq!(finish(input(7_usize)).get_as::<u16>(), 7);
+    }
+
+    /// A value that does not fit panics instead of truncating.
+    #[test]
+    #[should_panic(expected = "does not fit in u16")]
+    fn integer_results_reject_a_type_that_cannot_hold_the_value() {
+        finish(input(-1_i32)).get_as::<u16>();
     }
 
     /// Verify return conversion narrows integers and tests Boolean truth before native result extraction.
