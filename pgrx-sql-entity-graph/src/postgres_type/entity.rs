@@ -315,24 +315,24 @@ impl ToSql for PostgresTypeEntity<'_> {
                 let receive_fn = function_name(&receive_fn_path);
                 let send_fn = function_name(&send_fn_path);
                 (
-                    format! {
+                    format!(
                         "\
                         \tRECEIVE = {schema_prefix_receive_fn}{receive_fn}, /* {receive_fn_path} */\n\
                         \tSEND = {schema_prefix_send_fn}{send_fn}, /* {send_fn_path} */\n\
                         ",
                         schema_prefix_receive_fn = context.schema_prefix_for(&receive_fn_graph_index),
                         schema_prefix_send_fn = context.schema_prefix_for(&send_fn_graph_index),
-                    },
-                    format! {
+                    ),
+                    format!(
                         "\n\
                         {receive_fn_sql}\n\
                         {send_fn_sql}\n\
                         "
-                    }
+                    )
                 )
             }).unwrap_or_default();
 
-        let materialized_type = format! {
+        let materialized_type = format!(
             "\n\
                 -- {file}:{line}\n\
                 -- {full_path}\n\
@@ -347,7 +347,7 @@ impl ToSql for PostgresTypeEntity<'_> {
             schema = context.schema_prefix_for(&self_index),
             schema_prefix_in_fn = context.schema_prefix_for(&in_fn_graph_index),
             schema_prefix_out_fn = context.schema_prefix_for(&out_fn_graph_index)
-        };
+        );
 
         let result = shell_type
             + "\n"

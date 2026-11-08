@@ -198,10 +198,8 @@ pub(crate) fn render_aggregate_argtypes(
     let render_slot = |arg: &AggregateTypeEntity| -> eyre::Result<String> {
         let slot = arg.name.unwrap_or("aggregate argument");
         let prefix = context.schema_prefix_for_used_type(&owner, slot, &arg.used_ty)?;
-        let sql = match arg.used_ty.metadata.argument_sql {
-            Ok(ref mapping) => aggregate_sql_type(mapping, arg.used_ty.composite_type)?,
-            Err(err) => return Err(err.into()),
-        };
+        let mapping = arg.used_ty.metadata.argument_sql.as_ref().map_err(|err| *err)?;
+        let sql = aggregate_sql_type(mapping, arg.used_ty.composite_type)?;
         let variadic = if arg.used_ty.variadic { "VARIADIC " } else { "" };
         Ok(format!("{variadic}{prefix}{sql}"))
     };

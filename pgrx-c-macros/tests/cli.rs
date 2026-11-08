@@ -55,9 +55,9 @@ impl TestConfig {
         let wrapper =
             Path::new(env!("CARGO_MANIFEST_DIR")).join(format!("include/pg{major_version}.h"));
         let wrapper = std::fs::read_to_string(wrapper).unwrap();
-        for include in wrapper.lines().filter_map(|line| {
-            line.trim().strip_prefix("#include \"").and_then(|include| include.strip_suffix('"'))
-        }) {
+        for include in
+            wrapper.lines().filter_map(|line| line.trim().strip_circumfix("#include \"", '"'))
+        {
             let header = config.include_dir.join(include);
             std::fs::create_dir_all(header.parent().unwrap()).unwrap();
             std::fs::write(header, "").unwrap();

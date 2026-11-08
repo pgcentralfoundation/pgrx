@@ -3646,7 +3646,9 @@ mod tests {
             let sections = u16::from_le_bytes(bytes[2..4].try_into().unwrap()) as usize;
             let optional = u16::from_le_bytes(bytes[16..18].try_into().unwrap()) as usize;
             let section = bytes[20 + optional..20 + optional + sections * 40]
-                .chunks_exact(40)
+                .as_chunks::<40>()
+                .0
+                .iter()
                 .find(|section| &section[..8] == b".drectve")
                 .expect("MSVC native objects retain POSIX compatibility linker directives");
             let length = u32::from_le_bytes(section[16..20].try_into().unwrap()) as usize;

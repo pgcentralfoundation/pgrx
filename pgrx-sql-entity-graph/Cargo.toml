@@ -41,5 +41,5 @@ owo-colors = { optional = true, workspace = true }
 syntect = { version = "5.3.0", default-features = false, features = ["default-fancy"], optional = true }
 
 [lints.clippy]
-assigning-clones = "allow" # wrong diagnosis and wrong suggestions
-too-many-arguments = "allow" # I argue with myself all the time
+assigning_clones = "allow" # wrong diagnosis and wrong suggestions
+too_many_arguments = "allow" # I argue with myself all the time

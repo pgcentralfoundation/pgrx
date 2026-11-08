@@ -29,4 +29,4 @@ serde_json.workspace = true
 tempfile = "3.27.0"
 
 [lints.rust]
-unsafe-op-in-unsafe-fn = "allow"
+unsafe_op_in_unsafe_fn = "allow"

@@ -133,6 +133,14 @@ impl Parse for Schema {
     fn parse(input: ParseStream) -> Result<Self, syn::Error> {
         let module: ItemMod = input.parse()?;
         crate::ident_is_acceptable_to_postgres(&module.ident)?;
+        // Since Rust 1.99 an attribute on `mod name;` reaches the macro, but only as that
+        // declaration. The items live in another file that the macro cannot read.
+        if module.content.is_none() {
+            return Err(syn::Error::new_spanned(
+                &module,
+                "`#[pg_schema]` requires an inline module: `mod name { ... }`",
+            ));
+        }
         Ok(Self { module })
     }
 }

@@ -107,8 +107,8 @@ error[E0308]: mismatched types
 8 | #[pg_extern]
   | ^^^^^^^^^^^^ one type is more general than the other
   |
-  = note: expected struct `pgrx::prelude::PgHeapTuple<'arr, pgrx::AllocatedByRust>`
-             found struct `pgrx::prelude::PgHeapTuple<'_, pgrx::AllocatedByRust>`
+  = note: expected struct `PgHeapTuple<'arr, AllocatedByRust>`
+             found struct `PgHeapTuple<'_, AllocatedByRust>`
 note: the lifetime requirement is introduced here
  --> $WORKSPACE/pgrx/src/callconv.rs
   |
@@ -122,8 +122,8 @@ error[E0308]: mismatched types
 23 | #[pg_extern]
    | ^^^^^^^^^^^^ one type is more general than the other
    |
-   = note: expected struct `pgrx::prelude::PgHeapTuple<'arr, pgrx::AllocatedByRust>`
-              found struct `pgrx::prelude::PgHeapTuple<'_, pgrx::AllocatedByRust>`
+   = note: expected struct `PgHeapTuple<'arr, AllocatedByRust>`
+              found struct `PgHeapTuple<'_, AllocatedByRust>`
 note: the lifetime requirement is introduced here
   --> $WORKSPACE/pgrx/src/callconv.rs
    |
@@ -137,8 +137,8 @@ error[E0308]: mismatched types
 39 | #[pg_extern]
    | ^^^^^^^^^^^^ one type is more general than the other
    |
-   = note: expected struct `pgrx::prelude::PgHeapTuple<'arr, pgrx::AllocatedByRust>`
-              found struct `pgrx::prelude::PgHeapTuple<'_, pgrx::AllocatedByRust>`
+   = note: expected struct `PgHeapTuple<'arr, AllocatedByRust>`
+              found struct `PgHeapTuple<'_, AllocatedByRust>`
 note: the lifetime requirement is introduced here
   --> $WORKSPACE/pgrx/src/callconv.rs
    |

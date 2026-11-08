@@ -130,16 +130,12 @@ mod vectors {
         // and https://www.reddit.com/r/rust/comments/13q56bp/comment/jlgq2t6/?utm_source=share&utm_medium=web2x&context=3
         //
         // the expectation here is that the compiler will autovectorize this code using SIMD
-        use std::convert::TryInto;
-
         const LANES: usize = 16;
 
         let values = values.as_slice()?;
-        let chunks = values.chunks_exact(LANES);
-        let remainder = chunks.remainder();
+        let (chunks, remainder) = values.as_chunks::<LANES>();
 
-        let sum = chunks.fold([0.0f32; LANES], |mut acc, chunk| {
-            let chunk: [f32; LANES] = chunk.try_into().unwrap();
+        let sum = chunks.iter().fold([0.0f32; LANES], |mut acc, chunk| {
             for i in 0..LANES {
                 acc[i] += chunk[i];
             }

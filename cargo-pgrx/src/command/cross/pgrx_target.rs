@@ -125,5 +125,5 @@ fn make_target_info(cmd: &PgrxTarget, tmp: &Path) -> Result<()> {
 fn run(c: &mut Command) -> Result<()> {
     c.stdout(Stdio::inherit()).stderr(Stdio::inherit());
     let status = c.status().wrap_err("Unable to create temporary crate")?;
-    if !status.success() { Err(eyre!("{c:?} failed with exit code: {status}")) } else { Ok(()) }
+    status.success().ok_or_else(|| eyre!("{c:?} failed with exit code: {status}"))
 }

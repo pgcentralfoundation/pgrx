@@ -103,12 +103,13 @@ error[E0277]: the trait bound `std::result::Result<MissingSqlType, std::io::Erro
 9 | fn returns_result_missing_sql() -> Result<MissingSqlType, std::io::Error> {
   |                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ the trait `pgrx::callconv::RetAbi` is not implemented for `std::result::Result<MissingSqlType, std::io::Error>`
   |
-help: the trait `pgrx::callconv::RetAbi` is implemented for `std::result::Result<T, E>`
+help: the trait `pgrx::callconv::RetAbi` is conditionally implemented for `std::result::Result<T, E>`
  --> $WORKSPACE/pgrx/src/callconv.rs
   |
   | / unsafe impl<T, E> RetAbi for Result<T, E>
   | | where
   | |     T: RetAbi,
+  | |        ------ unsatisfied requirement introduced here: `MissingSqlType: pgrx::callconv::RetAbi`
   | |     T::Item: RetAbi,
   | |     E: core::any::Any + core::fmt::Display,
   | |___________________________________________^
@@ -124,12 +125,13 @@ error[E0277]: the trait bound `std::result::Result<MissingSqlType, std::io::Erro
 11 | | }
    | |_^ the trait `pgrx::callconv::RetAbi` is not implemented for `std::result::Result<MissingSqlType, std::io::Error>`
    |
-help: the trait `pgrx::callconv::RetAbi` is implemented for `std::result::Result<T, E>`
+help: the trait `pgrx::callconv::RetAbi` is conditionally implemented for `std::result::Result<T, E>`
   --> $WORKSPACE/pgrx/src/callconv.rs
    |
    | / unsafe impl<T, E> RetAbi for Result<T, E>
    | | where
    | |     T: RetAbi,
+   | |        ------ unsatisfied requirement introduced here: `MissingSqlType: pgrx::callconv::RetAbi`
    | |     T::Item: RetAbi,
    | |     E: core::any::Any + core::fmt::Display,
    | |___________________________________________^
@@ -141,13 +143,15 @@ error[E0277]: the trait bound `pgrx::prelude::TableIterator<'static, (MissingSql
 14 | fn returns_table_with_missing_sql() -> TableIterator<'static, (name!(missing, MissingSqlType),)> {
    |                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ the trait `pgrx::callconv::RetAbi` is not implemented for `pgrx::prelude::TableIterator<'static, (MissingSqlType,)>`
    |
-help: the trait `pgrx::callconv::RetAbi` is implemented for `pgrx::prelude::TableIterator<'_, Row>`
+help: the trait `pgrx::callconv::RetAbi` is conditionally implemented for `pgrx::prelude::TableIterator<'_, Row>`
   --> $WORKSPACE/pgrx/src/iter.rs
    |
    | / unsafe impl<Row> RetAbi for TableIterator<'_, Row>
    | | where
    | |     Row: RetAbi,
-   | |________________^
+   | |__________------^
+   |            |
+   |            unsatisfied requirement introduced here: `(MissingSqlType,): pgrx::callconv::RetAbi`
 
 error[E0277]: the trait bound `pgrx::prelude::TableIterator<'_, (MissingSqlType,)>: pgrx::callconv::RetAbi` is not satisfied
   --> tests/compile-fail/type-ident-non-sql-leaf-types.rs:14:98
@@ -160,11 +164,13 @@ error[E0277]: the trait bound `pgrx::prelude::TableIterator<'_, (MissingSqlType,
 16 | | }
    | |_^ the trait `pgrx::callconv::RetAbi` is not implemented for `pgrx::prelude::TableIterator<'_, (MissingSqlType,)>`
    |
-help: the trait `pgrx::callconv::RetAbi` is implemented for `pgrx::prelude::TableIterator<'_, Row>`
+help: the trait `pgrx::callconv::RetAbi` is conditionally implemented for `pgrx::prelude::TableIterator<'_, Row>`
   --> $WORKSPACE/pgrx/src/iter.rs
    |
    | / unsafe impl<Row> RetAbi for TableIterator<'_, Row>
    | | where
    | |     Row: RetAbi,
-   | |________________^
+   | |__________------^
+   |            |
+   |            unsatisfied requirement introduced here: `(MissingSqlType,): pgrx::callconv::RetAbi`
    = note: this error originates in the attribute macro `pg_extern` (in Nightly builds, run with -Z macro-backtrace for more info)

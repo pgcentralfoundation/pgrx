@@ -801,11 +801,7 @@ fn llvm_witness(ir: &str, witness: &str, bits: u16, kind: BuiltinKind) -> Result
             }
         }
     }
-    if closed && returned {
-        Ok(())
-    } else {
-        Err("LLVM builtin witness has no proved operation return".into())
-    }
+    (closed && returned).ok_or_else(|| "LLVM builtin witness has no proved operation return".into())
 }
 
 /// Parse load/store pointer and alignment details needed to track supported O0 value copies.

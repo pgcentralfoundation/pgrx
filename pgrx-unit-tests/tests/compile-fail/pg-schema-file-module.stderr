@@ -1,0 +1,5 @@
+error: `#[pg_schema]` requires an inline module: `mod name { ... }`
+ --> tests/compile-fail/pg-schema-file-module.rs:5:1
+  |
+5 | mod file_module;
+  | ^^^^^^^^^^^^^^^^

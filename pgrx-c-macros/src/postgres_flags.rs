@@ -746,7 +746,9 @@ mod tests {
         let optional = u16::from_le_bytes(object[16..18].try_into().unwrap()) as usize;
         let headers = &object[20 + optional..20 + optional + sections * 40];
         let section = headers
-            .chunks_exact(40)
+            .as_chunks::<40>()
+            .0
+            .iter()
             .find(|section| &section[..8] == b".drectve")
             .expect("explicit CRT choices must emit COFF linker directives");
         let length = u32::from_le_bytes(section[16..20].try_into().unwrap()) as usize;

@@ -112,7 +112,7 @@ pub(crate) fn existing_upgrade_scripts(
         let target = path
             .file_name()
             .and_then(|name| name.to_str())
-            .and_then(|name| name.strip_prefix(&prefix)?.strip_suffix(".sql")?.rsplit_once("--"))
+            .and_then(|name| name.strip_circumfix(&prefix, ".sql")?.rsplit_once("--"))
             .and_then(|(_, target)| ExtVersion::parse(target));
 
         if let Some(target) = target

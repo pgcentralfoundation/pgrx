@@ -877,11 +877,7 @@ impl<'a> EntryReader<'a> {
     }
 
     pub fn finish(&self) -> Result<()> {
-        if self.is_empty() {
-            Ok(())
-        } else {
-            Err(eyre!("schema entry had {} trailing bytes", self.remaining()))
-        }
+        self.is_empty().ok_or_else(|| eyre!("schema entry had {} trailing bytes", self.remaining()))
     }
 }
 

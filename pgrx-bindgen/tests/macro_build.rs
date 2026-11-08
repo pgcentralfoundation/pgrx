@@ -522,7 +522,7 @@ fn script(path: &Path, body: &str) {
 /// Require a failed build whose diagnostics contain every expected fragment.
 #[track_caller]
 fn refused(output: Output, expected: &[&str]) -> String {
-    let stderr = String::from_utf8_lossy(&output.stderr).into_owned();
+    let stderr = String::from_utf8_lossy_owned(output.stderr);
     assert!(!output.status.success(), "the build must fail:\n{stderr}");
     for fragment in expected {
         assert!(stderr.contains(fragment), "stderr lacks {fragment:?}:\n{stderr}");

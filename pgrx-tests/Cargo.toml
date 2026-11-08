@@ -77,8 +77,8 @@ winapi = { version = "0.3.9", features = [
 ] }
 
 [lints.rust]
-unused-lifetimes = "deny"
-unsafe-op-in-unsafe-fn = "allow"
+unused_lifetimes = "deny"
+unsafe_op_in_unsafe_fn = "allow"
 
 [lints.clippy]
-used-underscore-binding = "deny"
+used_underscore_binding = "deny"

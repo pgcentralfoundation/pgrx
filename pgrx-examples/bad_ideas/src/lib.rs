@@ -92,7 +92,7 @@ fn http(url: &str) -> String {
         .as_reader()
         .read_to_end(&mut buf)
         .expect("should be able to read body from the response");
-    String::from_utf8_lossy(&buf).into_owned()
+    String::from_utf8_lossy_owned(buf)
 }
 
 #[pg_extern]

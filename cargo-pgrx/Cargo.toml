@@ -92,5 +92,5 @@ rustls = [
 ]
 
 [lints.clippy]
-or-fun-call = "allow" # kinda sus lint imo
+or_fun_call = "allow" # kinda sus lint imo
 too_many_arguments = "allow"
