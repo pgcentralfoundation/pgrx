@@ -197,6 +197,16 @@ an AI agent writes for this repository, including revisions to existing text.
   specific, searchable title. Issues should distinguish observed behavior from
   suspected causes and provide a minimal reproducer, expected behavior, and
   relevant versions when available. Say when a report has not been reproduced.
+- Refuse to open a PR unless pgrx maintainers can push to its branch; they
+  need to rebase, fix, and finish AI-written PRs. Push the branch to this
+  repository or to a fork owned by a personal account, because GitHub offers
+  maintainer edits only on user-owned forks
+  (`gh api repos/OWNER/REPO --jq .owner.type` must print `User`). Keep "Allow
+  edits and access to secrets by maintainers" enabled, and never pass
+  `--no-maintainer-edit` to `gh pr create`. After opening a PR from a fork,
+  confirm that `gh pr view --json maintainerCanModify` reports `true`. If it
+  does not and the setting cannot be enabled, close the PR and tell the user
+  why.
 - Keep diffs focused and reviewable. Link relevant issues and code, summarize
   behavioral changes, and leave unrelated cleanup for separate work. Do not
   include generated logs, private paths, credentials, or raw conversation text.
