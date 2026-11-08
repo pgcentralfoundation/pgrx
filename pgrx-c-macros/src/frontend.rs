@@ -939,7 +939,8 @@ fn signature(definition: &MacroDefinition) -> (bool, Vec<&str>) {
 
 /// Reconcile final replacement signatures with physical or source-less discovery origins.
 /// Distinct matching header origins remain ambiguous; repeated compiler/command-line
-/// observations do not invent competing physical ownership.
+/// observations do not invent competing physical ownership, and a compiler predefine yields
+/// to a header that repeats it.
 fn join_active(live: Vec<MacroDefinition>, inventory: &MacroInventory) -> MacroEnvironment {
     let mut history = HashMap::<_, (Vec<_>, HashSet<_>)>::new();
     for definition in &inventory.macros {
@@ -954,6 +955,13 @@ fn join_active(live: Vec<MacroDefinition>, inventory: &MacroInventory) -> MacroE
             continue;
         }
         definitions.push(definition);
+    }
+    // Compiler predefines precede every header, so a header definition with the same
+    // replacement is the live one. glibc's <stdint.h> repeats Clang 20's __INT64_C this way.
+    for (definitions, _) in history.values_mut() {
+        if definitions.iter().any(|definition| !definition.builtin) {
+            definitions.retain(|definition| !definition.builtin);
+        }
     }
     let mut environment = MacroEnvironment::default();
     for mut definition in live {

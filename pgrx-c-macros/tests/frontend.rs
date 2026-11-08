@@ -302,6 +302,25 @@ fn final_environment_tracks_undefinition_redefinition_restoration_and_ambiguity(
     assert!(output.environment().active.contains_key("FRONT_RESTORED"));
 }
 
+/// Clang 20 and later predefine `__INTn_C`, which C libraries define again with the same
+/// replacement. The header definition owns the macro, so the macros using it still expand.
+#[test]
+fn header_definitions_repeating_compiler_predefines_keep_their_provenance() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().expect("libclang must be available");
+    let header = fixture("frontend_predefine.h");
+    let frontend = inspect(&scanner, &header, &[], None).expect("inspect original header");
+    let repeated = &frontend.environment().active["__INT32_C"];
+    assert!(matches!(repeated.provenance, ActiveProvenance::Resolved), "{repeated:?}");
+    let provenance = repeated.definition.provenance.as_ref().expect("header provenance");
+    assert_eq!(provenance.file.canonicalize().unwrap(), header.canonicalize().unwrap());
+    let names = ["FRONT_PREDEFINE_USER"];
+    let session = AnalysisSession::prepare(&scanner, &frontend, &names)
+        .expect("prepare the macro using the repeated predefine");
+    let emission = emit(&session, names[0]);
+    assert!(matches!(emission.status, EmissionStatus::Emitted { .. }), "{emission:?}");
+}
+
 /// Clang splices a backslash followed by blanks and a line end, with only a warning. Token
 /// spellings must lose those splices too, or a definition no longer matches the compiler's
 /// final macro dump and loses its source identity.
