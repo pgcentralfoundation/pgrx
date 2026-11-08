@@ -91,7 +91,11 @@ The selected header still determines argument and result types. A size result
 can change from C `int` to `size_t`; `.get() as usize` is an explicit Rust size
 conversion in either case. Where the result is `size_t` in every version you
 build against, `.get_usize()` converts it without a cast; it does not compile
-for an `int` result. For predicates that change from C `int` to `bool`,
+for an `int` result. `.get_as::<T>()` converts any integer result to the Rust
+integer type `T` and panics if the value does not fit. Use it where the result
+type differs between versions, as `PageGetMaxOffsetNumber!`'s does: `size_t` on
+PG15 and `OffsetNumber` later. Clippy reports `.get() as T` as an unnecessary
+cast where the types already match. For predicates that change from C `int` to `bool`,
 use `.is_true()` to obtain a Rust condition with C's zero/null semantics. A
 function adapter evaluates each argument once, while a C macro keeps its
 original argument repetition. Generated docs distinguish the two and show the
