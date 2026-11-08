@@ -47,6 +47,15 @@ fn checked_newtype_inputs_keep_their_c_integer_identity() {
     assert_eq!(value.get(), 3_u32);
 }
 
+/// Checks that `InvalidOid` stays an `Oid`, which generated macros accept as C `Oid`.
+#[test]
+fn invalid_oid_is_an_oid() {
+    let invalid: pg::Oid = pg::InvalidOid;
+    assert_eq!(invalid, pg::Oid::INVALID);
+    assert!(!pg::OidIsValid!(pg::InvalidOid).is_true());
+    assert!(pg::OidIsValid!(pg::BOOLOID).is_true());
+}
+
 /// Checks that public macro expansion repeats the selected Max operand exactly as the C
 /// definition does.
 #[test]

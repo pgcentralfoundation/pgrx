@@ -57,6 +57,13 @@ pub use include::*;
 pub use node::PgNode;
 pub use port::*;
 
+/// `InvalidOid` from `postgres_ext.h`, as an [`Oid`].
+///
+/// The generated bindings declare it as a `u32`. This item shadows that
+/// glob re-export so code can keep comparing and passing it as an `Oid`.
+/// Generated macros still read the binding through `__pgrx_c_bindings`.
+pub const InvalidOid: Oid = Oid::INVALID;
+
 // For postgres 18+, some functions will reexport when enabling `cshim` feature
 #[allow(ambiguous_glob_reexports)]
 pub use submodules::*;
