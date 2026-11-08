@@ -447,10 +447,48 @@ fn pointer_to(ty: &TypeInfo) -> TypeInfo {
     }
 }
 
+/// The parameter types of a call's prototype: the named function's, or that of the function
+/// type the callee is proved to designate or point to. `objects` holds each node's
+/// compiler-proved object type.
+pub(super) fn call_parameters<'d>(
+    declarations: &'d DeclarationCatalog,
+    expression: &crate::syntax::Expression,
+    objects: &[Option<TypeInfo>],
+    compatibility: &Compatibility<'_>,
+    callee: NodeId,
+) -> Option<&'d [TypeInfo]> {
+    let mut named = callee;
+    while let ExpressionKind::Group { operand } = expression.nodes[named].kind {
+        named = operand;
+    }
+    let named = match &expression.nodes[named].kind {
+        ExpressionKind::Identifier { name } => {
+            declarations.function_signatures.get(name).map(|function| &function.signature)
+        }
+        _ => None,
+    };
+    let declared = || {
+        let ty = objects[callee].as_ref()?;
+        let function = if ty.category == TypeCategory::Function {
+            ty.clone()
+        } else {
+            compatibility.element(ty)?
+        };
+        match &declarations.type_shapes.get(&function.canonical_spelling)?.kind {
+            TypeShapeKind::Function { signature } => Some(signature),
+            _ => None,
+        }
+    };
+    named.or_else(declared)?.parameters.as_deref()
+}
+
 /// Conservatively retain syntaxes that could prove a C null pointer constant during lowering.
 ///
 /// This predicate is a pruning bound, not the final constant-expression proof.
-fn possible_null_constant(expression: &crate::syntax::Expression, mut node: NodeId) -> bool {
+pub(super) fn possible_null_constant(
+    expression: &crate::syntax::Expression,
+    mut node: NodeId,
+) -> bool {
     while let ExpressionKind::Group { operand } = expression.nodes[node].kind {
         node = operand;
     }
@@ -613,34 +651,13 @@ impl<'a> Constraints<'a> {
                         *callee,
                         Requirement::Call { arity: arguments.len(), output: index },
                     );
-                    let named = match &expression.syntax.nodes[result.representative[*callee]].kind
-                    {
-                        ExpressionKind::Identifier { name } => frontend
-                            .declarations()
-                            .function_signatures
-                            .get(name)
-                            .map(|function| &function.signature),
-                        _ => None,
-                    };
-                    let declared = objects[*callee].as_ref().and_then(|ty| {
-                        let function = if ty.category == TypeCategory::Function {
-                            Some(ty.clone())
-                        } else {
-                            result.element(ty)
-                        }?;
-                        match &frontend
-                            .declarations()
-                            .type_shapes
-                            .get(&function.canonical_spelling)?
-                            .kind
-                        {
-                            TypeShapeKind::Function { signature } => Some(signature),
-                            _ => None,
-                        }
-                    });
-                    if let Some(parameters) =
-                        named.or(declared).and_then(|signature| signature.parameters.as_ref())
-                    {
+                    if let Some(parameters) = call_parameters(
+                        frontend.declarations(),
+                        &expression.syntax,
+                        objects,
+                        compatibility,
+                        *callee,
+                    ) {
                         for (argument, parameter) in arguments.iter().zip(parameters) {
                             result.implicit(*argument, parameter, &expression.syntax);
                         }
@@ -1269,7 +1286,7 @@ impl<'a> Constraints<'a> {
 /// compiler facts retain the candidate. Pairs are shared across the whole batch;
 /// qualifiers are part of the key because inherited object qualifiers need not
 /// change the compiler's original canonical spelling.
-struct Compatibility<'a> {
+pub(super) struct Compatibility<'a> {
     /// Compiler type shapes required for structural and nominal compatibility proofs.
     declarations: &'a DeclarationCatalog,
     /// Selected target integer and pointer facts used by fallback type resolution.
@@ -1315,7 +1332,7 @@ struct TypePair {
 /// Memoize compiler type compatibility as a pruning proof with an explicit unknown state.
 impl<'a> Compatibility<'a> {
     /// Create one reusable compatibility cache for all macros in the batch.
-    fn new(declarations: &'a DeclarationCatalog, target: &'a TargetFacts) -> Self {
+    pub(super) fn new(declarations: &'a DeclarationCatalog, target: &'a TargetFacts) -> Self {
         Self { declarations, target, pairs: RefCell::new(BTreeMap::new()) }
     }
 
@@ -1342,7 +1359,12 @@ impl<'a> Compatibility<'a> {
     ///
     /// Pointer compatibility considers null-constant possibility and pointee qualifiers
     /// without using the native Rust representation as a C type identity.
-    fn implicit(&self, source: &TypeInfo, target: &TypeInfo, null_possible: bool) -> Option<bool> {
+    pub(super) fn implicit(
+        &self,
+        source: &TypeInfo,
+        target: &TypeInfo,
+        null_possible: bool,
+    ) -> Option<bool> {
         let array = matches!(
             self.declarations.type_shapes.get(&source.canonical_spelling).map(|shape| &shape.kind),
             Some(TypeShapeKind::Array { .. })
