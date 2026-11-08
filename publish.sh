@@ -26,14 +26,12 @@ set -x
 # │   [build-dependencies]
 # │   └── pgrx-pg-sys
 # │       └── pgrx
-# │           ├── pgrx-bench
 # │           └── pgrx-tests
 # └── pgrx-tests
 #
 # pgrx-sql-entity-graph
 # ├── cargo-pgrx
 # ├── pgrx
-# │   ├── pgrx-bench
 # │   └── pgrx-tests
 # ├── pgrx-macros
 # │   ├── pgrx
@@ -41,6 +39,8 @@ set -x
 # │   │   └── pgrx
 # │   └── pgrx-tests
 # └── pgrx-pg-sys
+#
+# pgrx-bench does not depend on any other pgrx crate
 
 
 cd $DIR/pgrx-pg-config && cargo publish
