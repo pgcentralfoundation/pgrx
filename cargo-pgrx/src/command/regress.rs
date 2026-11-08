@@ -16,6 +16,7 @@ use owo_colors::OwoColorize;
 use pgrx_pg_config::{PgConfig, Pgrx, createdb, dropdb, is_supported_major_version};
 use std::collections::HashSet;
 use std::env::temp_dir;
+use std::ffi::OsString;
 use std::fmt;
 use std::fs::{DirEntry, File};
 use std::io::{BufRead, BufReader, Write};
@@ -186,26 +187,7 @@ impl Regress {
                 .unwrap_or_default()
         });
 
-        // `setup.{only}` is a special file that we handle separately
-        let is_setup = |entry: &DirEntry| {
-            entry
-                .file_name()
-                .to_str()
-                .is_some_and(|filename| filename.ends_with(&format!("setup.{only}")))
-        };
-
-        // remove the "setup" file from the list
-        let setup_entry = files.iter().position(is_setup).map(|idx| files.remove(idx));
-
-        // not all filesystems list directories sorted and we want some kind of guaranteed evaluation order
-        files.sort_unstable_by_key(|entry| entry.file_name());
-
-        // if we detected a setup file and the caller wants to include it, make it the first entry
-        if let Some(setup_entry) = setup_entry
-            && include_setup
-        {
-            files.insert(0, setup_entry);
-        }
+        order_test_files(files, DirEntry::file_name, only, include_setup);
     }
 
     /// Bootstrap a new test by running it via pg_regress, promoting its output
@@ -1147,6 +1129,25 @@ fn make_test_name(entry: &DirEntry) -> String {
     filename.to_string()
 }
 
+/// Puts test files in run order. Only the file named exactly `setup.{extension}` is the setup
+/// file: it comes first when `include_setup` is true and is removed otherwise. The rest are
+/// sorted by name because not all filesystems list directories sorted.
+fn order_test_files<T>(
+    files: &mut Vec<T>,
+    file_name: impl Fn(&T) -> OsString,
+    extension: &str,
+    include_setup: bool,
+) {
+    let setup = OsString::from(format!("setup.{extension}"));
+    if !include_setup {
+        files.retain(|file| file_name(file) != setup);
+    }
+    files.sort_by_cached_key(|file| {
+        let name = file_name(file);
+        (name != setup, name)
+    });
+}
+
 fn manifest_path_to_sql_tests_path(manifest_path: &Path) -> PathBuf {
     let mut path = PathBuf::from(manifest_path);
     path.pop(); // pop `Cargo.toml`
@@ -1205,7 +1206,25 @@ fn is_git_repo(git: &Path) -> bool {
 
 #[cfg(test)]
 mod tests {
-    use super::{Regress, VersionDirective, filter_tests};
+    use super::{Regress, VersionDirective, filter_tests, order_test_files};
+    use std::ffi::OsString;
+
+    #[test]
+    fn order_test_files_only_treats_exact_setup_name_as_setup() {
+        // a directory listing may return `post_setup.sql` before `setup.sql`
+        let listing = ["post_setup.sql", "b.sql", "user_setup.sql", "setup.sql", "a.sql"];
+        let ordered = |include_setup| {
+            let mut files = listing.to_vec();
+            order_test_files(&mut files, |name| OsString::from(name), "sql", include_setup);
+            files
+        };
+
+        assert_eq!(
+            ordered(true),
+            ["setup.sql", "a.sql", "b.sql", "post_setup.sql", "user_setup.sql"]
+        );
+        assert_eq!(ordered(false), ["a.sql", "b.sql", "post_setup.sql", "user_setup.sql"]);
+    }
 
     #[test]
     fn version_directive_absent() {
