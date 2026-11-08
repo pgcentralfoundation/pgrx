@@ -77,6 +77,13 @@ fn binding_references_and_macro_calls_use_the_selected_build() {
     );
 }
 
+/// Checks that alignment results, whose C type is `uintptr_t`, extract as `usize`.
+#[test]
+fn size_results_extract_as_usize() {
+    assert_eq!(pg::BUFFERALIGN!(33_usize).get_usize(), 64);
+    assert_eq!(usize::from(pg::MAXALIGN!(usize::MAX)), 0);
+}
+
 /// Checks raw enum bytes and union fields without materializing invalid Rust record or enum
 /// values.
 #[test]

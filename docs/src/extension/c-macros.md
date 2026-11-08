@@ -87,7 +87,9 @@ type. In particular, tag a bindgen `char *` such as `pg_sys::Page` with
 
 The selected header still determines argument and result types. A size result
 can change from C `int` to `size_t`; `.get() as usize` is an explicit Rust size
-conversion in either case. For predicates that change from C `int` to `bool`,
+conversion in either case. Where the result is `size_t` in every version you
+build against, `.get_usize()` converts it without a cast; it does not compile
+for an `int` result. For predicates that change from C `int` to `bool`,
 use `.is_true()` to obtain a Rust condition with C's zero/null semantics. A
 function adapter evaluates each argument once, while a C macro keeps its
 original argument repetition. Generated docs distinguish the two and show the
@@ -221,6 +223,17 @@ let tagged: CValue<pg_sys::__pgrx_c_types::uintptr_t> = rounded.into_value();
 assert_eq!(tagged.get(), bytes);
 ```
 
+`.get()` returns the storage of the result's C type, which can differ from the
+Rust type you want: `BUFFERALIGN`'s `uintptr_t` is `unsigned long`, stored as a
+`u64` on 64-bit Linux. When a result's C type is the target's `size_t` type, as
+`size_t`, `Size`, and `uintptr_t` are, `.get_usize()` or `usize::from` returns
+it as a `usize` without a cast:
+
+```rust
+let bytes: usize = pgrx::BUFFERALIGN!(33_usize).get_usize();
+assert_eq!(usize::from(pgrx::BUFFERALIGN!(33_usize)), bytes);
+```
+
 The wrapper does not rerun the macro when you extract it. `BUFFERALIGN` uses the
 selected installation's alignment, so avoid assuming one fixed alignment across
 builds. A pointer result extracts a raw pointer. A raw aggregate result extracts
@@ -248,7 +261,7 @@ use pgrx::{cmacros::c::CValue, pg_sys};
 let input_len = 1024_usize;
 let capacity = pgrx::PGLZ_MAX_OUTPUT!(
     CValue::<pg_sys::__pgrx_c_types::size_t>::new(input_len as _)
-).get() as usize;
+).get_usize();
 assert_eq!(capacity, 1028);
 ```
 
