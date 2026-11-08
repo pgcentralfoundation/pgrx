@@ -42,17 +42,33 @@ pub(crate) fn split_cargo_flags(cargo_flags: &[String]) -> Vec<String> {
     cargo_flags.iter().flat_map(|f| f.split_ascii_whitespace().map(str::to_owned)).collect()
 }
 
+/// A cargo-pgrx release accepts any pgrx release in its series: `~0.19` for
+/// 0.19.3, `~1` for 1.2.3.
+///
+/// semver matches a prerelease only against a comparator naming the same
+/// major.minor.patch with a prerelease, so a prerelease cargo-pgrx keeps its
+/// full version: `^0.20.0-beta.1` accepts beta.1, later 0.20.0 prereleases,
+/// and 0.20.x.
 fn compatible_pgrx_versions(cargo_pgrx_version: &Version) -> VersionReq {
-    let major = cargo_pgrx_version.major;
-    VersionReq {
-        comparators: vec![Comparator {
+    let Version { major, minor, patch, ref pre, .. } = *cargo_pgrx_version;
+    let comparator = if pre.is_empty() {
+        Comparator {
             op: Op::Tilde,
             major,
-            minor: (major == 0).then_some(cargo_pgrx_version.minor),
+            minor: (major == 0).then_some(minor),
             patch: None,
             pre: Prerelease::EMPTY,
-        }],
-    }
+        }
+    } else {
+        Comparator {
+            op: Op::Caret,
+            major,
+            minor: Some(minor),
+            patch: Some(patch),
+            pre: pre.clone(),
+        }
+    };
+    VersionReq { comparators: vec![comparator] }
 }
 
 #[tracing::instrument(level = "error", skip_all)]
@@ -155,6 +171,24 @@ mod tests {
     #[test]
     fn prereleases_are_not_accepted() {
         assert!(!accepts("0.19.3", "0.19.0-beta.1"));
+    }
+
+    #[test]
+    fn prerelease_accepts_its_own_and_later_prereleases() {
+        assert!(accepts("0.20.0-beta.1", "0.20.0-beta.1"));
+        assert!(accepts("0.20.0-beta.1", "0.20.0-beta.2"));
+        assert!(!accepts("0.20.0-beta.1", "0.20.0-beta.0"));
+        assert!(!accepts("0.20.0-beta.1", "0.20.1-beta.0"));
+    }
+
+    #[test]
+    fn prerelease_accepts_the_stable_series() {
+        assert!(accepts("0.20.0-beta.1", "0.20.0"));
+        assert!(accepts("0.20.0-beta.1", "0.20.3"));
+        assert!(!accepts("0.20.0-beta.1", "0.19.3"));
+        assert!(!accepts("0.20.0-beta.1", "0.21.0"));
+        assert!(accepts("1.0.0-beta.1", "1.4.0"));
+        assert!(!accepts("1.0.0-beta.1", "2.0.0"));
     }
 
     #[test]
