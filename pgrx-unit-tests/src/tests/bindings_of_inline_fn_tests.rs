@@ -49,4 +49,43 @@ mod tests {
             pg_sys::table_close(relation, lockmode);
         }
     }
+
+    /// Where the build translates an inline function, `pg_sys::NAME` runs the translation
+    /// with the binding's signature. `MemoryContextSwitchTo` translates on every version.
+    #[pg_test]
+    fn test_translated_inline_fn() {
+        // SAFETY: TopMemoryContext and the previous context outlive both switches, which
+        // run on the backend thread.
+        unsafe {
+            let top = pg_sys::TopMemoryContext;
+            let previous = pg_sys::MemoryContextSwitchTo(top);
+            let current = pg_sys::CurrentMemoryContext;
+            assert_eq!(current, top);
+            assert_eq!(pg_sys::MemoryContextSwitchTo(previous), top);
+            let current = pg_sys::CurrentMemoryContext;
+            assert_eq!(current, previous);
+        }
+    }
+
+    /// A translated inline function keeps the guarded binding's thread check.
+    #[pg_test]
+    fn test_translated_inline_fn_panics_off_the_backend_thread() {
+        // SAFETY: switching to the current context on the backend thread changes nothing.
+        // The first checked call claims its thread as the one allowed to call PostgreSQL, so
+        // this one must come before the call on another thread.
+        let current = unsafe { pg_sys::MemoryContextSwitchTo(pg_sys::CurrentMemoryContext) };
+        let current = current.expose_provenance();
+        let off_thread = std::thread::scope(|scope| {
+            scope
+                .spawn(|| {
+                    let current = std::ptr::with_exposed_provenance_mut(current);
+                    // SAFETY: the thread check panics before the switch. Were it missing,
+                    // the switch would store the current context again while the backend
+                    // thread waits.
+                    unsafe { pg_sys::MemoryContextSwitchTo(current) }.expose_provenance()
+                })
+                .join()
+        });
+        assert!(off_thread.is_err(), "MemoryContextSwitchTo ran off the backend thread");
+    }
 }

@@ -70,13 +70,17 @@ installations, keep its `unsafe` block and allow `unused_unsafe`, as [the
 `DatumGetInt32` example](#choose-the-c-identity-of-an-input) does.
 
 Every native call goes through pgrx's FFI guard, which checks the thread and
-calls `sigsetjmp` each time. Where PostgreSQL defines a static inline function,
-`pg_sys::NAME(...)` is now that guarded binding rather than a Rust port. For
-example, `pg_sys::MemoryContextSwitchTo` and `pg_sys::heap_getattr` used to be
-Rust and are now guarded native calls. `MemoryContextSwitchTo!` translates to
-Rust on PG15–19. Whether another macro does depends on the version, the build and
-libclang; the build's generated documentation and `pgNN_macro_report.json` say
-whether it translates the body or calls the native function.
+calls `sigsetjmp` each time. Where PostgreSQL defines a static inline function
+and the build translates its body, `pgrx::pg_sys::NAME(...)` runs that
+translation, as `NAME!` does, with the binding's name and signature. It checks
+the thread but calls no `sigsetjmp` of its own; the PostgreSQL functions the body
+calls keep their guards. Otherwise `pg_sys::NAME(...)` is the guarded binding.
+`pgrx_pg_sys::NAME(...)`, named through `pgrx-pg-sys` directly, is always the
+guarded binding. For example, `pg_sys::MemoryContextSwitchTo` and
+`pg_sys::heap_getattr` used to be Rust ports, and on PG15–19 now run the
+translation. Whether another function does depends on the version, the build
+and libclang; the build's generated documentation and `pgNN_macro_report.json`
+say whether its macro translates the body or calls the native function.
 
 A function parameter applies C's assignment rules, which are stricter than the
 explicit casts inside many macros. Pass each operand with the parameter's C

@@ -1739,6 +1739,8 @@ fn generate_macros(
         &["__pgrx_c_bindings".into()],
     );
     symbols.ffi_boundary = Some(vec!["ffi".into(), "pg_guard_ffi_boundary".into()]);
+    symbols.thread_check =
+        Some(vec!["submodules".into(), "thread_check".into(), "check_active_thread".into()]);
     symbols.integer_storage.extend([
         ("Oid".into(), pgrx_c_macros::IntegerKind::UnsignedInt),
         ("TransactionId".into(), pgrx_c_macros::IntegerKind::UnsignedInt),
@@ -1751,15 +1753,18 @@ fn generate_macros(
     {
         symbols.integer_storage.insert("Datum".into(), *kind);
     }
-    let pgrx_c_macros::MacroGeneration { macros: emissions, support } =
+    let pgrx_c_macros::MacroGeneration { macros: emissions, support, functions } =
         generate_with_bindings(&session, &names, &symbols).map_err(|message| eyre!(message))?;
     let metadata = metadata_support::generate(&frontend, &symbols)?;
     // The snapshot ships the support this build includes with its macros, except that
     // the native metadata getters, which docs builds never link, have fixed link names.
+    // Docs builds define the translated-function macro as empty instead, so the guarded
+    // bindings keep their documentation.
     let documented = is_for_release()
         .then(|| format!("{source}{}{}", metadata.documentation_rust(), support.rust));
     source.push_str(&metadata.rust);
     source.push_str(&support.rust);
+    source.push_str(&functions);
     // Metadata support always contains C, so the active version always builds
     // its archive. It also owns bindgen's static wrappers and, when enabled,
     // the C shim.
