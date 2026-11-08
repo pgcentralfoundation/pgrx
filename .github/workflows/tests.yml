@@ -594,7 +594,6 @@ jobs:
     if: "!contains(github.event.head_commit.message, 'nogha')"
     env:
       CARGO_PGRX: cargo-pgrx
-      PGRX_MACRO_DEBUG: "1"
 
     strategy:
       matrix:
@@ -665,37 +664,6 @@ jobs:
 
       - name: Run tests
         run: cargo test --all --features "pg$PG_VER pg_test cshim proptest" --no-default-features
-
-      - name: Report macro generation details
-        if: failure()
-        run: |
-          set -x
-          pg_config --version; pg_config --cppflags; pg_config --cflags
-          ls -la /Library/Developer/CommandLineTools/SDKs || true
-          xcrun --show-sdk-path || true
-          which clang; clang --version
-          for report in target/debug/build/pgrx-pg-sys-*/out/pg*_macro_report.json; do
-            python3 - "$report" <<'PY'
-          import json, sys
-          r = json.load(open(sys.argv[1]))
-          ic = r.get("integer_constants") or {}
-          print(sys.argv[1], "integer_constants:", len(ic), "InvalidTransactionId" in ic)
-          sc = r.get("supplemental_constants") or {}
-          rejected = sc.get("rejected") or {}
-          print("supplemental:", len(sc.get("constants") or {}), "rejected:", len(rejected))
-          for name in list(rejected)[:25]:
-              print("  rejected", name, str(rejected[name])[:300])
-          for key in ("status", "cflags_recorded", "cflags_dropped", "include_detection", "diagnostics"):
-              print(key + ":", json.dumps(r.get(key))[:3000])
-          PY
-          done
-
-      - name: Upload macro reports
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: macos-macro-reports
-          path: target/debug/build/pgrx-pg-sys-*/out/pg*_macro_report.json
 
       # This test compiles only on macOS. It builds both slices of a universal installation, so
       # it needs the other slice's standard library. Its synthetic headers make one job enough.
