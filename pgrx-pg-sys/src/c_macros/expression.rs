@@ -679,6 +679,25 @@ impl<M: CType, Q: Qualifier> Pointer<M, Q> {
         self.access
     }
 }
+/// Tag a binding's `char *`, such as a `pg_sys::Page`, as a pointer to plain C `char`, without
+/// accessing it.
+///
+/// Bindgen stores C `char *` as `*mut c_char`, which Rust cannot tell from a pointer to
+/// `signed char` or `unsigned char`, so a generated macro needs this tag for a `Page` or other
+/// `char *` operand. Unlike [`Pointer::new`], this takes the binding's pointer type even when
+/// build flags give plain `char` the other signedness from Rust's `c_char`.
+impl From<*mut core::ffi::c_char> for Pointer<super::CChar> {
+    fn from(raw: *mut core::ffi::c_char) -> Self {
+        Self::new(raw.cast())
+    }
+}
+/// Tag a binding's `const char *` as a read-only pointer to plain C `char`, as the `*mut c_char`
+/// conversion does.
+impl From<*const core::ffi::c_char> for Pointer<super::CChar, ReadOnly> {
+    fn from(raw: *const core::ffi::c_char) -> Self {
+        Self::new(raw.cast())
+    }
+}
 /// Connect the declared C identity to its binding storage and evaluated value representations.
 impl<M: CType, Q: Qualifier> CType for CPointer<M, Q> {
     /// Rust binding representation used for this declared C object or value.

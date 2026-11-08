@@ -44,6 +44,16 @@ pg::if_c_macro! { PageGetItem {
         // SAFETY: The caller establishes the page, item and backend-thread contract.
         unsafe { pg::PageGetItem!(Pointer::<CChar>::new(page), item_id).get().cast() }
     }
+
+    /// Tag the binding's `Page` through the conversion from its `*mut c_char` type.
+    ///
+    /// # Safety
+    /// As for `tagged_page_item`.
+    unsafe fn binding_page_item(page: pg::Page, item_id: pg::ItemId) -> *mut core::ffi::c_void {
+        use pg::cmacros::c::Pointer;
+        // SAFETY: The caller establishes the page, item and backend-thread contract.
+        unsafe { pg::PageGetItem!(Pointer::from(page), item_id).get().cast() }
+    }
 }}
 
 pg::if_c_macro! { CStringGetDatum {
@@ -57,6 +67,18 @@ pg::if_c_macro! { CStringGetDatum {
         // SAFETY: CStringGetDatum converts the address without reading it; the
         // caller supplies any guarded call's backend-thread requirement.
         let _datum = unsafe { pg::CStringGetDatum!(Pointer::<CChar, ReadOnly>::new(value)) };
+    }
+
+    /// Tag the binding's read-only C string through the conversion from `*const c_char`.
+    ///
+    /// # Safety
+    /// The caller must run on the PostgreSQL backend thread.
+    #[allow(unused_unsafe, reason = "this conversion is pure where it is a macro or translated")]
+    unsafe fn binding_const_cstring(value: *const core::ffi::c_char) {
+        use pg::cmacros::c::Pointer;
+        // SAFETY: CStringGetDatum converts the address without reading it; the
+        // caller supplies any guarded call's backend-thread requirement.
+        let _datum = unsafe { pg::CStringGetDatum!(Pointer::from(value)) };
     }
 }}
 
