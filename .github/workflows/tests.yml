@@ -298,13 +298,15 @@ jobs:
             --features "pg$PG_VER" --no-default-features --lib varlena
 
       # Only this step sees the target headers; tests above check that builds without them refuse.
-      # Rust beta adds no target-specific coverage, so it skips this.
-      - name: Check that cross-compiled pgrx-unit-tests can build
+      # Build scripts still generate bindings and C macros from the aarch64 headers and compile
+      # the aarch64 C shim; checking skips only Rust code generation and linking, which the arm64
+      # job covers natively. Rust beta adds no target-specific coverage, so it skips this.
+      - name: Check that pgrx-unit-tests compiles for aarch64
         if: matrix.suite != 'extras' && !matrix.rust
         env:
           PGRX_INCLUDEDIR_SERVER_aarch64_unknown_linux_gnu: ${{ steps.arm64-headers.outputs.server }}
         run: |
-          cargo build --tests \
+          cargo check --tests \
             --features "pg$PG_VER" \
             --package pgrx-unit-tests \
             --target aarch64-unknown-linux-gnu
@@ -316,7 +318,7 @@ jobs:
             --features "pg$PG_VER cshim proptest" \
             --package pgrx-unit-tests --lib
 
-      # Every pgrx-unit-tests target, including the UI tests, runs here once.
+      # Every pgrx-unit-tests target runs here; its ignored UI tests run in the extras job.
       - name: Run pgrx-unit-tests with cshim disabled
         if: ${{ !matrix.suite }}
         run: |
@@ -324,13 +326,28 @@ jobs:
             --features "pg$PG_VER proptest" \
             --package pgrx-unit-tests
 
+      # A debug build reuses this job's artifacts; a release build of pgrx took most of the step.
       - name: Smoke test cargo pgrx bench against the benching example
         if: matrix.suite == 'extras'
         run: |
           CARGO_TARGET_DIR="$(pwd)/target" cargo pgrx bench pg$PG_VER \
             bench_normalize_phrase \
+            --debug \
             --manifest-path=pgrx-examples/benching/Cargo.toml \
             --group-name ci_benching_smoke
+
+      # These tests are ignored by default because each compiles its own copy of pgrx. Neither
+      # depends on the PostgreSQL version, so they run once, here.
+      - name: Run UI tests
+        if: matrix.suite == 'extras'
+        run: |
+          cargo test \
+            --features "pg$PG_VER proptest" \
+            --package pgrx-unit-tests --test ui -- --ignored
+
+      - name: Run the cargo pgrx install regression from a virtual workspace
+        if: matrix.suite == 'extras'
+        run: cargo test --package cargo-pgrx --test install_pg_test_regression -- --ignored
 
       - name: Run custom_types without schema generation example tests
         if: ${{ !matrix.suite }}
