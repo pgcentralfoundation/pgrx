@@ -55,6 +55,7 @@ cargo test --no-default-features --features "pg18 pg_test"
 | Build, install, and open psql | `cargo pgrx run pg18` |
 | Install files without starting PostgreSQL or opening psql | `cargo pgrx install --pg-config /path/to/pg_config` |
 | Run SQL regressions | `cargo pgrx regress pg18` |
+| Run SQL regressions matching one or more substrings | `cargo pgrx regress pg18 arrays spi` |
 | Bootstrap a regression expectation | `cargo pgrx regress pg18 --add test_name` |
 | Promote reviewed regression output | `cargo pgrx regress pg18 --auto` |
 | Run backend benchmarks | `cargo pgrx bench pg18` |
