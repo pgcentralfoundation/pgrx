@@ -10,17 +10,18 @@
 #![deny(unsafe_op_in_unsafe_fn)]
 #![allow(non_snake_case)]
 
-use core::ffi::{CStr, c_void};
+use core::ffi::{CStr, c_char, c_int, c_void};
 use std::any::Any;
 use std::borrow::Cow;
 use std::cell::Cell;
+use std::ffi::CString;
 use std::fmt::{Display, Formatter};
 use std::hint::unreachable_unchecked;
 use std::num::NonZeroUsize;
 use std::panic::{
     AssertUnwindSafe, Location, PanicHookInfo, UnwindSafe, catch_unwind, panic_any, resume_unwind,
 };
-use std::ptr;
+use std::ptr::{self, NonNull};
 use std::sync::atomic::{AtomicUsize, Ordering};
 
 use crate::elog::PgLogLevel;
@@ -151,8 +152,8 @@ impl Display for ErrorReport {
 pub struct ErrorReportWithLevel {
     pub(crate) level: PgLogLevel,
     pub(crate) inner: ErrorReport,
-    /// Marks the stack entry of the Postgres ERROR this report copies, if pgrx caught one
-    pub(crate) stack_entry: Option<ErrorStackEntry>,
+    /// The Postgres ERROR this report was made from, if pgrx caught one
+    pub(crate) caught: Option<Box<CaughtPostgresError>>,
 }
 
 /// Identifies the entry a caught Postgres ERROR occupies on Postgres' error data stack.
@@ -227,6 +228,245 @@ impl ErrorStackEntry {
                 && (*head).arg.addr() == self.token.get()
         }
     }
+}
+
+/// What pgrx keeps of a Postgres ERROR it caught, so that a `#[pg_guard]` function can pass the
+/// ERROR back to Postgres unchanged.
+#[derive(Debug)]
+pub(crate) struct CaughtPostgresError {
+    data: ErrorDataCopy,
+    entry: Option<ErrorStackEntry>,
+}
+
+impl CaughtPostgresError {
+    /// Copies and marks the ERROR on top of Postgres' error data stack, and returns the report
+    /// that catch handlers see for it.
+    ///
+    /// # Safety
+    ///
+    /// Call only on the backend thread, right after pgrx catches the ERROR, once Postgres'
+    /// exception and error context stacks are restored and `CurrentMemoryContext` isn't
+    /// `ErrorContext`.
+    pub(crate) unsafe fn catch() -> ErrorReportWithLevel {
+        // SAFETY: the caller just caught an ERROR, which `CopyErrorData()` copies into the
+        // current memory context with each string null or NUL-terminated
+        let (data, entry) = unsafe {
+            let errdata = crate::CopyErrorData();
+            let data = ErrorDataCopy::new(&*errdata);
+            crate::FreeErrorData(errdata);
+            (data, ErrorStackEntry::mark_top())
+        };
+        ErrorReportWithLevel {
+            level: data.elevel.into(),
+            inner: data.report(),
+            caught: Some(Box::new(Self { data, entry })),
+        }
+    }
+
+    /// How a `#[pg_guard]` function passes this ERROR back to Postgres.  `pg_re_throw()` raises
+    /// whatever is on top of the error data stack, so it's right only while the original is
+    /// there, and otherwise the copy is raised.  Returns `None` when `ErrorContext` has no memory
+    /// left for the copy.
+    ///
+    /// # Safety
+    ///
+    /// Call only on the backend thread.
+    unsafe fn guard_action<R>(&self) -> Option<GuardAction<R>> {
+        // SAFETY: the caller is on the backend thread
+        unsafe {
+            if self.entry.as_ref().is_some_and(|entry| entry.is_top()) {
+                Some(GuardAction::ReThrow)
+            } else {
+                self.data.in_error_context().map(GuardAction::ReThrowCopy)
+            }
+        }
+    }
+}
+
+/// A Rust-owned copy of every field of a caught ERROR's `ErrorData`, which outlives any memory
+/// context reset, so pgrx can raise the ERROR as it was after Postgres has discarded it.
+#[derive(Debug)]
+struct ErrorDataCopy {
+    elevel: c_int,
+    output_to_server: bool,
+    output_to_client: bool,
+    hide_stmt: bool,
+    hide_ctx: bool,
+    lineno: c_int,
+    sqlerrcode: c_int,
+    cursorpos: c_int,
+    internalpos: c_int,
+    saved_errno: c_int,
+    strings: ErrorDataStrings,
+}
+
+impl ErrorDataCopy {
+    /// # Safety
+    ///
+    /// Each of `edata`'s strings is null or NUL-terminated.
+    unsafe fn new(edata: &crate::ErrorData) -> Self {
+        Self {
+            elevel: edata.elevel,
+            output_to_server: edata.output_to_server,
+            output_to_client: edata.output_to_client,
+            hide_stmt: edata.hide_stmt,
+            hide_ctx: edata.hide_ctx,
+            lineno: edata.lineno,
+            sqlerrcode: edata.sqlerrcode,
+            cursorpos: edata.cursorpos,
+            internalpos: edata.internalpos,
+            saved_errno: edata.saved_errno,
+            // SAFETY: the caller vouches for the strings
+            strings: unsafe { ErrorDataStrings::new(edata) },
+        }
+    }
+
+    /// The report that catch handlers see, with its strings decoded as UTF-8
+    fn report(&self) -> ErrorReport {
+        let lossy = |s: &Option<CString>| s.as_deref().map(|s| s.to_string_lossy().into_owned());
+        let strings = &self.strings;
+        ErrorReport {
+            sqlerrcode: self.sqlerrcode.into(),
+            message: lossy(&strings.message)
+                .unwrap_or_else(|| "<null error message>".into())
+                .into(),
+            hint: lossy(&strings.hint),
+            detail: lossy(&strings.detail),
+            domain: lossy(&strings.domain),
+            location: ErrorReportLocation {
+                file: lossy(&strings.filename).unwrap_or_else(|| "<null filename>".into()),
+                funcname: lossy(&strings.funcname),
+                line: self.lineno as _,
+                col: 0,
+                backtrace: None,
+            },
+        }
+    }
+
+    /// Lays the copy out in one `ErrorContext` allocation for `ReThrowError()`.  That copies the
+    /// strings Postgres frees with an error, but keeps the others, such as `filename`, as they
+    /// are, so they need memory that lasts until Postgres discards the error, which it does by
+    /// resetting `ErrorContext`.  Returns `None` when `ErrorContext` has no memory left.
+    ///
+    /// # Safety
+    ///
+    /// Call only on the backend thread.
+    unsafe fn in_error_context(&self) -> Option<NonNull<crate::ErrorData>> {
+        let size = size_of::<crate::ErrorData>() + self.strings.len();
+        // SAFETY: ErrorContext exists once Postgres can raise an ERROR.  The allocation is
+        // MAXALIGNed, which suits ErrorData, and has room for it and then for the strings.
+        unsafe {
+            let edata = NonNull::new(
+                crate::MemoryContextAllocExtended(
+                    crate::ErrorContext,
+                    size,
+                    (crate::MCXT_ALLOC_HUGE | crate::MCXT_ALLOC_NO_OOM) as _,
+                )
+                .cast::<crate::ErrorData>(),
+            )?;
+            let mut copy = crate::ErrorData {
+                elevel: self.elevel,
+                output_to_server: self.output_to_server,
+                output_to_client: self.output_to_client,
+                hide_stmt: self.hide_stmt,
+                hide_ctx: self.hide_ctx,
+                lineno: self.lineno,
+                sqlerrcode: self.sqlerrcode,
+                cursorpos: self.cursorpos,
+                internalpos: self.internalpos,
+                saved_errno: self.saved_errno,
+                assoc_context: crate::ErrorContext,
+                ..Default::default()
+            };
+            self.strings.write(&mut copy, edata.as_ptr().add(1).cast());
+            edata.write(copy);
+            Some(edata)
+        }
+    }
+}
+
+/// Declares the strings of an `ErrorData` that `ErrorDataCopy` keeps, so that copying them out
+/// of Postgres and back in covers the same fields.
+macro_rules! error_data_strings {
+    ($($field:ident),* $(,)?) => {
+        /// The strings of a caught ERROR's `ErrorData`, byte for byte, since they're in the
+        /// server's encoding
+        #[derive(Debug)]
+        struct ErrorDataStrings {
+            $($field: Option<CString>,)*
+        }
+
+        impl ErrorDataStrings {
+            /// # Safety
+            ///
+            /// Each of `edata`'s strings is null or NUL-terminated.
+            unsafe fn new(edata: &crate::ErrorData) -> Self {
+                // SAFETY: the caller vouches for the strings
+                unsafe { Self { $($field: owned_c_str(edata.$field),)* } }
+            }
+
+            /// The bytes the strings take with their NULs
+            fn len(&self) -> usize {
+                [$(&self.$field),*].into_iter().flatten().map(|s| s.as_bytes_with_nul().len()).sum()
+            }
+
+            /// Points `edata`'s strings at copies written from `buf` on.
+            ///
+            /// # Safety
+            ///
+            /// `buf` is valid for writes of `self.len()` bytes.
+            unsafe fn write(&self, edata: &mut crate::ErrorData, mut buf: *mut c_char) {
+                // SAFETY: the caller vouches for `buf`
+                unsafe { $(edata.$field = write_c_str(&self.$field, &mut buf);)* }
+            }
+        }
+    };
+}
+
+error_data_strings!(
+    filename,
+    funcname,
+    domain,
+    context_domain,
+    message,
+    detail,
+    detail_log,
+    hint,
+    context,
+    backtrace,
+    message_id,
+    schema_name,
+    table_name,
+    column_name,
+    datatype_name,
+    constraint_name,
+    internalquery,
+);
+
+/// # Safety
+///
+/// `s` is null or NUL-terminated.
+unsafe fn owned_c_str(s: *const c_char) -> Option<CString> {
+    // SAFETY: the caller vouches for `s`
+    (!s.is_null()).then(|| unsafe { CStr::from_ptr(s) }.to_owned())
+}
+
+/// Writes `s` and its NUL at `*buf` and moves `*buf` past them.  Returns where `s` was written,
+/// or null for `None`.
+///
+/// # Safety
+///
+/// `*buf` is valid for writes of `s` and its NUL.
+unsafe fn write_c_str(s: &Option<CString>, buf: &mut *mut c_char) -> *mut c_char {
+    let Some(s) = s else { return ptr::null_mut() };
+    let bytes = s.as_bytes_with_nul();
+    let start = *buf;
+    // SAFETY: the caller vouches for the room, and Rust's copy can't overlap Postgres' memory
+    unsafe {
+        ptr::copy_nonoverlapping(bytes.as_ptr().cast::<c_char>(), start, bytes.len());
+        *buf = start.add(bytes.len());
+    }
+    start
 }
 
 impl ErrorReportWithLevel {
@@ -414,7 +654,7 @@ impl ErrorReport {
     ///
     /// If the provided `level` is >= [`PgLogLevel::ERROR`] this function will not return.
     pub fn report(self, level: PgLogLevel) {
-        ErrorReportWithLevel { level, inner: self, stack_entry: None }.report()
+        ErrorReportWithLevel { level, inner: self, caught: None }.report()
     }
 }
 
@@ -456,10 +696,10 @@ pub fn register_pg_guard_panic_hook() {
 /// for a C `PG_CATCH()` block, until something calls `FlushErrorState()`.  [`PgTryBuilder`] does
 /// that when a catch handler returns, and Postgres does when it aborts the transaction.
 ///
-/// [`CaughtError::rethrow()`] passes Postgres back its original ERROR, with every field, while
-/// that ERROR is still on top of the stack.  Otherwise pgrx raises a new ERROR from its copy,
-/// which has the same SQLSTATE, message, DETAIL, HINT, and location, takes its CONTEXT from where
-/// it is raised, and lacks Postgres' other fields, such as the constraint name.
+/// [`CaughtError::rethrow()`] passes Postgres back its original ERROR while that ERROR is still on
+/// top of the stack.  Otherwise pgrx raises the copy of every field that it made when it caught
+/// the ERROR, so Postgres' error handlers, such as PL/pgSQL's `GET STACKED DIAGNOSTICS`, see the
+/// same ERROR either way.
 ///
 /// A [`CaughtError::PostgresError`] that is neither rethrown nor handled by [`PgTryBuilder`],
 /// for example one caught by [`std::panic::catch_unwind()`] and dropped, keeps its stack entry.
@@ -497,7 +737,10 @@ impl CaughtError {
 #[derive(Debug)]
 enum GuardAction<R> {
     Return(R),
+    /// Rethrow the caught ERROR on top of Postgres' error data stack
     ReThrow,
+    /// Rethrow this copy of a caught ERROR that's no longer on top of the stack
+    ReThrowCopy(NonNull<crate::ErrorData>),
     Report(ErrorReportWithLevel),
 }
 
@@ -549,6 +792,20 @@ where
                 pg_re_throw()
             }
         }
+        GuardAction::ReThrowCopy(edata) => {
+            // the bindings guard ReThrowError(), which would catch the ERROR it raises
+            #[cfg_attr(target_os = "windows", link(name = "postgres"))]
+            unsafe extern "C-unwind" {
+                fn ReThrowError(edata: *mut crate::ErrorData);
+            }
+            // SAFETY: `edata` is a complete ERROR in ErrorContext, which keeps it until Postgres
+            // discards the error, and this frame holds nothing that needs dropping.  Postgres
+            // declares ReThrowError() noreturn.
+            unsafe {
+                ReThrowError(edata.as_ptr());
+                unreachable_unchecked()
+            }
+        }
         GuardAction::Report(ereport) => {
             unsafe {
                 do_ereport(ereport);
@@ -567,19 +824,19 @@ where
     match catch_unwind(f) {
         Ok(v) => GuardAction::Return(v),
         Err(e) => match downcast_panic_payload(e) {
-            // SAFETY: Postgres called the guarded function on the backend thread
-            CaughtError::PostgresError(ereport)
-                if ereport.stack_entry.as_ref().is_some_and(|entry| unsafe { entry.is_top() }) =>
-            {
-                // Return to the caller to rethrow the original Postgres ErrorData unchanged.  We
-                // can't do it here because this function has non-POF frames.
-                GuardAction::ReThrow
-            }
             CaughtError::PostgresError(mut ereport) => {
-                // `pg_re_throw()` would raise whatever is on top of the stack now, or read below
-                // an empty one, so raise our copy instead.  Like a rethrow, it gets no backtrace
-                ereport.inner.location.backtrace = None;
-                GuardAction::Report(ereport)
+                // Return to the caller to rethrow the Postgres ERROR unchanged.  We can't do it
+                // here because this function has non-POF frames.
+                //
+                // SAFETY: Postgres called the guarded function on the backend thread
+                let action =
+                    ereport.caught.take().and_then(|caught| unsafe { caught.guard_action() });
+                action.unwrap_or_else(|| {
+                    // with no memory for a copy of every field, report the main ones.  Like a
+                    // rethrow, the report gets no backtrace
+                    ereport.inner.location.backtrace = None;
+                    GuardAction::Report(ereport)
+                })
             }
             CaughtError::ErrorReport(ereport) | CaughtError::RustPanic { ereport, .. } => {
                 GuardAction::Report(ereport)
@@ -614,7 +871,7 @@ pub(crate) fn downcast_panic_payload(e: Box<dyn Any + Send>) -> CaughtError {
         CaughtError::ErrorReport(ErrorReportWithLevel {
             level: PgLogLevel::ERROR,
             inner: *e.downcast().unwrap(),
-            stack_entry: None,
+            caught: None,
         })
     } else if let Some(message) = e.downcast_ref::<&str>() {
         // something panic'd with a &str, so it gets raised as an INTERNAL_ERROR at the ERROR level
@@ -626,7 +883,7 @@ pub(crate) fn downcast_panic_payload(e: Box<dyn Any + Send>) -> CaughtError {
                     message.to_string(),
                     take_panic_location(),
                 ),
-                stack_entry: None,
+                caught: None,
             },
             payload: e,
         }
@@ -640,7 +897,7 @@ pub(crate) fn downcast_panic_payload(e: Box<dyn Any + Send>) -> CaughtError {
                     message.clone(),
                     take_panic_location(),
                 ),
-                stack_entry: None,
+                caught: None,
             },
             payload: e,
         }
@@ -654,7 +911,7 @@ pub(crate) fn downcast_panic_payload(e: Box<dyn Any + Send>) -> CaughtError {
                     "Box<Any>",
                     take_panic_location(),
                 ),
-                stack_entry: None,
+                caught: None,
             },
             payload: e,
         }

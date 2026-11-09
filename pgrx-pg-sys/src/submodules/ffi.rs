@@ -143,10 +143,7 @@ being converted into a transaction-aborting Postgres `ERROR` by PGRX.
 [trivially-deallocated stack frame]: https://github.com/rust-lang/rfcs/blob/master/text/2945-c-unwind-abi.md#plain-old-frames
 **/
 use crate as pg_sys;
-use crate::panic::{
-    CaughtError, ErrorReport, ErrorReportLocation, ErrorReportWithLevel, ErrorStackEntry,
-};
-use core::ffi::CStr;
+use crate::panic::{CaughtError, CaughtPostgresError};
 use std::mem::MaybeUninit;
 
 #[inline(always)]
@@ -202,75 +199,14 @@ unsafe fn pg_guard_ffi_boundary_impl<T, F: FnOnce() -> T>(f: F) -> T {
             pg_sys::PG_exception_stack = prev_exception_stack;
             pg_sys::error_context_stack = prev_error_context_stack;
 
-            // the overhead to get the current [ErrorData] from Postgres and convert
-            // it into our [ErrorReportWithLevel] seems worth the user benefit
-            //
-            // Note that this only happens in the case of us trapping an error
-
             // At this point, we're running within `pg_sys::ErrorContext`, but should be in the
             // memory context the caller was in before we call [CopyErrorData()] and start using it
             pg_sys::CurrentMemoryContext = caller_memxct;
 
-            // SAFETY: `pg_sys::CopyErrorData()` will always give us a valid pointer, so just assume so
-            let errdata_ptr = pg_sys::CopyErrorData();
-            let errdata = errdata_ptr.as_ref().unwrap_unchecked();
-
-            // copy out the fields we need to support pgrx' error handling
-            let level = errdata.elevel.into();
-            let sqlerrcode = errdata.sqlerrcode.into();
-            let message = if errdata.message.is_null() {
-                String::from("<null error message>")
-            } else {
-                CStr::from_ptr(errdata.message).to_string_lossy().to_string()
-            };
-            let domain = if errdata.domain.is_null() {
-                None
-            } else {
-                { Some(CStr::from_ptr(errdata.domain).to_string_lossy().to_string()) }
-            };
-            let detail = if errdata.detail.is_null() {
-                None
-            } else {
-                { Some(CStr::from_ptr(errdata.detail).to_string_lossy().to_string()) }
-            };
-            let hint = if errdata.hint.is_null() {
-                None
-            } else {
-                { Some(CStr::from_ptr(errdata.hint).to_string_lossy().to_string()) }
-            };
-            let funcname = if errdata.funcname.is_null() {
-                None
-            } else {
-                { Some(CStr::from_ptr(errdata.funcname).to_string_lossy().to_string()) }
-            };
-            let file = if errdata.filename.is_null() {
-                String::from("<null filename>")
-            } else {
-                CStr::from_ptr(errdata.filename).to_string_lossy().to_string()
-            };
-            let line = errdata.lineno as _;
-
-            // clean up after ourselves by freeing the result of [CopyErrorData].  Keep the original
-            // error on Postgres' error stack so it can later be rethrown without losing fields.
-            pg_sys::FreeErrorData(errdata_ptr);
-
-            // remember the original's stack entry so the error is rethrown only while it's on top
-            let stack_entry = ErrorStackEntry::mark_top();
-
             // finally, turn this Postgres error into a Rust panic so that we can ensure proper
-            // Rust stack unwinding and also defer handling until later
-            std::panic::panic_any(CaughtError::PostgresError(ErrorReportWithLevel {
-                level,
-                inner: ErrorReport {
-                    sqlerrcode,
-                    message: message.into(),
-                    detail,
-                    hint,
-                    domain,
-                    location: ErrorReportLocation { file, funcname, line, col: 0, backtrace: None },
-                },
-                stack_entry,
-            }))
+            // Rust stack unwinding and also defer handling until later.  The original stays on
+            // Postgres' error stack, so it can later be rethrown unchanged
+            std::panic::panic_any(CaughtError::PostgresError(CaughtPostgresError::catch()))
         }
     }
 }

@@ -59,20 +59,15 @@ fn get_relation_name(oid: pg_sys::Oid) -> String {
     .execute()
 }
 
-/// Runs `sql` and rethrows its error from the catch handler.
+/// Runs `sql` and rethrows its error from the catch handler or, if `after_handler`, after the
+/// handler has returned it.
 #[pg_extern]
-fn rethrow_in_handler(sql: &str) {
-    PgTryBuilder::new(|| Spi::run(sql).expect("SPI failed")).catch_others(|e| e.rethrow()).execute()
-}
-
-/// Runs `sql` and rethrows its error after the catch handler has returned it.
-#[pg_extern]
-fn rethrow_after_handler(sql: &str) {
+fn rethrow_caught_error(sql: &str, after_handler: bool) {
     let caught = PgTryBuilder::new(|| {
         Spi::run(sql).expect("SPI failed");
         None
     })
-    .catch_others(Some)
+    .catch_others(|e| if after_handler { Some(e) } else { e.rethrow() })
     .execute();
     if let Some(e) = caught {
         e.rethrow()
@@ -84,6 +79,7 @@ fn rethrow_after_handler(sql: &str) {
 mod tests {
     #[allow(unused_imports)]
     use crate as pgrx_unit_tests;
+    use std::collections::BTreeMap;
     use std::rc::Rc;
     use std::sync::atomic::{AtomicBool, Ordering};
 
@@ -419,52 +415,95 @@ mod tests {
         }
     }
 
-    /// Calls the named `rethrow_*` function on a unique violation from PL/pgSQL and returns the
-    /// SQLSTATE, DETAIL, and constraint name of the error its EXCEPTION block caught.
-    fn stacked_diagnostics(rethrow_fn: &str) -> String {
+    /// The items that `pg_temp.diagnostics()` reads, in the order it returns them.
+    const DIAGNOSTICS: [&str; 10] = [
+        "RETURNED_SQLSTATE",
+        "MESSAGE_TEXT",
+        "PG_EXCEPTION_DETAIL",
+        "PG_EXCEPTION_HINT",
+        "PG_EXCEPTION_CONTEXT",
+        "SCHEMA_NAME",
+        "TABLE_NAME",
+        "COLUMN_NAME",
+        "PG_DATATYPE_NAME",
+        "CONSTRAINT_NAME",
+    ];
+
+    /// Creates `pg_temp.diagnostics(after_handler)`, which has `rethrow_caught_error` rethrow a
+    /// unique violation into PL/pgSQL and returns what `GET STACKED DIAGNOSTICS` reads from it.
+    fn create_diagnostics_function() {
         Spi::run(
             "CREATE TEMP TABLE caught_error (k int CONSTRAINT caught_error_k_unique UNIQUE);
              INSERT INTO caught_error VALUES (1);
-             CREATE FUNCTION pg_temp.stacked_diagnostics(rethrow_fn text) RETURNS text
+             CREATE FUNCTION pg_temp.diagnostics(after_handler bool) RETURNS text[]
              LANGUAGE plpgsql AS $$
              DECLARE
-                 state text;
-                 detail text;
-                 constraint_name text;
+                 d_state text;
+                 d_message text;
+                 d_detail text;
+                 d_hint text;
+                 d_context text;
+                 d_schema text;
+                 d_table text;
+                 d_column text;
+                 d_datatype text;
+                 d_constraint text;
              BEGIN
-                 EXECUTE format('SELECT %I(%L)', rethrow_fn, 'INSERT INTO caught_error VALUES (1)');
-                 RETURN 'no error';
+                 PERFORM rethrow_caught_error('INSERT INTO caught_error VALUES (1)', after_handler);
+                 RETURN NULL;
              EXCEPTION WHEN OTHERS THEN
                  GET STACKED DIAGNOSTICS
-                     state = RETURNED_SQLSTATE,
-                     detail = PG_EXCEPTION_DETAIL,
-                     constraint_name = CONSTRAINT_NAME;
-                 RETURN format('%s|%s|%s', state, detail, constraint_name);
+                     d_state = RETURNED_SQLSTATE,
+                     d_message = MESSAGE_TEXT,
+                     d_detail = PG_EXCEPTION_DETAIL,
+                     d_hint = PG_EXCEPTION_HINT,
+                     d_context = PG_EXCEPTION_CONTEXT,
+                     d_schema = SCHEMA_NAME,
+                     d_table = TABLE_NAME,
+                     d_column = COLUMN_NAME,
+                     d_datatype = PG_DATATYPE_NAME,
+                     d_constraint = CONSTRAINT_NAME;
+                 RETURN ARRAY[d_state, d_message, d_detail, d_hint, d_context,
+                              d_schema, d_table, d_column, d_datatype, d_constraint];
              END $$",
         )
         .expect("SPI failed");
-        Spi::get_one::<String>(&format!("SELECT pg_temp.stacked_diagnostics('{rethrow_fn}')"))
-            .expect("SPI failed")
-            .expect("stacked_diagnostics returned NULL")
     }
 
-    /// A rethrow from the catch handler passes PostgreSQL its original error with every field.
+    fn diagnostics(after_handler: bool) -> BTreeMap<&'static str, String> {
+        // the flag is a parameter, since CONTEXT quotes the query
+        let values = Spi::get_one_with_args::<Vec<Option<String>>>(
+            "SELECT pg_temp.diagnostics($1)",
+            &[after_handler.into()],
+        )
+        .expect("SPI failed")
+        .expect("rethrow_caught_error should have raised an ERROR");
+        DIAGNOSTICS
+            .into_iter()
+            .zip(values)
+            .map(|(item, value)| (item, value.unwrap_or_default()))
+            .collect()
+    }
+
+    /// A rethrow from the catch handler passes PostgreSQL its original error.
     #[pg_test]
     fn test_rethrow_in_handler_keeps_postgres_error() {
-        assert_eq!(
-            stacked_diagnostics("rethrow_in_handler"),
-            "23505|Key (k)=(1) already exists.|caught_error_k_unique"
-        );
+        create_diagnostics_function();
+        let original = diagnostics(false);
+        assert_eq!(original["RETURNED_SQLSTATE"], "23505");
+        assert_eq!(original["PG_EXCEPTION_DETAIL"], "Key (k)=(1) already exists.");
+        assert_eq!(original["TABLE_NAME"], "caught_error");
+        assert_eq!(original["CONSTRAINT_NAME"], "caught_error_k_unique");
     }
 
     /// `execute` clears PostgreSQL's error state when a handler returns, so a later rethrow
-    /// raises the error from pgrx's copy, which has no constraint name.
+    /// raises pgrx's copy of the error, which PL/pgSQL can't tell from the original.
     #[pg_test]
     fn test_rethrow_after_handler_reports_copy() {
-        assert_eq!(
-            stacked_diagnostics("rethrow_after_handler"),
-            "23505|Key (k)=(1) already exists.|"
-        );
+        create_diagnostics_function();
+        let copy = diagnostics(true);
+        assert_eq!(copy["CONSTRAINT_NAME"], "caught_error_k_unique");
+        assert_eq!(copy, diagnostics(false));
     }
 
     #[pg_test(error = "could not open relation with OID 0")]
