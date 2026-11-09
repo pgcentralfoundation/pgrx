@@ -30,6 +30,7 @@ pg18 = ["pgrx/pg18"]
 pg19 = ["pgrx/pg19"]
 pg_test = []
 proptest = ["dep:proptest"]
+client = ["dep:postgres"]
 cshim = ["pgrx/cshim"]
 no-schema-generation = [
     "pgrx/no-schema-generation",
@@ -38,7 +39,7 @@ no-schema-generation = [
 nightly = ["pgrx/nightly"]
 
 [package.metadata.docs.rs]
-features = ["pg15", "proptest"]
+features = ["pg15", "proptest", "client"]
 no-default-features = true
 targets = ["x86_64-unknown-linux-gnu"]
 
@@ -53,7 +54,7 @@ regex.workspace = true
 shlex.workspace = true
 thiserror.workspace = true
 
-postgres = "0.19.14"
+postgres = { version = "0.19.14", optional = true }
 proptest = { version = "1", optional = true }
 tempfile = "3.27.0"
 sysinfo = "0.40.1"

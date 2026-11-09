@@ -115,7 +115,7 @@ separate clusters and dynamic ports; see [test.md](test.md) for its cleanup.
 ## References
 
 - [init.md](init.md): initialization, port selection, private worktree homes
-- [test.md](test.md): Rust and backend tests, filters, test cluster lifecycle
+- [test.md](test.md): Rust and backend tests, filters, tests with more than one session, test cluster lifecycle
 - [run.md](run.md): build, install, restart, and open a client
 - [regress.md](regress.md): SQL regressions and expected-output management
 - [bench.md](bench.md): backend benchmarks and stored comparisons

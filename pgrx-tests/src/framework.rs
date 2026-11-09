@@ -14,7 +14,6 @@ use eyre::{WrapErr, eyre};
 use owo_colors::OwoColorize;
 use pgrx::prelude::*;
 use pgrx_pg_config::{PgConfig, Pgrx, createdb, get_c_locale_flags, get_target_dir};
-use postgres::error::DbError;
 use std::collections::HashMap;
 use std::env::VarError;
 use std::ffi::OsStr;
@@ -25,6 +24,7 @@ use std::time::Duration;
 use sysinfo::{Pid, System};
 
 mod shutdown;
+mod wire;
 pub use shutdown::add_shutdown_hook;
 
 type LogLines = Arc<Mutex<HashMap<String, Vec<String>>>>;
@@ -63,67 +63,38 @@ impl PortReservation {
     }
 }
 
-// The goal of this closure is to allow "wrapping" of anything that might issue
-// an SQL simple_query or query using either a postgres::Client or
-// postgres::Transaction and capture the output. The use of this wrapper is
-// completely optional, but it might help narrow down some errors later on.
-fn query_wrapper<F, T>(
-    query: Option<String>,
-    query_params: Option<&[&(dyn postgres::types::ToSql + Sync)]>,
-    mut f: F,
-) -> eyre::Result<T>
-where
-    T: IntoIterator,
-    F: FnMut(
-        Option<String>,
-        Option<&[&(dyn postgres::types::ToSql + Sync)]>,
-    ) -> Result<T, postgres::Error>,
-{
-    let result = f(query.clone(), query_params);
+/// Run `query` with the framework's client, and describe a server error along with the query.
+fn query_wrapper(client: &mut wire::Client, query: &str) -> eyre::Result<Vec<wire::Row>> {
+    match client.simple_query(query) {
+        Ok(rows) => Ok(rows),
+        Err(wire::Error::Db(dberror)) => {
+            let query_message = &dberror.message;
 
-    match result {
-        Ok(result) => Ok(result),
-        Err(e) => {
-            if let Some(dberror) = e.as_db_error() {
-                let query = query.unwrap();
-                let query_message = dberror.message();
+            let code = &dberror.code;
+            let severity = &dberror.severity;
 
-                let code = dberror.code().code();
-                let severity = dberror.severity();
+            let mut message = format!("{severity} SQLSTATE[{code}]").bold().red().to_string();
 
-                let mut message = format!("{severity} SQLSTATE[{code}]").bold().red().to_string();
+            message.push_str(format!(": {}", query_message.bold().white()).as_str());
+            message.push_str(format!("\nquery: {}", query.bold().white()).as_str());
+            // The simple query protocol has no parameters.
+            message.push_str("\nparams: None");
 
-                message.push_str(format!(": {}", query_message.bold().white()).as_str());
-                message.push_str(format!("\nquery: {}", query.bold().white()).as_str());
-                message.push_str(
-                    format!(
-                        "\nparams: {}",
-                        match query_params {
-                            Some(params) => format!("{params:?}"),
-                            None => "None".to_string(),
-                        }
-                    )
-                    .as_str(),
-                );
-
-                if let Ok(var) = std::env::var("RUST_BACKTRACE")
-                    && var.eq("1")
-                {
-                    let detail = dberror.detail().unwrap_or("None");
-                    let hint = dberror.hint().unwrap_or("None");
-                    let schema = dberror.hint().unwrap_or("None");
-                    let table = dberror.table().unwrap_or("None");
-                    let more_info = format!(
-                        "\ndetail: {detail}\nhint: {hint}\nschema: {schema}\ntable: {table}"
-                    );
-                    message.push_str(more_info.as_str());
-                }
-
-                Err(eyre!(message))
-            } else {
-                Err(e).wrap_err("non-DbError")
+            if let Ok(var) = std::env::var("RUST_BACKTRACE")
+                && var.eq("1")
+            {
+                let detail = dberror.detail.as_deref().unwrap_or("None");
+                let hint = dberror.hint.as_deref().unwrap_or("None");
+                let schema = dberror.schema.as_deref().unwrap_or("None");
+                let table = dberror.table.as_deref().unwrap_or("None");
+                let more_info =
+                    format!("\ndetail: {detail}\nhint: {hint}\nschema: {schema}\ntable: {table}");
+                message.push_str(more_info.as_str());
             }
+
+            Err(eyre!(message))
         }
+        Err(e) => Err(e).wrap_err("non-DbError"),
     }
 }
 
@@ -140,50 +111,37 @@ pub fn run_test(
     }
     let (loglines, system_session_id) = get_test_framework(postgresql_conf)?;
 
-    let (mut client, session_id) = client()?;
+    let mut client = connect()?;
+    let session_id = get_session_id(&mut client)?;
 
-    let result = client.transaction().map(|mut tx| {
+    let result = client.simple_query("BEGIN").and_then(|_| {
         let schema = "tests"; // get_extension_schema();
-        let result = tx.simple_query(&format!("SELECT \"{schema}\".\"{sql_funcname}\"();"));
+        let result = client.simple_query(&format!("SELECT \"{schema}\".\"{sql_funcname}\"();"));
 
-        if result.is_ok() {
-            // and abort the transaction when complete
-            tx.rollback()?;
-        }
-
-        result
+        // Abort the transaction whether or not the test failed. A failed test has already
+        // aborted it, and its error is the one to report.
+        let rollback = client.simple_query("ROLLBACK");
+        result.and(rollback)
     });
 
-    // flatten the above result
-    let result = match result {
-        Err(e) => Err(e),
-        Ok(Err(e)) => Err(e),
-        Ok(_) => Ok(()),
-    };
-
     if let Err(e) = result {
-        let error_as_string = format!("{e}");
-        let cause = e.into_source();
-
-        let (pg_location, rust_location, message) =
-            if let Some(Some(dberror)) = cause.map(|e| e.downcast_ref::<DbError>().cloned()) {
-                let received_error_message = dberror.message();
-
-                if Some(received_error_message) == expected_error {
+        let (pg_location, rust_location, message) = match e {
+            wire::Error::Db(dberror) => {
+                if Some(dberror.message.as_str()) == expected_error {
                     // the error received is the one we expected, so just return if they match
                     return Ok(());
                 }
 
-                let mut pg_location = dberror.file().unwrap_or("<unknown>").to_string();
-                let rust_location = dberror.where_().unwrap_or("<unknown>").to_string();
-                if let Some(lineno) = dberror.line() {
+                let mut pg_location = dberror.file.unwrap_or_else(|| "<unknown>".to_string());
+                let rust_location = dberror.where_.unwrap_or_else(|| "<unknown>".to_string());
+                if let Some(lineno) = dberror.line {
                     pg_location += &format!(":{lineno}");
                 }
 
-                (pg_location, rust_location, received_error_message.to_string())
-            } else {
-                ("<unknown>".to_string(), "<unknown>".to_string(), error_as_string.to_string())
-            };
+                (pg_location, rust_location, dberror.message)
+            }
+            e => ("<unknown>".to_string(), "<unknown>".to_string(), e.to_string()),
+        };
 
         // wait a second for Postgres to get log messages written to stderr
         std::thread::sleep(std::time::Duration::from_millis(1000));
@@ -290,6 +248,34 @@ fn get_pg_config() -> eyre::Result<PgConfig> {
     Ok(pg_config)
 }
 
+/// Selects the connection's session ID, which the `%c` escape in `log_line_prefix` prints at
+/// the start of each of its lines in the server log.
+const SESSION_ID_QUERY: &str = "SELECT to_hex(trunc(EXTRACT(EPOCH FROM backend_start))::integer) || '.' || to_hex(pid) AS sid FROM pg_stat_activity WHERE pid = pg_backend_pid();";
+
+/// Connect the framework's client to the test database.
+fn connect() -> eyre::Result<wire::Client> {
+    let pg_config = get_pg_config()?;
+    wire::Client::connect(pg_config.host(), pg_config.test_port()?, &get_pg_user(), get_pg_dbname())
+        .wrap_err("Error connecting to Postgres")
+}
+
+fn get_session_id(client: &mut wire::Client) -> eyre::Result<String> {
+    let rows = query_wrapper(client, SESSION_ID_QUERY)
+        .wrap_err("There was an issue attempting to get the session ID from Postgres")?;
+    match rows.first().and_then(|row| row.get("sid")) {
+        Some(session_id) => Ok(session_id.to_string()),
+        None => Err(eyre!("Failed to obtain a client Session ID from Postgres")),
+    }
+}
+
+/// Connect a [`postgres::Client`] to the test database, and return it with its session ID.
+///
+/// The session ID is the `%c` value that starts each of the connection's lines in the
+/// server log. Only the test process that started the server knows its port: call
+/// [`run_test`] first, and don't call this from inside a `#[pg_test]` function.
+///
+/// Requires the `client` feature.
+#[cfg(feature = "client")]
 pub fn client() -> eyre::Result<(postgres::Client, String)> {
     let pg_config = get_pg_config()?;
     let mut client = postgres::Config::new()
@@ -300,12 +286,9 @@ pub fn client() -> eyre::Result<(postgres::Client, String)> {
         .connect(postgres::NoTls)
         .wrap_err("Error connecting to Postgres")?;
 
-    let sid_query_result = query_wrapper(
-        Some("SELECT to_hex(trunc(EXTRACT(EPOCH FROM backend_start))::integer) || '.' || to_hex(pid) AS sid FROM pg_stat_activity WHERE pid = pg_backend_pid();".to_string()),
-        Some(&[]),
-        |query, query_params| client.query(&query.unwrap(), query_params.unwrap()),
-    )
-    .wrap_err("There was an issue attempting to get the session ID from Postgres")?;
+    let sid_query_result = client
+        .query(SESSION_ID_QUERY, &[])
+        .wrap_err("There was an issue attempting to get the session ID from Postgres")?;
 
     let session_id = match sid_query_result.first() {
         Some(row) => row.get::<&str, &str>("sid").to_string(),
@@ -903,15 +886,12 @@ fn dropdb() -> eyre::Result<()> {
 }
 
 fn create_extension() -> eyre::Result<()> {
-    let (mut client, _) = client()?;
+    let mut client = connect()?;
     let extension_name = get_extension_name()?;
 
-    query_wrapper(Some(format!("CREATE EXTENSION {extension_name} CASCADE;")), None, |query, _| {
-        client.simple_query(query.unwrap().as_str())
-    })
-    .wrap_err(format!(
-        "There was an issue creating the extension '{extension_name}' in Postgres: "
-    ))?;
+    query_wrapper(&mut client, &format!("CREATE EXTENSION {extension_name} CASCADE;")).wrap_err(
+        format!("There was an issue creating the extension '{extension_name}' in Postgres: "),
+    )?;
 
     Ok(())
 }

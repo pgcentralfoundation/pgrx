@@ -47,6 +47,24 @@ cleanup paths. Calls into PostgreSQL belong in `#[pg_test]`. Use
 `cargo check` for compilation, [regress](regress.md) for SQL expectations, and
 [bench](bench.md) for measurements.
 
+## Tests with more than one session
+
+A `#[pg_test]` function runs in one backend. To open more sessions from it, use
+pgrx-tests' `client` feature, which re-exports the `postgres` crate as
+`pgrx_tests::postgres`; it's off by default because `postgres` brings in `tokio`.
+`#[pg_test]` bodies are compiled into the extension library, which can't use
+dev-dependencies, so the extension also lists pgrx-tests under `[dependencies]`
+with `features = ["client"]`, `optional = true`, and `pg_test = ["dep:pgrx-tests"]`.
+Forward PostgreSQL features with `pgrx-tests?/pgNN`; `pgrx-tests/pgNN` turns
+the optional dependency on in release builds. In the test, read `port`,
+`unix_socket_directories`, `current_user`, and `current_database()` with SPI and
+connect with `pgrx_tests::postgres::Config`, as
+[postgres_reexport_tests.rs](../../pgrx-unit-tests/src/tests/postgres_reexport_tests.rs)
+does. `pgrx_tests::client()` can't find the server from a backend; it works from
+an ordinary `#[test]` after `pgrx_tests::run_test` starts the server. An
+unresolved `pgrx_tests::postgres` in the extension build means the feature or
+the `[dependencies]` entry is missing.
+
 ## Harness installation
 
 The harness invokes cargo-pgrx separately to install the test extension. It uses
