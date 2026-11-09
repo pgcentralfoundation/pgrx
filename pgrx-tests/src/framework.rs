@@ -1024,8 +1024,16 @@ pub fn get_named_capture(
     regex.captures(against).map(|cap| cap[name].to_string())
 }
 
-fn get_cargo_test_features() -> eyre::Result<clap_cargo::Features> {
-    let mut features = clap_cargo::Features::default();
+/// The feature flags given to the `cargo test` command that started this test binary.
+#[derive(Default)]
+struct CargoTestFeatures {
+    features: Vec<String>,
+    all_features: bool,
+    no_default_features: bool,
+}
+
+fn get_cargo_test_features() -> eyre::Result<CargoTestFeatures> {
+    let mut features = CargoTestFeatures::default();
     let cargo_user_args = get_cargo_args()?;
     let mut iter = cargo_user_args.iter();
     while let Some(part) = iter.next() {

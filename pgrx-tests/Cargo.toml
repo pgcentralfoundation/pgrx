@@ -46,7 +46,6 @@ targets = ["x86_64-unknown-linux-gnu"]
 pgrx-macros.workspace = true
 pgrx-pg-config.workspace = true
 
-clap-cargo.workspace = true
 eyre.workspace = true
 libc.workspace = true
 owo-colors.workspace = true

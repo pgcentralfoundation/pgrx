@@ -2417,7 +2417,6 @@ dependencies = [
 name = "pgrx-tests"
 version = "0.20.0-beta.0"
 dependencies = [
- "clap-cargo",
  "eyre",
  "libc",
  "owo-colors",
