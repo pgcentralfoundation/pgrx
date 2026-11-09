@@ -465,6 +465,7 @@ fn main() {{
             let size = VARTAG_SIZE!(assertion_argument(tag));
             println!("size\t{{}}\t{{}}", size.get(), assertion_evaluations());
         }}
+        assertion_site(core::ptr::null(), 0);
         println!("site\t{{}}\t{{}}", file!(), line!() + 1);
         let invalid = VARTAG_SIZE!(assertion_argument(0_i32));
         println!("unasserted\t{{}}\t{{}}", invalid.get(), assertion_evaluations());

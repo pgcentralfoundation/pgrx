@@ -11,8 +11,12 @@
 //! that reached the check, as for other invocation diagnostics.
 //!
 //! These functions are safe: they read only their arguments, and aborting the process is
-//! defined behavior on any thread. They never unwind, so a failure cannot become a
+//! defined behavior on any thread. They never return or unwind, so a failure cannot become a
 //! recoverable PostgreSQL `ERROR`.
+//!
+//! They are typed `()`, not `!`, because generated macros keep C's expression shapes, such as
+//! `AssertMacro`'s `(failure, 0)`. A `!` call there would make rustc report the rest of the
+//! expansion as unreachable code at every caller of the macro.
 
 use std::io::Write;
 
