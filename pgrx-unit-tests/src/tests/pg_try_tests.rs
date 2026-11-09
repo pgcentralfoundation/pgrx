@@ -59,6 +59,26 @@ fn get_relation_name(oid: pg_sys::Oid) -> String {
     .execute()
 }
 
+/// Runs `sql` and rethrows its error from the catch handler.
+#[pg_extern]
+fn rethrow_in_handler(sql: &str) {
+    PgTryBuilder::new(|| Spi::run(sql).expect("SPI failed")).catch_others(|e| e.rethrow()).execute()
+}
+
+/// Runs `sql` and rethrows its error after the catch handler has returned it.
+#[pg_extern]
+fn rethrow_after_handler(sql: &str) {
+    let caught = PgTryBuilder::new(|| {
+        Spi::run(sql).expect("SPI failed");
+        None
+    })
+    .catch_others(Some)
+    .execute();
+    if let Some(e) = caught {
+        e.rethrow()
+    }
+}
+
 #[cfg(any(test, feature = "pg_test"))]
 #[pg_schema]
 mod tests {
@@ -386,5 +406,120 @@ mod tests {
 
         // really just testing that the finally block ran
         assert!(finally.load(Ordering::SeqCst));
+    }
+
+    /// Raises PostgreSQL's "could not open relation with OID {oid}" ERROR.
+    fn open_missing_relation(oid: u32) {
+        let lockmode = pg_sys::AccessShareLock as pg_sys::LOCKMODE;
+        // SAFETY: relation_open raises an ERROR for an OID that names no relation. A relation it
+        // does open is closed with the lock mode it was opened with.
+        unsafe {
+            let rel = pg_sys::relation_open(pg_sys::Oid::from(oid), lockmode);
+            pg_sys::relation_close(rel, lockmode);
+        }
+    }
+
+    /// Calls the named `rethrow_*` function on a unique violation from PL/pgSQL and returns the
+    /// SQLSTATE, DETAIL, and constraint name of the error its EXCEPTION block caught.
+    fn stacked_diagnostics(rethrow_fn: &str) -> String {
+        Spi::run(
+            "CREATE TEMP TABLE caught_error (k int CONSTRAINT caught_error_k_unique UNIQUE);
+             INSERT INTO caught_error VALUES (1);
+             CREATE FUNCTION pg_temp.stacked_diagnostics(rethrow_fn text) RETURNS text
+             LANGUAGE plpgsql AS $$
+             DECLARE
+                 state text;
+                 detail text;
+                 constraint_name text;
+             BEGIN
+                 EXECUTE format('SELECT %I(%L)', rethrow_fn, 'INSERT INTO caught_error VALUES (1)');
+                 RETURN 'no error';
+             EXCEPTION WHEN OTHERS THEN
+                 GET STACKED DIAGNOSTICS
+                     state = RETURNED_SQLSTATE,
+                     detail = PG_EXCEPTION_DETAIL,
+                     constraint_name = CONSTRAINT_NAME;
+                 RETURN format('%s|%s|%s', state, detail, constraint_name);
+             END $$",
+        )
+        .expect("SPI failed");
+        Spi::get_one::<String>(&format!("SELECT pg_temp.stacked_diagnostics('{rethrow_fn}')"))
+            .expect("SPI failed")
+            .expect("stacked_diagnostics returned NULL")
+    }
+
+    /// A rethrow from the catch handler passes PostgreSQL its original error with every field.
+    #[pg_test]
+    fn test_rethrow_in_handler_keeps_postgres_error() {
+        assert_eq!(
+            stacked_diagnostics("rethrow_in_handler"),
+            "23505|Key (k)=(1) already exists.|caught_error_k_unique"
+        );
+    }
+
+    /// `execute` clears PostgreSQL's error state when a handler returns, so a later rethrow
+    /// raises the error from pgrx's copy, which has no constraint name.
+    #[pg_test]
+    fn test_rethrow_after_handler_reports_copy() {
+        assert_eq!(
+            stacked_diagnostics("rethrow_after_handler"),
+            "23505|Key (k)=(1) already exists.|"
+        );
+    }
+
+    #[pg_test(error = "could not open relation with OID 0")]
+    fn test_rethrow_postgres_error_returned_by_handler() {
+        let caught = PgTryBuilder::new(|| {
+            open_missing_relation(0);
+            None
+        })
+        .catch_others(Some)
+        .execute();
+        caught.expect("relation_open should have raised an ERROR").rethrow();
+    }
+
+    #[pg_test(error = "could not open relation with OID 0")]
+    fn test_rethrow_after_nested_pg_try_handled_error() {
+        PgTryBuilder::new(|| open_missing_relation(0))
+            .catch_others(|e| {
+                PgTryBuilder::new(|| open_missing_relation(1)).catch_others(|_| ()).execute();
+                e.rethrow()
+            })
+            .execute();
+    }
+
+    #[pg_test(error = "could not open relation with OID 0")]
+    fn test_rethrow_after_plpgsql_handled_error() {
+        PgTryBuilder::new(|| open_missing_relation(0))
+            .catch_others(|e| {
+                Spi::run(
+                    "DO $$ BEGIN PERFORM 1 / 0; EXCEPTION WHEN division_by_zero THEN NULL; END $$",
+                )
+                .expect("SPI failed");
+                e.rethrow()
+            })
+            .execute();
+    }
+
+    #[pg_test(error = "could not open relation with OID 0")]
+    fn test_rethrow_under_newer_swallowed_error() {
+        PgTryBuilder::new(|| open_missing_relation(0))
+            .catch_others(|e| {
+                std::panic::catch_unwind(|| open_missing_relation(1)).unwrap_err();
+                e.rethrow()
+            })
+            .execute();
+    }
+
+    #[pg_test(error = "could not open relation with OID 0")]
+    fn test_rethrow_over_older_swallowed_error() {
+        let caught = PgTryBuilder::new(|| {
+            open_missing_relation(0);
+            None
+        })
+        .catch_others(Some)
+        .execute();
+        std::panic::catch_unwind(|| open_missing_relation(1)).unwrap_err();
+        caught.expect("relation_open should have raised an ERROR").rethrow();
     }
 }

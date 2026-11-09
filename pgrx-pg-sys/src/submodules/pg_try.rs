@@ -136,6 +136,12 @@ impl<'a, R, F: FnOnce() -> R + UnwindSafe> PgTryBuilder<'a, R, F> {
 
     /// Run the main execution block closure.  Any error raised will be passed to a registered
     /// catch handler, and when finished, the finally block will be run.
+    ///
+    /// When a catch handler returns instead of raising, `execute` calls Postgres'
+    /// `FlushErrorState()`, as C code must once it has handled an ERROR.  That empties Postgres'
+    /// whole error data stack, so a [`CaughtError::PostgresError`] still held afterward, such as
+    /// one the handler returned, is rethrown from pgrx's copy.  See
+    /// [`CaughtError`](CaughtError#postgres-errors).
     pub fn execute(mut self) -> R {
         let result = catch_unwind(self.func);
 

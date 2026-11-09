@@ -143,7 +143,9 @@ being converted into a transaction-aborting Postgres `ERROR` by PGRX.
 [trivially-deallocated stack frame]: https://github.com/rust-lang/rfcs/blob/master/text/2945-c-unwind-abi.md#plain-old-frames
 **/
 use crate as pg_sys;
-use crate::panic::{CaughtError, ErrorReport, ErrorReportLocation, ErrorReportWithLevel};
+use crate::panic::{
+    CaughtError, ErrorReport, ErrorReportLocation, ErrorReportWithLevel, ErrorStackEntry,
+};
 use core::ffi::CStr;
 use std::mem::MaybeUninit;
 
@@ -247,6 +249,9 @@ unsafe fn pg_guard_ffi_boundary_impl<T, F: FnOnce() -> T>(f: F) -> T {
             pg_sys::PG_exception_stack = prev_exception_stack;
             pg_sys::error_context_stack = prev_error_context_stack;
 
+            // remember the original's stack entry so the error is rethrown only while it's on top
+            let stack_entry = ErrorStackEntry::mark_top();
+
             // finally, turn this Postgres error into a Rust panic so that we can ensure proper
             // Rust stack unwinding and also defer handling until later
             std::panic::panic_any(CaughtError::PostgresError(ErrorReportWithLevel {
@@ -259,6 +264,7 @@ unsafe fn pg_guard_ffi_boundary_impl<T, F: FnOnce() -> T>(f: F) -> T {
                     domain,
                     location: ErrorReportLocation { file, funcname, line, col: 0, backtrace: None },
                 },
+                stack_entry,
             }))
         }
     }

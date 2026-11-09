@@ -10,15 +10,18 @@
 #![deny(unsafe_op_in_unsafe_fn)]
 #![allow(non_snake_case)]
 
-use core::ffi::CStr;
+use core::ffi::{CStr, c_void};
 use std::any::Any;
 use std::borrow::Cow;
 use std::cell::Cell;
 use std::fmt::{Display, Formatter};
 use std::hint::unreachable_unchecked;
+use std::num::NonZeroUsize;
 use std::panic::{
     AssertUnwindSafe, Location, PanicHookInfo, UnwindSafe, catch_unwind, panic_any, resume_unwind,
 };
+use std::ptr;
+use std::sync::atomic::{AtomicUsize, Ordering};
 
 use crate::elog::PgLogLevel;
 use crate::errcodes::PgSqlErrorCode;
@@ -148,6 +151,82 @@ impl Display for ErrorReport {
 pub struct ErrorReportWithLevel {
     pub(crate) level: PgLogLevel,
     pub(crate) inner: ErrorReport,
+    /// Marks the stack entry of the Postgres ERROR this report copies, if pgrx caught one
+    pub(crate) stack_entry: Option<ErrorStackEntry>,
+}
+
+/// Identifies the entry a caught Postgres ERROR occupies on Postgres' error data stack.
+///
+/// Postgres gives the entries on that stack no identity, so when pgrx catches an ERROR, it
+/// registers a reset callback on `ErrorContext`, which goes to the head of the context's callback
+/// list.  Only two things move the ERROR off the top of the stack: a reset of `ErrorContext`,
+/// which `FlushErrorState()` does and which empties the list, and a newer ERROR, which pgrx marks
+/// the same way when it catches it.  So while the callback is the head of the list, the ERROR is
+/// the top of the stack, unless code that doesn't mark what it catches, such as C code or an
+/// extension built with an older pgrx, keeps a newer ERROR without flushing it.
+#[derive(Debug)]
+pub(crate) struct ErrorStackEntry {
+    token: NonZeroUsize,
+}
+
+/// The callback that marks a caught ERROR.  Its place in `ErrorContext`'s callback list is the
+/// mark, so it has nothing to do when Postgres calls it during the reset.
+unsafe extern "C-unwind" fn caught_error_mark(_token: *mut c_void) {}
+
+impl ErrorStackEntry {
+    /// Marks the entry at the top of Postgres' error data stack.  Returns `None` when
+    /// `ErrorContext` has no memory left for the mark.
+    ///
+    /// # Safety
+    ///
+    /// Call only on the backend thread, while the ERROR that pgrx just caught is on top of the
+    /// stack.
+    pub(crate) unsafe fn mark_top() -> Option<Self> {
+        static LAST_TOKEN: AtomicUsize = AtomicUsize::new(0);
+        // a token that wraps to zero leaves its ERROR unmarked, which only costs fields
+        let token = NonZeroUsize::new(LAST_TOKEN.fetch_add(1, Ordering::Relaxed).wrapping_add(1))?;
+
+        // SAFETY: ErrorContext exists once Postgres can raise an ERROR.  The callback is
+        // allocated in ErrorContext, and Postgres removes it from the list and calls it before
+        // the reset frees it.  Its fields are written before it's registered.
+        unsafe {
+            let cb: *mut crate::MemoryContextCallback = crate::MemoryContextAllocExtended(
+                crate::ErrorContext,
+                size_of::<crate::MemoryContextCallback>(),
+                crate::MCXT_ALLOC_NO_OOM as _,
+            )
+            .cast();
+            if cb.is_null() {
+                return None;
+            }
+            cb.write(crate::MemoryContextCallback {
+                func: Some(caught_error_mark),
+                arg: ptr::without_provenance_mut(token.get()),
+                next: ptr::null_mut(),
+            });
+            crate::MemoryContextRegisterResetCallback(crate::ErrorContext, cb);
+        }
+        Some(Self { token })
+    }
+
+    /// Whether the marked ERROR is still the top of Postgres' error data stack.
+    ///
+    /// # Safety
+    ///
+    /// Call only on the backend thread.
+    unsafe fn is_top(&self) -> bool {
+        // SAFETY: ErrorContext exists once Postgres can raise an ERROR, and the head of its
+        // callback list is either null or a callback that is still registered and allocated.
+        unsafe {
+            let head = (*crate::ErrorContext).reset_cbs;
+            if head.is_null() {
+                return false;
+            }
+            let mark: unsafe extern "C-unwind" fn(*mut c_void) = caught_error_mark;
+            (*head).func.is_some_and(|func| ptr::fn_addr_eq(func, mark))
+                && (*head).arg.addr() == self.token.get()
+        }
+    }
 }
 
 impl ErrorReportWithLevel {
@@ -335,7 +414,7 @@ impl ErrorReport {
     ///
     /// If the provided `level` is >= [`PgLogLevel::ERROR`] this function will not return.
     pub fn report(self, level: PgLogLevel) {
-        ErrorReportWithLevel { level, inner: self }.report()
+        ErrorReportWithLevel { level, inner: self, stack_entry: None }.report()
     }
 }
 
@@ -370,6 +449,19 @@ pub fn register_pg_guard_panic_hook() {
 }
 
 /// What kind of error was caught?
+///
+/// # Postgres errors
+///
+/// When pgrx catches a Postgres ERROR, the ERROR stays on Postgres' error data stack, as it does
+/// for a C `PG_CATCH()` block, until something calls `FlushErrorState()`.  [`PgTryBuilder`] does
+/// that when a catch handler returns, and Postgres does when it aborts the transaction.
+///
+/// [`CaughtError::rethrow()`] passes Postgres back its original ERROR, with every field, while
+/// that ERROR is still on top of the stack.  Otherwise pgrx raises a new ERROR from its copy,
+/// which has the same SQLSTATE, message, DETAIL, HINT, and location, takes its CONTEXT from where
+/// it is raised, and lacks Postgres' other fields, such as the constraint name.
+///
+/// [`PgTryBuilder`]: crate::PgTryBuilder
 #[derive(Debug)]
 pub enum CaughtError {
     /// An error raised from within Postgres
@@ -385,7 +477,9 @@ pub enum CaughtError {
 impl CaughtError {
     /// Rethrow this [CaughtError].  
     ///
-    /// This is the same as [std::panic::resume_unwind()] and has the same semantics.
+    /// This is the same as [std::panic::resume_unwind()] and has the same semantics.  See
+    /// [Postgres errors](CaughtError#postgres-errors) for what Postgres receives when the unwind
+    /// reaches a `#[pg_guard]` function.
     pub fn rethrow(self) -> ! {
         // we resume_unwind here as [CaughtError] represents a previously caught panic, not a new
         // one to be thrown
@@ -466,10 +560,19 @@ where
     match catch_unwind(f) {
         Ok(v) => GuardAction::Return(v),
         Err(e) => match downcast_panic_payload(e) {
-            CaughtError::PostgresError(_) => {
+            // SAFETY: Postgres called the guarded function on the backend thread
+            CaughtError::PostgresError(ereport)
+                if ereport.stack_entry.as_ref().is_some_and(|entry| unsafe { entry.is_top() }) =>
+            {
                 // Return to the caller to rethrow the original Postgres ErrorData unchanged.  We
                 // can't do it here because this function has non-POF frames.
                 GuardAction::ReThrow
+            }
+            CaughtError::PostgresError(mut ereport) => {
+                // `pg_re_throw()` would raise whatever is on top of the stack now, or read below
+                // an empty one, so raise our copy instead.  Like a rethrow, it gets no backtrace
+                ereport.inner.location.backtrace = None;
+                GuardAction::Report(ereport)
             }
             CaughtError::ErrorReport(ereport) | CaughtError::RustPanic { ereport, .. } => {
                 GuardAction::Report(ereport)
@@ -504,6 +607,7 @@ pub(crate) fn downcast_panic_payload(e: Box<dyn Any + Send>) -> CaughtError {
         CaughtError::ErrorReport(ErrorReportWithLevel {
             level: PgLogLevel::ERROR,
             inner: *e.downcast().unwrap(),
+            stack_entry: None,
         })
     } else if let Some(message) = e.downcast_ref::<&str>() {
         // something panic'd with a &str, so it gets raised as an INTERNAL_ERROR at the ERROR level
@@ -515,6 +619,7 @@ pub(crate) fn downcast_panic_payload(e: Box<dyn Any + Send>) -> CaughtError {
                     message.to_string(),
                     take_panic_location(),
                 ),
+                stack_entry: None,
             },
             payload: e,
         }
@@ -528,6 +633,7 @@ pub(crate) fn downcast_panic_payload(e: Box<dyn Any + Send>) -> CaughtError {
                     message.clone(),
                     take_panic_location(),
                 ),
+                stack_entry: None,
             },
             payload: e,
         }
@@ -541,6 +647,7 @@ pub(crate) fn downcast_panic_payload(e: Box<dyn Any + Send>) -> CaughtError {
                     "Box<Any>",
                     take_panic_location(),
                 ),
+                stack_entry: None,
             },
             payload: e,
         }
