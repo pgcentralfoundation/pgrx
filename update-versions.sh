@@ -74,6 +74,7 @@ echo "Generating bindings -- this may take a few moments"
 # misses a supported PostgreSQL version writes a partial C macro snapshot that must
 # not be committed; its warning is hidden without VERBOSE, so releases set
 # PGRX_PG_SYS_RELEASE_REQUIRE_ALL_VERSIONS=1 to make such a run fail instead.
-PGRX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE=1 cargo test --no-run $CARGO_QUIET_FLAG --workspace --no-default-features --features "pg${PG_VER:-15} cshim"
+# Only pgrx-pg-sys's build script writes these files, so nothing else needs building.
+PGRX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE=1 cargo build $CARGO_QUIET_FLAG -p pgrx-pg-sys --no-default-features --features "pg${PG_VER:-15} cshim"
 
 echo "Done!"
