@@ -22,7 +22,7 @@ use cargo_metadata::camino::Utf8PathBuf;
 use cargo_metadata::{Message, Package};
 use eyre::{WrapErr, bail, eyre};
 
-use crate::process::{self, OUTPUT, log};
+use crate::process::{self, Exit, OUTPUT, log};
 use crate::workspace::{self, Workspace};
 
 /// A built test binary and what `cargo test` would run it with.
@@ -121,6 +121,11 @@ pub(crate) fn build(workspace: &Workspace, args: &[String]) -> eyre::Result<Vec<
     Ok(binaries)
 }
 
+/// The longest one test binary may run. The slowest takes about a minute, so a binary still
+/// running after this has hung, and stopping it reports its output instead of holding the job
+/// until the workflow's timeout.
+const BINARY_LIMIT: Duration = Duration::from_secs(10 * 60);
+
 /// How one test binary's run ended.
 pub(crate) struct Outcome {
     label: String,
@@ -173,12 +178,13 @@ fn run_one(binary: &TestBinary, configure: &impl Fn(&TestBinary, &mut Command)) 
     let started = Instant::now();
     let mut command = binary.command();
     configure(binary, &mut command);
-    let (passed, output) = match process::run_captured(command) {
-        Ok((status, output)) => (status.success(), output),
-        Err(error) => (false, format!("{error:?}")),
+    let (verdict, passed, output) = match process::run_captured(command, BINARY_LIMIT) {
+        Ok((Exit::Status(status), output)) if status.success() => ("ok", true, output),
+        Ok((Exit::Status(_), output)) => ("FAILED", false, output),
+        Ok((Exit::TimedOut, output)) => ("TIMED OUT", false, output),
+        Err(error) => ("FAILED", false, format!("{error:?}")),
     };
     let elapsed = started.elapsed();
-    let verdict = if passed { "ok" } else { "FAILED" };
     let _guard = OUTPUT.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
     let mut stdout = std::io::stdout().lock();
     let output = output.trim_end();
