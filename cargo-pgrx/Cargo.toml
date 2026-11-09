@@ -53,7 +53,6 @@ tracing-subscriber = { version = "0.3.23", features = ["env-filter"] }
 serde.workspace = true
 serde_json.workspace = true
 ureq = { version = "3.5.1", default-features = false, features = ["gzip", "platform-verifier", "rustls"] }
-which = "8.0.6"
 postgres = { version = "0.19.14", features = ["with-serde_json-1", "with-uuid-1"] }
 uuid = { version = "1.29.1", features = ["v4"] }
 
