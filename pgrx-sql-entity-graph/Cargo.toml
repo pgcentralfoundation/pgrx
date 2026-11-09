@@ -31,8 +31,6 @@ quote.workspace = true
 syn.workspace = true
 thiserror.workspace = true
 
-convert_case = "0.12.0"
-
 [lints.clippy]
 assigning_clones = "allow" # wrong diagnosis and wrong suggestions
 too_many_arguments = "allow" # I argue with myself all the time

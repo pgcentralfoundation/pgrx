@@ -740,15 +740,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "convert_case"
-version = "0.12.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1af709f1f33454bf52eadfc8c78b3b9ef9cb26fb54d16dc9cd9a7299f899fd1b"
-dependencies = [
- "unicode-segmentation",
-]
-
-[[package]]
 name = "core-foundation"
 version = "0.10.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2449,7 +2440,6 @@ dependencies = [
 name = "pgrx-sql-entity-graph"
 version = "0.20.0-beta.0"
 dependencies = [
- "convert_case",
  "eyre",
  "proc-macro2",
  "quote",

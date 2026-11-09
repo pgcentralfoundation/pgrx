@@ -27,7 +27,6 @@ use syn::PathArguments;
 use crate::enrich::CodeEnrichment;
 use crate::enrich::ToEntityGraphTokens;
 use crate::enrich::ToRustCodeTokens;
-use convert_case::{Case, Casing};
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::quote;
 use syn::parse::{Parse, ParseStream};
@@ -188,8 +187,7 @@ impl PgAggregate {
         let generic_type = extract_generic_from_trait(&item_impl)?.clone();
         let generic_type_name = get_generic_type_name(&generic_type)?;
 
-        let snake_case_target_ident =
-            format!("{target_ident}_{generic_type_name}").to_case(Case::Snake);
+        let snake_case_target_ident = snake_case(&format!("{target_ident}_{generic_type_name}"));
         let snake_case_target_ident = Ident::new(&snake_case_target_ident, target_ident.span());
         crate::ident_is_acceptable_to_postgres(&snake_case_target_ident)?;
 
@@ -1232,6 +1230,67 @@ fn get_pgrx_attr_macro(attr_name: &str, ty: &syn::Type) -> Option<TokenStream2> 
     }
 }
 
+/// Lowercases the words of `name` and joins them with `_`, keeping the names that
+/// `convert_case`'s `to_case(Case::Snake)` produced for existing extensions.
+///
+/// Words end at `_`, `-` and spaces, which are dropped, and before the next character
+/// where a lowercase letter meets an uppercase letter or ASCII digit, an uppercase letter
+/// meets an ASCII digit, an ASCII digit meets a letter, or an acronym meets a capitalized
+/// word (`HTMLParser` becomes `html_parser`). `convert_case` classified grapheme clusters
+/// by their first character, so a name whose combining marks have no precomposed form can
+/// split differently here.
+fn snake_case(name: &str) -> String {
+    #[derive(Clone, Copy, PartialEq)]
+    enum Class {
+        Upper,
+        Lower,
+        Digit,
+        Delimiter,
+        Other,
+    }
+
+    let classes: Vec<(usize, Class)> = name
+        .char_indices()
+        .map(|(at, c)| {
+            let class = match c {
+                '_' | '-' | ' ' => Class::Delimiter,
+                '0'..='9' => Class::Digit,
+                c if c.is_uppercase() => Class::Upper,
+                c if c.is_lowercase() => Class::Lower,
+                _ => Class::Other,
+            };
+            (at, class)
+        })
+        .collect();
+
+    let mut words = Vec::new();
+    let mut start = 0;
+    for (i, &(at, class)) in classes.iter().enumerate() {
+        let next = classes.get(i + 1).map(|&(_, class)| class);
+        let ends_word = match (class, next) {
+            (Class::Delimiter, _) => {
+                words.push(&name[start..at]);
+                start = at + 1;
+                false
+            }
+            (Class::Lower, Some(Class::Upper | Class::Digit))
+            | (Class::Upper, Some(Class::Digit))
+            | (Class::Digit, Some(Class::Upper | Class::Lower)) => true,
+            (Class::Upper, Some(Class::Upper)) => {
+                classes.get(i + 2).is_some_and(|&(_, class)| class == Class::Lower)
+            }
+            _ => false,
+        };
+        if ends_word {
+            let end = classes[i + 1].0;
+            words.push(&name[start..end]);
+            start = end;
+        }
+    }
+    words.push(&name[start..]);
+    words.iter().map(|word| word.to_lowercase()).collect::<Vec<_>>().join("_")
+}
+
 #[cfg(test)]
 mod tests {
     use super::PgAggregate;
@@ -1379,5 +1438,25 @@ mod tests {
         let agg = PgAggregate::new(tokens);
         assert!(agg.is_err());
         Ok(())
+    }
+
+    /// Expected values are what `convert_case` 0.12 produced for the same input.
+    #[test]
+    fn snake_case_matches_convert_case() {
+        for (input, expected) in [
+            ("DemoSum_i32", "demo_sum_i_32"),
+            ("IntegerAvgState_i64", "integer_avg_state_i_64"),
+            ("HTMLParser_u8", "html_parser_u_8"),
+            ("FirstJson_JsonB", "first_json_json_b"),
+            ("MyAGG2_Vec", "my_agg_2_vec"),
+            ("a1b2C3", "a_1_b_2_c_3"),
+            ("Agg__x", "agg__x"),
+            ("agg-x y", "agg_x_y"),
+            ("_x", "_x"),
+            ("ÀbcDéf_ÉÉx", "àbc_déf_é_éx"),
+            ("", ""),
+        ] {
+            assert_eq!(super::snake_case(input), expected, "for {input:?}");
+        }
     }
 }
