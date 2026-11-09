@@ -2443,6 +2443,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "pgrx-ci"
+version = "0.0.0"
+dependencies = [
+ "cargo_metadata",
+ "eyre",
+]
+
+[[package]]
 name = "pgrx-macros"
 version = "0.20.0-beta.0"
 dependencies = [

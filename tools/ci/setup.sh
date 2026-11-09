@@ -157,6 +157,7 @@ if [[ -n "$pg_config" ]]; then
     fi
     mkdir -p "$pgrx_home"
     github_env "PGRX_HOME=$pgrx_home"
+    github_env "PG_CONFIG=$pg_config"
     # A TOML literal string keeps a Windows path as it is.
     printf "[configs]\npg%s = '%s'\n" "$PG_VER" "$pg_config" > "$pgrx_home/config.toml"
     cat "$pgrx_home/config.toml"

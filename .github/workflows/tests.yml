@@ -19,13 +19,12 @@ env:
   RUST_BACKTRACE: 1
   CARGO_INCREMENTAL: "false"
   CARGO_TERM_COLOR: always
-  PYTHONUNBUFFERED: "1"
   # Only pushes to develop save caches. Pull requests restore develop's newest caches, so their
   # caches cannot evict develop's from the repository's 10 GB of cache storage.
   SAVE_RUST_CACHE: ${{ github.ref == 'refs/heads/develop' || github.head_ref == 'ci-ten-minutes' }}
 
 jobs:
-  # Pull requests run only the jobs that test what the change touches; see tools/ci/plan.py.
+  # Pull requests run only the jobs that test what the change touches; see tools/ci/src/plan.rs.
   # Pushes to develop run everything.
   plan:
     name: Plan
@@ -52,6 +51,20 @@ jobs:
         with:
           # A pull request's merge commit and its first parent, the base it merges into.
           fetch-depth: 2
+      # The planner rarely changes, so its build is cached.
+      - name: Restore the CI driver
+        id: driver
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/pgrx-ci
+          key: pgrx-ci-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('tools/ci/**', 'Cargo.lock', 'rust-toolchain.toml') }}
+      - name: Build the CI driver
+        if: steps.driver.outputs.cache-hit != 'true'
+        run: |
+          tools/ci/setup.sh
+          cargo build --locked -p pgrx-ci
+          mkdir -p "$RUNNER_TEMP/pgrx-ci"
+          cp target/debug/pgrx-ci "$RUNNER_TEMP/pgrx-ci/"
       - id: plan
         name: Choose the jobs this change needs
         env:
@@ -59,9 +72,9 @@ jobs:
           RUSTUP_TOOLCHAIN: stable
         run: |
           if [ "${{ github.event_name }}" = pull_request ]; then
-            python3 tools/ci/plan.py --base HEAD^1 --head HEAD
+            "$RUNNER_TEMP/pgrx-ci/pgrx-ci" plan --base HEAD^1 --head HEAD
           else
-            python3 tools/ci/plan.py --all
+            "$RUNNER_TEMP/pgrx-ci/pgrx-ci" plan --all
           fi
 
   lint:
@@ -170,9 +183,9 @@ jobs:
       - name: Test the packages that need PostgreSQL
         shell: bash
         run: |
-          python=python3; [ "$RUNNER_OS" = Windows ] && python=python
+          cargo build --locked -p pgrx-ci
           cli_checks=; [ "$RUNNER_OS" = Linux ] && cli_checks=--cli-checks
-          "$python" tools/ci/test_pg.py --pg "$PG_VER" --run "${{ needs.plan.outputs.pg }}" $cli_checks
+          target/debug/pgrx-ci test-pg --pg "$PG_VER" --run "${{ needs.plan.outputs.pg }}" $cli_checks
 
   # The packages that don't need PostgreSQL, on each platform. cargo-pgrx's install
   # regression test installs pgrx-unit-tests, so these jobs still configure PostgreSQL 18.
@@ -209,8 +222,8 @@ jobs:
       - name: Test the packages that don't need PostgreSQL
         shell: bash
         run: |
-          python=python3; [ "$RUNNER_OS" = Windows ] && python=python
-          "$python" tools/ci/test_crates.py ${{ needs.plan.outputs.crates }}
+          cargo build --locked -p pgrx-ci
+          target/debug/pgrx-ci test-crates ${{ needs.plan.outputs.crates }}
       # This test builds both slices of a universal installation, so it needs the other
       # slice's standard library. Its synthetic headers make one job enough.
       - name: Run universal macOS binding build harness
@@ -287,7 +300,9 @@ jobs:
           PGRX_INCLUDEDIR_SERVER_aarch64_unknown_linux_gnu: ${{ steps.arm64-headers.outputs.server }}
           CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER: aarch64-linux-gnu-gcc
           BINDGEN_EXTRA_CLANG_ARGS_aarch64-unknown-linux-gnu: -target aarch64-unknown-linux-gnu -isystem /usr/aarch64-linux-gnu/include/ -ccc-gcc-name aarch64-linux-gnu-gcc
-        run: python3 tools/ci/test_variants.py --pg "$PG_VER"
+        run: |
+          cargo build --locked -p pgrx-ci
+          target/debug/pgrx-ci test-variants --pg "$PG_VER"
 
   miri:
     name: Miri

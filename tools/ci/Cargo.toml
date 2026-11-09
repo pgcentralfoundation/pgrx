@@ -1,0 +1,19 @@
+#LICENSE Portions Copyright 2026 PgCentral Foundation, Inc. <contact@pgcentral.org>
+#LICENSE
+#LICENSE All rights reserved.
+#LICENSE
+#LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+
+[package]
+name = "pgrx-ci"
+version = "0.0.0"
+edition.workspace = true
+rust-version.workspace = true
+authors = ["PgCentral Foundation, Inc. <contact@pgcentral.org>"]
+license = "MIT"
+description = "Chooses and runs the jobs of pgrx's CI workflow"
+publish = false
+
+[dependencies]
+cargo_metadata.workspace = true
+eyre.workspace = true
