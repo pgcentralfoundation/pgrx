@@ -289,6 +289,7 @@ jobs:
           workspaces: |
             . -> target
             . -> target-ext
+            . -> target-cross
           cache-bin: "false"
           save-if: ${{ env.SAVE_RUST_CACHE == 'true' && matrix.pg == 18 }}
       # Generated C macros are checked against the server headers' target, so the aarch64
@@ -319,7 +320,9 @@ jobs:
       # Only this step sees the target headers; tests elsewhere check that builds without them
       # refuse. Build scripts still generate bindings and C macros from the aarch64 headers and
       # compile the aarch64 C shim; checking skips only Rust code generation and linking, which
-      # the arm64 jobs cover natively.
+      # the arm64 jobs cover natively. It runs beside the other variants, in its own target
+      # directory: Cargo builds host crates differently for a cross build, so it would share
+      # nothing with them, and it is mostly single-threaded build scripts.
       - name: Build the variants
         env:
           PGRX_INCLUDEDIR_SERVER_aarch64_unknown_linux_gnu: ${{ steps.arm64-headers.outputs.server }}
