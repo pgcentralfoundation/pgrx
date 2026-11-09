@@ -14,7 +14,6 @@ version = "0.20.0-beta.0"
 authors.workspace = true
 license.workspace = true
 description = "Cargo subcommand for 'pgrx' to make Postgres extension development easy"
-homepage.workspace = true
 repository.workspace = true
 documentation = "https://docs.rs/cargo-pgrx"
 categories = ["development-tools::cargo-plugins", "command-line-utilities", "database"]

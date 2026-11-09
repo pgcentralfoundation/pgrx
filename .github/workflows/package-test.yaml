@@ -20,6 +20,11 @@ env:
 jobs:
   ubuntu:
     runs-on: ubuntu-22.04
+    # Any rustc warning or Cargo lint fails this job, including the manifest lints
+    # `cargo publish` reports. Workspace-level lints appear only in builds inside the
+    # workspace, such as installing cargo-pgrx, rather than in packaged-crate builds.
+    env:
+      CARGO_BUILD_WARNINGS: deny
 
     steps:
       - uses: actions/checkout@v4

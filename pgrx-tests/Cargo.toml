@@ -14,7 +14,6 @@ version = "0.20.0-beta.0"
 authors.workspace = true
 license.workspace = true
 description = "Test framework for 'pgrx'-based Postgres extensions"
-homepage.workspace = true
 repository.workspace = true
 documentation = "https://docs.rs/pgrx-tests"
 readme = "README.md"

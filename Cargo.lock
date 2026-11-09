@@ -2405,7 +2405,6 @@ dependencies = [
  "serde_cbor",
  "serde_json",
  "thiserror",
- "uuid",
 ]
 
 [[package]]
