@@ -56,6 +56,8 @@ const YANKED_POSTGRES_VERSIONS: &[PgVersion] = &[
 /// Reuse the binding build's collector so fixture tests reconcile exactly the Rust facts used
 /// in production generation.
 mod binding_symbols;
+/// Keep the C examples in headers' documentation comments out of Rust doctests.
+mod doc_comments;
 /// Render provenance-derived header modules and same-scope support fragments for publication.
 mod macro_files;
 /// Merge every version's macro documentation into the docs.rs snapshot.
@@ -166,6 +168,10 @@ impl bindgen::callbacks::ParseCallbacks for BindingOverride {
                 .push((variant_name.to_string(), variant_value)),
         });
         None
+    }
+
+    fn process_comment(&self, comment: &str) -> Option<String> {
+        Some(doc_comments::rustdoc(comment))
     }
 
     // FIXME: hide nodetag fields and default them to appropriate values
