@@ -37,7 +37,6 @@ toml_edit.workspace = true
 
 arx-pack = "0.3.7" # RPM and DEB packages for `cargo pgrx package`
 clap = { version = "4.4.2", features = ["env", "suggestions", "cargo", "derive", "wrap_help"] }
-crates-index = { version = "4.0", features = ["sparse"], default-features = false }
 jobslot = "0.2.24" # as seen in gmake -j{N}
 semver = "1.0.28" # checking pgrx versions match
 tempfile = "3.27.0"
@@ -50,17 +49,10 @@ tracing = "0.1"
 tracing-error = "0.2.1"
 tracing-subscriber = { version = "0.3.23", features = ["env-filter"] }
 
-# for downloading/unpacking things from the Postgres file servers
-bzip2 = "0.6.1"
-env_proxy = "0.4.1"
+# for downloading things from the Postgres file servers
 serde.workspace = true
 serde_json.workspace = true
-serde-xml-rs = "0.8.2"
-tar = "0.4.46"
 ureq = { version = "3.5.1", default-features = false, features = ["gzip", "platform-verifier", "rustls"] }
-url.workspace = true
-which = "8.0.6"
-zip = "9.4.2"
 postgres = { version = "0.19.14", features = ["with-serde_json-1", "with-uuid-1"] }
 uuid = { version = "1.29.1", features = ["v4"] }
 
@@ -75,17 +67,14 @@ features = [
     "coff", "elf", "macho", "pe", "xcoff", # support all object formats to allow cross-builds
 ]
 
+# EDB publishes PostgreSQL for Windows as deflated zip archives, and Windows may not have `tar`.
+# flate2 supplies the inflate backend that zip's `deflate-flate2` feature leaves to its users.
+[target.'cfg(target_os = "windows")'.dependencies]
+flate2 = "1"
+zip = { version = "9.4.2", default-features = false, features = ["deflate-flate2"] }
+
 [dev-dependencies]
 goldenfile = "1.11"
-
-[features]
-default = ["rustls"]
-native-tls = ["ureq/native-tls", "ureq/platform-verifier"]
-rustls = [
-    "ureq/rustls",
-    "ureq/native-tls", # induces rustls to use the OS-level root of trust
-    "ureq/platform-verifier" # use platform certificate store for validation
-]
 
 [lints.clippy]
 or_fun_call = "allow" # kinda sus lint imo

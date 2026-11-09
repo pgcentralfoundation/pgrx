@@ -14,9 +14,7 @@ use crate::{
     MacroKind, MacroScanner, SystemIncludes, postgres_clang_flags, separate_architecture_flags,
 };
 use pgrx_pg_config::{PgConfig, Pgrx};
-use sha2::{Digest, Sha256};
 use std::collections::{HashMap, HashSet};
-use std::fmt::Write as _;
 use std::io::Write;
 use std::path::{Path, PathBuf};
 
@@ -377,11 +375,7 @@ fn embedded_wrapper(major_version: u16) -> Result<&'static str, PostgresError> {
 /// existing files; racing readers see either an absent file or the complete identical wrapper.
 fn materialize_wrapper(major_version: u16, cache: &Path) -> Result<PathBuf, PostgresError> {
     let source = embedded_wrapper(major_version)?;
-    let mut digest = String::with_capacity(64);
-    for byte in Sha256::digest(source.as_bytes()) {
-        write!(digest, "{byte:02x}").expect("writing a digest to a String is infallible");
-    }
-    let directory = cache.join(digest);
+    let directory = cache.join(crate::sha256_hex(source.as_bytes()));
     let header = directory.join(format!("pg{major_version}.h"));
     let failure = |source| PostgresError::WrapperCache { path: header.clone(), source };
     match std::fs::read(&header) {

@@ -7,9 +7,8 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
-use env_proxy::for_url_str;
+use ureq::Agent;
 use ureq::tls::{RootCerts, TlsConfig};
-use ureq::{Agent, Proxy};
 
 pub(crate) mod bench;
 pub(crate) mod connect;
@@ -42,6 +41,15 @@ fn reject_removed_pg_version(label: Option<&str>) -> eyre::Result<()> {
     Ok(())
 }
 
+/// An HTTP agent that validates certificates against the platform's certificate store, which
+/// keeps working behind proxies that inspect TLS with a corporate certificate authority. Like
+/// any ureq agent, it sends requests through the proxy that `ALL_PROXY`, `HTTPS_PROXY` or
+/// `HTTP_PROXY` names, unless `NO_PROXY` excludes the host.
+fn http_agent() -> Agent {
+    let tls_config = TlsConfig::builder().root_certs(RootCerts::PlatformVerifier).build();
+    Agent::new_with_config(Agent::config_builder().tls_config(tls_config).build())
+}
+
 #[cfg(test)]
 mod tests {
     #[test]
@@ -52,26 +60,6 @@ mod tests {
         for label in [None, Some("pg15"), Some("pg19"), Some("pg99"), Some("my_database")] {
             assert!(super::reject_removed_pg_version(label).is_ok());
         }
-    }
-}
-
-// Build a ureq::Agent by the given url. Requests from this agent are proxied if we have
-// set the HTTPS_PROXY/HTTP_PROXY environment variables. This agent uses the platform's
-// certificate store to validate HTTPS connections, which works better with corporate proxies
-// that may use custom certificate authorities for SSL inspection.
-fn build_agent_for_url(url: &str) -> eyre::Result<Agent> {
-    // Create a TLS config that uses the platform's certificate store
-    let tls_config = TlsConfig::builder().root_certs(RootCerts::PlatformVerifier).build();
-
-    if let Some(proxy_url) = for_url_str(url).to_string() {
-        let config = Agent::config_builder()
-            .proxy(Some(Proxy::new(&proxy_url)?))
-            .tls_config(tls_config)
-            .build();
-        Ok(Agent::new_with_config(config))
-    } else {
-        let config = Agent::config_builder().tls_config(tls_config).build();
-        Ok(Agent::new_with_config(config))
     }
 }
 

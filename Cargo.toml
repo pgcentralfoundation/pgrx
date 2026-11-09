@@ -54,18 +54,17 @@ cargo_toml = "1.0" # used for building projects
 clap-cargo = { version = "0.18.3", features = ["cargo_metadata"] }
 eyre = "~0.6.14" # simplifies error-handling
 libc = "0.2" # FFI compat
-owo-colors = { version = "4.4", features = ["supports-color"] } # for output highlighting
+owo-colors = "4.4" # for output highlighting
 proc-macro2 = { version = "1.0.107", features = ["span-locations"] }
 quote = "1.0.47"
 regex = "1.13" # used for build/test
-serde = { version = "1.0", features = ["derive"] }
+serde = { version = "1.0", features = ["alloc", "derive"] } # `alloc` matches what toml turns on in pgrx-tests
 serde_json = "1.0"
 shlex = "2.0" # shell lexing, also used by many of our deps
 syn = { version = "2", features = ["extra-traits", "full", "parsing", "visit-mut"] }
 toml = "1" # our config files
 toml_edit = "0.25.19" # format-preserving edits to toml files
 thiserror = "2"
-url = "2.5.8" # the non-existent std::web
 walkdir = "2" # directory recursion
 
 [profile.dev]

@@ -2,7 +2,7 @@
 use crate::datum::{Array, BorrowDatum, Datum};
 use crate::layout::{Align, Layout};
 use crate::memcx::{MemCx, OutOfMemory};
-use crate::nullable::Nullable;
+use crate::nullable::{NullBitmap, NullLayout, Nullable};
 use crate::palloc::PBox;
 use crate::pgrx_sql_entity_graph::metadata::{
     ArgumentError, ReturnsError, ReturnsRef, SqlMappingRef, SqlTranslatable, array_argument_sql,
@@ -10,8 +10,6 @@ use crate::pgrx_sql_entity_graph::metadata::{
 };
 use crate::toast::{Toast, Toasty};
 use crate::{layout, pg_sys};
-use bitvec::ptr::{self as bitptr, BitPtr, BitPtrError, Const, Mut};
-use bitvec::slice::{self as bitslice, BitSlice};
 use core::iter::{ExactSizeIterator, FusedIterator};
 use core::marker::PhantomData;
 use core::{ffi, mem, ptr, slice};
@@ -217,8 +215,9 @@ where
     pub fn iter(&self) -> ArrayIter<'_, T> {
         let nelems = self.nelems();
         let raw = self.as_raw();
-        let nulls =
-            raw.nulls_bitptr().map(|p| unsafe { bitslice::from_raw_parts(p, nelems).unwrap() });
+        // SAFETY: The bitmap lies in `self`, which the iterator borrows, and a shared borrow of
+        // an array cannot write to it.
+        let nulls = unsafe { raw.null_bitmap() };
 
         let data = unsafe { ptr::NonNull::new_unchecked(raw.data_ptr().cast_mut()) };
         let arr = self;
@@ -368,7 +367,7 @@ where
 {
     arr: &'arr FlatArray<'arr, T>,
     data: ptr::NonNull<u8>,
-    nulls: Option<&'arr BitSlice<u8>>,
+    nulls: Option<NullBitmap<'arr>>,
     nelems: usize,
     index: usize,
     offset: usize,
@@ -386,7 +385,7 @@ where
             return None;
         }
         let is_null = match self.nulls {
-            Some(nulls) => !nulls.get(self.index).unwrap(),
+            Some(nulls) => nulls.is_null(self.index).unwrap(),
             None => false,
         };
         // note the index freezes when we reach the end, fusing the iterator

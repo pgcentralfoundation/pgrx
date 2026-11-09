@@ -13,13 +13,12 @@
 use crate as pgrx; // for #[pg_guard] support from within ourself
 use crate::pg_sys;
 use crate::prelude::*;
-use enum_map::{Enum, EnumMap};
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
 
 /// Postgres Transaction (Xact) Callback Events
-#[derive(Hash, Eq, PartialEq, Clone, Copy, Debug, Enum)]
+#[derive(Hash, Eq, PartialEq, Clone, Copy, Debug)]
 pub enum PgXactCallbackEvent {
     /// Fired when a transaction is aborted.  It is mutually exclusive with `PgrxactCallbackEvent::Commit`
     ///
@@ -58,6 +57,9 @@ pub enum PgXactCallbackEvent {
 }
 
 impl PgXactCallbackEvent {
+    // `PrePrepare` must stay the last variant for this to count every event.
+    const COUNT: usize = Self::PrePrepare as usize + 1;
+
     fn translate_pg_event(pg_event: pg_sys::XactEvent::Type) -> Self {
         use pg_sys::XactEvent::*;
         match pg_event {
@@ -105,9 +107,9 @@ struct XactCallbackWrapper(
     Box<dyn FnOnce() + std::panic::UnwindSafe + std::panic::RefUnwindSafe + 'static>,
 );
 
-/// Shorthand for the type representing the map of callbacks
+/// The callbacks registered for each event, indexed by the event's discriminant
 type CallbackMap =
-    EnumMap<PgXactCallbackEvent, Option<Vec<Rc<RefCell<Option<XactCallbackWrapper>>>>>>;
+    [Option<Vec<Rc<RefCell<Option<XactCallbackWrapper>>>>>; PgXactCallbackEvent::COUNT];
 
 /// Register a closure to be called during one of the `PgrxactCallbackEvent` events.  Multiple
 /// closures can be registered per event (one at a time), and they are called in the order in which
@@ -182,11 +184,11 @@ where
             | PgXactCallbackEvent::ParallelCommit
             | PgXactCallbackEvent::ParallelAbort => XACT_HOOKS
                 .replace(CallbackMap::default())
-                .expect("XACT_HOOKS was None during Commit/Abort")[which_event]
+                .expect("XACT_HOOKS was None during Commit/Abort")[which_event as usize]
                 .take(),
 
             // not in a transaction-end event, so just borrow our map
-            _ => XACT_HOOKS.as_mut().expect("XACT_HOOKS was None")[which_event].take(),
+            _ => XACT_HOOKS.as_mut().expect("XACT_HOOKS was None")[which_event as usize].take(),
         };
 
         // if we have a vec of hooks for this event they're consumed here and executed
@@ -229,7 +231,7 @@ where
     let wrapped_func = Rc::new(RefCell::new(Some(XactCallbackWrapper(Box::new(f)))));
 
     // find (or create) the map Entry for the specified event and add our wrapped hook to it
-    let entry = hooks[which_event].get_or_insert_with(Default::default);
+    let entry = hooks[which_event as usize].get_or_insert_with(Default::default);
     entry.push(Rc::clone(&wrapped_func));
 
     // give the user the ability to unregister

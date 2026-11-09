@@ -13,9 +13,7 @@
 use super::{MacroFiles, MacroOutput};
 use eyre::{WrapErr, eyre};
 use serde::{Deserialize, Serialize};
-use sha2::{Digest, Sha256};
 use std::collections::{BTreeMap, BTreeSet};
-use std::fmt::Write;
 use std::io::Read;
 use std::path::{Component, Path, PathBuf};
 use std::sync::atomic::{AtomicU64, Ordering};
@@ -464,11 +462,7 @@ fn integrity(files: &BTreeMap<String, Vec<u8>>) -> eyre::Result<BTreeMap<String,
 
 /// Render a content digest without platform-dependent or randomized hasher behavior.
 pub(super) fn sha256(bytes: &[u8]) -> String {
-    let mut digest = String::with_capacity(64);
-    for byte in Sha256::digest(bytes) {
-        write!(&mut digest, "{byte:02x}").expect("String formatting");
-    }
-    digest
+    pgrx_c_macros::sha256_hex(bytes)
 }
 
 /// Read a regular nonsymlink member using a bounded reader, detecting size changes after opening.

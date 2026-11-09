@@ -49,12 +49,8 @@ pgrx-sql-entity-graph.workspace = true
 
 thiserror.workspace = true # error handling and logging
 
-# used to internally impl things
-enum-map = "3.1.0"
-
 # exposed in public API
 bitflags = "2.13.2" # BackgroundWorker
-bitvec = "1.1" # processing array nullbitmaps
 libc.workspace = true # FFI type compat
 seahash = "4.1.0" # derive(PostgresHash)
 serde.workspace = true # impls on pub types

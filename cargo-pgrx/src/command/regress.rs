@@ -1184,24 +1184,21 @@ fn manifest_path_to_pg_regress_dir(manifest_path: &Path) -> PathBuf {
 }
 
 fn add_to_git(path: &Path) -> eyre::Result<()> {
-    if let Ok(git) = which::which("git")
-        && is_git_repo(&git)
-        && !Command::new(git).arg("add").arg(path).status()?.success()
-    {
+    // Without git on PATH, this is not a git repository and nothing is added.
+    if is_git_repo() && !Command::new("git").arg("add").arg(path).status()?.success() {
         panic!("unable to add {} to git", path.display());
     }
     Ok(())
 }
 
-fn is_git_repo(git: &Path) -> bool {
-    Command::new(git)
+fn is_git_repo() -> bool {
+    Command::new("git")
         .stdout(Stdio::null())
         .stderr(Stdio::null())
         .arg("rev-parse")
         .arg("--is-inside-work-tree")
         .status()
-        .map(|status| status.success())
-        .unwrap_or_default()
+        .is_ok_and(|status| status.success())
 }
 
 #[cfg(test)]

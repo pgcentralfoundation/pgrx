@@ -16,7 +16,6 @@ cli = ["dep:clap"]
 pgrx-pg-config.workspace = true
 eyre.workspace = true
 shlex.workspace = true
-sha2 = "0.11"
 clang = { version = "2.1", features = ["runtime", "clang_6_0"] }
 clang-sys = { version = "1", features = ["runtime", "clang_6_0"] }
 serde.workspace = true
@@ -31,7 +30,12 @@ proc-macro2.workspace = true
 [target.'cfg(all(any(target_os = "linux", target_os = "macos"), any(target_arch = "x86_64", target_arch = "aarch64")))'.dependencies]
 ring = { version = "0.17.14", default-features = false }
 
+# Other hosts hash with the portable implementation.
+[target.'cfg(not(all(any(target_os = "linux", target_os = "macos"), any(target_arch = "x86_64", target_arch = "aarch64"))))'.dependencies]
+sha2 = "0.11"
+
 [dev-dependencies]
+sha2 = "0.11" # checks that ring and sha2 produce the same digests
 bindgen = { version = "0.73.2", default-features = false, features = ["runtime"] }
 syn.workspace = true
 quote.workspace = true

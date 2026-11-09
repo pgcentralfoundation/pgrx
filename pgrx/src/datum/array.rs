@@ -14,12 +14,12 @@
 )]
 use super::{UnboxDatum, lookup_type_name, unbox};
 use crate::array::{RawArray, Scalar};
+use crate::layout::*;
 use crate::nullable::{
-    BitSliceNulls, IntoNullableIterator, MaybeStrictNulls, NullLayout, Nullable, NullableContainer,
+    IntoNullableIterator, MaybeStrictNulls, NullBitmap, NullLayout, Nullable, NullableContainer,
 };
 use crate::toast::Toast;
 use crate::{FromDatum, IntoDatum, PgMemoryContexts, pg_sys};
-use crate::{layout::*, nullable};
 use core::fmt::{Debug, Formatter};
 use core::ops::DerefMut;
 use core::ptr::NonNull;
@@ -66,7 +66,7 @@ fn with_vec(elems: Array<String>) {
 // An array is a detoasted varlena type, so we reason about the lifetime of
 // the memory context that the varlena is actually detoasted into.
 pub struct Array<'mcx, T> {
-    null_slice: MaybeStrictNulls<BitSliceNulls<'mcx>>,
+    null_slice: MaybeStrictNulls<NullBitmap<'mcx>>,
     slide_impl: ChaChaSlideImpl<T>,
     // Rust drops in FIFO order, drop this last
     raw: Toast<RawArray>,
@@ -185,7 +185,7 @@ impl<'mcx, T: UnboxDatum> Array<'mcx, T> {
     /// # Panics
     ///
     /// Panics if [`UnboxDatum::can_unbox`] rejects the element type.
-    pub(crate) unsafe fn deconstruct_from(mut raw: Toast<RawArray>) -> Array<'mcx, T> {
+    pub(crate) unsafe fn deconstruct_from(raw: Toast<RawArray>) -> Array<'mcx, T> {
         let oid = raw.oid();
         let elem_layout = Layout::lookup_oid(oid);
         // Every element unboxes through `T::unbox`, which may rely on this check.
@@ -196,9 +196,8 @@ impl<'mcx, T: UnboxDatum> Array<'mcx, T> {
                 core::any::type_name::<T>()
             );
         }
-        let null_inner = raw
-            .nulls_bitslice()
-            .map(|nonnull| unsafe { nullable::BitSliceNulls(&*nonnull.as_ptr()) });
+        // SAFETY: `Array` keeps `raw`, which it drops last, for 'mcx and never writes to it.
+        let null_inner = unsafe { raw.null_bitmap() };
         let null_slice = MaybeStrictNulls::new(null_inner);
         // do a little two-step before jumping into the Cha-Cha Slide and figure out
         // which implementation is correct for the type of element in this Array.
@@ -286,7 +285,7 @@ impl<'mcx, T: UnboxDatum> Array<'mcx, T> {
     /// Retrieve a value from a known-nullable (not strict) array.
     fn get_nullable_inner<'arr>(
         &'arr self,
-        nulls: &'arr BitSliceNulls,
+        nulls: &'arr NullBitmap,
         index: usize,
     ) -> Option<Option<T::As<'arr>>> {
         // This assertion should only fail if null_slice is longer than the
@@ -482,7 +481,7 @@ where
 impl<'mcx, T: UnboxDatum> NullableContainer<'mcx, usize, <T as unbox::UnboxDatum>::As<'mcx>>
     for Array<'mcx, T>
 {
-    type Layout = MaybeStrictNulls<BitSliceNulls<'mcx>>;
+    type Layout = MaybeStrictNulls<NullBitmap<'mcx>>;
 
     #[inline]
     fn get_layout(&'mcx self) -> &'mcx Self::Layout {

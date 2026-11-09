@@ -14,8 +14,12 @@
 mod framework;
 
 pub use framework::*;
-/// The `postgres` crate used by [`client()`], so callers can name its types without
-/// depending on a matching version of `postgres` themselves.
+/// The `postgres` crate, so `#[pg_test]` functions can open more connections to the test
+/// server, and callers of [`client()`] can name its types, without depending on a matching
+/// version of `postgres` themselves.
+///
+/// Requires the `client` feature.
+#[cfg(feature = "client")]
 pub use postgres;
 #[cfg(feature = "proptest")]
 pub mod proptest;

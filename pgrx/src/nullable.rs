@@ -3,7 +3,6 @@
 //! types which implement nullable (empty slot) behavior in a
 //! "structure-of-arrays" manner
 
-use bitvec::slice::BitSlice;
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, ReturnsError, ReturnsRef, SqlMappingRef, SqlTranslatable,
 };
@@ -250,22 +249,54 @@ where
     }
 }
 
-/// Bitmap of null slots on a container.
-/// For example, 00001001 would represent:
-/// \[valid, valid, valid, valid, null, valid, valid, null\]
-/// However, the underlying data buffer would be:
-/// \[valid, valid, valid, valid, valid, valid\]
-/// because of the skip behavior
-pub struct BitSliceNulls<'a>(pub &'a BitSlice<u8>);
+/// Bitmap of null slots on a container, laid out as Postgres' `ARR_NULLBITMAP`: element `i` is
+/// valid when bit `i % 8` of byte `i / 8`, counting from the least significant bit, is 1, and
+/// null when it is 0.
+///
+/// For example, the byte 0b00001001 represents
+/// \[valid, null, null, valid, null, null, null, null\]
+/// and the underlying data buffer holds only the two valid elements, because nulls are skipped.
+#[derive(Clone, Copy, Debug)]
+pub struct NullBitmap<'a> {
+    bytes: &'a [u8],
+    len: usize,
+}
 
-impl NullLayout<usize> for BitSliceNulls<'_> {
+impl<'a> NullBitmap<'a> {
+    /// The bitmap of `len` elements stored in `bytes`, or `None` if `bytes` is shorter than the
+    /// `len.div_ceil(8)` bytes it needs. Bits after the last element are ignored.
+    pub fn new(bytes: &'a [u8], len: usize) -> Option<Self> {
+        (bytes.len() >= len.div_ceil(8)).then_some(Self { bytes, len })
+    }
+
+    /// The number of elements the bitmap describes.
+    pub fn len(&self) -> usize {
+        self.len
+    }
+
+    /// Whether the bitmap describes no elements.
+    pub fn is_empty(&self) -> bool {
+        self.len == 0
+    }
+
+    /// The bytes that hold whole groups of eight elements, and the bits of the elements after
+    /// them, if any, in the low bits of a final byte whose other bits are set.
+    fn bytes_and_tail(&self) -> (&'a [u8], Option<u8>) {
+        let (whole, rest) = (self.len / 8, self.len % 8);
+        // `new` guarantees `whole` bytes, and one more when `rest` is not zero.
+        let tail = (rest != 0).then(|| self.bytes[whole] | !((1u8 << rest) - 1));
+        (&self.bytes[..whole], tail)
+    }
+}
+
+impl NullLayout<usize> for NullBitmap<'_> {
     /// Returns true if this container has any nulls, checked at run-time.
     /// # Performance
-    /// This implementation should be very fast, since all it needs to do
-    /// is check if at least one byte isn't `0b00000000u8`.
+    /// This stops at the first byte that marks a null.
     #[inline]
     fn contains_nulls(&self) -> bool {
-        self.0.not_all()
+        let (bytes, tail) = self.bytes_and_tail();
+        bytes.iter().chain(&tail).any(|&byte| byte != u8::MAX)
     }
 
     /// Returns Some(true) if the element at `idx` is valid (non-null),
@@ -273,20 +304,14 @@ impl NullLayout<usize> for BitSliceNulls<'_> {
     /// or `None` if `idx` is out-of-bounds.
     #[inline]
     fn is_valid(&self, idx: usize) -> Option<bool> {
-        // For the bitmap array, 1 is "valid", 0 is "null",
-        self.0.get(idx).map(|b| *b)
-    }
-    /// Returns Some(true) if the element at `idx` is null,
-    /// Some(false) if the element at `idx` is valid (non-null),
-    /// or `None` if `idx` is out-of-bounds.
-    #[inline]
-    fn is_null(&self, idx: usize) -> Option<bool> {
-        self.0.get(idx).map(|b| !b)
+        // For the bitmap array, 1 is "valid", 0 is "null". `new` guarantees the byte exists.
+        (idx < self.len).then(|| self.bytes[idx / 8] & (1 << (idx % 8)) != 0)
     }
 
     #[inline]
     fn count_nulls(&self) -> usize {
-        self.0.count_zeros()
+        let (bytes, tail) = self.bytes_and_tail();
+        bytes.iter().chain(&tail).map(|byte| byte.count_zeros() as usize).sum()
     }
 }
 
@@ -442,4 +467,42 @@ where
     const TYPE_ORIGIN: pgrx_sql_entity_graph::metadata::TypeOrigin = T::TYPE_ORIGIN;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = T::ARGUMENT_SQL;
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> = T::RETURN_SQL;
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{NullBitmap, NullLayout};
+
+    #[test]
+    fn null_bitmap_reads_bits_least_significant_first() {
+        let bitmap = NullBitmap::new(&[0b0000_1001], 8).unwrap();
+        let valid: Vec<_> = (0..8).map(|idx| bitmap.is_valid(idx).unwrap()).collect();
+        assert_eq!(valid, [true, false, false, true, false, false, false, false]);
+        assert_eq!(bitmap.is_null(1), Some(true));
+        assert_eq!(bitmap.is_valid(8), None);
+        assert_eq!(bitmap.count_nulls(), 6);
+        assert!(bitmap.contains_nulls());
+    }
+
+    #[test]
+    fn null_bitmap_ignores_bits_after_the_last_element() {
+        // Elements 0..3 are valid; the cleared bits above them belong to no element.
+        let bitmap = NullBitmap::new(&[0b0000_0111], 3).unwrap();
+        assert!(!bitmap.contains_nulls());
+        assert_eq!(bitmap.count_nulls(), 0);
+
+        let bitmap = NullBitmap::new(&[u8::MAX, 0b0000_0010], 10).unwrap();
+        assert_eq!(bitmap.count_nulls(), 1);
+        assert_eq!(bitmap.is_null(8), Some(true));
+        assert_eq!(bitmap.is_null(9), Some(false));
+
+        let empty = NullBitmap::new(&[], 0).unwrap();
+        assert!(empty.is_empty() && !empty.contains_nulls() && empty.count_nulls() == 0);
+    }
+
+    #[test]
+    fn null_bitmap_needs_a_byte_for_every_eight_elements() {
+        assert!(NullBitmap::new(&[u8::MAX], 9).is_none());
+        assert!(NullBitmap::new(&[u8::MAX, u8::MAX], 9).is_some());
+    }
 }

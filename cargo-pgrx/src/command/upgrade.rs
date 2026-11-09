@@ -8,12 +8,13 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use cargo_toml::{Dependency, DepsSet, Manifest};
-use crates_index::{HashKind, SparseIndex, sparse};
-use eyre::eyre;
-use semver::VersionReq;
+use eyre::{WrapErr, eyre};
+use semver::{Version, VersionReq};
+use serde::Deserialize;
 use std::collections::HashSet;
+use std::fs;
+use std::path::{Path, PathBuf};
 use std::sync::LazyLock;
-use std::{fs, path::PathBuf};
 use toml_edit::DocumentMut;
 use tracing::info;
 
@@ -62,8 +63,7 @@ impl CommandExecute for Upgrade {
         let version = if let Some(v) = self.to {
             TargetVersion::Match(v)
         } else {
-            // crates-index defaults to the cache directory name Cargo used before 1.85.
-            let index = SparseIndex::from_url_with_hash_kind(sparse::URL, &HashKind::Stable)?;
+            let index = IndexCache::new()?;
             if self.include_prereleases {
                 TargetVersion::DiscoverPrerelease(index)
             } else {
@@ -82,10 +82,80 @@ impl CommandExecute for Upgrade {
     }
 }
 
+/// Cargo's local cache of the crates.io sparse index. Cargo refreshes it whenever it resolves
+/// dependencies, so reading it needs no network access.
+#[derive(Debug)]
+struct IndexCache(PathBuf);
+
+/// A version of a crate in [`IndexCache`].
+struct IndexedVersion {
+    version: Version,
+    yanked: bool,
+}
+
+impl IndexCache {
+    /// Cargo 1.85 and later cache the crates.io index in this directory, named by a stable
+    /// hash of the index URL. The directory that older Cargo versions used is ignored.
+    const DIR: &str = "index.crates.io-1949cf8c6b5b557f";
+
+    fn new() -> eyre::Result<Self> {
+        let cargo_home = match std::env::var_os("CARGO_HOME").filter(|home| !home.is_empty()) {
+            Some(home) => std::path::absolute(home)?,
+            None => std::env::home_dir().ok_or_else(|| eyre!("no home directory"))?.join(".cargo"),
+        };
+        Ok(Self::in_cargo_home(&cargo_home))
+    }
+
+    fn in_cargo_home(cargo_home: &Path) -> Self {
+        Self(cargo_home.join("registry").join("index").join(Self::DIR).join(".cache"))
+    }
+
+    /// The versions of the crate `name` that the cache lists, yanked or not.
+    fn versions(&self, name: &str) -> eyre::Result<Vec<IndexedVersion>> {
+        // Cargo lays out the index by the crate's ASCII name, lowercased.
+        let name = name.to_ascii_lowercase();
+        let path = match name.len() {
+            1 => self.0.join("1"),
+            2 => self.0.join("2"),
+            3 => self.0.join("3").join(&name[..1]),
+            _ => self.0.join(&name[..2]).join(&name[2..4]),
+        }
+        .join(&name);
+        let entry = fs::read(&path).map_err(|e| eyre!("{e}: `{}`", path.display()))?;
+        Self::parse(&entry).wrap_err_with(|| format!("malformed index entry `{}`", path.display()))
+    }
+
+    /// Parses a cache entry: the cache format version (3) as one byte, the index format
+    /// version (2) as a little-endian `u32`, then the HTTP cache key and each version followed
+    /// by its JSON index line, with every field ending in a NUL byte.
+    fn parse(entry: &[u8]) -> eyre::Result<Vec<IndexedVersion>> {
+        #[derive(Deserialize)]
+        struct IndexLine {
+            vers: String,
+            #[serde(default)]
+            yanked: bool,
+        }
+
+        let fields = match entry {
+            [3, a, b, c, d, fields @ ..] if u32::from_le_bytes([*a, *b, *c, *d]) == 2 => fields,
+            _ => return Err(eyre!("unsupported cache format")),
+        };
+        let fields = fields.strip_suffix(b"\0").ok_or_else(|| eyre!("truncated entry"))?;
+        let mut fields = fields.split(|&byte| byte == 0).skip(1); // the HTTP cache key
+        let mut versions = Vec::new();
+        while let Some(_version) = fields.next() {
+            let line = fields.next().ok_or_else(|| eyre!("a version has no index line"))?;
+            let line: IndexLine = serde_json::from_slice(line)?;
+            versions.push(IndexedVersion { version: line.vers.parse()?, yanked: line.yanked });
+        }
+        Ok(versions)
+    }
+}
+
 #[derive(Debug)]
 enum TargetVersion {
-    DiscoverPrerelease(SparseIndex),
-    DiscoverReleased(SparseIndex),
+    DiscoverPrerelease(IndexCache),
+    DiscoverReleased(IndexCache),
     Match(VersionReq),
 }
 
@@ -243,24 +313,25 @@ fn update_manifest_section<T: toml_edit::TableLike + ?Sized>(
         let strategy: Rewrite = match target {
             TargetVersion::Match(req) => Rewrite::Replace(req.to_string()),
             TargetVersion::DiscoverPrerelease(index) => {
-                let krate = index.crate_from_cache(crate_name)?;
-                let highest = krate.highest_version();
-                let bare = (!highest.is_yanked())
-                    .then_some(highest.version())
-                    .ok_or_else(|| {
-                        eyre!("Latest version {:?} for {crate_name:?} is yanked", highest.version())
-                    })?
-                    .to_owned();
-                Rewrite::SwapBareVersion(bare)
+                let versions = index.versions(crate_name)?;
+                let highest = versions
+                    .iter()
+                    .max_by(|a, b| a.version.cmp(&b.version))
+                    .ok_or_else(|| eyre!("No version for {crate_name:?}"))?;
+                if highest.yanked {
+                    let version = highest.version.to_string();
+                    return Err(eyre!("Latest version {version:?} for {crate_name:?} is yanked"));
+                }
+                Rewrite::SwapBareVersion(highest.version.to_string())
             }
             TargetVersion::DiscoverReleased(index) => {
-                let krate = index.crate_from_cache(crate_name)?;
-                let highest = krate.highest_normal_version();
-                let bare = highest
-                    .ok_or_else(|| eyre!("No released version for {crate_name:?}"))?
-                    .version()
-                    .to_owned();
-                Rewrite::SwapBareVersion(bare)
+                let versions = index.versions(crate_name)?;
+                let highest = versions
+                    .iter()
+                    .filter(|indexed| !indexed.yanked && indexed.version.pre.is_empty())
+                    .max_by(|a, b| a.version.cmp(&b.version))
+                    .ok_or_else(|| eyre!("No released version for {crate_name:?}"))?;
+                Rewrite::SwapBareVersion(highest.version.to_string())
             }
         };
 
@@ -509,7 +580,6 @@ mod tests {
 
     // Version discovery reads a fake crates.io index cache from a temporary Cargo home.
     use crate::CommandExecute;
-    use crates_index::{HashKind, SparseIndex, sparse};
     use std::path::Path;
 
     const CURRENT_INDEX_DIR: &str = "index.crates.io-1949cf8c6b5b557f";
@@ -578,9 +648,9 @@ pgrx-tests = "=0.18.1"
         home
     }
 
-    /// The index `cargo pgrx upgrade` opens, but rooted at `cargo_home`.
-    fn index_in(cargo_home: &Path) -> SparseIndex {
-        SparseIndex::with_path_and_hash_kind(cargo_home, sparse::URL, &HashKind::Stable).unwrap()
+    /// The index cache `cargo pgrx upgrade` reads, but in `cargo_home`.
+    fn index_in(cargo_home: &Path) -> super::IndexCache {
+        super::IndexCache::in_cargo_home(cargo_home)
     }
 
     fn released_in(cargo_home: &Path) -> super::TargetVersion {

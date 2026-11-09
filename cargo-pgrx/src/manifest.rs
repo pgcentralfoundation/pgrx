@@ -265,3 +265,64 @@ pub(crate) fn all_pg_in_both_tomls<'a>(
         _ => true,
     })
 }
+
+/// Names and versions that cargo-pgrx reads from a crate's `Cargo.toml`.
+pub(crate) trait PgrxManifestExt {
+    /// Package name
+    fn package_name(&self) -> eyre::Result<String>;
+
+    /// Package version
+    fn package_version(&self) -> eyre::Result<String>;
+
+    /// Resolved string for target library name, either its lib.name,
+    /// or package name with hyphens replaced with underscore.
+    /// <https://doc.rust-lang.org/cargo/reference/cargo-targets.html#the-name-field>
+    fn lib_name(&self) -> eyre::Result<String>;
+
+    /// Resolved string for target library name extension filename
+    fn lib_filename(&self) -> eyre::Result<String>;
+}
+
+impl PgrxManifestExt for Manifest {
+    fn package_name(&self) -> eyre::Result<String> {
+        match &self.package {
+            Some(package) => Ok(package.name.to_owned()),
+            None => Err(eyre!("Could not get [package] from manifest.")),
+        }
+    }
+
+    fn package_version(&self) -> eyre::Result<String> {
+        match &self.package {
+            Some(package) => match &package.version {
+                cargo_toml::Inheritable::Set(version) => Ok(version.to_string()),
+                // This should be impossible to hit, since we use
+                // `Manifest::from_path`, which calls `complete_from_path`,
+                // which is documented as resolving these. That said, I
+                // haven't tested it, and it's not clear how much it
+                // actually matters either way, so we just emit an error
+                // rather than doing something like `unreachable!()`.
+                cargo_toml::Inheritable::Inherited => {
+                    Err(eyre!("Workspace-inherited package version are not currently supported."))
+                }
+            },
+            None => Err(eyre!("Could not get [package] from manifest.")),
+        }
+    }
+
+    fn lib_name(&self) -> eyre::Result<String> {
+        // `cargo_manifest` auto fills lib.name with package.name;
+        // hyphen replaced with underscore if crate type is lib.
+        // So we will always have a lib.name for lib crates.
+        self.package
+            .as_ref()
+            .and(self.lib.as_ref())
+            .and_then(|lib| lib.name.to_owned())
+            .ok_or_else(|| eyre!("Could not get [lib] name from manifest."))
+    }
+
+    fn lib_filename(&self) -> eyre::Result<String> {
+        use std::env::consts::{DLL_PREFIX, DLL_SUFFIX};
+        let lib_name = &self.lib_name()?;
+        Ok(format!("{DLL_PREFIX}{}{DLL_SUFFIX}", lib_name))
+    }
+}

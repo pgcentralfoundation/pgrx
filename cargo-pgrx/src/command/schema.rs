@@ -10,12 +10,12 @@
 use crate::CommandExecute;
 use crate::cargo::{self, Cargo, CargoProfile};
 use crate::command::get::{find_control_file, get_property};
+use crate::manifest::PgrxManifestExt;
 use crate::manifest::{get_package_manifest, pg_config_and_version};
 use crate::object_utils::schema_section_data;
 use cargo_toml::Manifest;
 use eyre::WrapErr;
 use owo_colors::OwoColorize;
-use pgrx_pg_config::cargo::PgrxManifestExt;
 use pgrx_pg_config::{Pgrx, is_supported_major_version};
 use pgrx_sql_entity_graph::section::decode_entities;
 use pgrx_sql_entity_graph::{ControlFile, PgrxSql, SqlGraphEntity};

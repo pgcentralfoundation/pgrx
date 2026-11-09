@@ -76,6 +76,13 @@ impl FileDigest {
     }
 }
 
+/// The SHA-256 of `bytes` in lowercase hexadecimal, from the same backend as file fingerprints.
+pub fn sha256_hex(bytes: &[u8]) -> String {
+    let mut digest = FileDigest::new();
+    digest.update(bytes);
+    digest.finish()
+}
+
 /// Encode a digest without relying on backend-specific formatting trait implementations.
 fn hexadecimal(bytes: &[u8]) -> String {
     use std::fmt::Write as _;

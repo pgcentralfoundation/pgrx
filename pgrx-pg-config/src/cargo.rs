@@ -10,75 +10,35 @@
 use std::path::Path;
 use std::process::Command;
 
-use cargo_toml::Manifest;
 use eyre::eyre;
+use serde::Deserialize;
 
-/// Extension to `cargo_toml::Manifest`.
-/// Import by adding `use pgrx_pg_config::cargo::PgrxManifestExt;`
-/// and extended functions will be available on `Manifest` values.
-pub trait PgrxManifestExt {
-    /// Package name
-    fn package_name(&self) -> eyre::Result<String>;
-
-    /// Package version
-    fn package_version(&self) -> eyre::Result<String>;
-
-    /// Resolved string for target library name, either its lib.name,
-    /// or package name with hyphens replaced with underscore.
-    /// <https://doc.rust-lang.org/cargo/reference/cargo-targets.html#the-name-field>
-    fn lib_name(&self) -> eyre::Result<String>;
-
-    /// Resolved string for target library name extension filename
-    fn lib_filename(&self) -> eyre::Result<String>;
-}
-
-impl PgrxManifestExt for Manifest {
-    fn package_name(&self) -> eyre::Result<String> {
-        match &self.package {
-            Some(package) => Ok(package.name.to_owned()),
-            None => Err(eyre!("Could not get [package] from manifest.")),
-        }
+/// The name of the library target in the `Cargo.toml` at `manifest_path`: its `[lib] name`, or
+/// else the package name with each hyphen replaced by an underscore, as Cargo names it.
+/// <https://doc.rust-lang.org/cargo/reference/cargo-targets.html#the-name-field>
+pub fn lib_name(manifest_path: impl AsRef<Path>) -> eyre::Result<String> {
+    #[derive(Deserialize)]
+    struct Manifest {
+        package: Option<Package>,
+        lib: Option<Lib>,
+    }
+    #[derive(Deserialize)]
+    struct Package {
+        name: String,
+    }
+    #[derive(Deserialize)]
+    struct Lib {
+        name: Option<String>,
     }
 
-    fn package_version(&self) -> eyre::Result<String> {
-        match &self.package {
-            Some(package) => match &package.version {
-                cargo_toml::Inheritable::Set(version) => Ok(version.to_string()),
-                // This should be impossible to hit, since we use
-                // `Manifest::from_path`, which calls `complete_from_path`,
-                // which is documented as resolving these. That said, I
-                // haven't tested it, and it's not clear how much it
-                // actually matters either way, so we just emit an error
-                // rather than doing something like `unreachable!()`.
-                cargo_toml::Inheritable::Inherited => {
-                    Err(eyre!("Workspace-inherited package version are not currently supported."))
-                }
-            },
-            None => Err(eyre!("Could not get [package] from manifest.")),
-        }
-    }
-
-    fn lib_name(&self) -> eyre::Result<String> {
-        // `cargo_manifest` auto fills lib.name with package.name;
-        // hyphen replaced with underscore if crate type is lib.
-        // So we will always have a lib.name for lib crates.
-        self.package
-            .as_ref()
-            .and(self.lib.as_ref())
-            .and_then(|lib| lib.name.to_owned())
-            .ok_or_else(|| eyre!("Could not get [lib] name from manifest."))
-    }
-
-    fn lib_filename(&self) -> eyre::Result<String> {
-        use std::env::consts::{DLL_PREFIX, DLL_SUFFIX};
-        let lib_name = &self.lib_name()?;
-        Ok(format!("{DLL_PREFIX}{}{DLL_SUFFIX}", lib_name))
-    }
-}
-
-/// Helper functions to read `Cargo.toml` and remap error to `eyre::Result`.
-pub fn read_manifest<T: AsRef<Path>>(path: T) -> eyre::Result<Manifest> {
-    Manifest::from_path(path).map_err(|err| eyre!("Couldn't parse manifest: {err}"))
+    let path = manifest_path.as_ref();
+    let manifest = std::fs::read_to_string(path)
+        .map_err(|err| eyre!("Couldn't read manifest `{}`: {err}", path.display()))?;
+    let manifest: Manifest =
+        toml::from_str(&manifest).map_err(|err| eyre!("Couldn't parse manifest: {err}"))?;
+    let package =
+        manifest.package.ok_or_else(|| eyre!("Could not get [package] from manifest."))?;
+    Ok(manifest.lib.and_then(|lib| lib.name).unwrap_or_else(|| package.name.replace('-', "_")))
 }
 
 /// Keep a Cargo command from inheriting the variables that `cargo run` and `cargo test` set to
@@ -117,7 +77,25 @@ fn is_package_env(name: &str) -> bool {
 
 #[cfg(test)]
 mod tests {
-    use super::is_package_env;
+    use super::{is_package_env, lib_name};
+
+    #[test]
+    fn lib_name_prefers_the_lib_section_over_the_package_name() {
+        let dir = std::env::temp_dir().join(format!("pgrx-lib-name-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let manifest = dir.join("Cargo.toml");
+
+        std::fs::write(&manifest, "[package]\nname = \"my-ext\"\nversion = \"0.1.0\"\n").unwrap();
+        assert_eq!(lib_name(&manifest).unwrap(), "my_ext");
+
+        std::fs::write(&manifest, "[package]\nname = \"my-ext\"\n\n[lib]\nname = \"other\"\n")
+            .unwrap();
+        assert_eq!(lib_name(&manifest).unwrap(), "other");
+
+        std::fs::write(&manifest, "[workspace]\nmembers = []\n").unwrap();
+        assert!(lib_name(&manifest).is_err());
+        std::fs::remove_dir_all(&dir).unwrap();
+    }
 
     #[test]
     fn package_env_excludes_cargo_configuration() {
