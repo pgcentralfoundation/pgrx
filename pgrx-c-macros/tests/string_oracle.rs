@@ -425,9 +425,13 @@ static const char *expected_file;
 static int expected_line;
 static volatile unsigned evaluations;
 /* Report the operand evaluations when a failed assertion aborts the process. */
+static char assertion_text[32] = "evaluations\t";
+static char assertion_digits[10];
 static void assertion_aborted(int signal_number) {{
-    char text[32] = "evaluations\t";
-    char digits[10];
+    /* Static buffers: a local array would make the compiler reference its stack guard, which
+     * this standalone link does not provide on every platform. */
+    char *text = assertion_text;
+    char *digits = assertion_digits;
     unsigned value = evaluations;
     int length = 12, count = 0;
     (void) signal_number;

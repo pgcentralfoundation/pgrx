@@ -61,12 +61,16 @@ fn assertion_functions_are_safe_macros_in_every_build<Uninstantiated>() {
 #[allow(dead_code)]
 unsafe fn checks_through_pointers_need_unsafe_in_every_build<Uninstantiated>(
     page: pg::Page,
-    control: pg::SlruCtl,
+    #[cfg(not(feature = "pg19"))] control: pg::SlruCtl,
+    // PostgreSQL 19 names the control structure `SlruDesc`.
+    #[cfg(feature = "pg19")] control: *mut pg::SlruDesc,
 ) {
     use pg::cmacros::c::Pointer;
     // SAFETY: the caller provides the page and control structure these checks read.
     unsafe {
-        let () = pg::PageValidateSpecialPointer!(Pointer::from(page)).get();
+        // PostgreSQL 15's definition yields `bool` and later versions' yields nothing; the
+        // type is the same for both build flavors of one version.
+        let _ = pg::PageValidateSpecialPointer!(Pointer::from(page)).get();
         let () = pg::SlruPagePrecedesUnitTests!(control, 1_i32).get();
     }
 }
