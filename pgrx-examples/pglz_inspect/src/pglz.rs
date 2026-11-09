@@ -24,6 +24,7 @@ pub enum Strategy {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PglzError {
     /// `pglz_decompress` returned -1: corrupt or truncated input.
+    #[cfg(any(test, feature = "pg_test"))]
     Decompress,
     /// Source slice length or `rawsize` does not fit in `i32`.
     InputTooLarge,
@@ -36,6 +37,7 @@ pub enum PglzError {
 impl fmt::Display for PglzError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
+            #[cfg(any(test, feature = "pg_test"))]
             Self::Decompress => f.write_str("pglz_decompress failed: corrupt or truncated input"),
             Self::InputTooLarge => f.write_str("input length exceeds i32::MAX"),
             Self::Allocation => f.write_str("failed to allocate output buffer"),
@@ -89,12 +91,15 @@ unsafe fn compress_raw(
     }
 }
 
+// The SQL functions only compress; the tests decompress to check round trips.
+
 /// Decompress into storage whose capacity has already been checked.
 ///
 /// # Safety
 /// The caller runs on PostgreSQL's initialized backend thread, provides
 /// `src.len() <= i32::MAX` and `rawsize <= i32::MAX`, and grants exclusive write
 /// access to `dest` for at least `rawsize` bytes.
+#[cfg(any(test, feature = "pg_test"))]
 #[inline]
 unsafe fn decompress_raw(
     src: &[u8],
@@ -144,6 +149,7 @@ pub fn compress_into(
 /// Decompress `src` into the first `rawsize` bytes of caller-provided `dest`. Returns the number of bytes actually written (always `<= rawsize`). If `check_complete` is `true`, all of `src` must be consumed.
 ///
 /// `rawsize` is the expected uncompressed size and is independent of `dest.len()` — pass a buffer larger than `rawsize` to reuse a scratch allocation across multiple decode calls of varying sizes. Returns `Err(BufferTooSmall)` if `dest.len() < rawsize`.
+#[cfg(any(test, feature = "pg_test"))]
 pub fn decompress_into(
     src: &[u8],
     dest: &mut [u8],
@@ -187,6 +193,7 @@ pub fn compress(src: &[u8], strategy: Strategy) -> Result<Option<Vec<u8>>, PglzE
 /// # Security
 ///
 /// `rawsize` controls a buffer allocation up to ~2 GiB and **must come from a trusted source** (e.g. a TOAST varlena header), never from untrusted SQL input. A hostile caller passing `rawsize = i32::MAX` causes a multi-gigabyte allocation per call — a trivial DoS vector. Allocation failures are reported as `PglzError::Allocation` rather than aborting, but callers that accept `rawsize` from users must still bound it themselves.
+#[cfg(any(test, feature = "pg_test"))]
 pub fn decompress(src: &[u8], rawsize: usize, check_complete: bool) -> Result<Vec<u8>, PglzError> {
     if src.len() > i32::MAX as usize || rawsize > i32::MAX as usize {
         return Err(PglzError::InputTooLarge);
