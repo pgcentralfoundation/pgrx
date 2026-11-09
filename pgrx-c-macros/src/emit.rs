@@ -286,6 +286,58 @@ pub fn emit_with_bindings(
     emit_with_lowering(session, name, bindings, Generated::NONE, &mut None)
 }
 
+/// Emit `count` macros with `emit` on several threads, in index order.
+///
+/// A macro's emission reads only the shared session, catalogs and generated state, so neither
+/// the thread that emits it nor the order of emission can change the result. Each thread
+/// builds its own lowering index the first time one of its macros needs it.
+fn emit_in_parallel<'a>(
+    count: usize,
+    emit: impl Fn(usize, &mut Option<types::Lowering<'a>>) -> MacroEmission + Sync,
+) -> Vec<MacroEmission> {
+    let threads = emission_threads().clamp(1, count.max(1));
+    if threads == 1 {
+        let mut lowering = None;
+        return (0..count).map(|index| emit(index, &mut lowering)).collect();
+    }
+    let next = std::sync::atomic::AtomicUsize::new(0);
+    let mut emitted = std::thread::scope(|scope| {
+        let workers = (0..threads)
+            .map(|_| {
+                scope.spawn(|| {
+                    let mut lowering = None;
+                    let mut emitted = Vec::new();
+                    loop {
+                        let index = next.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+                        if index >= count {
+                            break emitted;
+                        }
+                        emitted.push((index, emit(index, &mut lowering)));
+                    }
+                })
+            })
+            .collect::<Vec<_>>();
+        workers
+            .into_iter()
+            .flat_map(|worker| {
+                worker.join().unwrap_or_else(|panic| std::panic::resume_unwind(panic))
+            })
+            .collect::<Vec<_>>()
+    });
+    emitted.sort_unstable_by_key(|(index, _)| *index);
+    emitted.into_iter().map(|(_, emission)| emission).collect()
+}
+
+/// Threads for batch emission: Cargo's job count when a build script runs it, otherwise the
+/// machine's available parallelism.
+fn emission_threads() -> usize {
+    std::env::var("NUM_JOBS")
+        .ok()
+        .and_then(|jobs| jobs.parse().ok())
+        .or_else(|| std::thread::available_parallelism().ok().map(std::num::NonZero::get))
+        .unwrap_or(1)
+}
+
 /// Apply admission gates before rendering, sharing storage reconciliation across a batch.
 ///
 /// The optional lowering is populated only after a macro survives analysis and ABI
@@ -389,15 +441,12 @@ fn emit_prepared_batch(
 ) -> Vec<MacroEmission> {
     // Each pass borrows one immutable catalog and generated state. Index its C/Rust
     // storage identities once, after the first macro passes its admission gates.
+    let names = names.iter().map(AsRef::as_ref).collect::<Vec<&str>>();
     let initial = {
         let generated = Generated { adapters, ..Generated::NONE };
-        let mut lowering = None;
-        names
-            .iter()
-            .map(|name| {
-                emit_with_lowering(session, name.as_ref(), bindings, generated, &mut lowering)
-            })
-            .collect::<Vec<_>>()
+        emit_in_parallel(names.len(), |index, lowering| {
+            emit_with_lowering(session, names[index], bindings, generated, lowering)
+        })
     };
     let mut roots = initial
         .iter()
@@ -458,54 +507,44 @@ fn emit_prepared_batch(
     let mut translations = translation_panics(&initial, &translated);
     let finish = |translations: &BTreeMap<String, BTreeSet<&'static str>>| {
         let generated = Generated { adapters, translations };
-        let mut available_lowering = None;
-        let mut emissions = initial
-            .iter()
-            .map(|emission| {
-                let name = &emission.analysis.name;
-                let failure = if let Some(impact) = impacted.get(name.as_str()) {
-                    Some((impact.dependency.as_str(), impact.root.as_str()))
-                } else if roots.contains_key(name) {
-                    // A wrapper may independently see the same folded constant.
-                    // Prefer its direct dependency as the explanation where possible.
-                    graph.dependencies(name).find_map(|dependency| {
-                        if dependency != name && roots.contains_key(dependency) {
-                            Some((dependency, dependency))
-                        } else {
-                            impacted.get(dependency).and_then(|impact| {
-                                (impact.root != *name).then_some((dependency, impact.root.as_str()))
-                            })
-                        }
-                    })
-                } else {
-                    None
-                };
-                if let Some((dependency, root)) = failure {
-                    let reason =
-                        dependency_skip(&emission.analysis, dependency, root, &roots[root]);
-                    MacroEmission {
-                        analysis: emission.analysis.clone(),
-                        status: EmissionStatus::Skipped { reason },
-                        fallback: None,
+        let mut emissions = emit_in_parallel(initial.len(), |index, lowering| {
+            let emission = &initial[index];
+            let name = &emission.analysis.name;
+            let failure = if let Some(impact) = impacted.get(name.as_str()) {
+                Some((impact.dependency.as_str(), impact.root.as_str()))
+            } else if roots.contains_key(name) {
+                // A wrapper may independently see the same folded constant.
+                // Prefer its direct dependency as the explanation where possible.
+                graph.dependencies(name).find_map(|dependency| {
+                    if dependency != name && roots.contains_key(dependency) {
+                        Some((dependency, dependency))
+                    } else {
+                        impacted.get(dependency).and_then(|impact| {
+                            (impact.root != *name).then_some((dependency, impact.root.as_str()))
+                        })
                     }
-                } else if roots.contains_key(name) {
-                    let reason = roots[name].clone();
-                    MacroEmission {
-                        analysis: emission.analysis.clone(),
-                        status: EmissionStatus::Skipped { reason },
-                        fallback: None,
-                    }
-                } else {
-                    emit_with_lowering(
-                        session,
-                        name,
-                        &available,
-                        generated,
-                        &mut available_lowering,
-                    )
+                })
+            } else {
+                None
+            };
+            if let Some((dependency, root)) = failure {
+                let reason = dependency_skip(&emission.analysis, dependency, root, &roots[root]);
+                MacroEmission {
+                    analysis: emission.analysis.clone(),
+                    status: EmissionStatus::Skipped { reason },
+                    fallback: None,
                 }
-            })
-            .collect::<Vec<_>>();
+            } else if roots.contains_key(name) {
+                let reason = roots[name].clone();
+                MacroEmission {
+                    analysis: emission.analysis.clone(),
+                    status: EmissionStatus::Skipped { reason },
+                    fallback: None,
+                }
+            } else {
+                emit_with_lowering(session, name, &available, generated, lowering)
+            }
+        });
         // If a final rendering hits an output limit, reject its dependents too rather
         // than leaving a preserved call to a macro whose definition is absent.
         let late = emissions
