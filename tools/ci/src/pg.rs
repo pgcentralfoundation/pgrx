@@ -312,14 +312,19 @@ pub(crate) fn run(options: &Options) -> eyre::Result<bool> {
     let mut passed = testbin::passed(&outcomes);
 
     // Only Rust libraries hold doctests; Cargo warns about every extension crate it is asked
-    // to test this way. Their default features name no PostgreSQL version and keep pgrx's C
-    // shim, as the test build did, so the libraries it made are reused.
+    // to test this way. Each keeps its default features, which name no PostgreSQL version,
+    // and turns on its C shim, which the test build had through pgrx-unit-tests. Only pgrx
+    // defaults to the shim: without it Windows can't build pgrx-pg-sys, and other platforms
+    // would rebuild it instead of reusing the test build's.
     let mut doctests = Command::new("cargo");
     doctests.args(["test", "--locked", "--doc", "--features", &feature]);
     let mut any = false;
     for package in pg_packages.iter().filter(|p| wanted.contains(p.name.as_str())) {
         if workspace::only_rust_library(package) {
             doctests.args(["-p", &package.name]);
+            if package.features.contains_key("cshim") {
+                doctests.arg("--features").arg(format!("{}/cshim", package.name));
+            }
             any = true;
         }
     }
