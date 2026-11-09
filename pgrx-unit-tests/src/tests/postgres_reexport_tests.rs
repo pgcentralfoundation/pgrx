@@ -27,9 +27,23 @@ mod tests {
     #[pg_test]
     fn test_postgres_reexport_server() {}
 
-    // A `#[pg_test]` body runs inside a backend, where `pgrx_tests::client()`
-    // doesn't know the server's address. Read it from the server's settings
-    // and connect through the re-exported crate instead.
+    // A `#[pg_test]` body runs inside a backend. The harness gives the server
+    // its port, so `pgrx_tests::client()` can connect from here too.
+    #[pg_test]
+    fn test_client_from_pg_test() {
+        let (mut client, _session_id) = pgrx_tests::client().expect("connect to the test server");
+
+        // The client is a separate backend, so it can't see this test's
+        // uncommitted table.
+        Spi::run("CREATE TABLE tests.client_uncommitted ()").unwrap();
+        let row = client
+            .query_one("SELECT to_regclass('tests.client_uncommitted') IS NULL", &[])
+            .unwrap();
+        assert!(row.get::<_, bool>(0));
+    }
+
+    // Connect through the re-exported crate directly, with the address read
+    // from the server's settings.
     #[pg_test]
     fn test_postgres_reexport_from_pg_test() {
         use pgrx_tests::postgres::{Config, NoTls};

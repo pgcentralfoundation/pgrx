@@ -7,11 +7,11 @@ Use this as a `[dev-dependencies]` crate when your extension uses `#[pg_test]`.
 ## The `client` feature
 
 A `#[pg_test]` function runs in one backend. A test that needs more sessions,
-such as a test of notifications or lock waits, can open more connections to the
-test server with the [`postgres`](https://crates.io/crates/postgres) crate,
-which the `client` feature re-exports as `pgrx_tests::postgres`. The harness
-doesn't need the feature, and it's off by default because `postgres` brings in
-`tokio`.
+such as a test of notifications or lock waits, can open them with
+`pgrx_tests::client()`, which the `client` feature adds. It returns a
+[`postgres`](https://crates.io/crates/postgres) client, and the feature
+re-exports that crate as `pgrx_tests::postgres`. The harness doesn't need the
+feature, and it's off by default because `postgres` brings in `tokio`.
 
 `#[pg_test]` functions are compiled into the extension's library, which can't
 use dev-dependencies. So also list `pgrx-tests` under `[dependencies]`, as an
@@ -31,31 +31,22 @@ pgrx-tests = { version = "=0.20.0", features = ["client"], optional = true }
 pgrx-tests = "=0.20.0"
 ```
 
-In the test, read the server's address with SPI and connect:
+Then, in the test:
 
 ```rust
 #[pg_test]
 fn test_two_sessions() {
-    use pgrx_tests::postgres::{Config, NoTls};
+    let (mut other, _session_id) = pgrx_tests::client().unwrap();
 
-    let setting = |sql: &str| Spi::get_one::<String>(sql).unwrap().unwrap();
-    let socket_dir = setting("SHOW unix_socket_directories");
-    let host = match socket_dir.split(',').next().map(str::trim) {
-        Some(dir) if !cfg!(windows) && !dir.is_empty() => dir,
-        _ => "127.0.0.1",
-    };
-    let mut other = Config::new()
-        .host(host)
-        .port(setting("SHOW port").parse().unwrap())
-        .user(&setting("SELECT current_user::text"))
-        .dbname(&setting("SELECT current_database()::text"))
-        .connect(NoTls)
+    // `other` is a separate session, so it can't see this test's uncommitted table.
+    Spi::run("CREATE TABLE tests.mine ()").unwrap();
+    let row = other
+        .query_one("SELECT to_regclass('tests.mine') IS NULL", &[])
         .unwrap();
-    // `other` is a separate session, so it doesn't see this test's uncommitted changes.
+    assert!(row.get::<_, bool>(0));
 }
 ```
 
-`pgrx_tests::client()` doesn't work inside a `#[pg_test]`, because only the test
-process knows the port the harness chose. From an ordinary `#[test]`, after
-`pgrx_tests::run_test` has started the server, it returns a connected client and
-the connection's session ID.
+`client()` also returns the session's ID, the `%c` value that starts its lines
+in the server log. It works from an ordinary `#[test]` too, once
+`pgrx_tests::run_test` has started the server.
