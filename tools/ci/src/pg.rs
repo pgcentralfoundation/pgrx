@@ -9,9 +9,9 @@
 //! The pg_test harness installs each extension with `cargo pgrx install`, which builds the
 //! extension with only its own package's features. pgrx-unit-tests' build nearly matches the
 //! workspace's test build and reuses it, but the examples' builds rebuild the bindings and
-//! pgrx. So the test binaries build in `target` while cargo-pgrx and one example from each
-//! group of examples with the same dependencies build in `target-ext`, and then the test
-//! binaries run in parallel.
+//! pgrx. So the test binaries build in `target` while cargo-pgrx and the examples' extensions
+//! build in `target-ext`, each group of examples with the same dependencies in one Cargo
+//! invocation, and then the test binaries run in parallel.
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
@@ -103,6 +103,35 @@ impl Postgres {
         log(format_args!("installed {} in {:.0?}", package.name, started.elapsed()));
     }
 
+    /// Build `packages`' extension libraries together, so their own crates compile in
+    /// parallel. They resolve the same dependencies, so this build matches each package's own,
+    /// and the installs that follow reuse it. cargo-pgrx adds a linker argument on Linux, so
+    /// there each install still relinks its final crate. A failure is logged for the installs
+    /// to repeat.
+    pub(crate) fn build_libraries(&self, target_dir: &Utf8Path, packages: &[&Package]) {
+        let Some(first) = packages.first() else { return };
+        let mut command = Command::new("cargo");
+        command
+            .args(["build", "--locked", "--lib", "--message-format=short", "--features"])
+            .arg(format!("{} pg_test", self.features(&first.name)))
+            .arg("--no-default-features")
+            .env("CARGO_TARGET_DIR", target_dir);
+        for package in packages {
+            command.args(["-p", &package.name]);
+        }
+        let started = Instant::now();
+        match process::run(&mut command) {
+            Ok(true) => {}
+            Ok(false) => log("building the extension libraries failed"),
+            Err(error) => log(format_args!("building the extension libraries failed: {error:?}")),
+        }
+        log(format_args!(
+            "built {} extension libraries in {:.0?}",
+            packages.len(),
+            started.elapsed()
+        ));
+    }
+
     /// Configure a test binary's command to install its extension the way [`install`] did.
     ///
     /// [`install`]: Self::install
@@ -161,10 +190,10 @@ fn contains_pg_test(dir: &Utf8Path) -> eyre::Result<bool> {
     Ok(false)
 }
 
-/// One package from each group whose extension builds resolve the same dependencies, the
-/// largest group first, since the most binaries wait on its build.
-fn dependency_groups<'a>(packages: &[&'a Package]) -> Vec<&'a Package> {
-    type Signature = BTreeSet<(String, bool, bool, BTreeSet<String>)>;
+/// Group the packages whose extension builds resolve the same dependencies, largest group
+/// first, since the most test binaries wait on its build.
+fn dependency_groups<'a>(packages: &[&'a Package]) -> Vec<Vec<&'a Package>> {
+    type Signature = BTreeSet<(String, bool, bool, BTreeSet<String>, Option<String>)>;
     let mut groups: BTreeMap<Signature, Vec<&'a Package>> = BTreeMap::new();
     for &package in packages {
         let enabled: BTreeSet<&str> =
@@ -184,6 +213,7 @@ fn dependency_groups<'a>(packages: &[&'a Package]) -> Vec<&'a Package> {
                     dependency.kind == DependencyKind::Build,
                     dependency.uses_default_features,
                     dependency.features.iter().cloned().collect(),
+                    dependency.target.as_ref().map(ToString::to_string),
                 )
             })
             .collect();
@@ -191,7 +221,7 @@ fn dependency_groups<'a>(packages: &[&'a Package]) -> Vec<&'a Package> {
     }
     let mut groups: Vec<Vec<&Package>> = groups.into_values().collect();
     groups.sort_by_key(|group| std::cmp::Reverse(group.len()));
-    groups.into_iter().map(|group| group[0]).collect()
+    groups
 }
 
 pub(crate) fn run(options: &Options) -> eyre::Result<bool> {
@@ -246,8 +276,13 @@ pub(crate) fn run(options: &Options) -> eyre::Result<bool> {
                 .copied()
                 .filter(|package| !SHARES_TEST_TARGET.contains(&package.name.as_str()))
                 .collect();
-            for package in dependency_groups(&examples) {
-                postgres.install(&cargo_pgrx, &ext_target, package);
+            for group in dependency_groups(&examples) {
+                if group.len() > 1 {
+                    postgres.build_libraries(&ext_target, &group);
+                }
+                for package in group {
+                    postgres.install(&cargo_pgrx, &ext_target, package);
+                }
             }
             Ok(())
         });
