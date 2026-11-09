@@ -58,7 +58,7 @@ owo-colors = "4.4" # for output highlighting
 proc-macro2 = { version = "1.0.107", features = ["span-locations"] }
 quote = "1.0.47"
 regex = "1.13" # used for build/test
-serde = { version = "1.0", features = ["derive"] }
+serde = { version = "1.0", features = ["alloc", "derive"] } # `alloc` matches what toml turns on in pgrx-tests
 serde_json = "1.0"
 shlex = "2.0" # shell lexing, also used by many of our deps
 syn = { version = "2", features = ["extra-traits", "full", "parsing", "visit-mut"] }
