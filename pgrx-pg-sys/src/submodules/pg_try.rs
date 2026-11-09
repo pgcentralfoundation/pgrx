@@ -141,17 +141,10 @@ impl<'a, R, F: FnOnce() -> R + UnwindSafe> PgTryBuilder<'a, R, F> {
     /// Run the main execution block closure.  Any error raised will be passed to a registered
     /// catch handler, and when finished, the finally block will be run.
     ///
-    /// When a catch handler returns instead of raising after catching a
-    /// [`CaughtError::PostgresError`], `execute` calls Postgres' `FlushErrorState()`, as C code
-    /// must once it has handled an ERROR.  That empties Postgres' whole error data stack, so a
-    /// [`CaughtError::PostgresError`] still held afterward, such as one the handler returned, is
-    /// rethrown from pgrx's copy.
-    ///
-    /// A Rust panic or a [`CaughtError::ErrorReport`] puts nothing on that stack, so `execute`
-    /// doesn't flush after a handler returns from one, which leaves alone any ERROR that C code is
-    /// still handling.  A Postgres ERROR that such a panic replaced, for example in an inner
-    /// `PgTryBuilder` whose catch handler panicked, stays on the stack: rethrow the panic, or call
-    /// `FlushErrorState()` once you're done with it.  See
+    /// Once a catch handler has handled a [`CaughtError::PostgresError`], by returning or by
+    /// raising any other error, `execute` calls Postgres' `FlushErrorState()`, as C code must.  A
+    /// Rust panic or [`CaughtError::ErrorReport`] isn't on Postgres' error data stack, so `execute`
+    /// doesn't flush for one, which leaves alone any ERROR that C code is still handling.  See
     /// [`CaughtError`](CaughtError#postgres-errors).
     pub fn execute(mut self) -> R {
         let result = catch_unwind(self.func);
@@ -162,15 +155,30 @@ impl<'a, R, F: FnOnce() -> R + UnwindSafe> PgTryBuilder<'a, R, F> {
             }
         }
 
+        fn flush_error_state() {
+            // Postgres says:
+            unsafe {
+                /*
+                 * FlushErrorState --- flush the error state after error recovery
+                 *
+                 * This should be called by an error handler after it's done processing
+                 * the error; or as soon as it's done CopyErrorData, if it intends to
+                 * do stuff that is likely to provoke another error.  You are not "out" of
+                 * the error subsystem until you have done this.
+                 */
+                crate::FlushErrorState();
+            }
+        }
+
         let result = match result {
             Ok(result) => result,
             Err(error) => {
                 let root_cause = downcast_panic_payload(error);
-                let (sqlerrcode, postgres_error) = match &root_cause {
-                    CaughtError::PostgresError(ereport) => (ereport.inner.sqlerrcode, true),
-                    CaughtError::ErrorReport(ereport) | CaughtError::RustPanic { ereport, .. } => {
-                        (ereport.inner.sqlerrcode, false)
-                    }
+                let caught_token = root_cause.postgres_token();
+                let sqlerrcode = match &root_cause {
+                    CaughtError::PostgresError(ereport)
+                    | CaughtError::ErrorReport(ereport)
+                    | CaughtError::RustPanic { ereport, .. } => ereport.inner.sqlerrcode,
                 };
 
                 // Postgres source docs says that a PG_TRY/PG_CATCH/PG_FINALLY block can't have
@@ -202,6 +210,14 @@ impl<'a, R, F: FnOnce() -> R + UnwindSafe> PgTryBuilder<'a, R, F> {
                     Err(caught) => {
                         let catch_handler_error = downcast_panic_payload(caught);
 
+                        // a handler that raised anything but the Postgres ERROR it caught is done
+                        // with that ERROR
+                        if caught_token.is_some()
+                            && catch_handler_error.postgres_token() != caught_token
+                        {
+                            flush_error_state();
+                        }
+
                         // make sure to run the finally block and then resume unwinding
                         // with this new panic
                         finally(&mut self.finally);
@@ -209,22 +225,10 @@ impl<'a, R, F: FnOnce() -> R + UnwindSafe> PgTryBuilder<'a, R, F> {
                     }
                 };
 
-                // Being here means the catch handler didn't raise an error.  A Rust panic or
-                // ErrorReport put nothing on Postgres' error stack, so a flush after one would
-                // only discard an ERROR that C code may still be handling.  For a Postgres ERROR,
-                // Postgres says:
-                if postgres_error {
-                    unsafe {
-                        /*
-                         * FlushErrorState --- flush the error state after error recovery
-                         *
-                         * This should be called by an error handler after it's done processing
-                         * the error; or as soon as it's done CopyErrorData, if it intends to
-                         * do stuff that is likely to provoke another error.  You are not "out" of
-                         * the error subsystem until you have done this.
-                         */
-                        crate::FlushErrorState();
-                    }
+                // Being here means the catch handler didn't raise an error, so it's done with
+                // any Postgres ERROR it caught
+                if caught_token.is_some() {
+                    flush_error_state();
                 }
                 handler_result
             }

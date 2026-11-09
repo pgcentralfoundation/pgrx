@@ -691,7 +691,7 @@ pub fn register_pg_guard_panic_hook() {
 ///
 /// When pgrx catches a Postgres ERROR, the ERROR stays on Postgres' error data stack, as it does
 /// for a C `PG_CATCH()` block, until something calls `FlushErrorState()`.  [`PgTryBuilder`] does
-/// that when a catch handler returns from a [`CaughtError::PostgresError`], and Postgres does when
+/// that once a catch handler has handled a [`CaughtError::PostgresError`], and Postgres does when
 /// it recovers from an ERROR that no one caught, such as one that fails a statement.
 ///
 /// [`CaughtError::rethrow()`] passes Postgres back its original ERROR while that ERROR is still on
@@ -699,9 +699,8 @@ pub fn register_pg_guard_panic_hook() {
 /// the ERROR, so Postgres' error handlers, such as PL/pgSQL's `GET STACKED DIAGNOSTICS`, see the
 /// same ERROR either way.
 ///
-/// A [`CaughtError::PostgresError`] that is swallowed instead of rethrown, for example with
-/// [`std::panic::catch_unwind()`], keeps its stack entry, and so does one that a Rust panic
-/// replaced, for example when a catch handler panicked and a [`PgTryBuilder`] handled that panic.
+/// A [`CaughtError::PostgresError`] that is swallowed some other way, for example with
+/// [`std::panic::catch_unwind()`], keeps its stack entry.
 /// Postgres has room for five entries and PANICs when an error needs a sixth, so call
 /// [`crate::FlushErrorState()`] once you're done with such an error.  A flush empties the whole
 /// stack, including an ERROR that C code which called into Rust is still handling, such as one
@@ -730,6 +729,17 @@ impl CaughtError {
         // we resume_unwind here as [CaughtError] represents a previously caught panic, not a new
         // one to be thrown
         resume_unwind(Box::new(self))
+    }
+
+    /// Tells this Postgres ERROR from every other that this library caught, or `None` if this
+    /// isn't one
+    pub(crate) fn postgres_token(&self) -> Option<usize> {
+        match self {
+            CaughtError::PostgresError(ereport) => {
+                ereport.caught.as_ref().map(|caught| caught.token)
+            }
+            CaughtError::ErrorReport(_) | CaughtError::RustPanic { .. } => None,
+        }
     }
 }
 

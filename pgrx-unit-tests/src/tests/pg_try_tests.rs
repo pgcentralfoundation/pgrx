@@ -609,6 +609,51 @@ mod tests {
         .execute();
     }
 
+    /// Whether Postgres' error data stack is empty, which `geterrcode()` reports by raising
+    fn error_stack_is_empty() -> bool {
+        use pgrx::pg_sys::panic::CaughtError;
+
+        PgTryBuilder::new(|| {
+            // SAFETY: geterrcode() reads the top entry's SQLSTATE, and raises if there isn't one
+            unsafe { pg_sys::geterrcode() };
+            false
+        })
+        .catch_others(|e| match e {
+            CaughtError::PostgresError(ereport)
+                if ereport.message() == "errstart was not called" =>
+            {
+                true
+            }
+            e => e.rethrow(),
+        })
+        .execute()
+    }
+
+    /// An inner handler replaces a Postgres ERROR with a Rust error, which an outer handler
+    /// swallows.
+    fn swallow_replaced_postgres_error() {
+        PgTryBuilder::new(|| {
+            PgTryBuilder::new(|| open_missing_relation(0))
+                .catch_others(|_| error!("replaced"))
+                .execute()
+        })
+        .catch_others(|_| ())
+        .execute();
+    }
+
+    #[pg_test]
+    fn test_replaced_postgres_error_leaves_stack_empty() {
+        swallow_replaced_postgres_error();
+        assert!(error_stack_is_empty(), "the replaced ERROR is still on Postgres' error stack");
+    }
+
+    #[pg_test]
+    fn test_replaced_postgres_errors_do_not_fill_stack() {
+        for _ in 0..6 {
+            swallow_replaced_postgres_error();
+        }
+    }
+
     /// Each guard rethrows the original ERROR.  Raising a copy instead would push one more entry
     /// onto Postgres' five-entry error data stack per guard.
     #[pg_test(error = "raised through guards")]
