@@ -261,8 +261,12 @@ fn update_files(args: &UpdateFilesArgs) {
                     .as_str(),
             )
         } else {
-            // Bump package version if we can
-            if let Some(package_version) = doc.get_mut("package").and_then(|p| p.get_mut("version"))
+            // Bump a literal package version. A crate with `version.workspace = true` gets
+            // the new version from the [workspace.package] bump below, so leave it inherited.
+            if let Some(package_version) = doc
+                .get_mut("package")
+                .and_then(|p| p.get_mut("version"))
+                .filter(|version| version.is_str())
             {
                 *package_version = value(args.update_version.clone());
             }

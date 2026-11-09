@@ -10,11 +10,10 @@
 
 [package]
 name = "pgrx-bench"
-version = "0.20.0-beta.0"
+version.workspace = true
 authors.workspace = true
 license.workspace = true
 description = "Benchmark runtime support for pgrx extensions"
-homepage.workspace = true
 repository.workspace = true
 documentation = "https://docs.rs/pgrx-bench"
 edition.workspace = true

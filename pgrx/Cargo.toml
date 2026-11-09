@@ -10,11 +10,10 @@
 
 [package]
 name = "pgrx"
-version = "0.20.0-beta.0"
+version.workspace = true
 authors.workspace = true
 license.workspace = true
 description = "pgrx:  A Rust framework for creating Postgres extensions"
-homepage.workspace = true
 repository.workspace = true
 documentation = "https://docs.rs/pgrx"
 categories = ["database"]
@@ -51,7 +50,6 @@ pgrx-sql-entity-graph.workspace = true
 thiserror.workspace = true # error handling and logging
 
 # used to internally impl things
-uuid = { version = "1.29.1", features = ["v4"] } # PgLwLock and shmem
 enum-map = "3.1.0"
 
 # exposed in public API

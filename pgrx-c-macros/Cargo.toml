@@ -1,12 +1,11 @@
 [package]
 name = "pgrx-c-macros"
 description = "Discover and translate C macros for pgrx binding generation"
-version = "0.20.0-beta.0"
+version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 authors.workspace = true
 license.workspace = true
-homepage.workspace = true
 repository.workspace = true
 
 [features]

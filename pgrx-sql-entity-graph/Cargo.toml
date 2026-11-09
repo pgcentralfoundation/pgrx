@@ -10,11 +10,10 @@
  
 [package]
 name = "pgrx-sql-entity-graph"
-version = "0.20.0-beta.0"
+version.workspace = true
 authors.workspace = true
 license.workspace = true
 description = "Sql Entity Graph for `pgrx`"
-homepage.workspace = true
 repository.workspace = true
 documentation = "https://docs.rs/pgrx-sql-entity-graph"
 readme = "README.md"
