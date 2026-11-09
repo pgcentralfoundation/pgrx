@@ -244,7 +244,7 @@ fn download_postgres(
     pgrx_home: &Path,
     init: &Init,
 ) -> eyre::Result<PgConfig> {
-    use crate::command::build_agent_for_url;
+    use crate::command::http_agent;
 
     println!(
         "{} Postgres v{} from {}",
@@ -253,7 +253,7 @@ fn download_postgres(
         pg_config.url().expect("no url"),
     );
     let url = pg_config.url().expect("no url for pg_config");
-    let http_client = build_agent_for_url(url)?;
+    let http_client = http_agent();
     let buf = download_postgres_archive_with_retries(&http_client, url, &pg_config.version()?)?;
 
     let pgdir = untar(&buf, pgrx_home, pg_config, init)?;

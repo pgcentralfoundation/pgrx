@@ -27,7 +27,7 @@ mod rss {
     use std::collections::BTreeMap;
     use std::io::Read;
 
-    use crate::command::build_agent_for_url;
+    use crate::command::http_agent;
 
     #[cfg(not(target_os = "windows"))]
     fn download_url(major: u16, minor: u16) -> String {
@@ -49,7 +49,7 @@ mod rss {
         pub(super) fn try_new(supported_versions: &[PgVersion]) -> eyre::Result<Vec<PgVersion>> {
             static VERSIONS_RSS_URL: &str = "https://www.postgresql.org/versions.rss";
 
-            let http_client = build_agent_for_url(VERSIONS_RSS_URL)?;
+            let http_client = http_agent();
             let mut response = http_client
                 .get(VERSIONS_RSS_URL)
                 .call()

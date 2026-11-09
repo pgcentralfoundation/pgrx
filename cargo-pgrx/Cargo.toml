@@ -52,7 +52,6 @@ tracing-subscriber = { version = "0.3.23", features = ["env-filter"] }
 
 # for downloading/unpacking things from the Postgres file servers
 bzip2 = "0.6.1"
-env_proxy = "0.4.1"
 serde.workspace = true
 serde_json.workspace = true
 serde-xml-rs = "0.8.2"
@@ -76,15 +75,6 @@ features = [
 
 [dev-dependencies]
 goldenfile = "1.11"
-
-[features]
-default = ["rustls"]
-native-tls = ["ureq/native-tls", "ureq/platform-verifier"]
-rustls = [
-    "ureq/rustls",
-    "ureq/native-tls", # induces rustls to use the OS-level root of trust
-    "ureq/platform-verifier" # use platform certificate store for validation
-]
 
 [lints.clippy]
 or_fun_call = "allow" # kinda sus lint imo
