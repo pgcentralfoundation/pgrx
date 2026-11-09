@@ -164,17 +164,19 @@ jobs:
     env:
       PG_VER: ${{ matrix.pg }}
       CLANG_VER: ${{ matrix.clang }}
-      PG19_CACHE: ${{ github.workspace }}/../pg19
     steps:
       - uses: actions/checkout@v4
       - name: Restore the PostgreSQL 19 build
         if: matrix.platform == 'macos' && matrix.pg == 19
         uses: actions/cache@v4
         with:
-          path: ${{ env.PG19_CACHE }}
+          # The cache action refuses paths that contain `..`.
+          path: ${{ runner.temp }}/pg19
           key: pg19-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('pgrx-pg-config/src/lib.rs') }}
       - name: Set up Rust and PostgreSQL ${{ matrix.pg }}
         shell: bash
+        env:
+          PG19_CACHE: ${{ runner.temp }}/pg19
         run: tools/ci/setup.sh
       # Third-party crates build the same way for every PostgreSQL version, so all of a
       # platform's jobs share the cache that its PG18 job saves on pushes to develop.
