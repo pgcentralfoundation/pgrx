@@ -61,6 +61,7 @@ pub fn get_c_locale_flags() -> &'static [&'static str] {
 // most sense. In this case, it made the most sense to put them into this
 // pgrx-pg-config crate. That doesn't mean they can't be moved at a later date.
 mod path_methods;
+use path_methods::find_executable_in_path;
 pub use path_methods::{get_target_dir, prefix_path};
 
 use crate::decoding::decode_from_bytes;
@@ -175,8 +176,7 @@ impl PgConfig {
     }
 
     pub fn from_path() -> Self {
-        let path =
-            pathsearch::find_executable_in_path("pg_config").unwrap_or_else(|| "pg_config".into());
+        let path = find_executable_in_path("pg_config").unwrap_or_else(|| "pg_config".into());
         Self::new_with_defaults(path)
     }
 
