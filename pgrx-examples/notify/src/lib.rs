@@ -76,7 +76,7 @@ mod tests {
     use pgrx::prelude::*;
     use std::time::Duration;
 
-    /// Open a fresh client connection (a separate backend) to the running test server. `pgrx_tests::client()` can't be used from inside a `#[pg_test]` body — its `TEST_PORT` cell is unset there — so discover the live address from the server's own GUCs and connect directly.
+    /// Open a fresh client connection (a separate backend) to the running test server. This example depends on `postgres` directly instead of on pgrx-tests' `client` feature, so discover the live address from the server's own GUCs and connect directly.
     fn open_client() -> postgres::Client {
         let port: String = Spi::get_one("SHOW port").expect("SHOW port").expect("port set");
         let host = if cfg!(windows) {

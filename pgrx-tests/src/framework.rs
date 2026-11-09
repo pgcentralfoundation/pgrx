@@ -41,6 +41,10 @@ static TEST_MUTEX: OnceLock<Mutex<SetupState>> = OnceLock::new();
 /// Set once during test framework initialization, read by every connection.
 static TEST_PORT: OnceLock<u16> = OnceLock::new();
 
+/// The environment variable that gives the server's processes the port in [`TEST_PORT`], which
+/// only the test process knows, so `client()` can connect from a `#[pg_test]` function.
+const TEST_PORT_ENV: &str = "CARGO_PGRX_TEST_PORT";
+
 /// A reserved TCP port held open by a bound listener. Dropping the
 /// reservation releases the port so Postgres (or anything else) can
 /// bind it.
@@ -271,16 +275,32 @@ fn get_session_id(client: &mut wire::Client) -> eyre::Result<String> {
 /// Connect a [`postgres::Client`] to the test database, and return it with its session ID.
 ///
 /// The session ID is the `%c` value that starts each of the connection's lines in the
-/// server log. Only the test process that started the server knows its port: call
-/// [`run_test`] first, and don't call this from inside a `#[pg_test]` function.
+/// server log. Call this from a `#[pg_test]` function to open another session, or from the
+/// test process after [`run_test`] has started the server. A `#[pg_test]` function is compiled
+/// into the extension's library, so calling this there needs `pgrx-tests` under the extension's
+/// `[dependencies]`, not only its `[dev-dependencies]`.
 ///
 /// Requires the `client` feature.
 #[cfg(feature = "client")]
 pub fn client() -> eyre::Result<(postgres::Client, String)> {
-    let pg_config = get_pg_config()?;
-    let mut client = postgres::Config::new()
-        .host(pg_config.host())
-        .port(pg_config.test_port().expect("unable to determine test port"))
+    let mut config = postgres::Config::new();
+    match (TEST_PORT.get(), std::env::var_os(TEST_PORT_ENV)) {
+        // One of the server's backends, which `start_pg` gave the port. The server listens on
+        // what `localhost` resolves to, so try both loopback addresses. Resolving `localhost`
+        // here would make the client start a thread in the backend.
+        (None, Some(port)) => {
+            let port = port
+                .to_str()
+                .and_then(|port| port.parse().ok())
+                .ok_or_else(|| eyre!("{TEST_PORT_ENV} is not a port number: {port:?}"))?;
+            config.host("127.0.0.1").host("::1").port(port);
+        }
+        _ => {
+            let pg_config = get_pg_config()?;
+            config.host(pg_config.host()).port(pg_config.test_port()?);
+        }
+    }
+    let mut client = config
         .user(&get_pg_user())
         .dbname(get_pg_dbname())
         .connect(postgres::NoTls)
@@ -656,11 +676,15 @@ fn start_pg(loglines: LogLines, port_reservation: PortReservation) -> eyre::Resu
                 cmd.arg(env_as_arg);
             }
         }
+        // and the port, which `client()` reads in the backends
+        cmd.arg(format!("{TEST_PORT_ENV}={test_port}"));
         // now we can add the `pg_ctl` as the command for `sudo` to execute
         cmd.arg(pg_ctl);
         cmd
     } else {
-        Command::new(pg_ctl)
+        let mut cmd = Command::new(pg_ctl);
+        cmd.env(TEST_PORT_ENV, test_port.to_string());
+        cmd
     };
     command
         .stdout(Stdio::piped())
