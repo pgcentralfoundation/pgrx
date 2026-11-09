@@ -694,19 +694,21 @@ pub fn register_pg_guard_panic_hook() {
 ///
 /// When pgrx catches a Postgres ERROR, the ERROR stays on Postgres' error data stack, as it does
 /// for a C `PG_CATCH()` block, until something calls `FlushErrorState()`.  [`PgTryBuilder`] does
-/// that when a catch handler returns, and Postgres does when it aborts the transaction.
+/// that when a catch handler returns from a [`CaughtError::PostgresError`], and Postgres does
+/// when it aborts the transaction.
 ///
 /// [`CaughtError::rethrow()`] passes Postgres back its original ERROR while that ERROR is still on
 /// top of the stack.  Otherwise pgrx raises the copy of every field that it made when it caught
 /// the ERROR, so Postgres' error handlers, such as PL/pgSQL's `GET STACKED DIAGNOSTICS`, see the
 /// same ERROR either way.
 ///
-/// A [`CaughtError::PostgresError`] that is neither rethrown nor handled by [`PgTryBuilder`],
-/// for example one caught by [`std::panic::catch_unwind()`] and dropped, keeps its stack entry.
+/// A [`CaughtError::PostgresError`] that is swallowed instead of rethrown, for example with
+/// [`std::panic::catch_unwind()`], keeps its stack entry, and so does one that a Rust panic
+/// replaced, for example when a catch handler panicked and a [`PgTryBuilder`] handled that panic.
 /// Postgres has room for five entries and PANICs when an error needs a sixth, so call
-/// [`crate::FlushErrorState()`] after swallowing one.  That and [`PgTryBuilder`] both empty the
-/// whole stack, including an ERROR that C code which called into Rust is still handling, such as
-/// one that a `PG_FINALLY()` block will rethrow.
+/// [`crate::FlushErrorState()`] once you're done with such an error.  A flush empties the whole
+/// stack, including an ERROR that C code which called into Rust is still handling, such as one
+/// that a `PG_FINALLY()` block will rethrow.
 ///
 /// [`PgTryBuilder`]: crate::PgTryBuilder
 #[derive(Debug)]

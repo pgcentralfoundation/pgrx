@@ -595,4 +595,30 @@ mod tests {
         assert_eq!(message, "errstart was not called");
         assert_eq!(after, before);
     }
+
+    /// Catches a Rust panic and returns.  As an error context callback, it runs while Postgres
+    /// handles an ERROR.
+    #[pg_guard]
+    unsafe extern "C-unwind" fn swallow_rust_panic(_arg: *mut core::ffi::c_void) {
+        PgTryBuilder::new(|| panic!("swallowed")).catch_others(|_| ()).execute();
+    }
+
+    /// Catching a Rust panic while Postgres handles an ERROR leaves that ERROR on Postgres' stack.
+    #[pg_test(error = "could not open relation with OID 0")]
+    fn test_rust_panic_caught_while_postgres_handles_error() {
+        // SAFETY: tests run on the backend thread
+        let previous = unsafe { pg_sys::error_context_stack };
+        let mut callback = pg_sys::ErrorContextCallback {
+            previous,
+            callback: Some(swallow_rust_panic),
+            arg: core::ptr::null_mut(),
+        };
+        PgTryBuilder::new(std::panic::AssertUnwindSafe(|| {
+            // SAFETY: `finally` takes `callback` off the stack before it goes out of scope
+            unsafe { pg_sys::error_context_stack = &mut callback };
+            open_missing_relation(0);
+        }))
+        .finally(|| unsafe { pg_sys::error_context_stack = previous })
+        .execute();
+    }
 }
