@@ -278,10 +278,54 @@ impl CaughtPostgresError {
     }
 }
 
-/// A Rust-owned copy of every field of a caught ERROR's `ErrorData`, which outlives any memory
-/// context reset, so pgrx can raise the ERROR as it was after Postgres has discarded it.
-#[derive(Debug)]
-struct ErrorDataCopy {
+/// Declares `ErrorDataCopy` with the fields of `ErrorData`, which its conversions name without
+/// `..`, so a field that Postgres adds is a compile error rather than a field pgrx doesn't copy.
+macro_rules! error_data_copy {
+    ($($scalar:ident: $ty:ty),* ; $($string:ident),* $(,)?) => {
+        /// A Rust-owned copy of every field of a caught ERROR's `ErrorData`, which outlives any
+        /// memory context reset.  Its strings are byte for byte, in the server's encoding.
+        #[derive(Debug)]
+        struct ErrorDataCopy {
+            $($scalar: $ty,)*
+            $($string: Option<CString>,)*
+        }
+
+        impl ErrorDataCopy {
+            /// # Safety
+            ///
+            /// Each of `edata`'s strings is null or NUL-terminated.
+            unsafe fn new(edata: &crate::ErrorData) -> Self {
+                let crate::ErrorData { $($scalar,)* $($string,)* assoc_context: _ } = *edata;
+                // SAFETY: the caller vouches for the strings
+                unsafe { Self { $($scalar,)* $($string: owned_c_str($string),)* } }
+            }
+
+            /// The bytes the strings take with their NULs
+            fn strings_len(&self) -> usize {
+                [$(&self.$string),*].into_iter().flatten().map(|s| s.as_bytes_with_nul().len()).sum()
+            }
+
+            /// This copy as an `ErrorData`, with its strings written from `buf` on.
+            ///
+            /// # Safety
+            ///
+            /// `buf` is valid for writes of `self.strings_len()` bytes.
+            unsafe fn error_data(&self, mut buf: *mut c_char) -> crate::ErrorData {
+                // SAFETY: the caller vouches for `buf`
+                unsafe {
+                    crate::ErrorData {
+                        $($scalar: self.$scalar,)*
+                        $($string: write_c_str(&self.$string, &mut buf),)*
+                        // ReThrowError() sets this to ErrorContext anyway
+                        assoc_context: crate::ErrorContext,
+                    }
+                }
+            }
+        }
+    };
+}
+
+error_data_copy!(
     elevel: c_int,
     output_to_server: bool,
     output_to_client: bool,
@@ -291,136 +335,7 @@ struct ErrorDataCopy {
     sqlerrcode: c_int,
     cursorpos: c_int,
     internalpos: c_int,
-    saved_errno: c_int,
-    strings: ErrorDataStrings,
-}
-
-impl ErrorDataCopy {
-    /// # Safety
-    ///
-    /// Each of `edata`'s strings is null or NUL-terminated.
-    unsafe fn new(edata: &crate::ErrorData) -> Self {
-        Self {
-            elevel: edata.elevel,
-            output_to_server: edata.output_to_server,
-            output_to_client: edata.output_to_client,
-            hide_stmt: edata.hide_stmt,
-            hide_ctx: edata.hide_ctx,
-            lineno: edata.lineno,
-            sqlerrcode: edata.sqlerrcode,
-            cursorpos: edata.cursorpos,
-            internalpos: edata.internalpos,
-            saved_errno: edata.saved_errno,
-            // SAFETY: the caller vouches for the strings
-            strings: unsafe { ErrorDataStrings::new(edata) },
-        }
-    }
-
-    /// The report that catch handlers see, with its strings decoded as UTF-8
-    fn report(&self) -> ErrorReport {
-        let lossy = |s: &Option<CString>| s.as_deref().map(|s| s.to_string_lossy().into_owned());
-        let strings = &self.strings;
-        ErrorReport {
-            sqlerrcode: self.sqlerrcode.into(),
-            message: lossy(&strings.message)
-                .unwrap_or_else(|| "<null error message>".into())
-                .into(),
-            hint: lossy(&strings.hint),
-            detail: lossy(&strings.detail),
-            domain: lossy(&strings.domain),
-            location: ErrorReportLocation {
-                file: lossy(&strings.filename).unwrap_or_else(|| "<null filename>".into()),
-                funcname: lossy(&strings.funcname),
-                line: self.lineno as _,
-                col: 0,
-                backtrace: None,
-            },
-        }
-    }
-
-    /// Lays the copy out in one `ErrorContext` allocation for `ReThrowError()`.  That copies the
-    /// strings Postgres frees with an error, but keeps the others, such as `filename`, as they
-    /// are, so they need memory that lasts until Postgres discards the error, which it does by
-    /// resetting `ErrorContext`.  Returns `None` when `ErrorContext` has no memory left.
-    ///
-    /// # Safety
-    ///
-    /// Call only on the backend thread.
-    unsafe fn in_error_context(&self) -> Option<NonNull<crate::ErrorData>> {
-        let size = size_of::<crate::ErrorData>() + self.strings.len();
-        // SAFETY: ErrorContext exists once Postgres can raise an ERROR.  The allocation is
-        // MAXALIGNed, which suits ErrorData, and has room for it and then for the strings.  It
-        // can't raise, which a guard that has already caught its panic relies on: NO_OOM returns
-        // null instead, and HUGE accepts any size these strings can add up to.
-        unsafe {
-            let edata = NonNull::new(
-                crate::MemoryContextAllocExtended(
-                    crate::ErrorContext,
-                    size,
-                    (crate::MCXT_ALLOC_HUGE | crate::MCXT_ALLOC_NO_OOM) as _,
-                )
-                .cast::<crate::ErrorData>(),
-            )?;
-            let mut copy = crate::ErrorData {
-                elevel: self.elevel,
-                output_to_server: self.output_to_server,
-                output_to_client: self.output_to_client,
-                hide_stmt: self.hide_stmt,
-                hide_ctx: self.hide_ctx,
-                lineno: self.lineno,
-                sqlerrcode: self.sqlerrcode,
-                cursorpos: self.cursorpos,
-                internalpos: self.internalpos,
-                saved_errno: self.saved_errno,
-                assoc_context: crate::ErrorContext,
-                ..Default::default()
-            };
-            self.strings.write(&mut copy, edata.as_ptr().add(1).cast());
-            edata.write(copy);
-            Some(edata)
-        }
-    }
-}
-
-/// Declares the strings of an `ErrorData` that `ErrorDataCopy` keeps, so that copying them out
-/// of Postgres and back in covers the same fields.
-macro_rules! error_data_strings {
-    ($($field:ident),* $(,)?) => {
-        /// The strings of a caught ERROR's `ErrorData`, byte for byte, since they're in the
-        /// server's encoding
-        #[derive(Debug)]
-        struct ErrorDataStrings {
-            $($field: Option<CString>,)*
-        }
-
-        impl ErrorDataStrings {
-            /// # Safety
-            ///
-            /// Each of `edata`'s strings is null or NUL-terminated.
-            unsafe fn new(edata: &crate::ErrorData) -> Self {
-                // SAFETY: the caller vouches for the strings
-                unsafe { Self { $($field: owned_c_str(edata.$field),)* } }
-            }
-
-            /// The bytes the strings take with their NULs
-            fn len(&self) -> usize {
-                [$(&self.$field),*].into_iter().flatten().map(|s| s.as_bytes_with_nul().len()).sum()
-            }
-
-            /// Points `edata`'s strings at copies written from `buf` on.
-            ///
-            /// # Safety
-            ///
-            /// `buf` is valid for writes of `self.len()` bytes.
-            unsafe fn write(&self, edata: &mut crate::ErrorData, mut buf: *mut c_char) {
-                // SAFETY: the caller vouches for `buf`
-                unsafe { $(edata.$field = write_c_str(&self.$field, &mut buf);)* }
-            }
-        }
-    };
-}
-
-error_data_strings!(
+    saved_errno: c_int;
     filename,
     funcname,
     domain,
@@ -439,6 +354,55 @@ error_data_strings!(
     constraint_name,
     internalquery,
 );
+
+impl ErrorDataCopy {
+    /// The report that catch handlers see, with its strings decoded as UTF-8
+    fn report(&self) -> ErrorReport {
+        let lossy = |s: &Option<CString>| s.as_deref().map(|s| s.to_string_lossy().into_owned());
+        ErrorReport {
+            sqlerrcode: self.sqlerrcode.into(),
+            message: lossy(&self.message).unwrap_or_else(|| "<null error message>".into()).into(),
+            hint: lossy(&self.hint),
+            detail: lossy(&self.detail),
+            domain: lossy(&self.domain),
+            location: ErrorReportLocation {
+                file: lossy(&self.filename).unwrap_or_else(|| "<null filename>".into()),
+                funcname: lossy(&self.funcname),
+                line: self.lineno as _,
+                col: 0,
+                backtrace: None,
+            },
+        }
+    }
+
+    /// Lays the copy out in one `ErrorContext` allocation for `ReThrowError()`.  That copies the
+    /// strings Postgres frees with an error, but keeps the others, such as `filename`, as they
+    /// are, so they need memory that lasts until Postgres discards the error, which it does by
+    /// resetting `ErrorContext`.  Returns `None` when `ErrorContext` has no memory left.
+    ///
+    /// # Safety
+    ///
+    /// Call only on the backend thread.
+    unsafe fn in_error_context(&self) -> Option<NonNull<crate::ErrorData>> {
+        let size = size_of::<crate::ErrorData>() + self.strings_len();
+        // SAFETY: ErrorContext exists once Postgres can raise an ERROR.  The allocation is
+        // MAXALIGNed, which suits ErrorData, and has room for it and then for the strings.  It
+        // can't raise, which a guard that has already caught its panic relies on: NO_OOM returns
+        // null instead, and HUGE accepts any size these strings can add up to.
+        unsafe {
+            let edata = NonNull::new(
+                crate::MemoryContextAllocExtended(
+                    crate::ErrorContext,
+                    size,
+                    (crate::MCXT_ALLOC_HUGE | crate::MCXT_ALLOC_NO_OOM) as _,
+                )
+                .cast::<crate::ErrorData>(),
+            )?;
+            edata.write(self.error_data(edata.as_ptr().add(1).cast()));
+            Some(edata)
+        }
+    }
+}
 
 /// # Safety
 ///
