@@ -38,7 +38,7 @@ done
 rustup toolchain install "$toolchain" --profile minimal --no-self-update "${components[@]}"
 
 # Dependencies build without debuginfo, which would only enlarge the cache and slow linking.
-# Workspace crates keep the workspace profile's line tables for backtraces.
+# Workspace crates keep the workspace profile's line tables for backtraces, except on Windows.
 cargo_home="${CARGO_HOME:-$HOME/.cargo}"
 if [[ "$platform" == windows ]]; then
     cargo_home="$(cygpath -u "$cargo_home")"
@@ -48,6 +48,15 @@ cat >> "$cargo_home/config.toml" <<'EOF'
 [profile.dev.package."*"]
 debug = false
 EOF
+if [[ "$platform" == windows ]]; then
+    # MSVC writes a PDB for every test binary and extension it links, which dominates
+    # Windows links. Panic locations don't come from debuginfo, so workspace crates go
+    # without it there too.
+    cat >> "$cargo_home/config.toml" <<'EOF'
+[profile.dev]
+debug = false
+EOF
+fi
 
 pg_config=""
 
