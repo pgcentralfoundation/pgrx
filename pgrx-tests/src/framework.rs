@@ -586,17 +586,10 @@ fn start_pg(loglines: LogLines, port_reservation: PortReservation) -> eyre::Resu
     let pg_config = get_pg_config()?;
     let pg_ctl = pg_config.pg_ctl_path()?;
 
+    // A script beside this run's PGDATA that starts the postmaster under valgrind.
     let postmaster_path = if use_valgrind() {
-        #[allow(unused_mut)]
-        let mut builder = tempfile::Builder::new();
-        #[cfg(target_family = "unix")]
-        {
-            use std::os::unix::fs::PermissionsExt;
-            let permission = std::fs::Permissions::from_mode(0o700);
-            builder.permissions(permission);
-        }
-        let mut file = builder.tempfile()?;
-        file.write_all(b"#!/usr/bin/sh\n")?;
+        let path = get_pgdata_path()?
+            .with_file_name(format!("{}-valgrind-postmaster", test_invocation_dir_name()));
         let mut command = Command::new("exec");
         command.arg("valgrind");
         command.arg("--leak-check=no");
@@ -610,9 +603,13 @@ fn start_pg(loglines: LogLines, port_reservation: PortReservation) -> eyre::Resu
             command.arg(format!("--suppressions={}", path.display()));
         }
         command.arg(pg_config.postmaster_path()?.display().to_string());
-        file.write_all(format!("{command:?}").as_bytes())?;
-        file.write_all(b" \"$@\"\n")?;
-        Some(file.into_temp_path())
+        std::fs::write(&path, format!("#!/usr/bin/sh\n{command:?} \"$@\"\n"))?;
+        #[cfg(target_family = "unix")]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o700))?;
+        }
+        Some(path)
     } else {
         None
     };
@@ -726,6 +723,10 @@ fn start_pg(loglines: LogLines, port_reservation: PortReservation) -> eyre::Resu
             String::from_utf8(output.stderr).unwrap(),
             String::from_utf8(log).unwrap()
         );
+    }
+    // The postmaster is running, so its valgrind script is no longer needed.
+    if let Some(path) = postmaster_path {
+        let _ = std::fs::remove_file(path);
     }
 
     add_shutdown_hook(|| {
