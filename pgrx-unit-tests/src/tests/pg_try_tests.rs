@@ -609,6 +609,13 @@ mod tests {
         .execute();
     }
 
+    /// Raises PostgreSQL's "invalid input syntax for type integer" ERROR without allocating in
+    /// the current memory context.
+    fn parse_bad_int4() -> i32 {
+        // SAFETY: the argument is a NUL-terminated string
+        unsafe { pg_sys::pg_strtoint32(c"x".as_ptr()) }
+    }
+
     /// Whether Postgres' error data stack is empty, which `geterrcode()` reports by raising
     fn error_stack_is_empty() -> bool {
         use pgrx::pg_sys::panic::CaughtError;
@@ -659,5 +666,46 @@ mod tests {
     #[pg_test(error = "raised through guards")]
     fn test_rethrow_through_seven_guards() {
         Spi::run("SELECT raise_through_guards(7)").expect("SPI failed");
+    }
+
+    /// Code that runs while `CurrentMemoryContext` is `ErrorContext`, such as a C `PG_CATCH()`
+    /// block before it switches back, can catch a Postgres ERROR and stays in `ErrorContext`.
+    #[pg_test]
+    fn test_catch_postgres_error_in_error_context() {
+        // SAFETY: tests run on the backend thread, and the previous context is switched back to
+        let (caught, current) = unsafe {
+            let previous = pg_sys::MemoryContextSwitchTo(pg_sys::ErrorContext);
+            let caught =
+                PgTryBuilder::new(|| parse_bad_int4() == 0).catch_others(|_| true).execute();
+            (caught, pg_sys::MemoryContextSwitchTo(previous))
+        };
+        assert!(caught);
+        assert_eq!(current, unsafe { pg_sys::ErrorContext });
+    }
+
+    /// Catching a Postgres ERROR leaves nothing behind in the current memory context.
+    #[pg_test]
+    fn test_catch_postgres_error_frees_its_copy() {
+        // SAFETY: tests run on the backend thread.  The context is switched away from before
+        // it's deleted.
+        let (before, after) = unsafe {
+            let context = pg_sys::AllocSetContextCreateInternal(
+                pg_sys::CurrentMemoryContext,
+                c"caught errors".as_ptr(),
+                pg_sys::ALLOCSET_DEFAULT_MINSIZE as usize,
+                pg_sys::ALLOCSET_DEFAULT_INITSIZE as usize,
+                pg_sys::ALLOCSET_DEFAULT_MAXSIZE as usize,
+            );
+            let previous = pg_sys::MemoryContextSwitchTo(context);
+            let before = pg_sys::MemoryContextMemAllocated(context, false);
+            for _ in 0..1000 {
+                PgTryBuilder::new(parse_bad_int4).catch_others(|_| 0).execute();
+            }
+            let after = pg_sys::MemoryContextMemAllocated(context, false);
+            pg_sys::MemoryContextSwitchTo(previous);
+            pg_sys::MemoryContextDelete(context);
+            (before, after)
+        };
+        assert_eq!(after, before);
     }
 }

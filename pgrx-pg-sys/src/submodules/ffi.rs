@@ -200,7 +200,7 @@ unsafe fn pg_guard_ffi_boundary_impl<T, F: FnOnce() -> T>(f: F) -> T {
             pg_sys::error_context_stack = prev_error_context_stack;
 
             // At this point, we're running within `pg_sys::ErrorContext`, but should be in the
-            // memory context the caller was in before we call [CopyErrorData()] and start using it
+            // memory context the caller was in
             pg_sys::CurrentMemoryContext = caller_memxct;
 
             // finally, turn this Postgres error into a Rust panic so that we can ensure proper

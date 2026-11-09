@@ -212,17 +212,28 @@ impl CaughtPostgresError {
     /// # Safety
     ///
     /// Call only on the backend thread, right after pgrx catches the ERROR and restores Postgres'
-    /// exception and error context stacks.  `CopyErrorData()` asserts that `CurrentMemoryContext`
-    /// isn't `ErrorContext`, which it is when the ERROR is caught in an error context callback.
+    /// exception and error context stacks.
     pub(crate) unsafe fn catch() -> ErrorReportWithLevel {
         let token = TOKENS.fetch_add(1, Ordering::Relaxed);
-        // SAFETY: the caller just caught an ERROR, which `CopyErrorData()` copies into the
-        // current memory context with each string null or NUL-terminated
+        // SAFETY: the caller just caught an ERROR, so ErrorContext exists and `CopyErrorData()`
+        // has an entry to copy, with each string null or NUL-terminated.  `CopyErrorData()` can
+        // raise, so its copy is caught to put the current context back and free its own.
         let data = unsafe {
-            let errdata = crate::CopyErrorData();
-            let data = ErrorDataCopy::new(&*errdata);
-            crate::FreeErrorData(errdata);
-            data
+            // `CopyErrorData()` asserts that it isn't copying into ErrorContext, which is current
+            // in an error context callback, and `FreeErrorData()` doesn't free all it copies.  A
+            // context of our own, under ErrorContext, avoids both.
+            let context = crate::AllocSetContextCreateInternal(
+                crate::ErrorContext,
+                c"pgrx caught ERROR".as_ptr(),
+                crate::ALLOCSET_SMALL_MINSIZE as _,
+                crate::ALLOCSET_SMALL_INITSIZE as _,
+                crate::ALLOCSET_SMALL_MAXSIZE as _,
+            );
+            let previous = crate::MemoryContextSwitchTo(context);
+            let copied = catch_unwind(|| ErrorDataCopy::new(&*crate::CopyErrorData()));
+            crate::MemoryContextSwitchTo(previous);
+            crate::MemoryContextDelete(context);
+            copied.unwrap_or_else(|e| resume_unwind(e))
         };
 
         // SAFETY: as above.  The mark is allocated in ErrorContext, and Postgres removes it from
