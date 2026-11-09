@@ -17,7 +17,6 @@ use std::cell::Cell;
 use std::ffi::CString;
 use std::fmt::{Display, Formatter};
 use std::hint::unreachable_unchecked;
-use std::num::NonZeroUsize;
 use std::panic::{
     AssertUnwindSafe, Location, PanicHookInfo, UnwindSafe, catch_unwind, panic_any, resume_unwind,
 };
@@ -156,86 +155,54 @@ pub struct ErrorReportWithLevel {
     pub(crate) caught: Option<Box<CaughtPostgresError>>,
 }
 
-/// Identifies the entry a caught Postgres ERROR occupies on Postgres' error data stack.
-///
-/// Postgres gives the entries on that stack no identity, so when pgrx catches an ERROR, it
-/// registers a reset callback on `ErrorContext`, which goes to the head of the context's callback
-/// list.  Only two things move the ERROR off the top of the stack: a reset of `ErrorContext`,
-/// which `FlushErrorState()` does and which empties the list, and a newer ERROR, which pgrx marks
-/// the same way when it catches it.  So while the callback is the head of the list, the ERROR is
-/// the top of the stack, unless code that doesn't mark what it catches, such as C code or an
-/// extension built with an older pgrx, keeps a newer ERROR without flushing it.
-#[derive(Debug)]
-pub(crate) struct ErrorStackEntry {
-    token: NonZeroUsize,
-}
-
-/// The callback that marks a caught ERROR.  Its place in `ErrorContext`'s callback list is the
-/// mark, so it has nothing to do when Postgres calls it during the reset.
-unsafe extern "C-unwind" fn caught_error_mark(_token: *mut c_void) {}
-
-impl ErrorStackEntry {
-    /// Marks the entry at the top of Postgres' error data stack.  Returns `None` when
-    /// `ErrorContext` has no memory left for the mark.
-    ///
-    /// # Safety
-    ///
-    /// Call only on the backend thread, while the ERROR that pgrx just caught is on top of the
-    /// stack.
-    pub(crate) unsafe fn mark_top() -> Option<Self> {
-        static LAST_TOKEN: AtomicUsize = AtomicUsize::new(0);
-        // a token that wraps to zero leaves its ERROR unmarked, which only costs fields
-        let token = NonZeroUsize::new(LAST_TOKEN.fetch_add(1, Ordering::Relaxed).wrapping_add(1))?;
-
-        // SAFETY: ErrorContext exists once Postgres can raise an ERROR.  The callback is
-        // allocated in ErrorContext, and Postgres removes it from the list and calls it before
-        // the reset frees it.  Its fields are written before it's registered.
-        unsafe {
-            let cb: *mut crate::MemoryContextCallback = crate::MemoryContextAllocExtended(
-                crate::ErrorContext,
-                size_of::<crate::MemoryContextCallback>(),
-                crate::MCXT_ALLOC_NO_OOM as _,
-            )
-            .cast();
-            if cb.is_null() {
-                return None;
-            }
-            cb.write(crate::MemoryContextCallback {
-                func: Some(caught_error_mark),
-                arg: ptr::without_provenance_mut(token.get()),
-                next: ptr::null_mut(),
-            });
-            crate::MemoryContextRegisterResetCallback(crate::ErrorContext, cb);
-        }
-        Some(Self { token })
-    }
-
-    /// Whether the marked ERROR is still the top of Postgres' error data stack.
-    ///
-    /// # Safety
-    ///
-    /// Call only on the backend thread.
-    unsafe fn is_top(&self) -> bool {
-        // SAFETY: ErrorContext exists once Postgres can raise an ERROR, and the head of its
-        // callback list is either null or a callback that is still registered and allocated.
-        unsafe {
-            let head = (*crate::ErrorContext).reset_cbs;
-            if head.is_null() {
-                return false;
-            }
-            let mark: unsafe extern "C-unwind" fn(*mut c_void) = caught_error_mark;
-            (*head).func.is_some_and(|func| ptr::fn_addr_eq(func, mark))
-                && (*head).arg.addr() == self.token.get()
-        }
-    }
-}
-
 /// What pgrx keeps of a Postgres ERROR it caught, so that a `#[pg_guard]` function can pass the
 /// ERROR back to Postgres unchanged.
+///
+/// Postgres gives the entries on its error data stack no identity, so when pgrx catches an ERROR,
+/// it puts a [`Mark`] at the head of `ErrorContext`'s reset callbacks.  Only two things move the
+/// ERROR off the top of the stack: a reset of `ErrorContext`, which `FlushErrorState()` does and
+/// which empties the list, and a newer ERROR, which pgrx marks the same way when it catches it.
+/// So while the mark heads the list, the ERROR is the top of the stack, unless code that doesn't
+/// mark what it catches keeps a newer ERROR without flushing it.  That code is C, an extension
+/// built with an older pgrx, or another extension's pgrx that had no memory for its mark.
 #[derive(Debug)]
 pub(crate) struct CaughtPostgresError {
     data: ErrorDataCopy,
-    entry: Option<ErrorStackEntry>,
+    /// Tells this catch from every other in this library
+    token: usize,
+}
+
+/// What pgrx registers on `ErrorContext` for a caught ERROR
+#[repr(C)]
+struct Mark {
+    callback: crate::MemoryContextCallback,
+    token: usize,
+}
+
+/// Counts this library's catches.  Its address, as a mark's callback argument, tells this
+/// library's marks from other callbacks, including other libraries' marks.
+static TOKENS: AtomicUsize = AtomicUsize::new(0);
+
+fn mark_owner() -> *mut c_void {
+    (&raw const TOKENS).cast_mut().cast()
+}
+
+/// A mark's callback.  Its place in the list is what counts, so it has nothing to do.
+unsafe extern "C-unwind" fn forget_mark(_owner: *mut c_void) {}
+
+/// This library's mark at the head of `ErrorContext`'s reset callbacks, if it's there
+///
+/// # Safety
+///
+/// Call only on the backend thread.
+unsafe fn head_mark() -> Option<*mut Mark> {
+    // SAFETY: ErrorContext exists once Postgres can raise an ERROR.  The head of its callback
+    // list is null or registered and allocated, and only this library registers a callback
+    // whose argument is `mark_owner()`, always at the start of a `Mark`.
+    unsafe {
+        let head = (*crate::ErrorContext).reset_cbs;
+        (!head.is_null() && (*head).arg == mark_owner()).then(|| head.cast())
+    }
 }
 
 impl CaughtPostgresError {
@@ -244,22 +211,50 @@ impl CaughtPostgresError {
     ///
     /// # Safety
     ///
-    /// Call only on the backend thread, right after pgrx catches the ERROR, once Postgres'
-    /// exception and error context stacks are restored and `CurrentMemoryContext` isn't
-    /// `ErrorContext`.
+    /// Call only on the backend thread, right after pgrx catches the ERROR and restores Postgres'
+    /// exception and error context stacks.  `CopyErrorData()` asserts that `CurrentMemoryContext`
+    /// isn't `ErrorContext`, which it is when the ERROR is caught in an error context callback.
     pub(crate) unsafe fn catch() -> ErrorReportWithLevel {
+        let token = TOKENS.fetch_add(1, Ordering::Relaxed);
         // SAFETY: the caller just caught an ERROR, which `CopyErrorData()` copies into the
         // current memory context with each string null or NUL-terminated
-        let (data, entry) = unsafe {
+        let data = unsafe {
             let errdata = crate::CopyErrorData();
             let data = ErrorDataCopy::new(&*errdata);
             crate::FreeErrorData(errdata);
-            (data, ErrorStackEntry::mark_top())
+            data
         };
+
+        // SAFETY: as above.  The mark is allocated in ErrorContext, and Postgres removes it from
+        // the list and calls it before the reset frees it.  Its fields are written before it's
+        // registered.
+        unsafe {
+            let mark: *mut Mark = crate::MemoryContextAllocExtended(
+                crate::ErrorContext,
+                size_of::<Mark>(),
+                crate::MCXT_ALLOC_NO_OOM as _,
+            )
+            .cast();
+            if mark.is_null() {
+                // a mark left at the head would claim this ERROR's place on the stack
+                if let Some(head) = head_mark() {
+                    (*head).callback.arg = ptr::null_mut();
+                }
+            } else {
+                let callback = crate::MemoryContextCallback {
+                    func: Some(forget_mark),
+                    arg: mark_owner(),
+                    next: ptr::null_mut(),
+                };
+                mark.write(Mark { callback, token });
+                crate::MemoryContextRegisterResetCallback(crate::ErrorContext, mark.cast());
+            }
+        }
+
         ErrorReportWithLevel {
             level: data.elevel.into(),
             inner: data.report(),
-            caught: Some(Box::new(Self { data, entry })),
+            caught: Some(Box::new(Self { data, token })),
         }
     }
 
@@ -274,7 +269,7 @@ impl CaughtPostgresError {
     unsafe fn guard_action<R>(&self) -> Option<GuardAction<R>> {
         // SAFETY: the caller is on the backend thread
         unsafe {
-            if self.entry.as_ref().is_some_and(|entry| entry.is_top()) {
+            if head_mark().is_some_and(|mark| (*mark).token == self.token) {
                 Some(GuardAction::ReThrow)
             } else {
                 self.data.in_error_context().map(GuardAction::ReThrowCopy)
@@ -354,7 +349,9 @@ impl ErrorDataCopy {
     unsafe fn in_error_context(&self) -> Option<NonNull<crate::ErrorData>> {
         let size = size_of::<crate::ErrorData>() + self.strings.len();
         // SAFETY: ErrorContext exists once Postgres can raise an ERROR.  The allocation is
-        // MAXALIGNed, which suits ErrorData, and has room for it and then for the strings.
+        // MAXALIGNed, which suits ErrorData, and has room for it and then for the strings.  It
+        // can't raise, which a guard that has already caught its panic relies on: NO_OOM returns
+        // null instead, and HUGE accepts any size these strings can add up to.
         unsafe {
             let edata = NonNull::new(
                 crate::MemoryContextAllocExtended(
@@ -694,8 +691,8 @@ pub fn register_pg_guard_panic_hook() {
 ///
 /// When pgrx catches a Postgres ERROR, the ERROR stays on Postgres' error data stack, as it does
 /// for a C `PG_CATCH()` block, until something calls `FlushErrorState()`.  [`PgTryBuilder`] does
-/// that when a catch handler returns from a [`CaughtError::PostgresError`], and Postgres does
-/// when it aborts the transaction.
+/// that when a catch handler returns from a [`CaughtError::PostgresError`], and Postgres does when
+/// it recovers from an ERROR that no one caught, such as one that fails a statement.
 ///
 /// [`CaughtError::rethrow()`] passes Postgres back its original ERROR while that ERROR is still on
 /// top of the stack.  Otherwise pgrx raises the copy of every field that it made when it caught

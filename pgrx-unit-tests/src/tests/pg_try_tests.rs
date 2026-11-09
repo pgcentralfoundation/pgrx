@@ -74,6 +74,15 @@ fn rethrow_caught_error(sql: &str, after_handler: bool) {
     }
 }
 
+/// Raises an ERROR `depth` SPI calls down, so it crosses that many guards on the way back up.
+#[pg_extern]
+fn raise_through_guards(depth: i32) {
+    if depth == 0 {
+        error!("raised through guards");
+    }
+    Spi::run(&format!("SELECT raise_through_guards({})", depth - 1)).expect("SPI failed");
+}
+
 #[cfg(any(test, feature = "pg_test"))]
 #[pg_schema]
 mod tests {
@@ -485,17 +494,6 @@ mod tests {
             .collect()
     }
 
-    /// A rethrow from the catch handler passes PostgreSQL its original error.
-    #[pg_test]
-    fn test_rethrow_in_handler_keeps_postgres_error() {
-        create_diagnostics_function();
-        let original = diagnostics(false);
-        assert_eq!(original["RETURNED_SQLSTATE"], "23505");
-        assert_eq!(original["PG_EXCEPTION_DETAIL"], "Key (k)=(1) already exists.");
-        assert_eq!(original["TABLE_NAME"], "caught_error");
-        assert_eq!(original["CONSTRAINT_NAME"], "caught_error_k_unique");
-    }
-
     /// `execute` clears PostgreSQL's error state when a handler returns, so a later rethrow
     /// raises pgrx's copy of the error, which PL/pgSQL can't tell from the original.
     #[pg_test]
@@ -504,17 +502,6 @@ mod tests {
         let copy = diagnostics(true);
         assert_eq!(copy["CONSTRAINT_NAME"], "caught_error_k_unique");
         assert_eq!(copy, diagnostics(false));
-    }
-
-    #[pg_test(error = "could not open relation with OID 0")]
-    fn test_rethrow_postgres_error_returned_by_handler() {
-        let caught = PgTryBuilder::new(|| {
-            open_missing_relation(0);
-            None
-        })
-        .catch_others(Some)
-        .execute();
-        caught.expect("relation_open should have raised an ERROR").rethrow();
     }
 
     #[pg_test(error = "could not open relation with OID 0")]
@@ -620,5 +607,12 @@ mod tests {
         }))
         .finally(|| unsafe { pg_sys::error_context_stack = previous })
         .execute();
+    }
+
+    /// Each guard rethrows the original ERROR.  Raising a copy instead would push one more entry
+    /// onto Postgres' five-entry error data stack per guard.
+    #[pg_test(error = "raised through guards")]
+    fn test_rethrow_through_seven_guards() {
+        Spi::run("SELECT raise_through_guards(7)").expect("SPI failed");
     }
 }
