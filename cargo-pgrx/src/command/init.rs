@@ -252,7 +252,7 @@ fn download_postgres(
         pg_config.version()?,
         pg_config.url().expect("no url"),
     );
-    let url = pg_config.url().expect("no url for pg_config").as_str();
+    let url = pg_config.url().expect("no url for pg_config");
     let http_client = build_agent_for_url(url)?;
     let buf = download_postgres_archive_with_retries(&http_client, url, &pg_config.version()?)?;
 

@@ -65,7 +65,6 @@ syn = { version = "2", features = ["extra-traits", "full", "parsing", "visit-mut
 toml = "1" # our config files
 toml_edit = "0.25.19" # format-preserving edits to toml files
 thiserror = "2"
-url = "2.5.8" # the non-existent std::web
 walkdir = "2" # directory recursion
 
 [profile.dev]

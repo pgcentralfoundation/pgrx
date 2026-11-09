@@ -30,7 +30,6 @@ serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true
 toml.workspace = true
-url.workspace = true
 
 [target.'cfg(target_os = "windows")'.dependencies]
 codepage = "0.1.3"

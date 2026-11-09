@@ -20,7 +20,6 @@ use std::path::PathBuf;
 use std::process::{Command, Stdio};
 use std::str::FromStr;
 use thiserror::Error;
-use url::Url;
 
 mod decoding;
 
@@ -98,11 +97,12 @@ impl PgMinorVersion {
 pub struct PgVersion {
     pub major: u16,
     pub minor: PgMinorVersion,
-    pub url: Option<Url>,
+    /// Where `cargo pgrx init` downloads this version's source (or, on Windows, binaries).
+    pub url: Option<String>,
 }
 
 impl PgVersion {
-    pub const fn new(major: u16, minor: PgMinorVersion, url: Option<Url>) -> Self {
+    pub const fn new(major: u16, minor: PgMinorVersion, url: Option<String>) -> Self {
         Self { major, minor, url }
     }
 
@@ -329,9 +329,9 @@ impl PgConfig {
         }
     }
 
-    pub fn url(&self) -> Option<&Url> {
+    pub fn url(&self) -> Option<&str> {
         match &self.version {
-            Some(version) => version.url.as_ref(),
+            Some(version) => version.url.as_deref(),
             None => None,
         }
     }
@@ -803,10 +803,7 @@ pub fn SUPPORTED_VERSIONS() -> Vec<PgVersion> {
         PgVersion::new(
             19,
             PgMinorVersion::Rc(1),
-            Some(
-                Url::parse("https://ftp.postgresql.org/pub/source/v19rc1/postgresql-19rc1.tar.bz2")
-                    .expect("malformed pg19rc1 url"),
-            ),
+            Some("https://ftp.postgresql.org/pub/source/v19rc1/postgresql-19rc1.tar.bz2".into()),
         ),
     ]
 }

@@ -26,7 +26,6 @@ mod rss {
     use serde::Deserialize;
     use std::collections::BTreeMap;
     use std::io::Read;
-    use url::Url;
 
     use crate::command::build_agent_for_url;
 
@@ -81,7 +80,7 @@ mod rss {
                 {
                     // fill in the latest minor version number and its url
                     known_pgver.minor = PgMinorVersion::Release(minor);
-                    known_pgver.url = Some(Url::parse(&download_url(major, minor))?);
+                    known_pgver.url = Some(download_url(major, minor));
                 }
             }
 

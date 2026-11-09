@@ -432,7 +432,6 @@ dependencies = [
  "tracing-error",
  "tracing-subscriber",
  "ureq",
- "url",
  "uuid",
  "which",
  "zip",
@@ -2384,7 +2383,6 @@ dependencies = [
  "serde_json",
  "thiserror",
  "toml 1.2.1+spec-1.1.0",
- "url",
  "winapi",
 ]
 
