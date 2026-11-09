@@ -42,32 +42,5 @@ fn main() -> Result<ExitCode, Box<dyn std::error::Error>> {
     let output = std::env::current_dir()?.join("c_ext");
     println!("cargo:rustc-link-arg-cdylib={}/c_ext.o", output.display());
 
-    let out_dir = PathBuf::from(std::env::var("OUT_DIR")?);
-
-    // Force-export these symbols from the final .so
-    let vers = out_dir.join("exports.map");
-    fs::write(
-        &vers,
-        r#"
-{
-  global:
-    start_thread;
-    pg_finfo_start_thread;
-  local:
-    *;
-};
-"#,
-    )?;
-
-    if target.contains("apple-darwin") {
-        println!("cargo:rustc-link-arg-cdylib=-Wl,-u,_start_thread");
-        println!("cargo:rustc-link-arg-cdylib=-Wl,-exported_symbol,_start_thread");
-        println!("cargo:rustc-link-arg-cdylib=-Wl,-exported_symbol,_pg_finfo_start_thread");
-    } else if target.contains("unknown-linux-gnu") {
-        println!("cargo:rustc-link-arg-cdylib=-Wl,--undefined=start_thread");
-        println!("cargo:rustc-link-arg-cdylib=-Wl,--undefined=pg_finfo_start_thread");
-        println!("cargo:rustc-link-arg-cdylib=-Wl,--version-script={}", vers.display());
-    }
-
     Ok(ExitCode::SUCCESS)
 }

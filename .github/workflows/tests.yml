@@ -356,7 +356,17 @@ jobs:
         with:
           shared-key: bindgen-harness
           save-if: ${{ env.SAVE_RUST_CACHE == 'true' }}
-      - run: |
+      # The fixture builds run Cargo offline, and one cross-compiles for aarch64.
+      - name: Fetch every locked crate and set up the aarch64 cross build
+        run: |
+          cargo fetch --locked
+          rustup target add aarch64-unknown-linux-gnu
+          sudo apt-get install -y -qq --no-install-recommends crossbuild-essential-arm64 > /dev/null
+      - name: Run the binding build harnesses
+        env:
+          CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER: aarch64-linux-gnu-gcc
+          BINDGEN_EXTRA_CLANG_ARGS_aarch64-unknown-linux-gnu: -target aarch64-unknown-linux-gnu -isystem /usr/aarch64-linux-gnu/include/ -ccc-gcc-name aarch64-linux-gnu-gcc
+        run: |
           cargo test --locked --package pgrx-bindgen \
             --test macro_build --test shipped_macros -- --include-ignored --test-threads=1
 

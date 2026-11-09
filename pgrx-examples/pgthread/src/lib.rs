@@ -6,14 +6,24 @@ use std::ffi::CStr;
 
 static mut PREV_POST_PARSE_ANALYZE_HOOK: pg_sys::post_parse_analyze_hook_type = None;
 
-// this function is in the "c_ext.c" extension which is built/linked via our "build.rs"
+// `build.rs` compiles "c_ext.c" with PGXS and links it into this extension.
 #[cfg(not(target_os = "windows"))]
-extension_sql!(
-    r#"
-        create function start_thread() returns void language c as 'pgthread', 'start_thread';
-    "#,
-    name = "start_thread"
-);
+unsafe extern "C-unwind" {
+    /// Runs SPI on a new thread and waits for it, raising an ERROR when the work fails.
+    fn pgthread_run_spi_in_thread();
+}
+
+/// Run SPI on a pthread through the C code, which is not how Postgres is meant to be used.
+///
+/// Rust exports this function. A C function would need its own version script to stay
+/// exported, and GNU ld refuses to combine one with the version script rustc writes.
+#[cfg(not(target_os = "windows"))]
+#[pg_extern]
+fn start_thread() {
+    // SAFETY: pgrx calls `#[pg_extern]` functions on the backend thread. The closure only
+    // calls the C function, so a raised ERROR jumps over nothing that needs dropping.
+    unsafe { pg_guard_ffi_boundary(|| pgthread_run_spi_in_thread()) }
+}
 
 #[pg_guard]
 pub unsafe extern "C-unwind" fn _PG_init() {

@@ -107,7 +107,9 @@ setup_macos() {
         if [[ ! -f "$build_home/config.toml" ]]; then
             brew install --quiet icu4c pkgconf
             cargo build --locked -p cargo-pgrx
-            PGRX_HOME="$build_home" target/debug/cargo-pgrx pgrx init --pg19 download
+            # Homebrew's ICU is keg-only, so configure finds it only through its pkg-config files.
+            PKG_CONFIG_PATH="$(brew --prefix icu4c)/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}" \
+                PGRX_HOME="$build_home" target/debug/cargo-pgrx pgrx init --pg19 download
         fi
         pg_config="$(sed -n "s/^pg19 = [\"']\(.*\)[\"']\$/\1/p" "$build_home/config.toml")"
     else
@@ -123,7 +125,11 @@ setup_windows() {
     # version when the newest one is missing.
     local latest minor url archive="$RUNNER_TEMP/postgresql.zip"
     latest="$(curl -fsSL --retry 3 https://www.postgresql.org/versions.rss \
-        | grep -o "<title>$PG_VER\.[0-9]*</title>" | head -1 | sed 's/<[^>]*>//g')"
+        | grep -o "[0-9.]* is the latest release in the $PG_VER series" | head -1 | cut -d' ' -f1)"
+    if [[ -z "$latest" ]]; then
+        echo "versions.rss names no PostgreSQL $PG_VER release" >&2
+        exit 1
+    fi
     minor="${latest#*.}"
     while (( minor >= 0 )); do
         url="https://get.enterprisedb.com/postgresql/postgresql-$PG_VER.$minor-1-windows-x64-binaries.zip"
