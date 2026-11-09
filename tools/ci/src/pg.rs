@@ -8,10 +8,11 @@
 //!
 //! The pg_test harness installs each extension with `cargo pgrx install`, which builds the
 //! extension with only its own package's features. pgrx-unit-tests' build nearly matches the
-//! workspace's test build and reuses it, but the examples' builds rebuild the bindings and
-//! pgrx. So the test binaries build in `target` while cargo-pgrx and the examples' extensions
-//! build in `target-ext`, each group of examples with the same dependencies in one Cargo
-//! invocation, and then the test binaries run in parallel.
+//! workspace's test build and reuses it. The examples' builds don't: the test build's
+//! dev-dependencies enable more features of crates that pgrx-pg-sys and pgrx depend on, such as
+//! serde_json, so those rebuild. So the test binaries build in `target` while cargo-pgrx and the
+//! examples' extensions build in `target-ext`, each group of examples with the same
+//! dependencies in one Cargo invocation, and then the test binaries run in parallel.
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
@@ -32,6 +33,12 @@ const SHARES_TEST_TARGET: &[&str] = &["pgrx-unit-tests"];
 
 /// Binaries that run longest, so they start first.
 const FIRST: &[&str] = &["pgrx-unit-tests", "pgrx-pg-sys"];
+
+/// Whether `cargo pgrx install` recompiles an extension's own crate after `cargo build` built
+/// it. On targets linked with GNU-style linkers it passes the crate an extra linker argument;
+/// elsewhere it reuses the build, and installing ahead of the harness would only repeat the
+/// harness's own install.
+const INSTALL_RECOMPILES: bool = cfg!(all(unix, not(target_os = "macos")));
 
 /// Examples whose `cargo pgrx` commands this job exercises, and the commands.
 const CLI_CHECKS: &[(&str, &[&[&str]])] = &[
@@ -105,9 +112,8 @@ impl Postgres {
 
     /// Build `packages`' extension libraries together, so their own crates compile in
     /// parallel. They resolve the same dependencies, so this build matches each package's own,
-    /// and the installs that follow reuse it. cargo-pgrx adds a linker argument on Linux, so
-    /// there each install still relinks its final crate. A failure is logged for the installs
-    /// to repeat.
+    /// and the installs that follow reuse it, except for the final crate where
+    /// [`INSTALL_RECOMPILES`]. A failure is logged for the installs to repeat.
     pub(crate) fn build_libraries(&self, target_dir: &Utf8Path, packages: &[&Package]) {
         let Some(first) = packages.first() else { return };
         let mut command = Command::new("cargo");
@@ -277,18 +283,20 @@ pub(crate) fn run(options: &Options) -> eyre::Result<bool> {
                 .filter(|package| !SHARES_TEST_TARGET.contains(&package.name.as_str()))
                 .collect();
             for group in dependency_groups(&examples) {
-                if group.len() > 1 {
+                if !INSTALL_RECOMPILES || group.len() > 1 {
                     postgres.build_libraries(&ext_target, &group);
                 }
-                for package in group {
-                    postgres.install(&cargo_pgrx, &ext_target, package);
+                if INSTALL_RECOMPILES {
+                    for package in group {
+                        postgres.install(&cargo_pgrx, &ext_target, package);
+                    }
                 }
             }
             Ok(())
         });
         let binaries = testbin::build(&workspace, &cargo_args);
         // These extensions' builds reuse the test build, so they install right after it.
-        if cargo_pgrx_built.recv().unwrap_or(false) {
+        if INSTALL_RECOMPILES && cargo_pgrx_built.recv().unwrap_or(false) {
             for package in
                 extensions.iter().filter(|p| SHARES_TEST_TARGET.contains(&p.name.as_str()))
             {

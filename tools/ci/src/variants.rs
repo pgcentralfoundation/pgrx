@@ -10,7 +10,10 @@
 //! - custom_types without schema generation, which compiles its tests out
 //! - pgrx-unit-tests checked for aarch64 against target headers fetched for the cross build
 //!
-//! Each builds in its own target directory, so the three builds overlap.
+//! The aarch64 check and the test build share `target`, and with it everything they compile
+//! for the host: the build scripts, procedural macros and their dependencies. Meanwhile
+//! cargo-pgrx and custom_types build in `target-ext`; custom_types keeps pgrx's C shim, so its
+//! bindings differ anyway.
 
 use std::process::Command;
 
@@ -32,26 +35,9 @@ pub(crate) fn run(version: u16) -> eyre::Result<bool> {
         workspace.package("custom_types").ok_or_else(|| eyre!("no custom_types package"))?;
     let test_target = workspace.target_dir("target");
     let ext_target = workspace.target_dir("target-ext");
-    let cross_target = workspace.target_dir("target-cross");
     let cargo_pgrx = pg::cargo_pgrx_in(&ext_target);
 
     std::thread::scope(|scope| -> eyre::Result<bool> {
-        let cross = scope.spawn(|| {
-            process::run(
-                Command::new("cargo")
-                    .args([
-                        "check",
-                        "--locked",
-                        "--tests",
-                        "--features",
-                        &feature,
-                        "--package",
-                        "pgrx-unit-tests",
-                    ])
-                    .args(["--target", "aarch64-unknown-linux-gnu"])
-                    .env("CARGO_TARGET_DIR", &cross_target),
-            )
-        });
         // custom_types without schema generation has no tests left, so building is its test.
         let tools = scope.spawn(|| -> eyre::Result<bool> {
             if !pg::build_cargo_pgrx(&ext_target)? {
@@ -70,6 +56,17 @@ pub(crate) fn run(version: u16) -> eyre::Result<bool> {
             )
         });
 
+        let cross_passed = process::run(
+            Command::new("cargo")
+                .args(["check", "--locked", "--tests", "--features", &feature])
+                .args(["--package", "pgrx-unit-tests", "--target", "aarch64-unknown-linux-gnu"])
+                .env("CARGO_TARGET_DIR", &test_target),
+        )
+        .wrap_err("aarch64 check")?;
+        if !cross_passed {
+            log("FAILED: the aarch64 check of pgrx-unit-tests");
+        }
+
         // pgrx-unit-tests without the C shim: its tests and its extension build in `target`.
         let features = postgres.features("pgrx-unit-tests");
         let binaries = testbin::build(
@@ -86,7 +83,7 @@ pub(crate) fn run(version: u16) -> eyre::Result<bool> {
         )?;
         let tools_passed =
             tools.join().map_err(|_| eyre!("the cargo-pgrx build thread panicked"))??;
-        let mut passed = tools_passed;
+        let mut passed = tools_passed && cross_passed;
         if tools_passed {
             postgres.install(&cargo_pgrx, &test_target, unit_tests);
             let outcomes = testbin::run_all(binaries, pg::parallelism(), |binary, command| {
@@ -99,13 +96,6 @@ pub(crate) fn run(version: u16) -> eyre::Result<bool> {
             });
             passed &= testbin::passed(&outcomes);
         }
-        let cross_passed = cross
-            .join()
-            .map_err(|_| eyre!("the aarch64 check thread panicked"))?
-            .wrap_err("aarch64 check")?;
-        if !cross_passed {
-            log("FAILED: the aarch64 check of pgrx-unit-tests");
-        }
-        Ok(passed && cross_passed)
+        Ok(passed)
     })
 }
