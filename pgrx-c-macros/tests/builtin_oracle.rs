@@ -621,16 +621,22 @@ fn shadowed_typeof_proof_helper_skips_builtins_and_keeps_ordinary_macros() {
 }
 
 /// Checks that expect uses exact C long rank and both parameter identities in each profile.
+/// PostgreSQL's build flags normally include `-g`, which adds debug intrinsics or records to
+/// the LLVM witnesses.
 #[test]
 fn expect_uses_exact_c_long_rank_and_both_parameter_identities_in_each_profile() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
     let directory = Directory::new();
     let header = directory.header(EXPECT_HEADER);
     let scanner = MacroScanner::new().expect("libclang required");
-    for optimization in ["-O0", "-O2"] {
-        let frontend = profile(&scanner, &header, optimization, false);
+    for (optimization, debug) in [("-O0", false), ("-O2", false), ("-O0", true), ("-O2", true)] {
+        let mut options = arguments(optimization, false);
+        if debug {
+            options.push("-g".into());
+        }
+        let frontend = inspect(&scanner, &header, &options, None).unwrap();
         let info = frontend.declarations().builtins.get("__builtin_expect").unwrap_or_else(|| {
-            panic!("{optimization}: {:?}", frontend.declarations().builtin_unavailable)
+            panic!("{options:?}: {:?}", frontend.declarations().builtin_unavailable)
         });
         assert_eq!(info.kind, BuiltinKind::Expect);
         let result = &info.signature.result;
@@ -645,7 +651,11 @@ fn expect_uses_exact_c_long_rank_and_both_parameter_identities_in_each_profile()
         assert!(!info.signature.variadic);
         assert_eq!(info.signature.calling_convention.as_deref(), Some("Cdecl"));
         for name in ["__builtin_bswap16", "__builtin_bswap32", "__builtin_bswap64"] {
-            assert!(frontend.declarations().builtins.contains_key(name));
+            assert!(
+                frontend.declarations().builtins.contains_key(name),
+                "{options:?} {name}: {:?}",
+                frontend.declarations().builtin_unavailable.get(name)
+            );
         }
     }
 }
