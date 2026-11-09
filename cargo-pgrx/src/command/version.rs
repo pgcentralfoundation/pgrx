@@ -68,7 +68,7 @@ fn with_latest_releases(supported: &[PgVersion], releases: &[Release]) -> Vec<Pg
 #[cfg(not(target_os = "windows"))]
 fn download_url(major: u16, minor: u16) -> String {
     format!(
-        "https://ftp.postgresql.org/pub/source/v{major}.{minor}/postgresql-{major}.{minor}.tar.bz2"
+        "https://ftp.postgresql.org/pub/source/v{major}.{minor}/postgresql-{major}.{minor}.tar.gz"
     )
 }
 

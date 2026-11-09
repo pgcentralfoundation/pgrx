@@ -803,7 +803,7 @@ pub fn SUPPORTED_VERSIONS() -> Vec<PgVersion> {
         PgVersion::new(
             19,
             PgMinorVersion::Rc(1),
-            Some("https://ftp.postgresql.org/pub/source/v19rc1/postgresql-19rc1.tar.bz2".into()),
+            Some("https://ftp.postgresql.org/pub/source/v19rc1/postgresql-19rc1.tar.gz".into()),
         ),
     ]
 }

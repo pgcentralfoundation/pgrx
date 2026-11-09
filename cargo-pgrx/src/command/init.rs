@@ -10,13 +10,11 @@
 use crate::CommandExecute;
 use crate::command::stop::stop_postgres;
 use crate::command::version::pgrx_default;
-use bzip2::bufread::BzDecoder;
 use eyre::{WrapErr, eyre};
 use owo_colors::OwoColorize;
 use pgrx_pg_config::{
     ConfigToml, PgConfig, PgConfigSelector, Pgrx, PgrxHomeError, get_c_locale_flags,
 };
-use tar::Archive;
 
 use std::collections::HashMap;
 use std::fs::File;
@@ -254,9 +252,13 @@ fn download_postgres(
     );
     let url = pg_config.url().expect("no url for pg_config");
     let http_client = http_agent();
-    let buf = download_postgres_archive_with_retries(&http_client, url, &pg_config.version()?)?;
-
-    let pgdir = untar(&buf, pgrx_home, pg_config, init)?;
+    let pgdir = {
+        // The archive is deleted with this directory once it is unpacked.
+        let download_dir = tempfile::tempdir_in(pgrx_home)?;
+        let archive = download_dir.path().join(url.rsplit_once('/').map_or(url, |(_, file)| file));
+        download_postgres_archive_with_retries(&http_client, url, &archive, &pg_config.version()?)?;
+        untar(&archive, pgrx_home, pg_config, init)?
+    };
     configure_postgres(pg_config, &pgdir, init)?;
     make_postgres(pg_config, &pgdir, init)?;
     make_install_postgres(pg_config, &pgdir, init) // returns a new PgConfig object
@@ -265,12 +267,13 @@ fn download_postgres(
 fn download_postgres_archive_with_retries(
     http_client: &ureq::Agent,
     url: &str,
+    archive: &Path,
     pg_version: &str,
-) -> eyre::Result<Vec<u8>> {
+) -> eyre::Result<()> {
     let max_attempts = 4;
     for failed_attempt in 1..=max_attempts {
-        match download_postgres_archive_once(http_client, url) {
-            Ok(buf) => return Ok(buf),
+        match download_postgres_archive_once(http_client, url, archive) {
+            Ok(()) => return Ok(()),
             Err(error) => {
                 if failed_attempt == max_attempts {
                     return Err(error);
@@ -297,20 +300,26 @@ fn download_postgres_archive_with_retries(
     unreachable!("download attempt loop should return")
 }
 
-fn download_postgres_archive_once(http_client: &ureq::Agent, url: &str) -> eyre::Result<Vec<u8>> {
+/// Writes the archive at `url` to `archive`, streaming it instead of holding it in memory.
+fn download_postgres_archive_once(
+    http_client: &ureq::Agent,
+    url: &str,
+    archive: &Path,
+) -> eyre::Result<()> {
     tracing::debug!(url = %url, "Fetching");
     let mut http_response =
         http_client.get(url).config().http_status_as_error(false).build().call()?;
-    let mut buf = Vec::new();
-    let _count = http_response.body_mut().as_reader().read_to_end(&mut buf)?;
-
     let status = http_response.status();
-    tracing::trace!(status_code = %status, url = %url, "Fetched");
+    let mut body = http_response.body_mut().as_reader();
     if status.as_u16() != 200 {
+        let mut buf = Vec::new();
+        let _count = body.read_to_end(&mut buf)?;
         return Err(download_postgres_status_error(url, status.as_u16(), &buf));
     }
 
-    Ok(buf)
+    let _count = std::io::copy(&mut body, &mut File::create(archive)?)?;
+    tracing::trace!(status_code = %status, url = %url, "Fetched");
+    Ok(())
 }
 
 fn download_postgres_status_error(url: &str, status: u16, body: &[u8]) -> eyre::Report {
@@ -325,7 +334,12 @@ fn download_error_summary(error: &eyre::Report) -> String {
     error.to_string().lines().next().unwrap_or("unknown download error").to_owned()
 }
 
-fn untar(bytes: &[u8], pgrxdir: &Path, pg_config: &PgConfig, init: &Init) -> eyre::Result<PathBuf> {
+fn untar(
+    archive: &Path,
+    pgrxdir: &Path,
+    pg_config: &PgConfig,
+    init: &Init,
+) -> eyre::Result<PathBuf> {
     let _token = init.jobserver.get().unwrap().acquire().unwrap();
 
     let mut unpackdir = pgrxdir.to_path_buf();
@@ -344,17 +358,7 @@ fn untar(bytes: &[u8], pgrxdir: &Path, pg_config: &PgConfig, init: &Init) -> eyr
         unpackdir.display()
     );
 
-    if bytes.starts_with(b"PK\x03\x04")
-        || bytes.starts_with(b"PK\x05\x06")
-        || bytes.starts_with(b"PK\x07\x08")
-    {
-        // it's a zip download from EDB
-        use std::io::Cursor;
-        zip::ZipArchive::new(Cursor::new(bytes))?.extract(&unpackdir)?;
-    } else {
-        let mut tar_decoder = Archive::new(BzDecoder::new(bytes));
-        tar_decoder.unpack(&unpackdir)?;
-    }
+    unpack_archive(archive, &unpackdir)?;
 
     let mut pgdir = pgrxdir.to_path_buf();
     pgdir.push(&pg_config.version()?);
@@ -391,6 +395,38 @@ fn untar(bytes: &[u8], pgrxdir: &Path, pg_config: &PgConfig, init: &Init) -> eyr
     std::fs::rename(first_level_dir, &pgdir)?;
 
     Ok(pgdir)
+}
+
+/// Unpacks a PostgreSQL source tarball with the system's `tar`, which detects its compression.
+/// The files belong to the user who unpacks them, even when that user is root.
+#[cfg(not(target_os = "windows"))]
+fn unpack_archive(archive: &Path, unpackdir: &Path) -> eyre::Result<()> {
+    let output = std::process::Command::new("tar")
+        .arg("-x")
+        .arg("--no-same-owner")
+        .arg("-f")
+        .arg(archive)
+        .arg("-C")
+        .arg(unpackdir)
+        .stdin(Stdio::null())
+        .output()
+        .wrap_err("could not run `tar`, which must be on PATH to unpack Postgres")?;
+    if !output.status.success() {
+        return Err(eyre!(
+            "`tar` could not unpack {}: {}",
+            archive.display(),
+            String::from_utf8_lossy(&output.stderr).trim()
+        ));
+    }
+    Ok(())
+}
+
+/// Unpacks the zip archive of PostgreSQL binaries that EDB publishes for Windows, which may not
+/// have a `tar` program.
+#[cfg(target_os = "windows")]
+fn unpack_archive(archive: &Path, unpackdir: &Path) -> eyre::Result<()> {
+    zip::ZipArchive::new(File::open(archive)?)?.extract(unpackdir)?;
+    Ok(())
 }
 
 #[cfg(not(target_os = "windows"))]

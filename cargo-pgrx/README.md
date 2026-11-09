@@ -107,7 +107,8 @@ It downloads the latest releases of supported Postgres versions,
 configures them for debugging, compiles them with assertions, and installs them to "${PGRX_HOME}".
 These include all [`contrib`] extensions and tools included with Postgres.
 Other `cargo pgrx` commands such as `run` and `test` will manage and use these installations on
-your behalf.
+your behalf. On Linux and macOS, `cargo pgrx init` unpacks the Postgres sources with the `tar`
+program on your `PATH`.
 
 [`contrib`]: https://www.postgresql.org/docs/current/contrib.html
 
