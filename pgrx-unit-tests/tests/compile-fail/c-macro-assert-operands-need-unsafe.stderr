@@ -1,0 +1,16 @@
+error[E0133]: dereference of raw pointer is unsafe and requires unsafe block
+ --> tests/compile-fail/c-macro-assert-operands-need-unsafe.rs:6:29
+  |
+6 |     let _ = pg_sys::Assert!(*pointer);
+  |                             ^^^^^^^^ dereference of raw pointer
+  |
+  = note: raw pointers may be null, dangling or unaligned; they can violate aliasing rules and cause data races: all of these are undefined behavior
+
+error[E0133]: dereference of raw pointer is unsafe and requires unsafe block
+  --> tests/compile-fail/c-macro-assert-operands-need-unsafe.rs:11:13
+   |
+11 |     let _ = pg_sys::AssertTransactionIdInAllowableRange!(*pointer);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ dereference of raw pointer
+   |
+   = note: raw pointers may be null, dangling or unaligned; they can violate aliasing rules and cause data races: all of these are undefined behavior
+   = note: this error originates in the macro `$crate::__pgrx_c_args_AssertTransactionIdInAllowableRange` which comes from the expansion of the macro `pg_sys::AssertTransactionIdInAllowableRange` (in Nightly builds, run with -Z macro-backtrace for more info)

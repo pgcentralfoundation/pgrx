@@ -34,6 +34,9 @@ mod bitfields;
 pub use arguments::split_recorded_cflags;
 /// Prove supported compiler operations by prototype and bounded LLVM effect witnesses.
 mod builtins;
+/// Generate the same macros for assert-enabled PostgreSQL as for a release build.
+mod counterpart;
+pub(crate) use counterpart::AssertionMode;
 /// Reparse original inline bodies to prove local definitions match the declaration-only catalog.
 mod definitions;
 /// Recheck complete input bytes with a host-appropriate SHA-256 backend and per-pass alias sharing.
@@ -245,19 +248,43 @@ pub(crate) fn inspect_with_compiler_hint(
     // successful profile: the lookup until the profile's inputs are recorded,
     // then those inputs. A failure to record the lookup itself has nothing to
     // carry and is returned alone.
-    let mut frontend = inspect_selected(
-        scanner,
-        requested_header,
-        arguments,
-        executable,
-        libclang_version,
-        &search,
-    )
-    .map_err(|error| search.track(error))?;
-    if let Err(error) = prove_snapshot_facts(scanner, &mut frontend) {
-        let inputs = Box::new(frontend.profile.inputs);
-        return Err(FrontendError::WithInputs { error: Box::new(error), inputs });
+    let inspect = |header: PathBuf| {
+        let mut frontend = inspect_selected(
+            scanner,
+            header,
+            arguments.clone(),
+            executable.clone(),
+            libclang_version.clone(),
+            &search,
+        )
+        .map_err(|error| search.track(error))?;
+        if let Err(error) = prove_snapshot_facts(scanner, &mut frontend) {
+            let inputs = Box::new(frontend.profile.inputs);
+            return Err(FrontendError::WithInputs { error: Box::new(error), inputs });
+        }
+        Ok(frontend)
+    };
+    let frontend = inspect(requested_header.clone())?;
+    if !counterpart::assert_enabled(&frontend) {
+        return Ok(frontend);
     }
+    let with_inputs = |error, frontend: &FrontendOutput| FrontendError::WithInputs {
+        error: Box::new(error),
+        inputs: Box::new(frontend.profile.inputs.clone()),
+    };
+    let (mode, derived) = counterpart::compare(scanner, &frontend, &requested_header)
+        .map_err(|error| with_inputs(error, &frontend))?;
+    let mut frontend = match derived {
+        Some(contents) => {
+            let derived = counterpart::materialize(&contents, &requested_header)
+                .map_err(|error| with_inputs(error, &frontend))?;
+            let mut derived = inspect(derived)?;
+            counterpart::locate(&mut derived, &mode);
+            derived
+        }
+        None => frontend,
+    };
+    frontend.assertions = mode;
     Ok(frontend)
 }
 
@@ -383,6 +410,7 @@ fn inspect_selected(
         environment,
         declarations,
         inventory,
+        assertions: AssertionMode::default(),
         dependencies: macro_dependencies,
     })
 }

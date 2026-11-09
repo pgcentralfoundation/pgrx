@@ -223,6 +223,8 @@ fn render_statements(
                 renderer.render(*expression, typed::Context::Value, rust)?;
                 rust.push_str("); ");
             }
+            // An omitted check stays out of the rendering, as release PostgreSQL omits it.
+            Statement::If { condition, .. } if renderer.drops(*condition) => {}
             Statement::If { condition, then_branch, else_branch, .. } => {
                 write!(rust, "if {SUPPORT}::expression::truth(").expect("String output");
                 renderer.render(*condition, typed::Context::Value, rust)?;

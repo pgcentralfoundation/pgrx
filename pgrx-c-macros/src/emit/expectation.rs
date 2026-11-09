@@ -306,6 +306,7 @@ mod tests {
                 unsupported_options: Vec::new(),
                 inputs: BuildInputs::default(),
             },
+            assertions: Default::default(),
             dependencies: MacroDependencyGraph::from_environment(&environment),
             environment,
             declarations,

@@ -1404,8 +1404,13 @@ fn run_bindgen(
     // The bindgen invocation is independent of macro CFLAGS, compiler-driver
     // discovery and native support. Inspection still verifies the fresh Rust
     // storage against the full recorded PostgreSQL C profile.
-    let generate = || -> eyre::Result<String> {
+    let generate = |release_macros: Vec<String>| -> eyre::Result<String> {
         let overrides = BindingOverride::new_from(Rc::clone(&enum_names));
+        // An assert-enabled build declares these where a release build defines macros, which
+        // the generated macros of both builds follow. Bind neither, as a release build can't.
+        let binder = release_macros
+            .iter()
+            .fold(binder, |binder, name| binder.blocklist_function(format!("^{name}$")));
         let bindings = binder
             .header(include_h.display().to_string())
             .clang_args(arguments)
@@ -1581,7 +1586,7 @@ fn generate_macros(
     native: NativeBuild<'_>,
     cflags: &MacroCflags,
     target: &str,
-    generate_bindings: impl FnOnce() -> eyre::Result<String>,
+    generate_bindings: impl FnOnce(Vec<String>) -> eyre::Result<String>,
 ) -> eyre::Result<(String, MacroOutput)> {
     let major_version = postgres.pg_config().major_version()?;
     let msvc = env_tracked("CARGO_CFG_TARGET_ENV").as_deref() == Some("msvc");
@@ -1658,7 +1663,8 @@ fn generate_macros(
     names.extend(inline_names);
     let mut source = pg_sys_integer_bridges(&frontend)?;
     // Macros require an unchanged input window around binding generation.
-    let mut bindings = generate_bindings()?;
+    let mut bindings =
+        generate_bindings(frontend.functions_with_release_macros().map(str::to_owned).collect())?;
     session.verify_inputs().wrap_err("C inputs changed during binding generation")?;
     let mut parsed_bindings =
         syn::parse_file(&bindings).wrap_err("could not parse bindings for C symbol references")?;

@@ -586,6 +586,11 @@ impl<'tu> MacroHistory<'tu, '_> {
             if !matches!(token.kind, TokenKind::Identifier | TokenKind::Keyword) {
                 continue;
             }
+            // `__FILE__` and `__LINE__` name the Rust invocation wherever they expand,
+            // so they need not expand as they did in the definition.
+            if crate::expansion::invocation_diagnostic(name) {
+                continue;
+            }
             if crate::expansion::dynamic_builtin(name) {
                 return false;
             }
@@ -677,6 +682,9 @@ impl<'tu> MacroHistory<'tu, '_> {
                 || parameters.contains(spelling)
                 || spelling == name
             {
+                return true;
+            }
+            if crate::expansion::invocation_diagnostic(spelling) {
                 return true;
             }
             if crate::expansion::dynamic_builtin(spelling) {

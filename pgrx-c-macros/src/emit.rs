@@ -48,6 +48,9 @@ enum InvocationSource<'a> {
 
 /// Original-function address adapters that bypass callable thunks and Rust guard wrappers.
 mod addresses;
+/// Safe stops for assertions and unreachable code, and assertions that keep release safety.
+mod assertions;
+pub(crate) use assertions::stops;
 /// Token normalization that preserves contextual C substitution at Rust macro call sites.
 mod arguments;
 /// Compiler-owned storage access for fields Rust cannot project directly.
@@ -238,6 +241,9 @@ pub enum EmissionStatus {
         rust: String,
         /// Advertised evaluation capability; emission currently produces runtime expressions.
         const_capability: ConstCapability,
+        /// Whether a call needs the caller's `unsafe` for operations the macro itself
+        /// performs. Caller operands that need `unsafe` need it in either case.
+        caller_unsafe: bool,
         /// Rustdoc-facing parts used to publish a documentation snapshot.
         #[serde(skip)]
         documentation: Box<MacroDocumentation>,
@@ -367,9 +373,10 @@ fn emit_with_lowering<'a>(
         }
     }
     let status = match lowered {
-        Ok((rust, documentation)) => EmissionStatus::Emitted {
+        Ok((rust, documentation, caller_unsafe)) => EmissionStatus::Emitted {
             rust,
             const_capability: ConstCapability::RuntimeOnly,
+            caller_unsafe,
             documentation: Box::new(documentation),
         },
         Err(reason) => EmissionStatus::Skipped { reason },
@@ -384,7 +391,7 @@ fn lower<'a>(
     bindings: &'a BindingCatalog,
     generated: Generated<'a>,
     lowering: &mut Option<types::Lowering<'a>>,
-) -> Result<(String, MacroDocumentation), SkipReason> {
+) -> Result<(String, MacroDocumentation, bool), SkipReason> {
     if let Some(reason) = binding_mismatch(session, analysis, bindings) {
         return Err(reason);
     }
@@ -504,8 +511,8 @@ fn emit_prepared_batch(
         available.macros.remove(name);
     }
     let mut translated = translated_callees(session, &initial, &available.macros);
-    let mut translations = translation_panics(&initial, &translated);
-    let finish = |translations: &BTreeMap<String, BTreeSet<&'static str>>| {
+    let mut translations = translation_facts(session, &initial, &translated);
+    let finish = |translations: &BTreeMap<String, assertions::Translation>| {
         let generated = Generated { adapters, translations };
         let mut emissions = emit_in_parallel(initial.len(), |index, lowering| {
             let emission = &initial[index];
@@ -595,7 +602,7 @@ fn emit_prepared_batch(
             return emissions;
         }
         translated.retain(|name| !lost.contains(name));
-        translations = translation_panics(&initial, &translated);
+        translations = translation_facts(session, &initial, &translated);
         emissions = finish(&translations);
     }
 }
@@ -672,22 +679,27 @@ fn translated_callees(
         .collect()
 }
 
-/// The panic conditions of each translation in `translated`, which lists every function
-/// after the translated functions it calls.
-fn translation_panics(
+/// The panic conditions and caller safety of each translation in `translated`, which lists
+/// every function after the translated functions it calls.
+fn translation_facts(
+    session: &AnalysisSession<'_>,
     emissions: &[MacroEmission],
     translated: &[String],
-) -> BTreeMap<String, BTreeSet<&'static str>> {
+) -> BTreeMap<String, assertions::Translation> {
     let analyses = emissions
         .iter()
         .map(|emission| (emission.analysis.name.as_str(), &emission.analysis))
         .collect::<BTreeMap<_, _>>();
-    let mut panics = BTreeMap::new();
+    let mut facts = BTreeMap::new();
     for name in translated {
-        let conditions = panic_conditions(analyses[name.as_str()], &panics);
-        panics.insert(name.clone(), conditions);
+        let analysis = analyses[name.as_str()];
+        let translation = assertions::Translation {
+            panics: panic_conditions(session, analysis, &facts),
+            caller_unsafe: assertions::plan(session.frontend(), analysis, &facts).caller_unsafe,
+        };
+        facts.insert(name.clone(), translation);
     }
-    panics
+    facts
 }
 
 /// Rust panic conditions of an analyzed expression's operations, as documentation text.
@@ -695,12 +707,13 @@ fn translation_panics(
 /// A call that expands a translation has that translation's conditions; any other call
 /// is an indirect or guarded native call.
 fn panic_conditions(
+    session: &AnalysisSession<'_>,
     analysis: &MacroAnalysis,
-    translations: &BTreeMap<String, BTreeSet<&'static str>>,
+    translations: &BTreeMap<String, assertions::Translation>,
 ) -> BTreeSet<&'static str> {
     let nodes = analysis.expression.as_ref().map_or(&[][..], |expression| &expression.syntax.nodes);
     let mut conditions = BTreeSet::new();
-    for node in nodes {
+    for (index, node) in nodes.iter().enumerate() {
         match &node.kind {
             ExpressionKind::Binary { operator, .. }
             | ExpressionKind::Assignment { operator: Some(operator), .. } => match operator {
@@ -723,8 +736,12 @@ fn panic_conditions(
                 conditions.insert("Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant.");
             }
             ExpressionKind::Call { callee, .. } => {
+                // A stop aborts the process; it neither returns nor panics.
+                if assertions::stop(session.frontend().declarations(), nodes, index).is_some() {
+                    continue;
+                }
                 match direct_callee(nodes, *callee).and_then(|name| translations.get(name)) {
-                    Some(translation) => conditions.extend(translation),
+                    Some(translation) => conditions.extend(&translation.panics),
                     None => {
                         conditions.insert("Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors.");
                     }
@@ -905,8 +922,15 @@ fn render_adapters(
     let operands = macros.iter().any(|emission| {
         matches!(emission.status, EmissionStatus::Emitted { .. })
             && emission.analysis.parameters.iter().any(|parameter| {
-                parameter.roles.contains(&crate::ParameterRole::Value)
-                    || parameter.roles.contains(&crate::ParameterRole::Spelling)
+                // Unused operands are classified too, for their dead safety checks.
+                parameter.roles.iter().any(|role| {
+                    matches!(
+                        role,
+                        crate::ParameterRole::Value
+                            | crate::ParameterRole::Spelling
+                            | crate::ParameterRole::Unused
+                    )
+                })
             })
     });
     rust.push_str(&crate::format_rust_macros(&arguments::shared(&exports, operands)?)?);
@@ -962,9 +986,9 @@ struct Generated<'a> {
     adapters: Option<&'a GeneratedAdapters>,
     /// Static inline functions emitted as translated bodies in this batch, with the
     /// Rust panic conditions their translation can raise, including those of the
-    /// translations it expands. Calls to them expand that translation instead of
-    /// calling the native binding.
-    translations: &'a BTreeMap<String, BTreeSet<&'static str>>,
+    /// translations it expands, and whether expanding it needs the caller's `unsafe`.
+    /// Calls to them expand that translation instead of calling the native binding.
+    translations: &'a BTreeMap<String, assertions::Translation>,
 }
 
 impl Generated<'static> {
@@ -1198,7 +1222,7 @@ fn render(
     bindings: &BindingCatalog,
     generated: Generated<'_>,
     lowering: &types::Lowering<'_>,
-) -> Result<(String, MacroDocumentation), SkipReason> {
+) -> Result<(String, MacroDocumentation, bool), SkipReason> {
     let identifier = macro_identifier(&analysis.name).ok_or_else(|| {
         skip(
             analysis,
@@ -1381,7 +1405,7 @@ fn render(
     }
     comment.push_str("\n\n# Safety\n\n");
     comment.push_str(documentation::SAFETY);
-    let failures = panic_conditions(analysis, generated.translations);
+    let failures = panic_conditions(session, analysis, generated.translations);
     if !failures.is_empty() {
         comment.push_str("\n\n# Panics\n\n");
         for failure in failures {
@@ -1421,10 +1445,22 @@ fn render(
         "(@__pgrx_c_check_safety; {expression_prefix}$($raw:tt)*) => {{ {safety_call} }};"
     )
     .expect("String output");
+    // Operands this rendering never evaluates are still checked for `unsafe` in dead code.
+    let unevaluated =
+        if inline_body.is_some() { Vec::new() } else { renderer.unevaluated_parameters() };
+    let checks =
+        (!unevaluated.is_empty()).then(|| arguments::render_operand_checks(analysis, &unevaluated));
     let public_body = if statement_body.is_some() {
-        value.clone()
+        match &checks {
+            Some(checks) => format!("{{ {checks} {value} }}"),
+            None => value.clone(),
+        }
     } else if empty {
-        String::new()
+        checks.clone().unwrap_or_default()
+    } else if let Some(checks) = &checks {
+        format!(
+            "{SUPPORT}::expression_result::finish_checked({checks}, $crate::{identifier}!(@__pgrx_emit_value; {operands}))"
+        )
     } else {
         format!(
             "{SUPPORT}::expression_result::finish($crate::{identifier}!(@__pgrx_emit_value; {operands}))"
@@ -1555,6 +1591,7 @@ fn render(
             None,
         ));
     }
+    let caller_unsafe = renderer.caller_unsafe();
     let documentation = MacroDocumentation {
         identifier,
         title,
@@ -1569,7 +1606,7 @@ fn render(
         hidden,
         result: documentation::result(analysis, renderer, inline_body.as_ref()),
     };
-    Ok((rust, documentation))
+    Ok((rust, documentation, caller_unsafe))
 }
 
 /// The C result of a translated inline function body.

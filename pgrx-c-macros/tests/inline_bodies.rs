@@ -95,7 +95,8 @@ const NATIVE: &[&str] = &[
     "BODY_LATE_USE",
     // The macro is redefined after the function.
     "BODY_REDEFINED_USE",
-    // `__LINE__` names the header line, not the Rust invocation.
+    // `__LINE__` names the header line, not the Rust invocation; only an assertion's report
+    // may use the invocation's location.
     "BODY_LINE",
     // The statement ends inside a macro argument, so its extent omits the closing `)`.
     "BODY_MACRO_ARG",

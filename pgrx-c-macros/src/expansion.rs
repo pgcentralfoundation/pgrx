@@ -367,23 +367,8 @@ pub(crate) fn prepare_inner_with_objects(
                 continue;
             }
         };
-        if active.definition.tokens[body_start..]
-            .iter()
-            .any(|token| matches!(token.spelling.as_str(), "#" | "%:"))
-        {
-            record_skip(
-                &mut results,
-                &name,
-                skip(
-                    ExpansionSkipCode::Stringification,
-                    "root stringification requires a C preprocessing operand-spelling contract",
-                    Some(&name),
-                    frontend,
-                ),
-                frontend,
-            );
-            continue;
-        }
+        // A stringified root formal becomes a stringification of the Rust invocation's
+        // tokens, which analysis admits only as diagnostic text, as for a dependency.
         let (closure, pastes) = match dependencies.closure(active_name) {
             Ok(closure) => closure,
             Err(reason) => {
@@ -510,9 +495,15 @@ pub(crate) fn prepare_synthetic(
                 Ok((reached, false))
                     if std::iter::once(name.as_str())
                         .chain(reached.iter().map(|dependency| dependency.name.as_str()))
-                        .any(|name| dependencies.nodes[name].stringifies) =>
+                        .any(|name| {
+                            dependencies.nodes[name].stringifies
+                                && !frontend.environment().active.get(name).is_some_and(|active| {
+                                    stringifies_diagnostics(&active.definition)
+                                })
+                        }) =>
                 {
-                    // The body's tokens are replayed with a space between each pair.
+                    // The body's tokens are replayed with a space between each pair, so a
+                    // stringification can spell its operand with different spacing.
                     refuse(
                         &mut results,
                         ExpansionSkipCode::Stringification,
@@ -1503,8 +1494,27 @@ pub(crate) fn dynamic_builtin(name: &str) -> bool {
         )
 }
 
+/// Whether a macro stringifies only the condition it reports through
+/// `ExceptionalCondition`, as PostgreSQL's assertions do.
+///
+/// That text is only a diagnostic, so a synthetic replacement may reach it although
+/// replaying the body's tokens can change the spacing of the condition's spelling.
+fn stringifies_diagnostics(definition: &MacroDefinition) -> bool {
+    let tokens = definition
+        .tokens
+        .iter()
+        .filter(|token| token.kind != TokenKind::Comment)
+        .collect::<Vec<_>>();
+    tokens.iter().enumerate().all(|(index, token)| {
+        !matches!(token.spelling.as_str(), "#" | "%:")
+            || index.checked_sub(2).is_some_and(|call| {
+                tokens[call].spelling == "ExceptionalCondition" && tokens[call + 1].spelling == "("
+            })
+    })
+}
+
 /// Invocation-sensitive diagnostics with an explicit Rust source-location contract.
-fn invocation_diagnostic(name: &str) -> bool {
+pub(crate) fn invocation_diagnostic(name: &str) -> bool {
     matches!(name, "__FILE__" | "__LINE__")
 }
 

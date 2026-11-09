@@ -44,9 +44,9 @@ fn main() {
         CValue::<CLongLong>::new(0),
     );
     assert_eq!(distinct_rank.get(), u64::MAX);
-    let _: CExpression<CValue<CLong>> = renamed_generated::EMIT_LONG!(unused_unknown_binding);
+    let _: CExpression<CValue<CLong>> = renamed_generated::EMIT_LONG!(panic!("an unused operand is not evaluated"));
     let maximum: CExpression<CValue<CUnsignedLongLong>> =
-        renamed_generated::EMIT_UNSIGNED_LONG_LONG!(unused_unknown_binding);
+        renamed_generated::EMIT_UNSIGNED_LONG_LONG!(panic!("an unused operand is not evaluated"));
     assert_eq!(maximum.get(), u64::MAX);
 
     let narrow: CExpression<CValue<CUnsignedShort>> = renamed_generated::EMIT_WORD!(-1_i32);
@@ -69,8 +69,8 @@ fn main() {
     assert_eq!(renamed_generated::EMIT_BITS!(1_u8, 0_u8).get(), -2);
     assert_eq!(renamed_generated::EMIT_KEYWORDS!(2_u8, 3_i16).get(), 5);
     assert_eq!(renamed_generated::r#match!(3_i32).get(), 4);
-    assert_eq!(renamed_generated::EMIT_CONSTANT!(unused_unknown_binding).get(), 7);
-    assert_eq!(renamed_generated::EMIT_UNUSED!(unused_unknown_binding).get(), 17);
+    assert_eq!(renamed_generated::EMIT_CONSTANT!(panic!("an unused operand is not evaluated")).get(), 7);
+    assert_eq!(renamed_generated::EMIT_UNUSED!(panic!("an unused operand is not evaluated")).get(), 17);
 
     let mut calls = 0;
     let mut read = || {

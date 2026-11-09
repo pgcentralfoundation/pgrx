@@ -191,10 +191,10 @@ call. Generated calls to a translated function expand its translation. `.get()`
 extracts native storage, including `()` for a void return. When a macro becomes
 an inline function, its return rank or evaluation rules can therefore change with
 PostgreSQL, and so can whether a call needs `unsafe`. Whether a body is translated
-also depends on the build and on the libclang that inspects it. An
-`--enable-cassert` build's `Assert` reports its file and line, which keeps a body
-that uses it native. Some libclang releases locate a statement that starts with a
-macro at the macro's definition, which also keeps the body native. Predicate
+also depends on the libclang that inspects it: some libclang releases locate a
+statement that starts with a macro at the macro's definition, which keeps the body
+native. An assert-enabled build translates the same bodies as a release build; see
+[Assertions and assert-enabled builds](#assertions-and-assert-enabled-builds). Predicate
 callers can use `.is_true()` for either C `int` or C `bool`; this explicitly
 converts truth without changing `.get()` or the original C identity. Native calls
 retain generated FFI guards and require the original function's unsafe caller
@@ -385,9 +385,13 @@ Operand-dependent dependency stringification is narrower: it must feed a direct
 The C text template is retained, while holes stringify the outer Rust invocation
 tokens without evaluating them. Non-ASCII token spelling, returned strings,
 unknown array extents, address-taking, pointer arithmetic, and concatenation of
-such holes are refused. Root `#` stringification remains unsupported.
-`__FILE__` and `__LINE__` use the Rust invocation's `file!()` and `line!()`, rather
-than freezing the generator's source location. Stringification of those location
+such holes are refused. A root's own `#` stringification is admitted on the same
+terms, as `Assert`'s condition text is. A translated inline body may reach a macro
+that stringifies only the condition it passes to `ExceptionalCondition`; that text
+can differ from C's in spacing, because the body's tokens are replayed with spaces
+between them. `__FILE__` and `__LINE__` use the Rust invocation's `file!()` and
+`line!()`, in macros and translated inline bodies alike, rather than freezing the
+generator's or the header's source location. Stringification of those location
 markers and other dynamic builtins remain unsupported. Literal writes acquire
 no mutation capability; wide, UTF-prefixed and unproved encodings are skipped.
 The typed expression support also covers:
@@ -397,7 +401,9 @@ The typed expression support also covers:
 - Record and union fields, packed fields, compiler-described bitfields, volatile
   accesses, assignment, compound assignment, and prefix and postfix mutation.
 - Unevaluated `sizeof` and alignment expressions, comma expressions, type and
-  field-name parameters, unused arguments, and empty replacements.
+  field-name parameters, unused arguments, and empty replacements. An unused
+  argument must be a Rust expression, and is checked in dead code like any operand
+  the expansion does not evaluate.
 - Calls through complete C prototypes, including static inline functions and
   nullable function pointers, and addresses of original C functions.
 - Compiler byte-swap intrinsics whose direct-call prototypes and LLVM value
@@ -419,6 +425,9 @@ The typed expression support also covers:
   values use stable Rust's `core::hint::cold_path()` to preserve branch direction;
   enclosing expectations take precedence over nested hints through groups or casts.
   Dynamic expectations remain unhinted, with a generated comment explaining why.
+- `ExceptionalCondition`, `abort()`, `__builtin_unreachable()` and MSVC's
+  `__assume`, which stop the process; see
+  [Assertions and assert-enabled builds](#assertions-and-assert-enabled-builds).
 - Closed token pastes resolved by Clang, including literal suffixes and fixed
   type, field, function, enum and helper names. Separate compiler probes reject
   pastes that depend on caller operands and discover synthesized dependencies
@@ -463,6 +472,51 @@ accepts expression operands there.
 Compatible function pointer types
 with distinct generated signature markers are conservatively rejected in
 operations that would require a proof relating those signatures.
+
+### Assertions and assert-enabled builds
+
+A generated macro has the same name, calling form and need for `unsafe` whether
+PostgreSQL was configured with `--enable-cassert` or not. `USE_ASSERT_CHECKING`
+otherwise changes much of that.
+
+Calls that stop the process lower to safe Rust in pgrx-pg-sys's support, without a
+native call. `ExceptionalCondition`, which `Assert` and its relatives call, writes
+PostgreSQL's `TRAP:` line and a backtrace to stderr and aborts. Its condition text
+is the C text, or the Rust invocation's tokens for a macro operand, and its file and
+line are the Rust invocation's. `abort()` aborts. Reaching `__builtin_unreachable()`,
+or a false MSVC `__assume`, is undefined in C, so it writes a `TRAP:` line and
+aborts. A failed check never unwinds, so it cannot become a recoverable
+PostgreSQL `ERROR`.
+
+A check is an `if` whose only statement stops, `holds || (stop, 0)`, or
+`__assume(holds)`. A release build omits `Assert`'s checks, so a check whose
+condition needs the caller's `unsafe`, for example to read a global or a pointer, is
+omitted when nothing else in the expansion needs `unsafe`. Otherwise the caller
+already holds `unsafe` and every check stays. `BufferIsValid`, which checks its
+argument against `NBuffers`, therefore needs no `unsafe` in either build. C still
+checks it when PostgreSQL calls it.
+
+A macro operand that the expansion never evaluates, because the argument is unused
+or appears only in an omitted check or a stop's text, is checked in dead code. An
+operand that needs `unsafe` needs it whether or not this build's C evaluates it.
+
+Inspecting assert-enabled headers also parses them as a release build would, with
+`USE_ASSERT_CHECKING` removed from `pg_config.h` in memory. Functions and macros
+that only the assert-enabled build declares, such as `castNodeImpl`, are not
+generated. A macro takes its release definition when the assert-enabled build
+declares that name as a function, or when its assert-enabled definition reaches a
+declaration the release build lacks, as `castNode` reaches `castNodeImpl`. A
+release static inline function without parameters, result or `return`, such as
+`AssertCouldGetRelation`, that the assert-enabled build declares only as a function
+becomes a statement macro of its body. These definitions follow the headers in a
+derived main file, so every later compiler pass sees them, and their generated
+documentation names the release definition's location. They lose the
+assert-enabled checks, as a release build does. `pgrx-pg-sys` also leaves out the
+bindings of functions an assert-enabled build declares where a release build defines
+a macro, such as `AssertTransactionIdInAllowableRange`, so each name is called the
+same way in every build; `FrontendOutput::functions_with_release_macros` lists them.
+The emission report records `caller_unsafe` for each emitted macro so that builds can
+be compared.
 
 ## Calling generated macros
 
@@ -730,8 +784,8 @@ is missing.
 Tests wrapped in `if_c_macro!` or the classifier's availability arm disappear
 when their macro is not emitted. The `pgrx-pg-sys` `macro_availability` test
 therefore requires each name gated in `pgrx-pg-sys/tests` and
-`pgrx-unit-tests/src/tests` to be emitted, apart from the version and
-assertion-profile differences it lists. It skips a gate that the build compiles
+`pgrx-unit-tests/src/tests` to be emitted, apart from the version differences it
+lists. It skips a gate that the build compiles
 out through a file-level `#![cfg]` or a single-line `#[cfg]` written directly
 on the gate, so put a platform or version cfg there rather than inside the
 gate. The guard evaluates only `target_os = "..."`, `feature = "pgNN"`, `docsrs`

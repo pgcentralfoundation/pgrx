@@ -23,6 +23,8 @@
 use super::{CInteger, CValue, IntoCValue, OverflowPolicy, PromotedInteger, sealed};
 use core::marker::PhantomData;
 
+/// Stop the process for failed C assertions and reached unreachable code without a native call.
+pub mod assertion;
 /// Preserve caller literal zero facts until expression/storage boundaries remove source-only metadata.
 /// This supplies contextual null conversions without mistaking runtime zero for a C constant expression.
 pub mod literal;

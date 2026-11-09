@@ -91,9 +91,22 @@ pub fn run_rust_linked_with_cfg(
     )
 }
 
+/// Link emitted Rust with the original C functions and run it, returning its exit status and
+/// both output streams, for an oracle that is expected to stop the process.
+#[allow(dead_code)]
+pub fn run_rust_linked_status(
+    source: &str,
+    c_compiler: &Path,
+    header: &Path,
+    c_source: &str,
+    arguments: &[&str],
+) -> (std::process::ExitStatus, String, String) {
+    let (_directory, executable) =
+        compile_rust_linked(source, c_compiler, header, c_source, arguments, &[]);
+    run_process(&mut Command::new(executable), "execute_linked")
+}
+
 /// Apply native C arguments and Rust runtime configuration within one bounded oracle run.
-/// The native startup also disables Windows CRT stdout translation, preserving exact mixed
-/// C/Rust output without rewriting intentional CRLFs or changing fixture source locations.
 fn run_rust_linked_with_arguments(
     source: &str,
     c_compiler: &Path,
@@ -102,6 +115,22 @@ fn run_rust_linked_with_arguments(
     arguments: &[&str],
     rust_arguments: &[&str],
 ) -> String {
+    let (_directory, executable) =
+        compile_rust_linked(source, c_compiler, header, c_source, arguments, rust_arguments);
+    run_tool(&mut Command::new(executable), "execute_linked")
+}
+
+/// Compile emitted Rust and link it with original C functions. The native startup also disables
+/// Windows CRT stdout translation, preserving exact mixed C/Rust output without rewriting
+/// intentional CRLFs or changing fixture source locations.
+fn compile_rust_linked(
+    source: &str,
+    c_compiler: &Path,
+    header: &Path,
+    c_source: &str,
+    arguments: &[&str],
+    rust_arguments: &[&str],
+) -> (TemporaryDirectory, std::path::PathBuf) {
     let directory = TemporaryDirectory::new();
     let native = directory.0.join("native.c");
     let object = directory.0.join("native.o");
@@ -138,7 +167,7 @@ fn run_rust_linked_with_arguments(
     #[cfg(all(target_os = "windows", target_env = "msvc"))]
     compiler.args(["-C", "link-arg=/OPT:REF"]);
     run_tool(&mut compiler, "compile_linked");
-    run_tool(&mut Command::new(executable), "execute_linked")
+    (directory, executable)
 }
 
 /// Type-check emitted Rust for an actual cross-target profile when that Rust target's standard

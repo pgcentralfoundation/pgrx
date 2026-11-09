@@ -200,6 +200,12 @@ pub fn finish<T: IntoExpression>(value: T) -> CExpression<T::Value> {
     CExpression(value.into_expression())
 }
 
+/// Like [`finish`], for a macro whose dead `checks` borrow caller operands it never
+/// evaluates, so an operand that needs `unsafe` still needs it.
+pub fn finish_checked<T: IntoExpression>(_checks: (), value: T) -> CExpression<T::Value> {
+    finish(value)
+}
+
 /// Apply C return assignment conversion to an unambiguous native result type.
 ///
 /// Generated return statements use Rust's enclosing result type to select its

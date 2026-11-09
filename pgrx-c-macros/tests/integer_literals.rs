@@ -185,9 +185,10 @@ fn main() {
 int main(void) {
 "#,
     );
+    // C never compiles an unused argument; Rust checks it in dead code without evaluating it.
     for &(name, _) in cases {
         writeln!(c, "RECORD(\"{name}\", {name}(undefined_unused_binding));").unwrap();
-        writeln!(rust, "record(\"{name}\", {name}!(undefined_unused_binding));").unwrap();
+        writeln!(rust, "record(\"{name}\", {name}!(0));").unwrap();
     }
     c.push_str("return 0; }\n");
     rust.push_str("}\n");

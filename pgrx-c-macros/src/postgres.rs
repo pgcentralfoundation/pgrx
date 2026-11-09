@@ -443,7 +443,9 @@ pub fn postgres_inline_function_names(
     let mut sources = HashMap::new();
     let mut names = Vec::new();
     for (name, function) in &inspected.declarations().function_signatures {
+        // A release build lacks this function, so no build generates it.
         if inspected.environment().active.contains_key(name)
+            || inspected.assertions.assert_only.contains(name)
             || !function.is_static
             || !function.is_inline
             || !function.definition_available
@@ -479,7 +481,8 @@ fn postgres_macro_names(
     }
     let mut names = Vec::new();
     for (name, active) in &inspected.environment().active {
-        if active.definition.kind != kind {
+        // A release build lacks this macro, so no build generates it.
+        if active.definition.kind != kind || inspected.assertions.assert_only.contains(name) {
             continue;
         }
         let owned = match &active.provenance {

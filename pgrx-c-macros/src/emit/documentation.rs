@@ -261,16 +261,13 @@ pub(super) fn documentation_forms(
         }
         let name = arguments::name(analysis, index);
         let roles = parameter.roles.as_slice();
-        let unparsed = !roles.is_empty()
-            && roles
-                .iter()
-                .all(|role| matches!(role, ParameterRole::Unused | ParameterRole::Spelling));
+        let unparsed =
+            !roles.is_empty() && roles.iter().all(|role| matches!(role, ParameterRole::Spelling));
         if unparsed && index + 1 == analysis.parameters.len() {
-            // The real normalizer takes up to its comma, or none for an unused argument.
-            // The repetition also takes a trailing comma. No block or witness names
-            // this operand, so binding it inside a repetition is safe.
-            let repetition = if roles == [ParameterRole::Unused] { '*' } else { '+' };
-            write!(operands, "$(${name}:tt){repetition}").expect("String output");
+            // The real normalizer takes up to its comma. The repetition also takes a
+            // trailing comma. No block or witness names this operand, so binding it
+            // inside a repetition is safe.
+            write!(operands, "$(${name}:tt)+").expect("String output");
             trailing_comma = false;
         } else if roles == [ParameterRole::Type] {
             write!(operands, "${name}:ty").expect("String output");

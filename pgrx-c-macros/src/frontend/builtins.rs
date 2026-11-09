@@ -25,12 +25,38 @@ use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::{SystemTime, UNIX_EPOCH};
 
 /// The reviewed builtin names and operation identities eligible for signature and effect proof.
-const OPERATIONS: &[(&str, BuiltinKind)] = &[
-    ("__builtin_bswap16", BuiltinKind::ByteSwap { bits: 16 }),
-    ("__builtin_bswap32", BuiltinKind::ByteSwap { bits: 32 }),
-    ("__builtin_bswap64", BuiltinKind::ByteSwap { bits: 64 }),
-    ("__builtin_expect", BuiltinKind::Expect),
+const OPERATIONS: &[(&str, Operation)] = &[
+    ("__builtin_bswap16", Operation::ByteSwap { bits: 16 }),
+    ("__builtin_bswap32", Operation::ByteSwap { bits: 32 }),
+    ("__builtin_bswap64", Operation::ByteSwap { bits: 64 }),
+    ("__builtin_expect", Operation::Expect),
 ];
+/// The reviewed builtins whose translation stops the process, eligible for prototype proof.
+const CONTROL: &[(&str, BuiltinKind)] =
+    &[("__builtin_unreachable", BuiltinKind::Unreachable), ("__assume", BuiltinKind::Assume)];
+
+/// A builtin whose computed value an LLVM witness proves.
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum Operation {
+    /// An integer byte swap of a fixed width.
+    ByteSwap {
+        /// The proved operand and result width.
+        bits: u16,
+    },
+    /// A branch hint that returns its first operand.
+    Expect,
+}
+
+/// Record a proved value operation in the shared builtin model.
+impl From<Operation> for BuiltinKind {
+    /// Map the witnessed operation onto its catalog kind.
+    fn from(operation: Operation) -> Self {
+        match operation {
+            Operation::ByteSwap { bits } => Self::ByteSwap { bits },
+            Operation::Expect => Self::Expect,
+        }
+    }
+}
 /// Bound one constructed probe source before invoking Clang or allocating additional instrumentation.
 const MAX_SOURCE_BYTES: usize = 4 * 1024 * 1024;
 /// Bound LLVM witness parsing so unsupported compiler bodies remain an explicit refusal.
@@ -55,7 +81,7 @@ struct Candidate {
     /// Reviewed builtin spelling selected for prototype and effect proof.
     name: &'static str,
     /// Intended compiler operation whose semantics the witnesses must establish.
-    kind: BuiltinKind,
+    kind: Operation,
     /// Target-derived operand/result width expected by the builtin proof.
     bits: u16,
     /// Fresh probe symbol used to associate typed and LLVM observations with one builtin candidate.
@@ -67,8 +93,8 @@ impl Candidate {
     /// Return the operation-specific operand count used by typed builtin probes.
     fn arity(&self) -> usize {
         match self.kind {
-            BuiltinKind::ByteSwap { .. } => 1,
-            BuiltinKind::Expect => 2,
+            Operation::ByteSwap { .. } => 1,
+            Operation::Expect => 2,
         }
     }
 }
@@ -99,16 +125,17 @@ pub(super) fn prove(
     {
         prefix.push('_');
     }
-    for &(name, kind) in OPERATIONS {
+    // A referenced builtin is eligible for proof unless C or a proof helper shadows it.
+    let shadowing = |name: &str| -> Option<Option<&'static str>> {
         if !frontend
             .environment()
             .active
             .values()
             .any(|active| active.definition.tokens.iter().any(|token| token.spelling == name))
         {
-            continue;
+            return None;
         }
-        let unavailable = if frontend.environment().active.contains_key(name) {
+        Some(if frontend.environment().active.contains_key(name) {
             Some("an active C macro shadows the compiler builtin")
         } else if frontend.declarations().functions.contains_key(name)
             || frontend.declarations().variables.contains_key(name)
@@ -122,41 +149,227 @@ pub(super) fn prove(
             Some("an active C macro shadows a builtin proof operation")
         } else {
             None
-        };
-        if let Some(reason) = unavailable {
+        })
+    };
+    let mut eligible = |name: &str| match shadowing(name) {
+        None => false,
+        Some(None) => true,
+        Some(Some(reason)) => {
             proof.unavailable.insert(name.into(), reason.into());
-        } else {
-            let (bits, suffix) = match kind {
-                BuiltinKind::ByteSwap { bits } => (bits, bits.to_string()),
-                BuiltinKind::Expect => {
-                    let Some(bits) = frontend
-                        .profile()
-                        .target
-                        .integers
-                        .get(&IntegerKind::Long)
-                        .and_then(|facts| u16::try_from(facts.bits).ok())
-                    else {
-                        proof.unavailable.insert(
-                            name.into(),
-                            "builtin expect requires a verified C long representation".into(),
-                        );
-                        continue;
-                    };
-                    (bits, "expect".into())
-                }
-            };
-            candidates.push(Candidate { name, kind, bits, witness: format!("{prefix}{suffix}") });
+            false
         }
+    };
+    let control = CONTROL.iter().copied().filter(|(name, _)| eligible(name)).collect::<Vec<_>>();
+    let operations =
+        OPERATIONS.iter().copied().filter(|(name, _)| eligible(name)).collect::<Vec<_>>();
+    for (name, kind) in operations {
+        let (bits, suffix) = match kind {
+            Operation::ByteSwap { bits } => (bits, bits.to_string()),
+            Operation::Expect => {
+                let Some(bits) = frontend
+                    .profile()
+                    .target
+                    .integers
+                    .get(&IntegerKind::Long)
+                    .and_then(|facts| u16::try_from(facts.bits).ok())
+                else {
+                    proof.unavailable.insert(
+                        name.into(),
+                        "builtin expect requires a verified C long representation".into(),
+                    );
+                    continue;
+                };
+                (bits, "expect".into())
+            }
+        };
+        candidates.push(Candidate { name, kind, bits, witness: format!("{prefix}{suffix}") });
     }
-    if candidates.is_empty() {
+    if candidates.is_empty() && control.is_empty() {
         return Ok(proof);
     }
     let inputs = &frontend.profile().inputs;
     super::verify_input_files(inputs)?;
-    let result = prove_inner(scanner, frontend, &prefix, &candidates, &mut proof);
+    let result = prove_control(scanner, frontend, &prefix, &control, &mut proof).and_then(|()| {
+        if candidates.is_empty() {
+            Ok(())
+        } else {
+            prove_inner(scanner, frontend, &prefix, &candidates, &mut proof)
+        }
+    });
     super::verify_input_files(inputs)?;
     result?;
     Ok(proof)
+}
+
+/// Prove the prototypes of builtins whose translation stops the process.
+///
+/// Reaching `__builtin_unreachable()`, or `__assume` of a false condition, is undefined in
+/// C, so stopping the process refines every behavior C allows and needs no LLVM witness.
+/// A typed libclang call must still resolve each name to the compiler's own builtin, with
+/// the prototype the translation assumes: `void (void)`, or `void` of one integer
+/// condition.
+fn prove_control(
+    scanner: &MacroScanner,
+    frontend: &FrontendOutput,
+    prefix: &str,
+    candidates: &[(&'static str, BuiltinKind)],
+    proof: &mut Proof,
+) -> Result<(), FrontendError> {
+    if candidates.is_empty() {
+        return Ok(());
+    }
+    let mut source = original_header(frontend)?;
+    source.push_str("\n\n");
+    let mut line = u32::try_from(source.bytes().filter(|byte| *byte == b'\n').count() + 1)
+        .map_err(|_| FrontendError::Output("builtin probe line count overflow".into()))?;
+    let mut ranges = Vec::new();
+    let witness = |kind| match kind {
+        BuiltinKind::Unreachable => format!("{prefix}unreachable"),
+        _ => format!("{prefix}assume"),
+    };
+    for &(name, kind) in candidates {
+        let (parameters, call) = match kind {
+            BuiltinKind::Unreachable => ("void".to_owned(), format!("{name}()")),
+            _ => (format!("int {prefix}value0"), format!("{name}({prefix}value0)")),
+        };
+        let probe = format!(
+            "#if __has_builtin({name})\nvoid {0}({parameters});\nvoid {0}({parameters}) {{ {call}; }}\n#endif\n",
+            witness(kind)
+        );
+        let end = line + 4;
+        ranges.push(ProbeRange { name, lines: line..end });
+        line = end;
+        source.push_str(&probe);
+    }
+    let index = Index::new(&scanner.clang, false, false);
+    let arguments = driver_arguments(&frontend.profile().arguments, &[], None);
+    let mut parser = index.parser(&frontend.profile().header);
+    parser
+        .arguments(&arguments)
+        .skip_function_bodies(false)
+        .unsaved(&[clang::Unsaved::new(&frontend.profile().header, &source)]);
+    let unit = parser.parse().map_err(|source| crate::Error::Parse {
+        header: frontend.profile().header.clone(),
+        source,
+    })?;
+    for diagnostic in unit.get_diagnostics() {
+        if !matches!(
+            diagnostic.get_severity(),
+            clang::diagnostic::Severity::Error | clang::diagnostic::Severity::Fatal
+        ) {
+            continue;
+        }
+        let location = diagnostic.get_location().get_expansion_location();
+        let candidate = location
+            .file
+            .filter(|file| file.get_path() == frontend.profile().header)
+            .and_then(|_| ranges.iter().find(|range| range.lines.contains(&location.line)));
+        let Some(range) = candidate else {
+            return Err(FrontendError::Environment(format!(
+                "original-header builtin probe failed: {diagnostic}"
+            )));
+        };
+        proof
+            .unavailable
+            .insert(range.name.into(), format!("typed builtin probe rejected: {diagnostic}"));
+    }
+    unit.get_entity().visit_children(|entity, _| {
+        if entity.get_kind() != EntityKind::FunctionDecl || !entity.is_definition() {
+            return EntityVisitResult::Continue;
+        }
+        let Some(&(name, kind)) = entity
+            .get_name()
+            .and_then(|function| candidates.iter().find(|(_, kind)| witness(*kind) == function))
+        else {
+            return EntityVisitResult::Continue;
+        };
+        if proof.unavailable.contains_key(name) {
+            return EntityVisitResult::Continue;
+        }
+        match control_prototype(entity, name, kind) {
+            Ok(signature) => {
+                proof.supported.insert(name.into(), BuiltinInfo { kind, signature });
+            }
+            Err(reason) => {
+                proof.unavailable.insert(name.into(), reason.into());
+            }
+        }
+        EntityVisitResult::Continue
+    });
+    for &(name, _) in candidates {
+        if !proof.supported.contains_key(name) {
+            proof.unavailable.entry(name.into()).or_insert_with(|| {
+                "libclang did not establish a direct builtin call and prototype".into()
+            });
+        }
+    }
+    Ok(())
+}
+
+/// Require a witness's only call to reach the compiler builtin with its expected prototype.
+fn control_prototype(
+    function: Entity<'_>,
+    name: &str,
+    kind: BuiltinKind,
+) -> Result<FunctionSignature, &'static str> {
+    let mut calls = Vec::new();
+    for body in function
+        .get_children()
+        .into_iter()
+        .filter(|child| child.get_kind() == EntityKind::CompoundStmt)
+    {
+        body.visit_children(|entity, _| {
+            if entity.get_kind() == EntityKind::CallExpr {
+                calls.push(entity);
+            }
+            EntityVisitResult::Recurse
+        });
+    }
+    let [call] = calls.as_slice() else {
+        return Err("typed witness must contain exactly one direct builtin call");
+    };
+    let declaration = call
+        .get_reference()
+        .filter(|declaration| {
+            declaration.get_kind() == EntityKind::FunctionDecl
+                && declaration.get_name().as_deref() == Some(name)
+                && !declaration.is_definition()
+        })
+        .ok_or("typed witness does not call the compiler builtin directly")?;
+    let ty = declaration.get_type().ok_or("builtin declaration has no type")?.get_canonical_type();
+    if ty.get_kind() != TypeKind::FunctionPrototype || ty.is_variadic() {
+        return Err("builtin requires a nonvariadic function prototype");
+    }
+    if ty.get_calling_convention() != Some(clang::CallingConvention::Cdecl) {
+        return Err("builtin prototype lacks the default C calling convention");
+    }
+    let parameters = ty
+        .get_argument_types()
+        .ok_or("builtin prototype has no parameter types")?
+        .into_iter()
+        .map(|parameter| type_info(parameter.get_canonical_type()))
+        .collect::<Vec<_>>();
+    let result = type_info(
+        ty.get_result_type().ok_or("builtin prototype has no result type")?.get_canonical_type(),
+    );
+    let expected = match kind {
+        BuiltinKind::Unreachable => parameters.is_empty(),
+        _ => {
+            matches!(parameters.as_slice(), [condition] if matches!(condition.category, TypeCategory::Integer(_)))
+        }
+    };
+    if result.category != TypeCategory::Void || !expected {
+        return Err(match kind {
+            BuiltinKind::Unreachable => "unreachable builtin lacks the void (void) prototype",
+            _ => "assume builtin lacks a void prototype of one integer condition",
+        });
+    }
+    Ok(FunctionSignature {
+        result,
+        parameters: Some(parameters),
+        variadic: false,
+        calling_convention: ty.get_calling_convention().map(|convention| format!("{convention:?}")),
+    })
 }
 
 /// Reconcile typed prototypes and driver LLVM witnesses for the bounded candidate set, recording
@@ -222,9 +435,10 @@ fn prove_inner(
         }
         match prototype(entity, candidate, frontend) {
             Ok(signature) => {
-                proof
-                    .supported
-                    .insert(candidate.name.into(), BuiltinInfo { kind: candidate.kind, signature });
+                proof.supported.insert(
+                    candidate.name.into(),
+                    BuiltinInfo { kind: candidate.kind.into(), signature },
+                );
             }
             Err(reason) => {
                 proof.unavailable.insert(candidate.name.into(), reason);
@@ -361,8 +575,8 @@ fn prototype(
         .get(&kind)
         .ok_or("builtin integer type is absent from target facts")?;
     let identity = match candidate.kind {
-        BuiltinKind::ByteSwap { .. } => !facts.signed,
-        BuiltinKind::Expect => kind == IntegerKind::Long && facts.signed && facts.rank == 4,
+        Operation::ByteSwap { .. } => !facts.signed,
+        Operation::Expect => kind == IntegerKind::Long && facts.signed && facts.rank == 4,
     };
     if parameters.iter().any(|parameter| parameter != &result)
         || result.is_const
@@ -375,10 +589,10 @@ fn prototype(
         || call.get_arguments().is_none_or(|arguments| arguments.len() != candidate.arity())
     {
         return Err(match candidate.kind {
-            BuiltinKind::ByteSwap { .. } => {
+            Operation::ByteSwap { .. } => {
                 "byte-swap builtin lacks matching unsigned parameter/result identity and width"
             }
-            BuiltinKind::Expect => "expect builtin lacks the exact C long(long, long) identity",
+            Operation::Expect => "expect builtin lacks the exact C long(long, long) identity",
         }
         .into());
     }
@@ -468,19 +682,7 @@ impl ProbeFiles {
     fn new(frontend: &FrontendOutput) -> Result<Self, FrontendError> {
         let header = &frontend.profile().header;
         let io_error = |source| FrontendError::FileIo { path: header.clone(), source };
-        let mut original = Vec::new();
-        fs::File::open(header)
-            .map_err(io_error)?
-            .take(MAX_SOURCE_BYTES as u64 + 1)
-            .read_to_end(&mut original)
-            .map_err(io_error)?;
-        if original.len() > MAX_SOURCE_BYTES {
-            return Err(FrontendError::Output(
-                "builtin main file exceeds the 4 MiB source budget".into(),
-            ));
-        }
-        let original = String::from_utf8(original)
-            .map_err(|_| FrontendError::Output("builtin main file is not UTF-8".into()))?;
+        let original = original_header(frontend)?;
         let nonce = SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .map_err(|error| {
@@ -523,6 +725,25 @@ impl ProbeFiles {
         arguments.push(super::path_string(&frontend.profile().header)?.into());
         Ok(arguments)
     }
+}
+
+/// Read the inspected main file, within the probe source budget, for probes that append to it.
+fn original_header(frontend: &FrontendOutput) -> Result<String, FrontendError> {
+    let header = &frontend.profile().header;
+    let io_error = |source| FrontendError::FileIo { path: header.clone(), source };
+    let mut original = Vec::new();
+    fs::File::open(header)
+        .map_err(io_error)?
+        .take(MAX_SOURCE_BYTES as u64 + 1)
+        .read_to_end(&mut original)
+        .map_err(io_error)?;
+    if original.len() > MAX_SOURCE_BYTES {
+        return Err(FrontendError::Output(
+            "builtin main file exceeds the 4 MiB source budget".into(),
+        ));
+    }
+    String::from_utf8(original)
+        .map_err(|_| FrontendError::Output("builtin main file is not UTF-8".into()))
 }
 
 /// Release resources owned by ProbeFiles even when a compiler or proof phase exits early.
@@ -593,7 +814,7 @@ struct Slot {
 
 /// Recognize a bounded LLVM body whose result identity and allowed effects prove the intended
 /// operation.
-fn llvm_witness(ir: &str, witness: &str, bits: u16, kind: BuiltinKind) -> Result<(), String> {
+fn llvm_witness(ir: &str, witness: &str, bits: u16, kind: Operation) -> Result<(), String> {
     let marker = format!("@{witness}(");
     let mut functions = ir.lines().filter(|line| line.starts_with("define "));
     let header = functions
@@ -609,8 +830,8 @@ fn llvm_witness(ir: &str, witness: &str, bits: u16, kind: BuiltinKind) -> Result
         return Err("LLVM builtin witness has an incompatible parameter/result width".into());
     }
     let arity = match kind {
-        BuiltinKind::ByteSwap { .. } => 1,
-        BuiltinKind::Expect => 2,
+        Operation::ByteSwap { .. } => 1,
+        Operation::Expect => 2,
     };
     let parameters = parameters.split(',').collect::<Vec<_>>();
     if parameters.len() != arity {
@@ -623,7 +844,7 @@ fn llvm_witness(ir: &str, witness: &str, bits: u16, kind: BuiltinKind) -> Result
             || words.first().copied() != Some(ty.as_str())
             || !words[1..words.len().saturating_sub(1)].iter().all(|word| {
                 matches!(*word, "noundef" | "zeroext" | "signext")
-                    || *word == "returned" && kind == BuiltinKind::Expect && index == 0
+                    || *word == "returned" && kind == Operation::Expect && index == 0
             })
         {
             return Err("LLVM builtin witness has incompatible scalar parameter attributes".into());
@@ -723,10 +944,10 @@ fn llvm_witness(ir: &str, witness: &str, bits: u16, kind: BuiltinKind) -> Result
                     return Err("LLVM builtin return has unsupported operands".into());
                 }
                 let valid = match kind {
-                    BuiltinKind::ByteSwap { .. } => {
+                    Operation::ByteSwap { .. } => {
                         values.get(value) == Some(&Origin::Swapped) && calls == 1
                     }
-                    BuiltinKind::Expect => values.get(value) == Some(&Origin::Parameter(0)),
+                    Operation::Expect => values.get(value) == Some(&Origin::Parameter(0)),
                 };
                 if !valid {
                     return Err(
@@ -738,8 +959,8 @@ fn llvm_witness(ir: &str, witness: &str, bits: u16, kind: BuiltinKind) -> Result
             }
             _ => {
                 let intrinsic = match kind {
-                    BuiltinKind::ByteSwap { .. } => "bswap",
-                    BuiltinKind::Expect => "expect",
+                    Operation::ByteSwap { .. } => "bswap",
+                    Operation::Expect => "expect",
                 };
                 let Some(call) =
                     unmarked.strip_prefix(&format!("call {ty} @llvm.{intrinsic}.{ty}("))
@@ -793,8 +1014,8 @@ fn llvm_witness(ir: &str, witness: &str, bits: u16, kind: BuiltinKind) -> Result
                 let destination =
                     destination.ok_or("LLVM builtin intrinsic discards its result")?;
                 let origin = match kind {
-                    BuiltinKind::ByteSwap { .. } => Origin::Swapped,
-                    BuiltinKind::Expect => Origin::Parameter(0),
+                    Operation::ByteSwap { .. } => Origin::Swapped,
+                    Operation::Expect => Origin::Parameter(0),
                 };
                 if slots.contains_key(destination) || values.insert(destination, origin).is_some() {
                     return Err("LLVM builtin witness redefines a value".into());
@@ -866,7 +1087,7 @@ mod tests {
             // Clang 18 at -g -O2.
             "  tail call void @llvm.dbg.value(metadata i32 %0, metadata !16, metadata !DIExpression()), !dbg !17\n  %2 = tail call i32 @llvm.bswap.i32(i32 %0), !dbg !18\n  ret i32 %2, !dbg !19",
         ] {
-            llvm_witness(&witness(body), "probe", 32, BuiltinKind::ByteSwap { bits: 32 }).unwrap();
+            llvm_witness(&witness(body), "probe", 32, Operation::ByteSwap { bits: 32 }).unwrap();
         }
     }
 
@@ -890,25 +1111,20 @@ mod tests {
             "  ret i32 %0",
         ] {
             assert!(
-                llvm_witness(&witness(body), "probe", 32, BuiltinKind::ByteSwap { bits: 32 })
+                llvm_witness(&witness(body), "probe", 32, Operation::ByteSwap { bits: 32 })
                     .is_err(),
                 "accepted {body}"
             );
         }
         assert!(
-            llvm_witness(&witness("  ret i32 %0"), "probe", 16, BuiltinKind::ByteSwap { bits: 16 })
+            llvm_witness(&witness("  ret i32 %0"), "probe", 16, Operation::ByteSwap { bits: 16 })
                 .is_err()
         );
         assert!(
-            llvm_witness(
-                &witness("  ret i32 %0"),
-                "missing",
-                32,
-                BuiltinKind::ByteSwap { bits: 32 }
-            )
-            .is_err()
+            llvm_witness(&witness("  ret i32 %0"), "missing", 32, Operation::ByteSwap { bits: 32 })
+                .is_err()
         );
-        assert!(llvm_witness("define i32 @probe(i32 returned %0) {\n  %1 = call i32 @llvm.bswap.i32(i32 %0)\n  ret i32 %1\n}", "probe", 32, BuiltinKind::ByteSwap { bits: 32 }).is_err());
+        assert!(llvm_witness("define i32 @probe(i32 returned %0) {\n  %1 = call i32 @llvm.bswap.i32(i32 %0)\n  ret i32 %1\n}", "probe", 32, Operation::ByteSwap { bits: 32 }).is_err());
     }
 
     /// Checks malformed or incomplete LLVM witnesses are errors.
@@ -922,7 +1138,7 @@ mod tests {
             "define i32 @probe(i32 %0) {\n  %1 = call i32 @llvm.bswap.i32(i32 %0)",
         ] {
             assert!(
-                llvm_witness(ir, "probe", 32, BuiltinKind::ByteSwap { bits: 32 }).is_err(),
+                llvm_witness(ir, "probe", 32, Operation::ByteSwap { bits: 32 }).is_err(),
                 "accepted {ir}"
             );
         }
@@ -937,13 +1153,13 @@ mod tests {
             "entry:\n  %2 = alloca i64, align 8\n  %3 = alloca i64, align 8\n  store i64 %0, ptr %2, align 8\n  store i64 %1, ptr %3, align 8\n  #dbg_declare(ptr %2, !1, !DIExpression(), !2)\n  %4 = load i64, ptr %2, align 8, !dbg !2\n  %5 = load i64, ptr %3, align 8\n  ret i64 %4, !dbg !2",
             "  %2 = alloca i64, align 8\n  %3 = alloca i64, align 8\n  store i64 %0, ptr %2, align 8\n  store i64 %1, ptr %3, align 8\n  %4 = load i64, ptr %2, align 8\n  %5 = load i64, ptr %3, align 8\n  %6 = call i64 @llvm.expect.i64(i64 %4, i64 %5) #2, !dbg !2\n  ret i64 %6",
         ] {
-            llvm_witness(&expect_witness(body), "probe", 64, BuiltinKind::Expect).unwrap();
+            llvm_witness(&expect_witness(body), "probe", 64, Operation::Expect).unwrap();
         }
         llvm_witness(
             "define i64 @probe(i64 noundef returned %first, i64 noundef %second) {\n  ret i64 %first\n}",
             "probe",
             64,
-            BuiltinKind::Expect,
+            Operation::Expect,
         )
         .unwrap();
         // Clang 18 at -g -O2 marks the debug intrinsic calls `tail`.
@@ -951,7 +1167,7 @@ mod tests {
             "define dso_local noundef i64 @probe(i64 noundef returned %0, i64 noundef %1) local_unnamed_addr #0 !dbg !14 {\n  tail call void @llvm.dbg.value(metadata i64 %0, metadata !20, metadata !DIExpression()), !dbg !22\n  tail call void @llvm.dbg.value(metadata i64 %1, metadata !21, metadata !DIExpression()), !dbg !22\n  ret i64 %0, !dbg !23\n}\n",
             "probe",
             64,
-            BuiltinKind::Expect,
+            Operation::Expect,
         )
         .unwrap();
     }
@@ -974,7 +1190,7 @@ mod tests {
             "  tail call void @effect(i64 %1)\n  ret i64 %0",
         ] {
             assert!(
-                llvm_witness(&expect_witness(body), "probe", 64, BuiltinKind::Expect).is_err(),
+                llvm_witness(&expect_witness(body), "probe", 64, Operation::Expect).is_err(),
                 "accepted {body}"
             );
         }
@@ -986,7 +1202,7 @@ mod tests {
             "define i64 @probe(i64 %0, i32 %1) {\n  ret i64 %0\n}",
             "define i64 @probe(i64 %0, i64 %1) {\n  ret i64 %0",
         ] {
-            assert!(llvm_witness(ir, "probe", 64, BuiltinKind::Expect).is_err(), "accepted {ir}");
+            assert!(llvm_witness(ir, "probe", 64, Operation::Expect).is_err(), "accepted {ir}");
         }
     }
 }

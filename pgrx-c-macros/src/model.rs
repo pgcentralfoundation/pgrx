@@ -33,6 +33,10 @@ pub struct FrontendOutput {
     /// augmentation.
     #[serde(skip)]
     pub(crate) dependencies: MacroDependencyGraph,
+    /// For assert-enabled headers, the names only that build declares and the macros
+    /// defined as in a release build.
+    #[serde(skip)]
+    pub(crate) assertions: crate::frontend::AssertionMode,
 }
 
 /// Expose the inspection bundle without allowing its compiler facts to be assembled independently.
@@ -61,6 +65,20 @@ impl FrontendOutput {
     /// Conservative lexical macro references in the final active environment.
     pub fn dependencies(&self) -> &MacroDependencyGraph {
         &self.dependencies
+    }
+
+    /// Functions that these assert-enabled headers declare where a release build of the same
+    /// headers defines a macro, such as `AssertTransactionIdInAllowableRange`.
+    ///
+    /// Generated code defines and calls that macro instead in either build. A binding generator
+    /// that leaves these functions out calls each name the same way in every build.
+    pub fn functions_with_release_macros(&self) -> impl Iterator<Item = &str> {
+        self.assertions.release_definitions.keys().map(String::as_str).filter(|name| {
+            self.declarations
+                .function_signatures
+                .get(*name)
+                .is_some_and(|function| !(function.is_static && function.is_inline))
+        })
     }
 }
 
@@ -825,6 +843,11 @@ pub enum BuiltinKind {
     /// The compiler’s first-operand-preserving branch hint operation proved by signature and LLVM
     /// witnesses.
     Expect,
+    /// `__builtin_unreachable()`. Reaching it is undefined, so a translation stops the process.
+    Unreachable,
+    /// MSVC's `__assume(condition)`. A false condition is undefined, so a translation stops the
+    /// process when the condition is false.
+    Assume,
 }
 
 /// A direct builtin call has this verified C prototype and pure operation.

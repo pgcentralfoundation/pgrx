@@ -454,12 +454,26 @@ impl MacroScanner {
         contents: Option<&str>,
         callback: impl FnOnce(&clang::TranslationUnit<'_>, MacroInventory) -> Result<R, Error>,
     ) -> Result<R, Error> {
+        let replaced = contents.map(|contents| (header, contents));
+        self.with_replaced_files(header, clang_args, replaced.as_slice(), false, callback)
+    }
+
+    /// Parse a C input as [`Self::with_translation_unit`] does, with each listed file's
+    /// contents replaced in memory, and with function bodies when `bodies` is set.
+    pub(crate) fn with_replaced_files<R>(
+        &self,
+        header: &Path,
+        clang_args: &[String],
+        replaced: &[(&Path, &str)],
+        bodies: bool,
+        callback: impl FnOnce(&clang::TranslationUnit<'_>, MacroInventory) -> Result<R, Error>,
+    ) -> Result<R, Error> {
         self.with_parsed_translation_unit(
             header,
             clang_args,
-            contents,
+            replaced,
             |parser| {
-                parser.detailed_preprocessing_record(true);
+                parser.detailed_preprocessing_record(true).skip_function_bodies(!bodies);
             },
             |unit, directory, diagnostics| {
                 callback(unit, collect_macro_inventory(unit, directory, diagnostics)?)
@@ -475,10 +489,11 @@ impl MacroScanner {
         contents: Option<&str>,
         callback: impl FnOnce(&clang::TranslationUnit<'_>) -> Result<R, Error>,
     ) -> Result<R, Error> {
+        let replaced = contents.map(|contents| (header, contents));
         self.with_parsed_translation_unit(
             header,
             clang_args,
-            contents,
+            replaced.as_slice(),
             |_| {},
             |unit, _, _| callback(unit),
         )
@@ -490,7 +505,7 @@ impl MacroScanner {
         &self,
         header: &Path,
         clang_args: &[String],
-        contents: Option<&str>,
+        replaced: &[(&Path, &str)],
         configure: impl FnOnce(&mut clang::Parser<'_>),
         callback: impl FnOnce(&clang::TranslationUnit<'_>, &Path, Vec<Diagnostic>) -> Result<R, Error>,
     ) -> Result<R, Error> {
@@ -525,8 +540,12 @@ impl MacroScanner {
         let mut parser = index.parser(header);
         parser.arguments(&arguments).skip_function_bodies(true);
         configure(&mut parser);
-        if let Some(contents) = contents {
-            parser.unsaved(&[clang::Unsaved::new(header, contents)]);
+        if !replaced.is_empty() {
+            let unsaved = replaced
+                .iter()
+                .map(|(path, contents)| clang::Unsaved::new(path, contents))
+                .collect::<Vec<_>>();
+            parser.unsaved(&unsaved);
         }
         let translation_unit =
             parser.parse().map_err(|source| Error::Parse { header: header.into(), source })?;
