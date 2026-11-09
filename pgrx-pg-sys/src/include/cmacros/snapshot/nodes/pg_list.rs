@@ -203,38 +203,6 @@ macro_rules! lfirst_int {
         )
     };
 }
-/// C macro lfirst_node from pg_list.h:172 (PostgreSQL 15), pg_list.h:176 (PostgreSQL 16–19)
-///
-/// ```text
-/// #define lfirst_node( type , lc ) castNode ( type , lfirst ( lc ) )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! lfirst_node {
-    ($type:ty, $lc:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$lc;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::type_witness::<
-                            $crate::__pgrx_c_macros::expression::CPointer<<$type as $crate::__pgrx_c_macros::expression::NativeType
-                        >::Marker,
-                        $crate::__pgrx_c_macros::expression::ReadWrite>>()
-                    )
-                )
-            }
-        )
-    };
-}
 /// C macro lfirst_oid from pg_list.h:171 (PostgreSQL 15), pg_list.h:174 (PostgreSQL 16–19)
 ///
 /// ```text
@@ -418,38 +386,6 @@ macro_rules! lfourth_int {
         )
     };
 }
-/// C macro lfourth_node from pg_list.h:192 (PostgreSQL 15), pg_list.h:196 (PostgreSQL 16–19)
-///
-/// ```text
-/// #define lfourth_node( type , l ) castNode ( type , lfourth ( l ) )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! lfourth_node {
-    ($type:ty, $l:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$l;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::type_witness::<
-                            $crate::__pgrx_c_macros::expression::CPointer<<$type as $crate::__pgrx_c_macros::expression::NativeType
-                        >::Marker,
-                        $crate::__pgrx_c_macros::expression::ReadWrite>>()
-                    )
-                )
-            }
-        )
-    };
-}
 /// C macro lfourth_oid from pg_list.h:191 (PostgreSQL 15), pg_list.h:195 (PostgreSQL 16–19)
 ///
 /// ```text
@@ -600,38 +536,6 @@ macro_rules! linitial_int {
                                 )
                             )
                         )
-                    )
-                )
-            }
-        )
-    };
-}
-/// C macro linitial_node from pg_list.h:177 (PostgreSQL 15), pg_list.h:181 (PostgreSQL 16–19)
-///
-/// ```text
-/// #define linitial_node( type , l ) castNode ( type , linitial ( l ) )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! linitial_node {
-    ($type:ty, $l:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$l;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::type_witness::<
-                            $crate::__pgrx_c_macros::expression::CPointer<<$type as $crate::__pgrx_c_macros::expression::NativeType
-                        >::Marker,
-                        $crate::__pgrx_c_macros::expression::ReadWrite>>()
                     )
                 )
             }
@@ -1831,39 +1735,6 @@ macro_rules! list_nth_int {
         )
     };
 }
-/// C macro list_nth_node from pg_list.h:306 (PostgreSQL 15), pg_list.h:327 (PostgreSQL 16–18), pg_list.h:359 (PostgreSQL 19)
-///
-/// ```text
-/// #define list_nth_node( type , list , n ) castNode ( type , list_nth ( list , n ) )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! list_nth_node {
-    ($type:ty, $list:expr, $n:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$list;
-                let _ = &$n;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::type_witness::<
-                            $crate::__pgrx_c_macros::expression::CPointer<<$type as $crate::__pgrx_c_macros::expression::NativeType
-                        >::Marker,
-                        $crate::__pgrx_c_macros::expression::ReadWrite>>()
-                    )
-                )
-            }
-        )
-    };
-}
 /// Typed call adapter for C inline function list_nth_oid from pg_list.h:299 (PostgreSQL 15), pg_list.h:320 (PostgreSQL 16–18), pg_list.h:352 (PostgreSQL 19)
 ///
 /// ```c
@@ -2082,38 +1953,6 @@ macro_rules! llast_int {
                                 )
                             )
                         )
-                    )
-                )
-            }
-        )
-    };
-}
-/// C macro llast_node from pg_list.h:197 (PostgreSQL 15), pg_list.h:202 (PostgreSQL 16–19)
-///
-/// ```text
-/// #define llast_node( type , l ) castNode ( type , llast ( l ) )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! llast_node {
-    ($type:ty, $l:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$l;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::type_witness::<
-                            $crate::__pgrx_c_macros::expression::CPointer<<$type as $crate::__pgrx_c_macros::expression::NativeType
-                        >::Marker,
-                        $crate::__pgrx_c_macros::expression::ReadWrite>>()
                     )
                 )
             }
@@ -2374,38 +2213,6 @@ macro_rules! lsecond_int {
         )
     };
 }
-/// C macro lsecond_node from pg_list.h:182 (PostgreSQL 15), pg_list.h:186 (PostgreSQL 16–19)
-///
-/// ```text
-/// #define lsecond_node( type , l ) castNode ( type , lsecond ( l ) )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! lsecond_node {
-    ($type:ty, $l:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$l;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::type_witness::<
-                            $crate::__pgrx_c_macros::expression::CPointer<<$type as $crate::__pgrx_c_macros::expression::NativeType
-                        >::Marker,
-                        $crate::__pgrx_c_macros::expression::ReadWrite>>()
-                    )
-                )
-            }
-        )
-    };
-}
 /// C macro lsecond_oid from pg_list.h:181 (PostgreSQL 15), pg_list.h:185 (PostgreSQL 16–19)
 ///
 /// ```text
@@ -2556,38 +2363,6 @@ macro_rules! lthird_int {
                                 )
                             )
                         )
-                    )
-                )
-            }
-        )
-    };
-}
-/// C macro lthird_node from pg_list.h:187 (PostgreSQL 15), pg_list.h:191 (PostgreSQL 16–19)
-///
-/// ```text
-/// #define lthird_node( type , l ) castNode ( type , lthird ( l ) )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! lthird_node {
-    ($type:ty, $l:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$l;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::type_witness::<
-                            $crate::__pgrx_c_macros::expression::CPointer<<$type as $crate::__pgrx_c_macros::expression::NativeType
-                        >::Marker,
-                        $crate::__pgrx_c_macros::expression::ReadWrite>>()
                     )
                 )
             }
@@ -3023,17 +2798,14 @@ pub use for_each_cell_setup;
 pub use for_each_from_setup;
 pub use lfirst;
 pub use lfirst_int;
-pub use lfirst_node;
 pub use lfirst_oid;
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
 pub use lfirst_xid;
 pub use lfourth;
 pub use lfourth_int;
-pub use lfourth_node;
 pub use lfourth_oid;
 pub use linitial;
 pub use linitial_int;
-pub use linitial_node;
 pub use linitial_oid;
 pub use list_cell_number;
 pub use list_head;
@@ -3090,23 +2862,19 @@ pub use list_make5_xid;
 pub use list_nth;
 pub use list_nth_cell;
 pub use list_nth_int;
-pub use list_nth_node;
 pub use list_nth_oid;
 pub use list_second_cell;
 pub use list_tail;
 pub use llast;
 pub use llast_int;
-pub use llast_node;
 pub use llast_oid;
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
 pub use llast_xid;
 pub use lnext;
 pub use lsecond;
 pub use lsecond_int;
-pub use lsecond_node;
 pub use lsecond_oid;
 pub use lthird;
 pub use lthird_int;
-pub use lthird_node;
 pub use lthird_oid;
 pub use multi_for_advance_cell;

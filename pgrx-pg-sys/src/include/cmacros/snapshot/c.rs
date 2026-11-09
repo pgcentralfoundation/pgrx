@@ -68,37 +68,19 @@ macro_rules! Abs {
         )
     };
 }
-/// C macro Assert from c.h:849 (PostgreSQL 15), c.h:859 (PostgreSQL 16), c.h:875 (PostgreSQL 17), c.h:844 (PostgreSQL 18), c.h:949 (PostgreSQL 19)
-///
-/// ```text
-/// #define Assert( condition ) ( ( void ) true )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! Assert {
-    ($($condition:tt)*) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                ($crate::__pgrx_c_macros::expression::profile_value::<true, _>(()))
-            }
-        )
-    };
-}
 #[cfg(feature = "pg15")]
-/// C macro AssertArg from c.h:851 (PostgreSQL 15)
+/// C macro AssertPointerAlignment from c.h:920 (PostgreSQL 15)
 ///
 /// ```text
-/// #define AssertArg( condition ) ( ( void ) true )
+/// #define AssertPointerAlignment( ptr , bndr ) Trap ( TYPEALIGN ( bndr , ( uintptr_t ) ( ptr ) ) != ( uintptr_t ) ( ptr ) , "UnalignedPointer" )
 /// ```
 ///
+///
+#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
+///
+/// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+///
+#[doc = crate::__pgrx_c_doc_statements!()]
 ///
 /// # Safety
 ///
@@ -106,64 +88,14 @@ macro_rules! Assert {
 ///
 /// # Panics
 ///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! AssertArg {
-    ($($condition:tt)*) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                ($crate::__pgrx_c_macros::expression::profile_value::<true, _>(()))
-            }
-        )
-    };
-}
-/// C macro AssertMacro from c.h:850 (PostgreSQL 15), c.h:860 (PostgreSQL 16), c.h:876 (PostgreSQL 17), c.h:845 (PostgreSQL 18), c.h:950 (PostgreSQL 19)
-///
-/// ```text
-/// #define AssertMacro( condition ) ( ( void ) true )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! AssertMacro {
-    ($($condition:tt)*) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                ($crate::__pgrx_c_macros::expression::profile_value::<true, _>(()))
-            }
-        )
-    };
-}
-#[cfg(feature = "pg15")]
-/// C macro AssertPointerAlignment from c.h:853 (PostgreSQL 15)
-///
-/// ```text
-/// #define AssertPointerAlignment( ptr , bndr ) ( ( void ) true )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! AssertPointerAlignment {
-    ($ptr:expr, $($bndr:tt)*) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                ($crate::__pgrx_c_macros::expression::profile_value::<true, _>(()))
-            }
-        )
+    ($ptr:expr, $bndr:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(@unit {
+            let _ = &$ptr;
+            let _ = &$bndr;
+        })
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -174,46 +106,26 @@ macro_rules! AssertPointerAlignment {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
+///
+/// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+///
+#[doc = crate::__pgrx_c_doc_statements!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! AssertPointerAlignment {
-    ($ptr:expr, $($bndr:tt)*) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                ($crate::__pgrx_c_macros::expression::profile_value::<true, _>(()))
-            }
-        )
-    };
-}
-#[cfg(feature = "pg15")]
-/// C macro AssertState from c.h:852 (PostgreSQL 15)
-///
-/// ```text
-/// #define AssertState( condition ) ( ( void ) true )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! AssertState {
-    ($($condition:tt)*) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                ($crate::__pgrx_c_macros::expression::profile_value::<true, _>(()))
-            }
-        )
+    ($ptr:expr, $bndr:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(@unit {
+            let _ = &$ptr;
+            let _ = &$bndr;
+        })
     };
 }
 /// C macro BUFFERALIGN from c.h:804 (PostgreSQL 15), c.h:814 (PostgreSQL 16), c.h:830 (PostgreSQL 17), c.h:799 (PostgreSQL 18), c.h:904 (PostgreSQL 19)
@@ -2430,36 +2342,10 @@ macro_rules! TYPEALIGN_DOWN {
         )
     };
 }
-#[cfg(feature = "pg15")]
-/// C macro Trap from c.h:854 (PostgreSQL 15)
+/// C macro dgettext from c.h:1226 (PostgreSQL 15), c.h:1208 (PostgreSQL 16), c.h:1200 (PostgreSQL 17), c.h:1169 (PostgreSQL 18), c.h:1278 (PostgreSQL 19)
 ///
 /// ```text
-/// #define Trap( condition , errorType ) ( ( void ) true )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! Trap {
-    ($condition:expr, $($errorType:tt)*) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                ($crate::__pgrx_c_macros::expression::profile_value::<true, _>(()))
-            }
-        )
-    };
-}
-#[cfg(feature = "pg15")]
-/// C macro TrapMacro from c.h:855 (PostgreSQL 15)
-///
-/// ```text
-/// #define TrapMacro( condition , errorType ) ( true )
+/// #define dgettext( d , x ) ( x )
 /// ```
 ///
 ///
@@ -2467,14 +2353,88 @@ macro_rules! Trap {
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
-macro_rules! TrapMacro {
-    ($condition:expr, $($errorType:tt)*) => {
+macro_rules! dgettext {
+    ($d:expr, $x:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
-                        $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(1i32)
+                        $crate::__pgrx_c_operand!(@value [true]; (@native [$x]))
+                    )
+                )
+            }
+        )
+    };
+}
+/// C macro dngettext from c.h:1228 (PostgreSQL 15), c.h:1210 (PostgreSQL 16), c.h:1202 (PostgreSQL 17), c.h:1171 (PostgreSQL 18), c.h:1280 (PostgreSQL 19)
+///
+/// ```text
+/// #define dngettext( d , s , p , n ) ( ( n ) == 1 ? ( s ) : ( p ) )
+/// ```
+///
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+#[macro_export]
+macro_rules! dngettext {
+    ($d:expr, $s:expr, $p:expr, $n:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::select(
+                            if $crate::__pgrx_c_macros::expression::truth(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::type_witness::<
+                                        $crate::__pgrx_c_macros::CInt
+                                    >()
+                                )
+                            ) {
+                                $crate::__pgrx_c_macros::Either::Left(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >($crate::__pgrx_c_operand!(@value [true]; (@native [$s])))
+                                    )
+                                )
+                            } else {
+                                $crate::__pgrx_c_macros::Either::Right(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >($crate::__pgrx_c_operand!(@value [true]; (@native [$p])))
+                                    )
+                                )
+                            }
+                        )
+                    )
+                )
+            }
+        )
+    };
+}
+/// C macro gettext from c.h:1225 (PostgreSQL 15), c.h:1207 (PostgreSQL 16), c.h:1199 (PostgreSQL 17), c.h:1168 (PostgreSQL 18), c.h:1277 (PostgreSQL 19)
+///
+/// ```text
+/// #define gettext( x ) ( x )
+/// ```
+///
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+#[macro_export]
+macro_rules! gettext {
+    ($x:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_operand!(@value [true]; (@native [$x]))
                     )
                 )
             }
@@ -2636,6 +2596,110 @@ macro_rules! likely {
         )
     };
 }
+/// C macro ngettext from c.h:1227 (PostgreSQL 15), c.h:1209 (PostgreSQL 16), c.h:1201 (PostgreSQL 17), c.h:1170 (PostgreSQL 18), c.h:1279 (PostgreSQL 19)
+///
+/// ```text
+/// #define ngettext( s , p , n ) ( ( n ) == 1 ? ( s ) : ( p ) )
+/// ```
+///
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+#[macro_export]
+macro_rules! ngettext {
+    ($s:expr, $p:expr, $n:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::select(
+                            if $crate::__pgrx_c_macros::expression::truth(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::type_witness::<
+                                        $crate::__pgrx_c_macros::CInt
+                                    >()
+                                )
+                            ) {
+                                $crate::__pgrx_c_macros::Either::Left(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >($crate::__pgrx_c_operand!(@value [true]; (@native [$s])))
+                                    )
+                                )
+                            } else {
+                                $crate::__pgrx_c_macros::Either::Right(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >($crate::__pgrx_c_operand!(@value [true]; (@native [$p])))
+                                    )
+                                )
+                            }
+                        )
+                    )
+                )
+            }
+        )
+    };
+}
+#[cfg(feature = "pg19")]
+/// C macro pg_assume from c.h:420 (PostgreSQL 19)
+///
+/// ```text
+/// #define pg_assume( expr ) Assert ( expr )
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
+///
+/// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+///
+#[doc = crate::__pgrx_c_doc_statements!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! pg_assume {
+    ($expr:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(@unit {
+            let _ = &$expr;
+        })
+    };
+}
+/// C macro pg_unreachable from c.h:275 (PostgreSQL 15), c.h:297 (PostgreSQL 16), c.h:313 (PostgreSQL 17), c.h:349 (PostgreSQL 18), c.h:374 (PostgreSQL 19)
+///
+/// ```text
+/// #define pg_unreachable( ) abort ( )
+/// ```
+///
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! pg_unreachable {
+    () => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
+    };
+}
 /// C macro strtoi64 from c.h:1366 (PostgreSQL 15), c.h:1319 (PostgreSQL 16), c.h:1314 (PostgreSQL 17), c.h:1283 (PostgreSQL 18), c.h:1416 (PostgreSQL 19)
 ///
 /// ```text
@@ -2733,13 +2797,7 @@ macro_rules! unlikely {
 }
 #[cfg(feature = "pg15")]
 pub use Abs;
-pub use Assert;
-#[cfg(feature = "pg15")]
-pub use AssertArg;
-pub use AssertMacro;
 pub use AssertPointerAlignment;
-#[cfg(feature = "pg15")]
-pub use AssertState;
 pub use BUFFERALIGN;
 pub use BUFFERALIGN_DOWN;
 pub use BoolIsValid;
@@ -2786,15 +2844,18 @@ pub use SQL_STR_DOUBLE;
 pub use TYPEALIGN;
 pub use TYPEALIGN_DOWN;
 pub use TYPEALIGN64;
-#[cfg(feature = "pg15")]
-pub use Trap;
-#[cfg(feature = "pg15")]
-pub use TrapMacro;
+pub use dgettext;
+pub use dngettext;
+pub use gettext;
 pub use gettext_noop;
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
 pub use i64abs;
 pub use lengthof;
 pub use likely;
+pub use ngettext;
+#[cfg(feature = "pg19")]
+pub use pg_assume;
+pub use pg_unreachable;
 pub use strtoi64;
 pub use strtou64;
 pub use unlikely;

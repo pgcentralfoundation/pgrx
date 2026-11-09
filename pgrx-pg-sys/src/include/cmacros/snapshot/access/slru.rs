@@ -88,24 +88,5 @@ macro_rules! SimpleLruGetBankLock {
         )
     };
 }
-/// C macro SlruPagePrecedesUnitTests from slru.h:156 (PostgreSQL 15–16), slru.h:199 (PostgreSQL 17–18), slru.h:233 (PostgreSQL 19)
-///
-/// ```text
-/// #define SlruPagePrecedesUnitTests( ctl , per_page ) do { } while ( 0 )
-/// ```
-///
-///
-#[doc = crate::__pgrx_c_doc_statements!()]
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-#[macro_export]
-macro_rules! SlruPagePrecedesUnitTests {
-    ($ctl:expr, $($per_page:tt)*) => {
-        $crate::__pgrx_c_documentation_shell!(@unit {})
-    };
-}
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
 pub use SimpleLruGetBankLock;
-pub use SlruPagePrecedesUnitTests;

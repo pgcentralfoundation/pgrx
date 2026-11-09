@@ -1026,7 +1026,7 @@ pub fn get_named_capture(
 
 fn get_cargo_test_features() -> eyre::Result<clap_cargo::Features> {
     let mut features = clap_cargo::Features::default();
-    let cargo_user_args = get_cargo_args();
+    let cargo_user_args = get_cargo_args()?;
     let mut iter = cargo_user_args.iter();
     while let Some(part) = iter.next() {
         match part.as_str() {
@@ -1050,9 +1050,10 @@ fn get_cargo_test_features() -> eyre::Result<clap_cargo::Features> {
     Ok(features)
 }
 
-fn get_cargo_args() -> Vec<String> {
+fn get_cargo_args() -> eyre::Result<Vec<String>> {
     // setup the sysinfo crate's "System"
-    let mut system = System::new_all();
+    let mut system =
+        System::new_all().wrap_err("couldn't read the process list to find `cargo test`")?;
     system.refresh_all();
 
     // starting with our process, look for the full set of arguments for the top-most "cargo" command
@@ -1076,7 +1077,11 @@ fn get_cargo_args() -> Vec<String> {
                 && !process.cmd().iter().any(|arg| arg == "pgrx")
             {
                 // ... do we want its args
-                return process.cmd().iter().map(|s| s.to_string_lossy().into_owned()).collect();
+                return Ok(process
+                    .cmd()
+                    .iter()
+                    .map(|s| s.to_string_lossy().into_owned())
+                    .collect());
             }
         }
 
@@ -1087,7 +1092,7 @@ fn get_cargo_args() -> Vec<String> {
         }
     }
 
-    Vec::new()
+    Ok(Vec::new())
 }
 
 fn cargo_pgrx() -> eyre::Result<Command> {

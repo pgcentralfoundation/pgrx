@@ -117,12 +117,6 @@ macro_rules! __pgrx_c_field_marker {
     (__mask_was_saved) => {
         $crate::__pgrx_c_generated::Field___mask_was_saved
     };
-    (__pad5) => {
-        $crate::__pgrx_c_generated::Field___pad5
-    };
-    (__ss_align) => {
-        $crate::__pgrx_c_generated::Field___ss_align
-    };
     (_cur_column) => {
         $crate::__pgrx_c_generated::Field__cur_column
     };
@@ -143,6 +137,12 @@ macro_rules! __pgrx_c_field_marker {
     };
     (_old_offset) => {
         $crate::__pgrx_c_generated::Field__old_offset
+    };
+    (_total_written) => {
+        $crate::__pgrx_c_generated::Field__total_written
+    };
+    (_unused3) => {
+        $crate::__pgrx_c_generated::Field__unused3
     };
     (_vtable_offset) => {
         $crate::__pgrx_c_generated::Field__vtable_offset
@@ -2082,9 +2082,6 @@ macro_rules! __pgrx_c_field_marker {
     (ctematerialized) => {
         $crate::__pgrx_c_generated::Field_ctematerialized
     };
-    (ctequery) => {
-        $crate::__pgrx_c_generated::Field_ctequery
-    };
     (cterecursive) => {
         $crate::__pgrx_c_generated::Field_cterecursive
     };
@@ -2453,6 +2450,9 @@ macro_rules! __pgrx_c_field_marker {
     };
     (delayChkptFlags) => {
         $crate::__pgrx_c_generated::Field_delayChkptFlags
+    };
+    (delay_ms) => {
+        $crate::__pgrx_c_generated::Field_delay_ms
     };
     (delays) => {
         $crate::__pgrx_c_generated::Field_delays
@@ -3209,6 +3209,9 @@ macro_rules! __pgrx_c_field_marker {
     };
     (fillfactor) => {
         $crate::__pgrx_c_generated::Field_fillfactor
+    };
+    (fin_time) => {
+        $crate::__pgrx_c_generated::Field_fin_time
     };
     (final_lsn) => {
         $crate::__pgrx_c_generated::Field_final_lsn
@@ -5180,6 +5183,9 @@ macro_rules! __pgrx_c_field_marker {
     };
     (just_dirtied) => {
         $crate::__pgrx_c_generated::Field_just_dirtied
+    };
+    (keep_indicator) => {
+        $crate::__pgrx_c_generated::Field_keep_indicator
     };
     (keep_null_tuples) => {
         $crate::__pgrx_c_generated::Field_keep_null_tuples
@@ -10248,9 +10254,6 @@ macro_rules! __pgrx_c_field_marker {
     (srvowner) => {
         $crate::__pgrx_c_generated::Field_srvowner
     };
-    (ss_family) => {
-        $crate::__pgrx_c_generated::Field_ss_family
-    };
     (ssl_bits) => {
         $crate::__pgrx_c_generated::Field_ssl_bits
     };
@@ -11078,6 +11081,9 @@ macro_rules! __pgrx_c_field_marker {
     };
     (total_edges) => {
         $crate::__pgrx_c_generated::Field_total_edges
+    };
+    (total_jumble_len) => {
+        $crate::__pgrx_c_generated::Field_total_jumble_len
     };
     (total_len) => {
         $crate::__pgrx_c_generated::Field_total_len

@@ -214,18 +214,22 @@ struct BitfieldAccess(
 /// Recover bitfield layout from actual getter access syntax rather than method naming
 /// conventions.
 impl syn::visit_mut::VisitMut for BitfieldAccess {
-    /// Record literal bindgen storage-unit reads while visiting the rest of the getter body,
-    /// allowing ambiguous access shapes to be rejected.
+    /// Record literal bindgen storage-unit reads, `self.unit.get_const::<OFFSET, WIDTH>()`,
+    /// while visiting the rest of the getter body, allowing ambiguous access shapes to be
+    /// rejected.
     fn visit_expr_method_call_mut(&mut self, call: &mut syn::ExprMethodCall) {
-        if call.method == "get"
-            && call.args.len() == 2
+        if call.method == "get_const"
+            && call.args.is_empty()
+            && let Some(generics) = &call.turbofish
+            && generics.args.len() == 2
             && let Expr::Field(receiver) = call.receiver.as_ref()
             && let Expr::Path(base) = receiver.base.as_ref()
             && base.path.is_ident("self")
             && let syn::Member::Named(storage) = &receiver.member
-            && let Some(offset) = literal_u64(&call.args[0])
-            && let Some(width) =
-                literal_u64(&call.args[1]).and_then(|width| u32::try_from(width).ok())
+            && let syn::GenericArgument::Const(offset) = &generics.args[0]
+            && let Some(offset) = literal_u64(offset)
+            && let syn::GenericArgument::Const(width) = &generics.args[1]
+            && let Some(width) = literal_u64(width).and_then(|width| u32::try_from(width).ok())
         {
             self.0.push((storage.to_string(), offset, width));
         }
@@ -1354,10 +1358,13 @@ unsafe extern "C" {
 pub struct Bits { pub lead: u32, pub storage: __BindgenBitfieldUnit<[u8;4usize]> }
 impl Bits {
     pub fn flag(&self) -> ::core::ffi::c_uint {
-        unsafe { ::core::mem::transmute(self.storage.get(3usize,7u8) as u32) }
+        unsafe { ::core::mem::transmute(self.storage.get_const::<3usize, 7u8>() as u32) }
     }
-    pub fn exceeds_storage(&self) -> ::core::ffi::c_uint { self.storage.get(31usize,7u8) as u32 }
-    pub fn ordinary_getter(&self) -> u32 { self.lead.get(0usize,1u8) }
+    pub fn exceeds_storage(&self) -> ::core::ffi::c_uint {
+        self.storage.get_const::<31usize, 7u8>() as u32
+    }
+    pub fn ordinary_getter(&self) -> u32 { self.lead.get_const::<0usize, 1u8>() }
+    pub fn runtime_arguments(&self) -> u32 { self.storage.get(3usize, 7u8) as u32 }
 }
 "#,
         )

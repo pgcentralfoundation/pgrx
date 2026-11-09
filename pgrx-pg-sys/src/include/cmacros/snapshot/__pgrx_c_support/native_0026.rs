@@ -1,5 +1,226 @@
 // Shared generated C macro support.
 
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::Result>() == 112);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::Result>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::Result {}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::ResourceOwnerData {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::ResourceOwnerData {
+    type Marker = c::expression::COpaque<Self>;
+}
+#[cfg(any(feature = "pg15", feature = "pg16"))]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::ReplicationSlotCtlData>() == 264);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::ReplicationSlotCtlData>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::ReplicationSlotCtlData {}
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::RWConflictPoolHeaderData>() == 24);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::RWConflictPoolHeaderData>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::RWConflictPoolHeaderData {}
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::RWConflictData>() == 48);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::RWConflictData>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::RWConflictData {}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::RBTree {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::RBTree {
+    type Marker = c::expression::COpaque<Self>;
+}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::QueryEnvironment {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::QueryEnvironment {
+    type Marker = c::expression::COpaque<Self>;
+}
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::QualCost>() == 16);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::QualCost>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::QualCost {}
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::PublicationRelInfo>() == 24);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::PublicationRelInfo>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::PublicationRelInfo {}
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::ProjectSetPath>() == 80);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::ProjectSetPath>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::ProjectSetPath {}
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::ProjectSet>() == 104);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::ProjectSet>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::ProjectSet {}
+#[cfg(feature = "pg15")]
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::PrivTarget {}
+#[cfg(feature = "pg15")]
+impl c::expression::NativeType for crate::__pgrx_c_bindings::PrivTarget {
+    type Marker = c::expression::COpaque<Self>;
+}
+#[cfg(feature = "pg15")]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::PredXactListElementData>() == 168);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::PredXactListElementData>() == 8);
+};
+#[cfg(feature = "pg15")]
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::PredXactListElementData {}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::Port {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::Port {
+    type Marker = c::expression::COpaque<Self>;
+}
+#[cfg(feature = "pg15")]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::PgStat_FunctionCallUsage>() == 56);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::PgStat_FunctionCallUsage>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::PgStat_FunctionCallUsage {}
+#[cfg(feature = "pg15")]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::PgStat_BackendFunctionEntry>() == 40);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::PgStat_BackendFunctionEntry>() == 8);
+};
+#[cfg(feature = "pg15")]
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::PgStat_BackendFunctionEntry {}
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::PendingWriteback>() == 20);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::PendingWriteback>() == 4);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::PendingWriteback {}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::PartitionTupleRouting {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::PartitionTupleRouting {
+    type Marker = c::expression::COpaque<Self>;
+}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::PartitionKeyData {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::PartitionKeyData {
+    type Marker = c::expression::COpaque<Self>;
+}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::PartitionDispatchData {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::PartitionDispatchData {
+    type Marker = c::expression::COpaque<Self>;
+}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::PartitionDirectoryData {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::PartitionDirectoryData {
+    type Marker = c::expression::COpaque<Self>;
+}
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::ParamsErrorCbData>() == 16);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::ParamsErrorCbData>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::ParamsErrorCbData {}
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::ParallelWorkerContext>() == 16);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::ParallelWorkerContext>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::ParallelWorkerContext {}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::ParallelVacuumState {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::ParallelVacuumState {
+    type Marker = c::expression::COpaque<Self>;
+}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::ParallelAppendState {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::ParallelAppendState {
+    type Marker = c::expression::COpaque<Self>;
+}
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::PREDICATELOCKTARGET>() == 32);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::PREDICATELOCKTARGET>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::PREDICATELOCKTARGET {}
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::PREDICATELOCKTAG>() == 16);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::PREDICATELOCKTAG>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::PREDICATELOCKTAG {}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::PMSignalData {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::PMSignalData {
+    type Marker = c::expression::COpaque<Self>;
+}
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::PLpgSQL_plugin>() == 80);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::PLpgSQL_plugin>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::PLpgSQL_plugin {}
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::PLcword>() == 8);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::PLcword>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::PLcword {}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::PGSemaphoreData {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::PGSemaphoreData {
+    type Marker = c::expression::COpaque<Self>;
+}
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::OutputPluginCallbacks>() == 168);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::OutputPluginCallbacks>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::OutputPluginCallbacks {}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::ObjectAddresses {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::ObjectAddresses {
+    type Marker = c::expression::COpaque<Self>;
+}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::NumericData {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::NumericData {
+    type Marker = c::expression::COpaque<Self>;
+}
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::NestPath>() == 104);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::NestPath>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::NestPath {}
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::NestLoop>() == 128);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::NestLoop>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::NestLoop {}
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::NamedTuplestoreScan>() == 120);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::NamedTuplestoreScan>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::NamedTuplestoreScan {}
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::MinMaxAggPath>() == 88);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::MinMaxAggPath>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::MinMaxAggPath {}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::MergeJoinClauseData {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::MergeJoinClauseData {
+    type Marker = c::expression::COpaque<Self>;
+}
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::MergeAppendPath>() == 88);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::MergeAppendPath>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::MergeAppendPath {}
+#[cfg(feature = "pg15")]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::MemoryContextMethods>() == 72);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::MemoryContextMethods>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::MemoryContextMethods {}
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::MemoryContextCallback>() == 24);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::MemoryContextCallback>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::MemoryContextCallback {}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::MemoizeTuple {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::MemoizeTuple {
+    type Marker = c::expression::COpaque<Self>;
+}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::MemoizeKey {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::MemoizeKey {
+    type Marker = c::expression::COpaque<Self>;
+}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::MemoizeEntry {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::MemoizeEntry {
+    type Marker = c::expression::COpaque<Self>;
+}
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
 const _: () = {
     assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::MaterialPath>() == 80);
@@ -612,6 +833,44 @@ pub unsafe fn Inline_CreateCommandTag(arg0: *mut crate::__pgrx_c_bindings::Node)
     // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
     unsafe { crate::ffi::pg_guard_ffi_boundary(move || raw_inline_CreateCommandTag(arg0)) }
 }
+const _: () = assert!(::core::mem::size_of::<*const i8>() == 8);
+const _: () = assert!(::core::mem::align_of::<*const i8>() == 8);
+const _: () = assert!(::core::mem::size_of::<*const i8>() == 8);
+const _: () = assert!(::core::mem::align_of::<*const i8>() == 8);
+const _: () = assert!(::core::mem::size_of::<*const i8>() == 8);
+const _: () = assert!(::core::mem::align_of::<*const i8>() == 8);
+const _: () = assert!(::core::mem::size_of::<i32>() == 4);
+const _: () = assert!(::core::mem::align_of::<i32>() == 4);
+#[cfg(feature = "pg15")]
+unsafe extern "C-unwind" {
+    #[link_name = "__pgrx_inline__fn__ExceptionalCondition"]
+    fn raw_inline_ExceptionalCondition(
+        arg0: *const i8,
+        arg1: *const i8,
+        arg2: *const i8,
+        arg3: i32,
+    ) -> ();
+}
+#[cfg(feature = "pg15")]
+#[doc = "Call the original C function `ExceptionalCondition`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
+#[inline]
+pub unsafe fn Inline_ExceptionalCondition(
+    arg0: *const i8,
+    arg1: *const i8,
+    arg2: *const i8,
+    arg3: i32,
+) -> () {
+    const _: () = assert!(!::core::mem::needs_drop::<*const i8>());
+    const _: () = assert!(!::core::mem::needs_drop::<*const i8>());
+    const _: () = assert!(!::core::mem::needs_drop::<*const i8>());
+    const _: () = assert!(!::core::mem::needs_drop::<i32>());
+    // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
+    unsafe {
+        crate::ffi::pg_guard_ffi_boundary(move || {
+            raw_inline_ExceptionalCondition(arg0, arg1, arg2, arg3)
+        })
+    }
+}
 const _: () = assert!(::core::mem::size_of::<u32>() == 4);
 const _: () = assert!(::core::mem::align_of::<u32>() == 4);
 const _: () = assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::TransactionId>() == 4);
@@ -919,6 +1178,16 @@ pub unsafe fn Inline___ctype_b_loc() -> *mut *const u16 {
     // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
     unsafe { crate::ffi::pg_guard_ffi_boundary(move || raw_inline___ctype_b_loc()) }
 }
+unsafe extern "C-unwind" {
+    #[link_name = "__pgrx_inline__fn__abort"]
+    fn raw_inline_abort() -> ();
+}
+#[doc = "Call the original C function `abort`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
+#[inline]
+pub unsafe fn Inline_abort() -> () {
+    // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
+    unsafe { crate::ffi::pg_guard_ffi_boundary(move || raw_inline_abort()) }
+}
 const _: () = assert!(::core::mem::size_of::<*mut crate::__pgrx_c_bindings::StringInfoData>() == 8);
 const _: () =
     assert!(::core::mem::align_of::<*mut crate::__pgrx_c_bindings::StringInfoData>() == 8);
@@ -959,6 +1228,30 @@ pub unsafe fn Inline_atof(arg0: *const i8) -> f64 {
     const _: () = assert!(!::core::mem::needs_drop::<*const i8>());
     // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
     unsafe { crate::ffi::pg_guard_ffi_boundary(move || raw_inline_atof(arg0)) }
+}
+const _: () = assert!(::core::mem::size_of::<u32>() == 4);
+const _: () = assert!(::core::mem::align_of::<u32>() == 4);
+const _: () = assert!(::core::mem::size_of::<*mut ::core::ffi::c_void>() == 8);
+const _: () = assert!(::core::mem::align_of::<*mut ::core::ffi::c_void>() == 8);
+const _: () = assert!(::core::mem::size_of::<*mut crate::__pgrx_c_bindings::Node>() == 8);
+const _: () = assert!(::core::mem::align_of::<*mut crate::__pgrx_c_bindings::Node>() == 8);
+unsafe extern "C-unwind" {
+    #[link_name = "__pgrx_inline__fn__castNodeImpl"]
+    fn raw_inline_castNodeImpl(
+        arg0: u32,
+        arg1: *mut ::core::ffi::c_void,
+    ) -> *mut crate::__pgrx_c_bindings::Node;
+}
+#[doc = "Call the original C function `castNodeImpl`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
+#[inline]
+pub unsafe fn Inline_castNodeImpl(
+    arg0: u32,
+    arg1: *mut ::core::ffi::c_void,
+) -> *mut crate::__pgrx_c_bindings::Node {
+    const _: () = assert!(!::core::mem::needs_drop::<u32>());
+    const _: () = assert!(!::core::mem::needs_drop::<*mut ::core::ffi::c_void>());
+    // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
+    unsafe { crate::ffi::pg_guard_ffi_boundary(move || raw_inline_castNodeImpl(arg0, arg1)) }
 }
 const _: () = assert!(::core::mem::size_of::<f64>() == 8);
 const _: () = assert!(::core::mem::align_of::<f64>() == 8);
@@ -1014,27 +1307,6 @@ pub unsafe fn Inline_collprovider_name(arg0: i8) -> *const ::core::ffi::c_char {
     const _: () = assert!(!::core::mem::needs_drop::<i8>());
     // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
     unsafe { crate::ffi::pg_guard_ffi_boundary(move || raw_inline_collprovider_name(arg0)) }
-}
-const _: () = assert!(::core::mem::size_of::<*const i8>() == 8);
-const _: () = assert!(::core::mem::align_of::<*const i8>() == 8);
-const _: () = assert!(::core::mem::size_of::<*const i8>() == 8);
-const _: () = assert!(::core::mem::align_of::<*const i8>() == 8);
-const _: () = assert!(::core::mem::size_of::<i32>() == 4);
-const _: () = assert!(::core::mem::align_of::<i32>() == 4);
-const _: () = assert!(::core::mem::size_of::<*mut i8>() == 8);
-const _: () = assert!(::core::mem::align_of::<*mut i8>() == 8);
-unsafe extern "C-unwind" {
-    #[link_name = "__pgrx_inline__fn__dcgettext"]
-    fn raw_inline_dcgettext(arg0: *const i8, arg1: *const i8, arg2: i32) -> *mut i8;
-}
-#[doc = "Call the original C function `dcgettext`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
-#[inline]
-pub unsafe fn Inline_dcgettext(arg0: *const i8, arg1: *const i8, arg2: i32) -> *mut i8 {
-    const _: () = assert!(!::core::mem::needs_drop::<*const i8>());
-    const _: () = assert!(!::core::mem::needs_drop::<*const i8>());
-    const _: () = assert!(!::core::mem::needs_drop::<i32>());
-    // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
-    unsafe { crate::ffi::pg_guard_ffi_boundary(move || raw_inline_dcgettext(arg0, arg1, arg2)) }
 }
 const _: () = assert!(::core::mem::size_of::<f64>() == 8);
 const _: () = assert!(::core::mem::align_of::<f64>() == 8);
@@ -1274,7 +1546,9 @@ pub unsafe fn Inline_strlen(arg0: *const i8) -> u64 {
 }
 const _: () = assert!(::core::mem::size_of::<*const i8>() == 8);
 const _: () = assert!(::core::mem::align_of::<*const i8>() == 8);
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
 const _: () = assert!(::core::mem::size_of::<*const i8>() == 8);
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
 const _: () = assert!(::core::mem::align_of::<*const i8>() == 8);
 const _: () = assert!(::core::mem::size_of::<u64>() == 8);
 const _: () = assert!(::core::mem::align_of::<u64>() == 8);
@@ -1290,7 +1564,9 @@ pub unsafe fn Inline_strspn(arg0: *const i8, arg1: *const i8) -> u64 {
     // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
     unsafe { crate::ffi::pg_guard_ffi_boundary(move || raw_inline_strspn(arg0, arg1)) }
 }
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
 const _: () = assert!(::core::mem::size_of::<*const i8>() == 8);
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
 const _: () = assert!(::core::mem::align_of::<*const i8>() == 8);
 const _: () = assert!(::core::mem::size_of::<*mut *mut i8>() == 8);
 const _: () = assert!(::core::mem::align_of::<*mut *mut i8>() == 8);
@@ -1311,7 +1587,9 @@ pub unsafe fn Inline_strtol(arg0: *const i8, arg1: *mut *mut i8, arg2: i32) -> i
     // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
     unsafe { crate::ffi::pg_guard_ffi_boundary(move || raw_inline_strtol(arg0, arg1, arg2)) }
 }
+#[cfg(feature = "pg15")]
 const _: () = assert!(::core::mem::size_of::<*const i8>() == 8);
+#[cfg(feature = "pg15")]
 const _: () = assert!(::core::mem::align_of::<*const i8>() == 8);
 const _: () = assert!(::core::mem::size_of::<*mut *mut i8>() == 8);
 const _: () = assert!(::core::mem::align_of::<*mut *mut i8>() == 8);
@@ -2720,6 +2998,20 @@ pub struct EnumIdentity_enum__TM_Result;
 impl c::sealed::Sealed for EnumIdentity_enum__TM_Result {}
 impl c::expression::EnumIdentity for EnumIdentity_enum__TM_Result {}
 impl c::expression::enumeration::NumericEnum for EnumIdentity_enum__TM_Result {
+    type Compatible = c::CUnsignedInt;
+}
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct EnumIdentity_enum__TimeoutId;
+impl c::sealed::Sealed for EnumIdentity_enum__TimeoutId {}
+impl c::expression::EnumIdentity for EnumIdentity_enum__TimeoutId {}
+impl c::expression::enumeration::NumericEnum for EnumIdentity_enum__TimeoutId {
+    type Compatible = c::CUnsignedInt;
+}
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct EnumIdentity_enum__TimeoutType;
+impl c::sealed::Sealed for EnumIdentity_enum__TimeoutType {}
+impl c::expression::EnumIdentity for EnumIdentity_enum__TimeoutType {}
+impl c::expression::enumeration::NumericEnum for EnumIdentity_enum__TimeoutType {
     type Compatible = c::CUnsignedInt;
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -4767,213 +5059,3 @@ const _: () = assert!(
 pub struct Signature_struct__Query__0p__0l__struct__Query__0p__0c__struct__Node__0p__0l__0p__0r__0l__struct__Node__0p__0c__void__0p__0r__0c__void__0p__0c__int__0r;
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
 impl c::sealed::Sealed for Signature_struct__Query__0p__0l__struct__Query__0p__0c__struct__Node__0p__0l__0p__0r__0l__struct__Node__0p__0c__void__0p__0r__0c__void__0p__0c__int__0r {}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::expression::NativeFunctionSignature for Signature_struct__Query__0p__0l__struct__Query__0p__0c__struct__Node__0p__0l__0p__0r__0l__struct__Node__0p__0c__void__0p__0r__0c__void__0p__0c__int__0r {
- type Physical = PhysicalFunction_C_unwind_4<::core::option::Option<unsafe extern "C-unwind" fn(*mut crate::__pgrx_c_bindings::Query, ::core::option::Option<unsafe extern "C-unwind" fn(*mut crate::__pgrx_c_bindings::Node, *mut ::core::ffi::c_void) -> *mut crate::__pgrx_c_bindings::Node>, *mut ::core::ffi::c_void, i32) -> *mut crate::__pgrx_c_bindings::Query>>;
-}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *const crate::__pgrx_c_bindings::buftag,
-            ) -> ::core::mem::MaybeUninit<
-                crate::__pgrx_c_bindings::RelFileLocator,
-            >,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *const crate::__pgrx_c_bindings::buftag,
-            ) -> ::core::mem::MaybeUninit<
-                crate::__pgrx_c_bindings::RelFileLocator,
-            >,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_struct__RelFileLocator__0l__const__struct__buftag__0p__0r;
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::sealed::Sealed for Signature_struct__RelFileLocator__0l__const__struct__buftag__0p__0r {}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::expression::NativeFunctionSignature
-    for Signature_struct__RelFileLocator__0l__const__struct__buftag__0p__0r
-{
-    type Physical = PhysicalFunction_C_unwind_1<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *const crate::__pgrx_c_bindings::buftag,
-            ) -> ::core::mem::MaybeUninit<
-                crate::__pgrx_c_bindings::RelFileLocator,
-            >,
-        >,
-    >;
-}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *mut crate::__pgrx_c_bindings::PlannerInfo,
-                *mut crate::__pgrx_c_bindings::Expr,
-                bool,
-                bool,
-                bool,
-                bool,
-                u32,
-                *mut crate::__pgrx_c_bindings::Bitmapset,
-                *mut crate::__pgrx_c_bindings::Bitmapset,
-                *mut crate::__pgrx_c_bindings::Bitmapset,
-            ) -> *mut crate::__pgrx_c_bindings::RestrictInfo,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *mut crate::__pgrx_c_bindings::PlannerInfo,
-                *mut crate::__pgrx_c_bindings::Expr,
-                bool,
-                bool,
-                bool,
-                bool,
-                u32,
-                *mut crate::__pgrx_c_bindings::Bitmapset,
-                *mut crate::__pgrx_c_bindings::Bitmapset,
-                *mut crate::__pgrx_c_bindings::Bitmapset,
-            ) -> *mut crate::__pgrx_c_bindings::RestrictInfo,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_struct__RestrictInfo__0p__0l__struct__PlannerInfo__0p__0c__struct__Expr__0p__0c__0x5f426f6f6c__0c__0x5f426f6f6c__0c__0x5f426f6f6c__0c__0x5f426f6f6c__0c__unsigned__int__0c__struct__Bitmapset__0p__0c__struct__Bitmapset__0p__0c__struct__Bitmapset__0p__0r;
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::sealed::Sealed for Signature_struct__RestrictInfo__0p__0l__struct__PlannerInfo__0p__0c__struct__Expr__0p__0c__0x5f426f6f6c__0c__0x5f426f6f6c__0c__0x5f426f6f6c__0c__0x5f426f6f6c__0c__unsigned__int__0c__struct__Bitmapset__0p__0c__struct__Bitmapset__0p__0c__struct__Bitmapset__0p__0r {}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::expression::NativeFunctionSignature for Signature_struct__RestrictInfo__0p__0l__struct__PlannerInfo__0p__0c__struct__Expr__0p__0c__0x5f426f6f6c__0c__0x5f426f6f6c__0c__0x5f426f6f6c__0c__0x5f426f6f6c__0c__unsigned__int__0c__struct__Bitmapset__0p__0c__struct__Bitmapset__0p__0c__struct__Bitmapset__0p__0r {
- type Physical = PhysicalFunction_C_unwind_10<::core::option::Option<unsafe extern "C-unwind" fn(*mut crate::__pgrx_c_bindings::PlannerInfo, *mut crate::__pgrx_c_bindings::Expr, bool, bool, bool, bool, u32, *mut crate::__pgrx_c_bindings::Bitmapset, *mut crate::__pgrx_c_bindings::Bitmapset, *mut crate::__pgrx_c_bindings::Bitmapset) -> *mut crate::__pgrx_c_bindings::RestrictInfo>>;
-}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-// SAFETY: This adapter validates null and converts arguments before the native guard, captures only destructor-free ABI storage, and decodes results after the native call.
-unsafe impl<A0: c::expression::ImplicitTo<c::expression::CPointer<c::expression::CRecord<crate::__pgrx_c_bindings::RelationData>, c::expression::ReadWrite>>, A1: c::expression::ImplicitTo<c::expression::CPointer<c::expression::CRecord<crate::__pgrx_c_bindings::SnapshotData>, c::expression::ReadWrite>>, A2: c::expression::ImplicitTo<c::CInt>, A3: c::expression::ImplicitTo<c::expression::CPointer<c::expression::CRecord<crate::__pgrx_c_bindings::ScanKeyData>, c::expression::ReadWrite>>, A4: c::expression::ImplicitTo<c::expression::CPointer<c::expression::CRecord<crate::__pgrx_c_bindings::ParallelTableScanDescData>, c::expression::ReadWrite>>, A5: c::expression::ImplicitTo<c::CUnsignedInt>> c::expression::Call<(A0,A1,A2,A3,A4,A5,)> for Signature_struct__TableScanDescData__0p__0l__struct__RelationData__0p__0c__struct__SnapshotData__0p__0c__int__0c__struct__ScanKeyData__0p__0c__struct__ParallelTableScanDescData__0p__0c__unsigned__int__0r {
- type Output = <c::expression::CPointer<c::expression::CRecord<crate::__pgrx_c_bindings::TableScanDescData>, c::expression::ReadWrite> as c::expression::CType>::Value;
- unsafe fn call(pointer: Self::Pointer, args: (A0,A1,A2,A3,A4,A5,)) -> Self::Output {
-let function = pointer.expect("C indirect call requires a non-null function pointer");
-const { assert!(!::core::mem::needs_drop::<A0>()); }
-const _: () = assert!(!::core::mem::needs_drop::<*mut crate::__pgrx_c_bindings::RelationData>());
-let native0 = <c::expression::CPointer<c::expression::CRecord<crate::__pgrx_c_bindings::RelationData>, c::expression::ReadWrite> as c::expression::CType>::into_storage(c::expression::implicit::<c::expression::CPointer<c::expression::CRecord<crate::__pgrx_c_bindings::RelationData>, c::expression::ReadWrite>, _>(args.0));
-const { assert!(!::core::mem::needs_drop::<A1>()); }
-const _: () = assert!(!::core::mem::needs_drop::<*mut crate::__pgrx_c_bindings::SnapshotData>());
-let native1 = <c::expression::CPointer<c::expression::CRecord<crate::__pgrx_c_bindings::SnapshotData>, c::expression::ReadWrite> as c::expression::CType>::into_storage(c::expression::implicit::<c::expression::CPointer<c::expression::CRecord<crate::__pgrx_c_bindings::SnapshotData>, c::expression::ReadWrite>, _>(args.1));
-const { assert!(!::core::mem::needs_drop::<A2>()); }
-const _: () = assert!(!::core::mem::needs_drop::<i32>());
-let native2 = <c::CInt as c::expression::CType>::into_storage(c::expression::implicit::<c::CInt, _>(args.2));
-const { assert!(!::core::mem::needs_drop::<A3>()); }
-const _: () = assert!(!::core::mem::needs_drop::<*mut crate::__pgrx_c_bindings::ScanKeyData>());
-let native3 = <c::expression::CPointer<c::expression::CRecord<crate::__pgrx_c_bindings::ScanKeyData>, c::expression::ReadWrite> as c::expression::CType>::into_storage(c::expression::implicit::<c::expression::CPointer<c::expression::CRecord<crate::__pgrx_c_bindings::ScanKeyData>, c::expression::ReadWrite>, _>(args.3));
-const { assert!(!::core::mem::needs_drop::<A4>()); }
-const _: () = assert!(!::core::mem::needs_drop::<*mut crate::__pgrx_c_bindings::ParallelTableScanDescData>());
-let native4 = <c::expression::CPointer<c::expression::CRecord<crate::__pgrx_c_bindings::ParallelTableScanDescData>, c::expression::ReadWrite> as c::expression::CType>::into_storage(c::expression::implicit::<c::expression::CPointer<c::expression::CRecord<crate::__pgrx_c_bindings::ParallelTableScanDescData>, c::expression::ReadWrite>, _>(args.4));
-const { assert!(!::core::mem::needs_drop::<A5>()); }
-const _: () = assert!(!::core::mem::needs_drop::<u32>());
-let native5 = <c::CUnsignedInt as c::expression::CType>::into_storage(c::expression::implicit::<c::CUnsignedInt, _>(args.5));
-// SAFETY: The caller establishes the exact native target contract, backend thread, and guarded callbacks. Conversions and the null check are complete; captured native storage and the function pointer have no destructors. The closure performs only the native call.
-let result = unsafe { crate::ffi::pg_guard_ffi_boundary(move || function(native0, native1, native2, native3, native4, native5)) };
-<c::expression::CPointer<c::expression::CRecord<crate::__pgrx_c_bindings::TableScanDescData>, c::expression::ReadWrite> as c::expression::CType>::from_storage(result)
-}
-}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-const _: () = assert!(::core::mem::size_of::<*mut crate::__pgrx_c_bindings::PlanState>() == 8);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-const _: () = assert!(::core::mem::align_of::<*mut crate::__pgrx_c_bindings::PlanState>() == 8);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-// SAFETY: This adapter validates null and converts arguments before the native guard, captures only destructor-free ABI storage, and decodes results after the native call.
-unsafe impl<
-    A0: c::expression::ImplicitTo<
-            c::expression::CPointer<
-                c::expression::CRecord<crate::__pgrx_c_bindings::PlanState>,
-                c::expression::ReadWrite,
-            >,
-        >,
-> c::expression::Call<(A0,)>
-    for Signature_struct__TupleTableSlot__0p__0l__struct__PlanState__0p__0r
-{
-    type Output = <c::expression::CPointer<
-        c::expression::CRecord<crate::__pgrx_c_bindings::TupleTableSlot>,
-        c::expression::ReadWrite,
-    > as c::expression::CType>::Value;
-    unsafe fn call(pointer: Self::Pointer, args: (A0,)) -> Self::Output {
-        let function = pointer.expect("C indirect call requires a non-null function pointer");
-        const {
-            assert!(!::core::mem::needs_drop::<A0>());
-        }
-        const _: () =
-            assert!(!::core::mem::needs_drop::<*mut crate::__pgrx_c_bindings::PlanState>());
-        let native0 = <c::expression::CPointer<
-            c::expression::CRecord<crate::__pgrx_c_bindings::PlanState>,
-            c::expression::ReadWrite,
-        > as c::expression::CType>::into_storage(c::expression::implicit::<
-            c::expression::CPointer<
-                c::expression::CRecord<crate::__pgrx_c_bindings::PlanState>,
-                c::expression::ReadWrite,
-            >,
-            _,
-        >(args.0));
-        // SAFETY: The caller establishes the exact native target contract, backend thread, and guarded callbacks. Conversions and the null check are complete; captured native storage and the function pointer have no destructors. The closure performs only the native call.
-        let result = unsafe { crate::ffi::pg_guard_ffi_boundary(move || function(native0)) };
-        <c::expression::CPointer<
-            c::expression::CRecord<crate::__pgrx_c_bindings::TupleTableSlot>,
-            c::expression::ReadWrite,
-        > as c::expression::CType>::from_storage(result)
-    }
-}
-#[cfg(feature = "pg16")]
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *const ::core::ffi::c_char,
-                bool,
-                bool,
-                *const ::core::ffi::c_char,
-                *mut *mut ::core::ffi::c_char,
-            )
-                -> *mut crate::__pgrx_c_bindings::WalReceiverConn,
-        >,
-    >() == 8
-);
-#[cfg(feature = "pg16")]
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *const ::core::ffi::c_char,
-                bool,
-                bool,
-                *const ::core::ffi::c_char,
-                *mut *mut ::core::ffi::c_char,
-            )
-                -> *mut crate::__pgrx_c_bindings::WalReceiverConn,
-        >,
-    >() == 8
-);
-#[cfg(feature = "pg16")]
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_struct__WalReceiverConn__0p__0l__const__char__0p__0c__0x5f426f6f6c__0c__0x5f426f6f6c__0c__const__char__0p__0c__char__0p__0p__0r;
-#[cfg(feature = "pg16")]
-impl c::sealed::Sealed for Signature_struct__WalReceiverConn__0p__0l__const__char__0p__0c__0x5f426f6f6c__0c__0x5f426f6f6c__0c__const__char__0p__0c__char__0p__0p__0r {}
-#[cfg(feature = "pg16")]
-impl c::expression::NativeFunctionSignature for Signature_struct__WalReceiverConn__0p__0l__const__char__0p__0c__0x5f426f6f6c__0c__0x5f426f6f6c__0c__const__char__0p__0c__char__0p__0p__0r {
- type Physical = PhysicalFunction_C_unwind_5<::core::option::Option<unsafe extern "C-unwind" fn(*const ::core::ffi::c_char, bool, bool, *const ::core::ffi::c_char, *mut *mut ::core::ffi::c_char) -> *mut crate::__pgrx_c_bindings::WalReceiverConn>>;
-}

@@ -1,6 +1,5 @@
 // Shared generated C macro support.
 
-impl c::sealed::Sealed for Signature_void__0l__struct__LogicalDecodingContext__0p__0c__struct__ReorderBufferTXN__0p__0c__unsigned__long__0c__long__0r {}
 impl c::expression::NativeFunctionSignature for Signature_void__0l__struct__LogicalDecodingContext__0p__0c__struct__ReorderBufferTXN__0p__0c__unsigned__long__0c__long__0r {
  type Physical = PhysicalFunction_C_unwind_4<::core::option::Option<unsafe extern "C-unwind" fn(*mut crate::__pgrx_c_bindings::LogicalDecodingContext, *mut crate::__pgrx_c_bindings::ReorderBufferTXN, u64, i64) -> ()>>;
 }
@@ -4276,6 +4275,32 @@ impl c::expression::NativeFunctionSignature
         >,
     >;
 }
+#[cfg(feature = "pg15")]
+const _: () = assert!(
+    ::core::mem::size_of::<
+        ::core::option::Option<
+            unsafe extern "C-unwind" fn(*const i8, *const i8, *const i8, i32) -> (),
+        >,
+    >() == 8
+);
+#[cfg(feature = "pg15")]
+const _: () = assert!(
+    ::core::mem::align_of::<
+        ::core::option::Option<
+            unsafe extern "C-unwind" fn(*const i8, *const i8, *const i8, i32) -> (),
+        >,
+    >() == 8
+);
+#[cfg(feature = "pg15")]
+#[doc(hidden)]
+#[derive(Clone, Copy)]
+pub struct Signature_void__0l__const__char__0p__0c__const__char__0p__0c__const__char__0p__0c__int__0r__0x5f5f6174747269627574655f5f__0l__0l__noreturn__0r__0r;
+#[cfg(feature = "pg15")]
+impl c::sealed::Sealed for Signature_void__0l__const__char__0p__0c__const__char__0p__0c__const__char__0p__0c__int__0r__0x5f5f6174747269627574655f5f__0l__0l__noreturn__0r__0r {}
+#[cfg(feature = "pg15")]
+impl c::expression::NativeFunctionSignature for Signature_void__0l__const__char__0p__0c__const__char__0p__0c__const__char__0p__0c__int__0r__0x5f5f6174747269627574655f5f__0l__0l__noreturn__0r__0r {
+ type Physical = PhysicalFunction_C_unwind_4<::core::option::Option<unsafe extern "C-unwind" fn(*const i8, *const i8, *const i8, i32) -> ()>>;
+}
 const _: () = assert!(
     ::core::mem::size_of::<
         ::core::option::Option<unsafe extern "C-unwind" fn(*const ::core::ffi::c_void) -> ()>,
@@ -5137,45 +5162,6 @@ const _: () = assert!(
     ::core::mem::size_of::<
         ::core::option::Option<
             unsafe extern "C-unwind" fn(
-                *mut crate::__pgrx_c_bindings::slist_head,
-                *mut crate::__pgrx_c_bindings::slist_node,
-            ) -> (),
-        >,
-    >() == 8
-);
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *mut crate::__pgrx_c_bindings::slist_head,
-                *mut crate::__pgrx_c_bindings::slist_node,
-            ) -> (),
-        >,
-    >() == 8
-);
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_void__0l__struct__slist_head__0p__0c__struct__slist_node__0p__0r;
-impl c::sealed::Sealed
-    for Signature_void__0l__struct__slist_head__0p__0c__struct__slist_node__0p__0r
-{
-}
-impl c::expression::NativeFunctionSignature
-    for Signature_void__0l__struct__slist_head__0p__0c__struct__slist_node__0p__0r
-{
-    type Physical = PhysicalFunction_C_unwind_2<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *mut crate::__pgrx_c_bindings::slist_head,
-                *mut crate::__pgrx_c_bindings::slist_node,
-            ) -> (),
-        >,
-    >;
-}
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
                 *mut crate::__pgrx_c_bindings::tuplehash_hash,
                 *mut crate::__pgrx_c_bindings::tuplehash_iterator,
             ) -> (),
@@ -5517,24 +5503,19 @@ impl c::sealed::Sealed for Signature_void__0l__void__0p__0c__unsigned__long__0c_
 impl c::expression::NativeFunctionSignature for Signature_void__0l__void__0p__0c__unsigned__long__0c__unsigned__long__0c__int__0l__0p__0r__0l__const__void__0p__0c__const__void__0p__0r__0r {
  type Physical = PhysicalFunction_C_unwind_4<::core::option::Option<unsafe extern "C-unwind" fn(*mut ::core::ffi::c_void, usize, usize, ::core::option::Option<unsafe extern "C-unwind" fn(*const ::core::ffi::c_void, *const ::core::ffi::c_void) -> i32>) -> ()>>;
 }
-#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
 const _: () = assert!(
     ::core::mem::size_of::<::core::option::Option<unsafe extern "C-unwind" fn() -> ()>>() == 8
 );
-#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
 const _: () = assert!(
     ::core::mem::align_of::<::core::option::Option<unsafe extern "C-unwind" fn() -> ()>>() == 8
 );
-#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
 #[doc(hidden)]
 #[derive(Clone, Copy)]
 pub struct Signature_void__0l__void__0r__0x5f5f6174747269627574655f5f__0l__0l__noreturn__0r__0r;
-#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
 impl c::sealed::Sealed
     for Signature_void__0l__void__0r__0x5f5f6174747269627574655f5f__0l__0l__noreturn__0r__0r
 {
 }
-#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
 impl c::expression::NativeFunctionSignature
     for Signature_void__0l__void__0r__0x5f5f6174747269627574655f5f__0l__0l__noreturn__0r__0r
 {

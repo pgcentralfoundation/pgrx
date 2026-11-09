@@ -3268,30 +3268,6 @@ unsafe impl<
 }
 const _: () = assert!(
     ::core::mem::size_of::<
-        ::core::option::Option<unsafe extern "C-unwind" fn(*const i8, *const i8, i32) -> *mut i8>,
-    >() == 8
-);
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<unsafe extern "C-unwind" fn(*const i8, *const i8, i32) -> *mut i8>,
-    >() == 8
-);
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_char__0p__0l__const__char__0p__0c__const__char__0p__0c__int__0r;
-impl c::sealed::Sealed
-    for Signature_char__0p__0l__const__char__0p__0c__const__char__0p__0c__int__0r
-{
-}
-impl c::expression::NativeFunctionSignature
-    for Signature_char__0p__0l__const__char__0p__0c__const__char__0p__0c__int__0r
-{
-    type Physical = PhysicalFunction_C_unwind_3<
-        ::core::option::Option<unsafe extern "C-unwind" fn(*const i8, *const i8, i32) -> *mut i8>,
-    >;
-}
-const _: () = assert!(
-    ::core::mem::size_of::<
         ::core::option::Option<
             unsafe extern "C-unwind" fn(
                 *const crate::__pgrx_c_bindings::varlena,
@@ -6590,3 +6566,39 @@ const _: () = assert!(
 #[doc(hidden)]
 #[derive(Clone, Copy)]
 pub struct Signature_struct__MemoryContextData__0p__0l__struct__MemoryContextData__0p__0r;
+impl c::sealed::Sealed
+    for Signature_struct__MemoryContextData__0p__0l__struct__MemoryContextData__0p__0r
+{
+}
+impl c::expression::NativeFunctionSignature
+    for Signature_struct__MemoryContextData__0p__0l__struct__MemoryContextData__0p__0r
+{
+    type Physical = PhysicalFunction_C_unwind_1<
+        ::core::option::Option<
+            unsafe extern "C-unwind" fn(
+                *mut crate::__pgrx_c_bindings::MemoryContextData,
+            )
+                -> *mut crate::__pgrx_c_bindings::MemoryContextData,
+        >,
+    >;
+}
+const _: () = assert!(
+    ::core::mem::size_of::<
+        ::core::option::Option<
+            unsafe extern "C-unwind" fn(
+                *mut ::core::ffi::c_void,
+            )
+                -> *mut crate::__pgrx_c_bindings::MemoryContextData,
+        >,
+    >() == 8
+);
+const _: () = assert!(
+    ::core::mem::align_of::<
+        ::core::option::Option<
+            unsafe extern "C-unwind" fn(
+                *mut ::core::ffi::c_void,
+            )
+                -> *mut crate::__pgrx_c_bindings::MemoryContextData,
+        >,
+    >() == 8
+);

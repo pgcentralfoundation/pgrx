@@ -38,6 +38,17 @@ use std::time::{SystemTime, UNIX_EPOCH};
 /// Allocate unique isolated consumer paths without sharing Cargo outputs between tests.
 static NEXT: AtomicU64 = AtomicU64::new(0);
 
+/// Pin an offline fixture build to the workspace's dependency versions. Without a lockfile,
+/// `--offline` prefers whatever versions the local cache holds, which can conflict with the
+/// workspace's own requirements.
+fn use_workspace_lockfile(manifest: &Path) {
+    let lockfile = manifest.with_file_name("Cargo.lock");
+    if manifest.parent().is_some_and(Path::is_dir) && !lockfile.exists() {
+        let workspace = Path::new(env!("CARGO_MANIFEST_DIR")).parent().unwrap();
+        fs::copy(workspace.join("Cargo.lock"), lockfile).expect("copy the workspace Cargo.lock");
+    }
+}
+
 /// Own an isolated consumer or header tree whose generated artifacts can be inspected without
 /// mutating the repository.
 struct Fixture(
@@ -70,6 +81,7 @@ impl Fixture {
     /// Run an offline Cargo subcommand on the consumer with an isolated PGRX_HOME and target
     /// output, and without inherited pgrx or bindgen settings.
     fn cargo(&self, subcommand: &str) -> Command {
+        use_workspace_lockfile(&self.source().join("Cargo.toml"));
         let mut command = Command::new("cargo");
         for (name, _) in std::env::vars_os() {
             if name.to_str().is_some_and(|name| {

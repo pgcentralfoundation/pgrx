@@ -32,6 +32,17 @@ static NEXT: AtomicU64 = AtomicU64::new(0);
 /// resources.
 const OUTPUT_LIMIT: u64 = 16 << 20;
 
+/// Pin an offline fixture build to the workspace's dependency versions. Without a lockfile,
+/// `--offline` prefers whatever versions the local cache holds, which can conflict with the
+/// workspace's own requirements.
+fn use_workspace_lockfile(manifest: &Path) {
+    let lockfile = manifest.with_file_name("Cargo.lock");
+    if manifest.parent().is_some_and(Path::is_dir) && !lockfile.exists() {
+        let workspace = Path::new(env!("CARGO_MANIFEST_DIR")).parent().unwrap();
+        fs::copy(workspace.join("Cargo.lock"), lockfile).expect("copy the workspace Cargo.lock");
+    }
+}
+
 /// Own an isolated consumer or header tree whose generated artifacts can be inspected without
 /// mutating the repository.
 struct Fixture(
@@ -74,6 +85,7 @@ impl Fixture {
     /// Configure an isolated Cargo `subcommand` for `manifest` without inherited pgrx
     /// installation state.
     fn cargo_for(&self, subcommand: &str, manifest: &Path) -> Command {
+        use_workspace_lockfile(manifest);
         let mut command = Command::new("cargo");
         for (name, _) in std::env::vars_os() {
             if name.to_str().is_some_and(|name| {

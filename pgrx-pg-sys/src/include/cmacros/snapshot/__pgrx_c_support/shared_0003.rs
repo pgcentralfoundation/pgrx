@@ -108,12 +108,6 @@ macro_rules! __pgrx_c_field_marker {
     (__mask_was_saved) => {
         $crate::__pgrx_c_generated::Field___mask_was_saved
     };
-    (__pad5) => {
-        $crate::__pgrx_c_generated::Field___pad5
-    };
-    (__ss_align) => {
-        $crate::__pgrx_c_generated::Field___ss_align
-    };
     (_cur_column) => {
         $crate::__pgrx_c_generated::Field__cur_column
     };
@@ -134,6 +128,12 @@ macro_rules! __pgrx_c_field_marker {
     };
     (_old_offset) => {
         $crate::__pgrx_c_generated::Field__old_offset
+    };
+    (_total_written) => {
+        $crate::__pgrx_c_generated::Field__total_written
+    };
+    (_unused3) => {
+        $crate::__pgrx_c_generated::Field__unused3
     };
     (_vtable_offset) => {
         $crate::__pgrx_c_generated::Field__vtable_offset
@@ -1938,9 +1938,6 @@ macro_rules! __pgrx_c_field_marker {
     (ctematerialized) => {
         $crate::__pgrx_c_generated::Field_ctematerialized
     };
-    (ctequery) => {
-        $crate::__pgrx_c_generated::Field_ctequery
-    };
     (cterecursive) => {
         $crate::__pgrx_c_generated::Field_cterecursive
     };
@@ -2282,6 +2279,9 @@ macro_rules! __pgrx_c_field_marker {
     };
     (delayChkptFlags) => {
         $crate::__pgrx_c_generated::Field_delayChkptFlags
+    };
+    (delay_ms) => {
+        $crate::__pgrx_c_generated::Field_delay_ms
     };
     (delays) => {
         $crate::__pgrx_c_generated::Field_delays
@@ -2960,6 +2960,9 @@ macro_rules! __pgrx_c_field_marker {
     };
     (fillfactor) => {
         $crate::__pgrx_c_generated::Field_fillfactor
+    };
+    (fin_time) => {
+        $crate::__pgrx_c_generated::Field_fin_time
     };
     (final_lsn) => {
         $crate::__pgrx_c_generated::Field_final_lsn
@@ -4745,6 +4748,9 @@ macro_rules! __pgrx_c_field_marker {
     };
     (keepNulls) => {
         $crate::__pgrx_c_generated::Field_keepNulls
+    };
+    (keep_indicator) => {
+        $crate::__pgrx_c_generated::Field_keep_indicator
     };
     (key) => {
         $crate::__pgrx_c_generated::Field_key
@@ -7407,6 +7413,12 @@ macro_rules! __pgrx_c_field_marker {
     (phystupsize) => {
         $crate::__pgrx_c_generated::Field_phystupsize
     };
+    (pi_exprContext) => {
+        $crate::__pgrx_c_generated::Field_pi_exprContext
+    };
+    (pi_state) => {
+        $crate::__pgrx_c_generated::Field_pi_state
+    };
     (pid) => {
         $crate::__pgrx_c_generated::Field_pid
     };
@@ -8460,6 +8472,9 @@ macro_rules! __pgrx_c_field_marker {
     (resultopsset) => {
         $crate::__pgrx_c_generated::Field_resultopsset
     };
+    (resultslot) => {
+        $crate::__pgrx_c_generated::Field_resultslot
+    };
     (resulttype) => {
         $crate::__pgrx_c_generated::Field_resulttype
     };
@@ -9374,9 +9389,6 @@ macro_rules! __pgrx_c_field_marker {
     };
     (srvowner) => {
         $crate::__pgrx_c_generated::Field_srvowner
-    };
-    (ss_family) => {
-        $crate::__pgrx_c_generated::Field_ss_family
     };
     (ssize) => {
         $crate::__pgrx_c_generated::Field_ssize

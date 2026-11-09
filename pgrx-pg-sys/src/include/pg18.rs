@@ -157,14 +157,11 @@ pub const ALIGNOF_LONG: u32 = 8;
 pub const ALIGNOF_PG_INT128_TYPE: u32 = 16;
 pub const ALIGNOF_SHORT: u32 = 2;
 pub const BLCKSZ: u32 = 8192;
-pub const DEF_PGPORT: u32 = 5432;
-pub const DEF_PGPORT_STR: &::core::ffi::CStr = c"5432";
+pub const DEF_PGPORT: u32 = 28818;
+pub const DEF_PGPORT_STR: &::core::ffi::CStr = c"28818";
 pub const DLSUFFIX: &::core::ffi::CStr = c".so";
-pub const ENABLE_GSS: u32 = 1;
-pub const ENABLE_NLS: u32 = 1;
 pub const MAXIMUM_ALIGNOF: u32 = 8;
 pub const MEMSET_LOOP_LIMIT: u32 = 1024;
-pub const OPENSSL_API_COMPAT: u32 = 269488128;
 pub const PACKAGE_BUGREPORT: &::core::ffi::CStr = c"pgsql-bugs@lists.postgresql.org";
 pub const PACKAGE_NAME: &::core::ffi::CStr = c"PostgreSQL";
 pub const PACKAGE_STRING: &::core::ffi::CStr = c"PostgreSQL 18.6";
@@ -175,9 +172,9 @@ pub const PG_KRB_SRVNAM: &::core::ffi::CStr = c"postgres";
 pub const PG_MAJORVERSION: &::core::ffi::CStr = c"18";
 pub const PG_MAJORVERSION_NUM: u32 = 18;
 pub const PG_MINORVERSION_NUM: u32 = 6;
-pub const PG_VERSION: &::core::ffi::CStr = c"18.6 (Ubuntu 18.6-1.pgdg24.04+2)";
+pub const PG_VERSION: &::core::ffi::CStr = c"18.6";
 pub const PG_VERSION_NUM: u32 = 180006;
-pub const PG_VERSION_STR : & :: core :: ffi :: CStr = c"PostgreSQL 18.6 (Ubuntu 18.6-1.pgdg24.04+2) on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0, 64-bit" ;
+pub const PG_VERSION_STR : & :: core :: ffi :: CStr = c"PostgreSQL 18.6 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0, 64-bit" ;
 pub const RELSEG_SIZE: u32 = 131072;
 pub const SIZEOF_LONG: u32 = 8;
 pub const SIZEOF_LONG_LONG: u32 = 8;
@@ -185,24 +182,13 @@ pub const SIZEOF_OFF_T: u32 = 8;
 pub const SIZEOF_SIZE_T: u32 = 8;
 pub const SIZEOF_VOID_P: u32 = 8;
 pub const STDC_HEADERS: u32 = 1;
+pub const USE_ASSERT_CHECKING: u32 = 1;
 pub const USE_AVX512_CRC32C_WITH_RUNTIME_CHECK: u32 = 1;
 pub const USE_AVX512_POPCNT_WITH_RUNTIME_CHECK: u32 = 1;
 pub const USE_ICU: u32 = 1;
-pub const USE_LDAP: u32 = 1;
-pub const USE_LIBCURL: u32 = 1;
-pub const USE_LIBNUMA: u32 = 1;
-pub const USE_LIBURING: u32 = 1;
-pub const USE_LIBXML: u32 = 1;
-pub const USE_LIBXSLT: u32 = 1;
-pub const USE_LLVM: u32 = 1;
-pub const USE_LZ4: u32 = 1;
-pub const USE_OPENSSL: u32 = 1;
-pub const USE_PAM: u32 = 1;
 pub const USE_SSE42_CRC32C_WITH_RUNTIME_CHECK: u32 = 1;
-pub const USE_SYSTEMD: u32 = 1;
 pub const USE_SYSV_SHARED_MEMORY: u32 = 1;
 pub const USE_UNNAMED_POSIX_SEMAPHORES: u32 = 1;
-pub const USE_ZSTD: u32 = 1;
 pub const XLOG_BLCKSZ: u32 = 8192;
 pub const DEFAULT_XLOG_SEG_SIZE: u32 = 16777216;
 pub const NAMEDATALEN: u32 = 64;
@@ -218,7 +204,7 @@ pub const DEFAULT_BACKEND_FLUSH_AFTER: u32 = 0;
 pub const DEFAULT_BGWRITER_FLUSH_AFTER: u32 = 64;
 pub const DEFAULT_CHECKPOINT_FLUSH_AFTER: u32 = 32;
 pub const WRITEBACK_MAX_PENDING_FLUSHES: u32 = 256;
-pub const DEFAULT_PGSOCKET_DIR: &::core::ffi::CStr = c"/var/run/postgresql";
+pub const DEFAULT_PGSOCKET_DIR: &::core::ffi::CStr = c"/tmp";
 pub const DEFAULT_EVENT_SOURCE: &::core::ffi::CStr = c"PostgreSQL";
 pub const PG_CACHE_LINE_SIZE: u32 = 128;
 pub const PG_IO_ALIGN_SIZE: u32 = 4096;
@@ -265,8 +251,7 @@ pub const PG_BINARY_A: &::core::ffi::CStr = c"a";
 pub const PG_BINARY_R: &::core::ffi::CStr = c"r";
 pub const PG_BINARY_W: &::core::ffi::CStr = c"w";
 pub const PGINVALID_SOCKET: i32 = -1;
-pub const PG_BACKEND_VERSIONSTR: &::core::ffi::CStr =
-    c"postgres (PostgreSQL) 18.6 (Ubuntu 18.6-1.pgdg24.04+2)\n";
+pub const PG_BACKEND_VERSIONSTR: &::core::ffi::CStr = c"postgres (PostgreSQL) 18.6\n";
 pub const EXE: &::core::ffi::CStr = c"";
 pub const DEVNULL: &::core::ffi::CStr = c"/dev/null";
 pub const USE_REPL_SNPRINTF: u32 = 1;
@@ -7047,6 +7032,7 @@ pub const DEFAULT_NUM_DISTINCT: u32 = 200;
 pub const DEFAULT_UNK_SEL: f64 = 0.005;
 pub const DEFAULT_NOT_UNK_SEL: f64 = 0.995;
 pub const SELFLAG_USED_DEFAULT: u32 = 1;
+pub type __uint64_t = ::core::ffi::c_ulong;
 pub type __dev_t = ::core::ffi::c_ulong;
 pub type __uid_t = ::core::ffi::c_uint;
 pub type __gid_t = ::core::ffi::c_uint;
@@ -7093,7 +7079,9 @@ pub struct _IO_FILE {
     pub _markers: *mut _IO_marker,
     pub _chain: *mut _IO_FILE,
     pub _fileno: ::core::ffi::c_int,
-    pub _flags2: ::core::ffi::c_int,
+    pub _bitfield_align_1: [u32; 0],
+    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 3usize]>,
+    pub _short_backupbuf: [::core::ffi::c_char; 1usize],
     pub _old_offset: __off_t,
     pub _cur_column: ::core::ffi::c_ushort,
     pub _vtable_offset: ::core::ffi::c_schar,
@@ -7104,9 +7092,11 @@ pub struct _IO_FILE {
     pub _wide_data: *mut _IO_wide_data,
     pub _freeres_list: *mut _IO_FILE,
     pub _freeres_buf: *mut ::core::ffi::c_void,
-    pub __pad5: usize,
+    pub _prevchain: *mut *mut _IO_FILE,
     pub _mode: ::core::ffi::c_int,
-    pub _unused2: [::core::ffi::c_char; 20usize],
+    pub _unused3: ::core::ffi::c_int,
+    pub _total_written: __uint64_t,
+    pub _unused2: [::core::ffi::c_char; 8usize],
 }
 impl Default for _IO_FILE {
     fn default() -> Self {
@@ -7115,6 +7105,50 @@ impl Default for _IO_FILE {
             ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
+    }
+}
+impl _IO_FILE {
+    #[inline]
+    pub fn _flags2(&self) -> ::core::ffi::c_int {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(0usize, 24u8) as u32) }
+    }
+    #[inline]
+    pub fn set__flags2(&mut self, val: ::core::ffi::c_int) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_1.set(0usize, 24u8, val as u64)
+        }
+    }
+    #[inline]
+    pub unsafe fn _flags2_raw(this: *const Self) -> ::core::ffi::c_int {
+        unsafe {
+            ::core::mem::transmute(<__BindgenBitfieldUnit<[u8; 3usize]>>::raw_get(
+                ::core::ptr::addr_of!((*this)._bitfield_1),
+                0usize,
+                24u8,
+            ) as u32)
+        }
+    }
+    #[inline]
+    pub unsafe fn set__flags2_raw(this: *mut Self, val: ::core::ffi::c_int) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            <__BindgenBitfieldUnit<[u8; 3usize]>>::raw_set(
+                ::core::ptr::addr_of_mut!((*this)._bitfield_1),
+                0usize,
+                24u8,
+                val as u64,
+            )
+        }
+    }
+    #[inline]
+    pub fn new_bitfield_1(_flags2: ::core::ffi::c_int) -> __BindgenBitfieldUnit<[u8; 3usize]> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 3usize]> = Default::default();
+        __bindgen_bitfield_unit.set(0usize, 24u8, {
+            let _flags2: u32 = unsafe { ::core::mem::transmute(_flags2) };
+            _flags2 as u64
+        });
+        __bindgen_bitfield_unit
     }
 }
 pub type va_list = __gnuc_va_list;
@@ -22319,7 +22353,7 @@ impl Default for xl_hash_vacuum_one_page {
     }
 }
 pub type sig_atomic_t = __sig_atomic_t;
-pub mod _bindgen_ty_16 {
+pub mod _bindgen_ty_17 {
     pub type Type = ::core::ffi::c_uint;
     pub const SIGEV_SIGNAL: Type = 0;
     pub const SIGEV_NONE: Type = 1;
@@ -31390,6 +31424,7 @@ pub struct MemoryContextMethods {
             print_to_stderr: bool,
         ),
     >,
+    pub check: ::core::option::Option<unsafe extern "C-unwind" fn(context: MemoryContext)>,
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -34378,6 +34413,7 @@ pub struct JumbleState {
     pub highest_extern_param_id: ::core::ffi::c_int,
     pub has_squashed_lists: bool,
     pub pending_nulls: ::core::ffi::c_uint,
+    pub total_jumble_len: Size,
 }
 impl Default for JumbleState {
     fn default() -> Self {
@@ -35945,7 +35981,7 @@ pub mod PLpgSQL_stmt_type {
     pub const PLPGSQL_STMT_COMMIT: Type = 25;
     pub const PLPGSQL_STMT_ROLLBACK: Type = 26;
 }
-pub mod _bindgen_ty_31 {
+pub mod _bindgen_ty_32 {
     pub type Type = ::core::ffi::c_uint;
     pub const PLPGSQL_RC_OK: Type = 0;
     pub const PLPGSQL_RC_EXIT: Type = 1;
@@ -38936,7 +38972,6 @@ pub mod IoMethod {
     pub type Type = ::core::ffi::c_uint;
     pub const IOMETHOD_SYNC: Type = 0;
     pub const IOMETHOD_WORKER: Type = 1;
-    pub const IOMETHOD_IO_URING: Type = 2;
 }
 pub mod PgAioHandleFlags {
     pub type Type = ::core::ffi::c_uint;
@@ -41650,6 +41685,63 @@ pub mod SysCacheIdentifier {
     pub const USERMAPPINGOID: Type = 83;
     pub const USERMAPPINGUSERSERVER: Type = 84;
 }
+pub mod TimeoutId {
+    pub type Type = ::core::ffi::c_uint;
+    pub const STARTUP_PACKET_TIMEOUT: Type = 0;
+    pub const DEADLOCK_TIMEOUT: Type = 1;
+    pub const LOCK_TIMEOUT: Type = 2;
+    pub const STATEMENT_TIMEOUT: Type = 3;
+    pub const STANDBY_DEADLOCK_TIMEOUT: Type = 4;
+    pub const STANDBY_TIMEOUT: Type = 5;
+    pub const STANDBY_LOCK_TIMEOUT: Type = 6;
+    pub const IDLE_IN_TRANSACTION_SESSION_TIMEOUT: Type = 7;
+    pub const TRANSACTION_TIMEOUT: Type = 8;
+    pub const IDLE_SESSION_TIMEOUT: Type = 9;
+    pub const IDLE_STATS_UPDATE_TIMEOUT: Type = 10;
+    pub const CLIENT_CONNECTION_CHECK_TIMEOUT: Type = 11;
+    pub const STARTUP_PROGRESS_TIMEOUT: Type = 12;
+    pub const USER_TIMEOUT: Type = 13;
+    pub const MAX_TIMEOUTS: Type = 23;
+}
+pub type timeout_handler_proc = ::core::option::Option<unsafe extern "C-unwind" fn()>;
+pub mod TimeoutType {
+    pub type Type = ::core::ffi::c_uint;
+    pub const TMPARAM_AFTER: Type = 0;
+    pub const TMPARAM_AT: Type = 1;
+    pub const TMPARAM_EVERY: Type = 2;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct EnableTimeoutParams {
+    pub id: TimeoutId::Type,
+    pub type_: TimeoutType::Type,
+    pub delay_ms: ::core::ffi::c_int,
+    pub fin_time: TimestampTz,
+}
+impl Default for EnableTimeoutParams {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct DisableTimeoutParams {
+    pub id: TimeoutId::Type,
+    pub keep_indicator: bool,
+}
+impl Default for DisableTimeoutParams {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct ClosestMatchState {
@@ -42819,6 +42911,7 @@ unsafe extern "C-unwind" {
     pub fn ForceTransactionIdLimitUpdate() -> bool;
     pub fn GetNewObjectId() -> Oid;
     pub fn StopGeneratingPinnedObjectIds();
+    pub fn AssertTransactionIdInAllowableRange(xid: TransactionId);
     #[link_name = "ReadNextTransactionId__pgrx_cshim"]
     pub fn ReadNextTransactionId() -> TransactionId;
     #[link_name = "TransactionIdRetreatedBy__pgrx_cshim"]
@@ -42837,6 +42930,8 @@ unsafe extern "C-unwind" {
     pub static mut no_such_variable: ::core::ffi::c_int;
     #[link_name = "newNode__pgrx_cshim"]
     pub fn newNode(size: usize, tag: NodeTag) -> *mut Node;
+    #[link_name = "castNodeImpl__pgrx_cshim"]
+    pub fn castNodeImpl(type_: NodeTag, ptr: *mut ::core::ffi::c_void) -> *mut Node;
     pub fn outNode(str_: *mut StringInfoData, obj: *const ::core::ffi::c_void);
     pub fn outToken(str_: *mut StringInfoData, s: *const ::core::ffi::c_char);
     pub fn outBitmapset(str_: *mut StringInfoData, bms: *const Bitmapset);
@@ -42850,6 +42945,7 @@ unsafe extern "C-unwind" {
     pub fn nodeToStringWithLocations(obj: *const ::core::ffi::c_void) -> *mut ::core::ffi::c_char;
     pub fn bmsToString(bms: *const Bitmapset) -> *mut ::core::ffi::c_char;
     pub fn stringToNode(str_: *const ::core::ffi::c_char) -> *mut ::core::ffi::c_void;
+    pub fn stringToNodeWithLocations(str_: *const ::core::ffi::c_char) -> *mut ::core::ffi::c_void;
     pub fn readBitmapset() -> *mut Bitmapset;
     pub fn readDatum(typbyval: bool) -> usize;
     pub fn readBoolCols(numCols: ::core::ffi::c_int) -> *mut bool;
@@ -43648,7 +43744,6 @@ unsafe extern "C-unwind" {
         key2: *const ::core::ffi::c_void,
         keysize: Size,
     ) -> ::core::ffi::c_int;
-    #[link_name = "AssertCouldGetRelation__pgrx_cshim"]
     pub fn AssertCouldGetRelation();
     pub fn RelationIdGetRelation(relationId: Oid) -> Relation;
     pub fn RelationClose(relation: Relation);
@@ -43706,6 +43801,7 @@ unsafe extern "C-unwind" {
     pub fn RelationForgetRelation(rid: Oid);
     pub fn RelationCacheInvalidateEntry(relationId: Oid);
     pub fn RelationCacheInvalidate(debug_discard: bool);
+    pub fn AssertPendingSyncs_RelationCache();
     pub fn AtEOXact_RelationCache(isCommit: bool);
     pub fn AtEOSubXact_RelationCache(
         isCommit: bool,
@@ -45514,6 +45610,7 @@ unsafe extern "C-unwind" {
     ) -> Buffer;
     pub fn InitBufferManagerAccess();
     pub fn AtEOXact_Buffers(isCommit: bool);
+    pub fn AssertBufferLocksPermitCatalogRead();
     pub fn DebugPrintBufferRefcount(buffer: Buffer) -> *mut ::core::ffi::c_char;
     pub fn CheckPointBuffers(flags: ::core::ffi::c_int);
     pub fn BufferGetBlockNumber(buffer: Buffer) -> BlockNumber;
@@ -48637,6 +48734,7 @@ unsafe extern "C-unwind" {
     pub fn LockReleaseCurrentOwner(locallocks: *mut *mut LOCALLOCK, nlocks: ::core::ffi::c_int);
     pub fn LockReassignCurrentOwner(locallocks: *mut *mut LOCALLOCK, nlocks: ::core::ffi::c_int);
     pub fn LockHeldByMe(locktag: *const LOCKTAG, lockmode: LOCKMODE, orstronger: bool) -> bool;
+    pub fn GetLockMethodLocalHash() -> *mut HTAB;
     pub fn LockHasWaiters(locktag: *const LOCKTAG, lockmode: LOCKMODE, sessionLock: bool) -> bool;
     pub fn GetLockConflicts(
         locktag: *const LOCKTAG,
@@ -49276,6 +49374,7 @@ unsafe extern "C-unwind" {
     ) -> ::core::ffi::c_int;
     pub fn SimpleLruWritePage(ctl: SlruCtl, slotno: ::core::ffi::c_int);
     pub fn SimpleLruWriteAll(ctl: SlruCtl, allow_redirtied: bool);
+    pub fn SlruPagePrecedesUnitTests(ctl: SlruCtl, per_page: ::core::ffi::c_int);
     pub fn SimpleLruTruncate(ctl: SlruCtl, cutoffPage: int64);
     pub fn SimpleLruDoesPhysicalPageExist(ctl: SlruCtl, pageno: int64) -> bool;
     pub fn SlruScanDirectory(
@@ -51094,6 +51193,9 @@ unsafe extern "C-unwind" {
     pub static mut Debug_print_parse: bool;
     pub static mut Debug_print_rewritten: bool;
     pub static mut Debug_pretty_print: bool;
+    pub static mut Debug_copy_parse_plan_trees: bool;
+    pub static mut Debug_write_read_parse_plan_trees: bool;
+    pub static mut Debug_raw_expression_coverage_test: bool;
     pub static mut log_parser_stats: bool;
     pub static mut log_planner_stats: bool;
     pub static mut log_executor_stats: bool;
@@ -52392,6 +52494,7 @@ unsafe extern "C-unwind" {
         print_to_stderr: bool,
     );
     pub fn MemoryContextAllowInCriticalSection(context: MemoryContext, allow: bool);
+    pub fn MemoryContextCheck(context: MemoryContext);
     pub fn HandleLogMemoryContextInterrupt();
     pub fn ProcessLogMemoryContextInterrupt();
     pub fn AllocSetContextCreateInternal(
@@ -55223,8 +55326,6 @@ unsafe extern "C-unwind" {
     pub fn GetDatabaseEncodingName() -> *const ::core::ffi::c_char;
     pub fn SetMessageEncoding(encoding: ::core::ffi::c_int);
     pub fn GetMessageEncoding() -> ::core::ffi::c_int;
-    pub fn pg_bind_textdomain_codeset(domainname: *const ::core::ffi::c_char)
-    -> ::core::ffi::c_int;
     pub fn pg_do_encoding_conversion(
         src: *mut ::core::ffi::c_uchar,
         len: ::core::ffi::c_int,
@@ -55749,6 +55850,7 @@ unsafe extern "C-unwind" {
     pub fn JumbleQuery(query: *mut Query) -> *mut JumbleState;
     pub fn EnableQueryId();
     pub static mut query_id_enabled: bool;
+    pub static mut restore_location_fields: bool;
     pub fn pg_strtok(length: *mut ::core::ffi::c_int) -> *const ::core::ffi::c_char;
     pub fn debackslash(
         token: *const ::core::ffi::c_char,
@@ -60612,7 +60714,6 @@ unsafe extern "C-unwind" {
     pub fn pgaio_io_get_target_name(ioh: *mut PgAioHandle) -> *const ::core::ffi::c_char;
     pub static pgaio_sync_ops: IoMethodOps;
     pub static pgaio_worker_ops: IoMethodOps;
-    pub static pgaio_uring_ops: IoMethodOps;
     pub static mut pgaio_method_ops: *const IoMethodOps;
     pub static mut pgaio_ctl: *mut PgAioCtl;
     pub static mut pgaio_my_backend: *mut PgAioBackend;
@@ -66100,6 +66201,24 @@ unsafe extern "C-unwind" {
     pub fn RelationInvalidatesSnapshotsOnly(relid: Oid) -> bool;
     pub fn RelationHasSysCache(relid: Oid) -> bool;
     pub fn RelationSupportsSysCache(relid: Oid) -> bool;
+    pub fn InitializeTimeouts();
+    pub fn RegisterTimeout(id: TimeoutId::Type, handler: timeout_handler_proc) -> TimeoutId::Type;
+    pub fn reschedule_timeouts();
+    pub fn enable_timeout_after(id: TimeoutId::Type, delay_ms: ::core::ffi::c_int);
+    pub fn enable_timeout_every(
+        id: TimeoutId::Type,
+        fin_time: TimestampTz,
+        delay_ms: ::core::ffi::c_int,
+    );
+    pub fn enable_timeout_at(id: TimeoutId::Type, fin_time: TimestampTz);
+    pub fn enable_timeouts(timeouts: *const EnableTimeoutParams, count: ::core::ffi::c_int);
+    pub fn disable_timeout(id: TimeoutId::Type, keep_indicator: bool);
+    pub fn disable_timeouts(timeouts: *const DisableTimeoutParams, count: ::core::ffi::c_int);
+    pub fn disable_all_timeouts(keep_indicators: bool);
+    pub fn get_timeout_active(id: TimeoutId::Type) -> bool;
+    pub fn get_timeout_indicator(id: TimeoutId::Type, reset_indicator: bool) -> bool;
+    pub fn get_timeout_start_time(id: TimeoutId::Type) -> TimestampTz;
+    pub fn get_timeout_finish_time(id: TimeoutId::Type) -> TimestampTz;
     pub fn varstr_cmp(
         arg1: *const ::core::ffi::c_char,
         len1: ::core::ffi::c_int,
@@ -66836,10 +66955,6 @@ pub const HAVE_COPY_FILE_RANGE: i32 = 1;
 pub const HAVE_DECL_FDATASYNC: i32 = 1;
 #[doc = " Compiler-verified C object macro `HAVE_DECL_F_FULLFSYNC`, omitted by bindgen."]
 pub const HAVE_DECL_F_FULLFSYNC: i32 = 0;
-#[doc = " Compiler-verified C object macro `HAVE_DECL_LLVMCREATEGDBREGISTRATIONLISTENER`, omitted by bindgen."]
-pub const HAVE_DECL_LLVMCREATEGDBREGISTRATIONLISTENER: i32 = 1;
-#[doc = " Compiler-verified C object macro `HAVE_DECL_LLVMCREATEPERFJITEVENTLISTENER`, omitted by bindgen."]
-pub const HAVE_DECL_LLVMCREATEPERFJITEVENTLISTENER: i32 = 1;
 #[doc = " Compiler-verified C object macro `HAVE_DECL_MEMSET_S`, omitted by bindgen."]
 pub const HAVE_DECL_MEMSET_S: i32 = 0;
 #[doc = " Compiler-verified C object macro `HAVE_DECL_POSIX_FADVISE`, omitted by bindgen."]
@@ -66890,10 +67005,6 @@ pub const HAVE_GETOPT_H: i32 = 1;
 pub const HAVE_GETOPT_LONG: i32 = 1;
 #[doc = " Compiler-verified C object macro `HAVE_GETRLIMIT`, omitted by bindgen."]
 pub const HAVE_GETRLIMIT: i32 = 1;
-#[doc = " Compiler-verified C object macro `HAVE_GSSAPI_GSSAPI_EXT_H`, omitted by bindgen."]
-pub const HAVE_GSSAPI_GSSAPI_EXT_H: i32 = 1;
-#[doc = " Compiler-verified C object macro `HAVE_GSSAPI_GSSAPI_H`, omitted by bindgen."]
-pub const HAVE_GSSAPI_GSSAPI_H: i32 = 1;
 #[doc = " Compiler-verified C object macro `HAVE_HISTORY_TRUNCATE_FILE`, omitted by bindgen."]
 pub const HAVE_HISTORY_TRUNCATE_FILE: i32 = 1;
 #[doc = " Compiler-verified C object macro `HAVE_IFADDRS_H`, omitted by bindgen."]
@@ -66912,38 +67023,14 @@ pub const HAVE_INTTYPES_H: i32 = 1;
 pub const HAVE_INT_OPTERR: i32 = 1;
 #[doc = " Compiler-verified C object macro `HAVE_INT_TIMEZONE`, omitted by bindgen."]
 pub const HAVE_INT_TIMEZONE: i32 = 1;
-#[doc = " Compiler-verified C object macro `HAVE_IO_URING_QUEUE_INIT_MEM`, omitted by bindgen."]
-pub const HAVE_IO_URING_QUEUE_INIT_MEM: i32 = 1;
-#[doc = " Compiler-verified C object macro `HAVE_LDAP_INITIALIZE`, omitted by bindgen."]
-pub const HAVE_LDAP_INITIALIZE: i32 = 1;
-#[doc = " Compiler-verified C object macro `HAVE_LIBCRYPTO`, omitted by bindgen."]
-pub const HAVE_LIBCRYPTO: i32 = 1;
-#[doc = " Compiler-verified C object macro `HAVE_LIBCURL`, omitted by bindgen."]
-pub const HAVE_LIBCURL: i32 = 1;
-#[doc = " Compiler-verified C object macro `HAVE_LIBLDAP`, omitted by bindgen."]
-pub const HAVE_LIBLDAP: i32 = 1;
-#[doc = " Compiler-verified C object macro `HAVE_LIBLZ4`, omitted by bindgen."]
-pub const HAVE_LIBLZ4: i32 = 1;
 #[doc = " Compiler-verified C object macro `HAVE_LIBM`, omitted by bindgen."]
 pub const HAVE_LIBM: i32 = 1;
-#[doc = " Compiler-verified C object macro `HAVE_LIBNUMA`, omitted by bindgen."]
-pub const HAVE_LIBNUMA: i32 = 1;
-#[doc = " Compiler-verified C object macro `HAVE_LIBPAM`, omitted by bindgen."]
-pub const HAVE_LIBPAM: i32 = 1;
 #[doc = " Compiler-verified C object macro `HAVE_LIBREADLINE`, omitted by bindgen."]
 pub const HAVE_LIBREADLINE: i32 = 1;
-#[doc = " Compiler-verified C object macro `HAVE_LIBSELINUX`, omitted by bindgen."]
-pub const HAVE_LIBSELINUX: i32 = 1;
-#[doc = " Compiler-verified C object macro `HAVE_LIBSSL`, omitted by bindgen."]
-pub const HAVE_LIBSSL: i32 = 1;
-#[doc = " Compiler-verified C object macro `HAVE_LIBXML2`, omitted by bindgen."]
-pub const HAVE_LIBXML2: i32 = 1;
-#[doc = " Compiler-verified C object macro `HAVE_LIBXSLT`, omitted by bindgen."]
-pub const HAVE_LIBXSLT: i32 = 1;
 #[doc = " Compiler-verified C object macro `HAVE_LIBZ`, omitted by bindgen."]
 pub const HAVE_LIBZ: i32 = 1;
-#[doc = " Compiler-verified C object macro `HAVE_LIBZSTD`, omitted by bindgen."]
-pub const HAVE_LIBZSTD: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_MEMORY_H`, omitted by bindgen."]
+pub const HAVE_MEMORY_H: i32 = 1;
 #[doc = " Compiler-verified C object macro `HAVE_MKDTEMP`, omitted by bindgen."]
 pub const HAVE_MKDTEMP: i32 = 1;
 #[doc = " Compiler-verified C object macro `HAVE_PLANNERINFO_TYPEDEF`, omitted by bindgen."]
@@ -66986,8 +67073,6 @@ pub const HAVE_RL_FILENAME_QUOTING_FUNCTION: i32 = 1;
 pub const HAVE_RL_RESET_SCREEN_SIZE: i32 = 1;
 #[doc = " Compiler-verified C object macro `HAVE_RL_VARIABLE_BIND`, omitted by bindgen."]
 pub const HAVE_RL_VARIABLE_BIND: i32 = 1;
-#[doc = " Compiler-verified C object macro `HAVE_SECURITY_PAM_APPL_H`, omitted by bindgen."]
-pub const HAVE_SECURITY_PAM_APPL_H: i32 = 1;
 #[doc = " Compiler-verified C object macro `HAVE_SETSID`, omitted by bindgen."]
 pub const HAVE_SETSID: i32 = 1;
 #[doc = " Compiler-verified C object macro `HAVE_SHM_OPEN`, omitted by bindgen."]
@@ -66996,18 +67081,8 @@ pub const HAVE_SHM_OPEN: i32 = 1;
 pub const HAVE_SOCKLEN_T: i32 = 1;
 #[doc = " Compiler-verified C object macro `HAVE_SPECIALJOININFO_TYPEDEF`, omitted by bindgen."]
 pub const HAVE_SPECIALJOININFO_TYPEDEF: i32 = 1;
-#[doc = " Compiler-verified C object macro `HAVE_SSL_CTX_SET_CERT_CB`, omitted by bindgen."]
-pub const HAVE_SSL_CTX_SET_CERT_CB: i32 = 1;
-#[doc = " Compiler-verified C object macro `HAVE_SSL_CTX_SET_CIPHERSUITES`, omitted by bindgen."]
-pub const HAVE_SSL_CTX_SET_CIPHERSUITES: i32 = 1;
-#[doc = " Compiler-verified C object macro `HAVE_SSL_CTX_SET_KEYLOG_CALLBACK`, omitted by bindgen."]
-pub const HAVE_SSL_CTX_SET_KEYLOG_CALLBACK: i32 = 1;
-#[doc = " Compiler-verified C object macro `HAVE_SSL_CTX_SET_NUM_TICKETS`, omitted by bindgen."]
-pub const HAVE_SSL_CTX_SET_NUM_TICKETS: i32 = 1;
 #[doc = " Compiler-verified C object macro `HAVE_STDINT_H`, omitted by bindgen."]
 pub const HAVE_STDINT_H: i32 = 1;
-#[doc = " Compiler-verified C object macro `HAVE_STDIO_H`, omitted by bindgen."]
-pub const HAVE_STDIO_H: i32 = 1;
 #[doc = " Compiler-verified C object macro `HAVE_STDLIB_H`, omitted by bindgen."]
 pub const HAVE_STDLIB_H: i32 = 1;
 #[doc = " Compiler-verified C object macro `HAVE_STRERROR_R`, omitted by bindgen."]
@@ -67052,22 +67127,14 @@ pub const HAVE_SYS_STAT_H: i32 = 1;
 pub const HAVE_SYS_TYPES_H: i32 = 1;
 #[doc = " Compiler-verified C object macro `HAVE_TERMIOS_H`, omitted by bindgen."]
 pub const HAVE_TERMIOS_H: i32 = 1;
-#[doc = " Compiler-verified C object macro `HAVE_THREADSAFE_CURL_GLOBAL_INIT`, omitted by bindgen."]
-pub const HAVE_THREADSAFE_CURL_GLOBAL_INIT: i32 = 1;
 #[doc = " Compiler-verified C object macro `HAVE_TYPEOF`, omitted by bindgen."]
 pub const HAVE_TYPEOF: i32 = 1;
 #[doc = " Compiler-verified C object macro `HAVE_UNISTD_H`, omitted by bindgen."]
 pub const HAVE_UNISTD_H: i32 = 1;
 #[doc = " Compiler-verified C object macro `HAVE_USELOCALE`, omitted by bindgen."]
 pub const HAVE_USELOCALE: i32 = 1;
-#[doc = " Compiler-verified C object macro `HAVE_UUID_E2FS`, omitted by bindgen."]
-pub const HAVE_UUID_E2FS: i32 = 1;
-#[doc = " Compiler-verified C object macro `HAVE_UUID_UUID_H`, omitted by bindgen."]
-pub const HAVE_UUID_UUID_H: i32 = 1;
 #[doc = " Compiler-verified C object macro `HAVE_VISIBILITY_ATTRIBUTE`, omitted by bindgen."]
 pub const HAVE_VISIBILITY_ATTRIBUTE: i32 = 1;
-#[doc = " Compiler-verified C object macro `HAVE_X509_GET_SIGNATURE_INFO`, omitted by bindgen."]
-pub const HAVE_X509_GET_SIGNATURE_INFO: i32 = 1;
 #[doc = " Compiler-verified C object macro `HAVE_X86_64_POPCNTQ`, omitted by bindgen."]
 pub const HAVE_X86_64_POPCNTQ: i32 = 1;
 #[doc = " Compiler-verified C object macro `HAVE_XSAVE_INTRINSICS`, omitted by bindgen."]
@@ -72071,4 +72138,4 @@ impl ::core::fmt::Display for XmlSerialize {
 #[doc = r" The release generation of these bindings, checked by the documentation snapshot."]
 #[doc(hidden)]
 pub const __PGRX_GENERATION: &str =
-    "cea26c54db3ee970e439f5717f868593bd2604a6b107b9c0d2fb98d8c4dd3959";
+    "d2d971efe8a0bba14a653b861907f09a278c34797b15e2d836269bb385ad7e21";

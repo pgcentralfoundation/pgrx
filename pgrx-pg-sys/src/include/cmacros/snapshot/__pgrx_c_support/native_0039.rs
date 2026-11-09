@@ -1,64 +1,6 @@
 // Shared generated C macro support.
 
 #[cfg(feature = "pg19")]
-const _: () = assert!(::core::mem::align_of::<u32>() == 4);
-#[cfg(feature = "pg19")]
-const _: () = assert!(
-    ::core::mem::size_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>>() == 8
-);
-#[cfg(feature = "pg19")]
-const _: () = assert!(
-    ::core::mem::align_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>>() == 8
-);
-#[cfg(feature = "pg19")]
-const _: () = assert!(
-    ::core::mem::size_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>>() == 8
-);
-#[cfg(feature = "pg19")]
-const _: () = assert!(
-    ::core::mem::align_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>>() == 8
-);
-#[cfg(feature = "pg19")]
-const _: () = assert!(
-    ::core::mem::size_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>>() == 8
-);
-#[cfg(feature = "pg19")]
-const _: () = assert!(
-    ::core::mem::align_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>>() == 8
-);
-#[cfg(feature = "pg19")]
-const _: () = assert!(
-    ::core::mem::size_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>>() == 8
-);
-#[cfg(feature = "pg19")]
-const _: () = assert!(
-    ::core::mem::align_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>>() == 8
-);
-#[cfg(feature = "pg19")]
-const _: () = assert!(
-    ::core::mem::size_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>>() == 8
-);
-#[cfg(feature = "pg19")]
-const _: () = assert!(
-    ::core::mem::align_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>>() == 8
-);
-#[cfg(feature = "pg19")]
-const _: () = assert!(::core::mem::size_of::<*mut crate::__pgrx_c_bindings::List>() == 8);
-#[cfg(feature = "pg19")]
-const _: () = assert!(::core::mem::align_of::<*mut crate::__pgrx_c_bindings::List>() == 8);
-#[cfg(feature = "pg19")]
-unsafe extern "C-unwind" {
-    #[link_name = "__pgrx_inline__fn__list_make5_impl"]
-    fn raw_inline_list_make5_impl(
-        arg0: u32,
-        arg1: ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>,
-        arg2: ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>,
-        arg3: ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>,
-        arg4: ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>,
-        arg5: ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>,
-    ) -> *mut crate::__pgrx_c_bindings::List;
-}
-#[cfg(feature = "pg19")]
 #[doc = "Call the original C function `list_make5_impl`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
 #[inline]
 pub unsafe fn Inline_list_make5_impl(
@@ -196,10 +138,6 @@ pub unsafe fn Inline_list_make_xid_cell(
     // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
     unsafe { crate::ffi::pg_guard_ffi_boundary(move || raw_inline_list_make_xid_cell(arg0)) }
 }
-#[cfg(feature = "pg19")]
-const _: () = assert!(::core::mem::size_of::<*mut ::core::ffi::c_void>() == 8);
-#[cfg(feature = "pg19")]
-const _: () = assert!(::core::mem::align_of::<*mut ::core::ffi::c_void>() == 8);
 #[cfg(feature = "pg19")]
 const _: () = assert!(::core::mem::size_of::<usize>() == 8);
 #[cfg(feature = "pg19")]

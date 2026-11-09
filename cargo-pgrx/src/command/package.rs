@@ -455,7 +455,7 @@ impl Vars {
             ("PG_MAJOR_VERSION", Ok(pg_config.major_version()?.to_string())),
             ("PG_PKGLIBDIR", Ok(utf8_path(&pg_config.pkglibdir()?)?)),
             ("PG_SHAREDIR", Ok(utf8_path(&pg_config.sharedir()?)?)),
-            ("VERSION", Ok(package_version(package.version()))),
+            ("VERSION", Ok(package_version(&package.version().to_string()))),
             ("WORKSPACE_ROOT", Ok(utf8_path(workspace_root)?)),
         ])))
     }

@@ -232,15 +232,17 @@ impl syn::visit_mut::VisitMut for BitAccess {
     /// Inspect actual bindgen storage-unit reads while retaining recursive traversal of the
     /// getter expression.
     fn visit_expr_method_call_mut(&mut self, call: &mut syn::ExprMethodCall) {
-        if call.method == "get"
-            && call.args.len() == 2
+        if call.method == "get_const"
+            && call.args.is_empty()
+            && let Some(generics) = &call.turbofish
+            && generics.args.len() == 2
             && let syn::Expr::Field(receiver) = call.receiver.as_ref()
             && let syn::Expr::Path(base) = receiver.base.as_ref()
             && base.path.is_ident("self")
             && let syn::Member::Named(field) = &receiver.member
-            && let syn::Expr::Lit(offset) = &call.args[0]
+            && let syn::GenericArgument::Const(syn::Expr::Lit(offset)) = &generics.args[0]
             && let syn::Lit::Int(offset) = &offset.lit
-            && let syn::Expr::Lit(width) = &call.args[1]
+            && let syn::GenericArgument::Const(syn::Expr::Lit(width)) = &generics.args[1]
             && let syn::Lit::Int(width) = &width.lit
         {
             self.0.push((

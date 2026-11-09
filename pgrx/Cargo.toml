@@ -10,7 +10,7 @@
 
 [package]
 name = "pgrx"
-version = "0.19.3"
+version = "0.20.0-beta.0"
 authors.workspace = true
 license.workspace = true
 description = "pgrx:  A Rust framework for creating Postgres extensions"
@@ -51,12 +51,12 @@ pgrx-sql-entity-graph.workspace = true
 thiserror.workspace = true # error handling and logging
 
 # used to internally impl things
-uuid = { version = "1.23.2", features = ["v4"] } # PgLwLock and shmem
-enum-map = "2.7.3"
+uuid = { version = "1.29.1", features = ["v4"] } # PgLwLock and shmem
+enum-map = "3.1.0"
 
 # exposed in public API
-bitflags = "2.13.0" # BackgroundWorker
-bitvec = "1.0" # processing array nullbitmaps
+bitflags = "2.13.2" # BackgroundWorker
+bitvec = "1.1" # processing array nullbitmaps
 libc.workspace = true # FFI type compat
 seahash = "4.1.0" # derive(PostgresHash)
 serde.workspace = true # impls on pub types
