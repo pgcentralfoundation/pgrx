@@ -53,7 +53,7 @@ fn macho_schema_section_data(data: &[u8]) -> eyre::Result<Option<&[u8]>> {
     let mut cursor = header_size;
 
     for _ in 0..ncmds {
-        let cmd = read_u32(data, cursor, endian)?;
+        let cmd = object::macho::LoadCommandType(read_u32(data, cursor, endian)?);
         let cmdsize = read_u32(data, cursor + 4, endian)? as usize;
         if cmdsize < 8 {
             bail!("invalid Mach-O load command size");
@@ -307,13 +307,13 @@ mod tests {
         bytes.extend_from_slice(&[0xcf, 0xfa, 0xed, 0xfe]);
         bytes.extend_from_slice(&0u32.to_le_bytes());
         bytes.extend_from_slice(&0u32.to_le_bytes());
-        bytes.extend_from_slice(&object::macho::MH_DYLIB.to_le_bytes());
+        bytes.extend_from_slice(&object::macho::MH_DYLIB.0.to_le_bytes());
         bytes.extend_from_slice(&1u32.to_le_bytes());
         bytes.extend_from_slice(&(command_len as u32).to_le_bytes());
         bytes.extend_from_slice(&0u32.to_le_bytes());
         bytes.extend_from_slice(&0u32.to_le_bytes());
 
-        bytes.extend_from_slice(&object::macho::LC_SEGMENT_64.to_le_bytes());
+        bytes.extend_from_slice(&object::macho::LC_SEGMENT_64.0.to_le_bytes());
         bytes.extend_from_slice(&(command_len as u32).to_le_bytes());
         push_padded_name(&mut bytes, MACHO_SEGMENT_NAME, 16);
         bytes.extend_from_slice(&0u64.to_le_bytes());

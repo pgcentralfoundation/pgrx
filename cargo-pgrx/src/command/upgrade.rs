@@ -273,20 +273,24 @@ fn update_manifest_section<T: toml_edit::TableLike + ?Sized>(
             }
         };
 
+        // Read the requirement as written. `cargo_toml` parses it into a
+        // `semver::VersionReq`, which displays `0.19.3` as `^0.19.3`.
         match dependency {
             Dependency::Inherited(_) => continue,
-            Dependency::Simple(requirement) => {
-                let next_requirement = rewrite(requirement);
-                section.insert(&local_name, next_requirement.into());
+            Dependency::Simple(_) => {
+                let requirement = section.get(local_name).and_then(toml_edit::Item::as_str);
+                let next_requirement = rewrite(requirement.expect("source and sink diverged"));
+                section.insert(local_name, next_requirement.into());
             }
             Dependency::Detailed(detail) => {
-                let Some(requirement) = &detail.version else {
+                if detail.version.is_none() {
                     info!("No version specified for {local_name}, not upgrading.");
                     continue;
-                };
-                let next_requirement = rewrite(requirement);
-                let table = section.get_mut(&local_name).expect("source and sink diverged");
+                }
+                let table = section.get_mut(local_name).expect("source and sink diverged");
                 let table = table.as_table_like_mut().expect("source and sink diverged");
+                let requirement = table.get("version").and_then(toml_edit::Item::as_str);
+                let next_requirement = rewrite(requirement.expect("source and sink diverged"));
                 table.insert("version", next_requirement.into());
             }
         }
