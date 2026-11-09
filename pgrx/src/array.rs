@@ -13,15 +13,13 @@
 use crate::datum::{Array, BorrowDatum, Datum};
 use crate::layout::{Align, Layout};
 use crate::memcx::MemCx;
-use crate::nullable::Nullable;
+use crate::nullable::{NullBitmap, Nullable};
 use crate::palloc::PBox;
 use crate::pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
 use crate::toast::{Toast, Toasty};
 use crate::{layout, pg_sys};
-use bitvec::ptr::{self as bitptr, BitPtr, BitPtrError, Const, Mut};
-use bitvec::slice::{self as bitslice, BitSlice};
 use core::iter::{ExactSizeIterator, FusedIterator};
 use core::marker::PhantomData;
 use core::ptr::{self, NonNull};
@@ -234,53 +232,15 @@ impl RawArray {
         unsafe { pg_sys::ARR_HASNULL!(self.ptr.as_ptr()).get() != 0 }
     }
 
-    /// May return null.
+    /// The null bitmap's bytes, or `None` when the array has no bitmap. This only computes a
+    /// pointer, so it needs no exclusive borrow; [RawArray::nulls] adds that for callers that
+    /// write through the result.
     #[inline]
-    fn nulls_mut_ptr(&mut self) -> *mut u8 {
+    fn null_bitmap_bytes(&self) -> Option<NonNull<[u8]>> {
         // SAFETY: Construction requires a live initialized ArrayType header and valid
         // dimensions. The macro reads the header and computes a raw pointer with
         // wrapping offsets or returns NULL; callers establish readable bitmap bounds.
-        unsafe { pg_sys::ARR_NULLBITMAP!(self.ptr.as_ptr()).get() }
-    }
-
-    #[inline]
-    fn nulls_bitptr(&self) -> Option<BitPtr<Const, u8>> {
-        // SAFETY: The constructor guarantees the live initialized array header and
-        // valid dimensions. Raw offsets wrap; no bitmap bytes are read here.
-        let nulls_ptr = unsafe { pg_sys::ARR_NULLBITMAP!(self.ptr.as_ptr()).get() }.cast_const();
-        match BitPtr::try_from(nulls_ptr) {
-            Ok(ptr) => Some(ptr),
-            Err(BitPtrError::Null(_)) => None,
-            Err(BitPtrError::Misaligned(_)) => unreachable!(),
-        }
-    }
-
-    #[inline]
-    fn nulls_mut_bitptr(&mut self) -> Option<BitPtr<Mut, u8>> {
-        // SAFETY: The constructor guarantees the live initialized array header and
-        // valid dimensions. Raw offsets wrap; no bitmap bytes are read here.
-        let nulls_ptr = unsafe { pg_sys::ARR_NULLBITMAP!(self.ptr.as_ptr()).get() };
-        match BitPtr::try_from(self.nulls_mut_ptr()) {
-            Ok(ptr) => Some(ptr),
-            Err(BitPtrError::Null(_)) => None,
-            Err(BitPtrError::Misaligned(_)) => unreachable!(),
-        }
-    }
-
-    /** Oxidized form of [ARR_NULLBITMAP(ArrayType*)][ARR_NULLBITMAP]
-
-    If this returns None, the array cannot have nulls.
-    If this returns Some, it points to the bitslice that marks nulls in this array.
-
-    Note that unlike the `is_null: bool` that appears elsewhere, here a 0 bit is null,
-    or possibly out of bounds for the final byte of the bitslice.
-
-    Note that if this is None, that does not mean it's always okay to read!
-    If len is 0, then this slice will be valid for 0 bytes.
-
-    [ARR_NULLBITMAP]: <https://git.postgresql.org/gitweb/?p=postgresql.git;a=blob;f=src/include/utils/array.h;h=4ae6c3be2f8b57afa38c19af2779f67c782e4efc;hb=278273ccbad27a8834dfdf11895da9cd91de4114#l293>
-    */
-    pub fn nulls(&mut self) -> Option<NonNull<[u8]>> {
+        let nulls = unsafe { pg_sys::ARR_NULLBITMAP!(self.ptr.as_ptr()).get() };
         // len() bounds the element count by MaxArraySize, so C int conversion and
         // BITMAPLEN's addition fit. The C operation also handles the empty bitmap.
         // SAFETY: BITMAPLEN reads no memory. Where it is a guarded native call, the guard
@@ -288,23 +248,39 @@ impl RawArray {
         #[allow(unused_unsafe, reason = "BITMAPLEN is pure where it is a macro or translated")]
         let len = unsafe { pg_sys::BITMAPLEN!(self.len() as libc::c_int).get() } as usize;
 
-        NonNull::new(ptr::slice_from_raw_parts_mut(self.nulls_mut_ptr(), len))
+        NonNull::new(ptr::slice_from_raw_parts_mut(nulls, len))
     }
 
-    /** The [bitvec] equivalent of [RawArray::nulls].
+    /// The null bitmap, borrowing the array's memory for `'a`, or `None` when the array has
+    /// no bitmap and so no nulls.
+    ///
+    /// # Safety
+    ///
+    /// The array's memory must stay alive, and its bitmap unmodified, for `'a`.
+    pub(crate) unsafe fn null_bitmap<'a>(&self) -> Option<NullBitmap<'a>> {
+        let bytes = self.null_bitmap_bytes()?;
+        // SAFETY: Construction makes the bitmap readable for its BITMAPLEN bytes, and the
+        // caller keeps those bytes alive and unmodified for 'a.
+        let bytes = unsafe { bytes.as_ref() };
+        Some(NullBitmap::new(bytes, self.len()).expect("BITMAPLEN covers every element"))
+    }
 
-    If this returns `None`, the array cannot have nulls.
-    If this returns `Some`, it points to the bitslice that marks nulls in this array.
+    /** Oxidized form of [ARR_NULLBITMAP(ArrayType*)][ARR_NULLBITMAP]
 
-    Note that unlike the `is_null: bool` that appears elsewhere, here a 0 bit is null.
-    Unlike [RawArray::nulls], this slice is bit-exact in length, so there are no caveats for safely-used BitSlices.
+    If this returns None, the array cannot have nulls.
+    If this returns Some, it points to the bitmap that marks nulls in this array.
 
-    [bitvec]: https://docs.rs/bitvec/latest
-    [BitPtrError::Null]: <https://docs.rs/bitvec/latest/bitvec/ptr/enum.BitPtrError.html>
+    Note that unlike the `is_null: bool` that appears elsewhere, here a 0 bit is null,
+    or possibly out of bounds for the final byte of the bitmap. [NullBitmap::new] with
+    [RawArray::len] reads only the bits that belong to elements.
+
+    Note that if this is None, that does not mean it's always okay to read!
+    If len is 0, then this slice will be valid for 0 bytes.
+
     [ARR_NULLBITMAP]: <https://git.postgresql.org/gitweb/?p=postgresql.git;a=blob;f=src/include/utils/array.h;h=4ae6c3be2f8b57afa38c19af2779f67c782e4efc;hb=278273ccbad27a8834dfdf11895da9cd91de4114#l293>
     */
-    pub fn nulls_bitslice(&mut self) -> Option<NonNull<BitSlice<u8>>> {
-        NonNull::new(bitptr::bitslice_from_raw_parts_mut(self.nulls_mut_bitptr()?, self.len()))
+    pub fn nulls(&mut self) -> Option<NonNull<[u8]>> {
+        self.null_bitmap_bytes()
     }
 
     /** Checks the array for any NULL values
