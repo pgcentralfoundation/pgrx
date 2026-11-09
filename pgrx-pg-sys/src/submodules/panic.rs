@@ -795,18 +795,17 @@ where
             }
         }
         GuardAction::ReThrowCopy(edata) => {
-            // the bindings guard ReThrowError(), which would catch the ERROR it raises
+            // The bindings guard ReThrowError(), which would catch the ERROR it raises.  They
+            // also disagree on its signature: bindgen sees `pg_attribute_noreturn()` through
+            // PG17, but not PG18's `pg_noreturn`.
+            #[allow(clashing_extern_declarations)]
             #[cfg_attr(target_os = "windows", link(name = "postgres"))]
             unsafe extern "C-unwind" {
-                fn ReThrowError(edata: *mut crate::ErrorData);
+                fn ReThrowError(edata: *mut crate::ErrorData) -> !;
             }
             // SAFETY: `edata` is a complete ERROR in ErrorContext, which keeps it until Postgres
-            // discards the error, and this frame holds nothing that needs dropping.  Postgres
-            // declares ReThrowError() noreturn.
-            unsafe {
-                ReThrowError(edata.as_ptr());
-                unreachable_unchecked()
-            }
+            // discards the error, and this frame holds nothing that needs dropping
+            unsafe { ReThrowError(edata.as_ptr()) }
         }
         GuardAction::Report(ereport) => {
             unsafe {
