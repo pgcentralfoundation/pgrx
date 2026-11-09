@@ -194,6 +194,14 @@ unsafe fn pg_guard_ffi_boundary_impl<T, F: FnOnce() -> T>(f: F) -> T {
         } else {
             // We've landed here b/c of a longjmp originating in Postgres
 
+            // Restore Postgres' understanding of where its next longjmp should go before calling
+            // anything that can raise an ERROR, as PG_CATCH() does.  The calls below are guarded,
+            // so an ERROR they raise unwinds out of here as a panic, which would leave Postgres
+            // jumping to our buffer, whose frame has returned, and calling context callbacks from
+            // the C frames that the longjmp discarded.
+            pg_sys::PG_exception_stack = prev_exception_stack;
+            pg_sys::error_context_stack = prev_error_context_stack;
+
             // the overhead to get the current [ErrorData] from Postgres and convert
             // it into our [ErrorReportWithLevel] seems worth the user benefit
             //
@@ -242,12 +250,9 @@ unsafe fn pg_guard_ffi_boundary_impl<T, F: FnOnce() -> T>(f: F) -> T {
             };
             let line = errdata.lineno as _;
 
-            // clean up after ourselves by freeing the result of [CopyErrorData] and restoring
-            // Postgres' understanding of where its next longjmp should go.  Keep the original
+            // clean up after ourselves by freeing the result of [CopyErrorData].  Keep the original
             // error on Postgres' error stack so it can later be rethrown without losing fields.
             pg_sys::FreeErrorData(errdata_ptr);
-            pg_sys::PG_exception_stack = prev_exception_stack;
-            pg_sys::error_context_stack = prev_error_context_stack;
 
             // remember the original's stack entry so the error is rethrown only while it's on top
             let stack_entry = ErrorStackEntry::mark_top();

@@ -522,4 +522,38 @@ mod tests {
         std::panic::catch_unwind(|| open_missing_relation(1)).unwrap_err();
         caught.expect("relation_open should have raised an ERROR").rethrow();
     }
+
+    /// The boundary's own `CopyErrorData()` raises when C code flushed the stack before it
+    /// rethrew.  Postgres' exception and error context stacks must already point where they did
+    /// before the boundary, not at its jump buffer, whose frame has returned.
+    #[pg_test]
+    fn test_boundary_restores_stacks_before_copying_error() {
+        use pgrx::pg_sys::panic::CaughtError;
+
+        #[cfg_attr(target_os = "windows", link(name = "postgres"))]
+        unsafe extern "C-unwind" {
+            fn pg_re_throw() -> !;
+        }
+
+        // SAFETY: tests run on the backend thread
+        let before = unsafe { (pg_sys::PG_exception_stack, pg_sys::error_context_stack) };
+        let message = PgTryBuilder::new(|| unsafe {
+            // SAFETY: the closure holds nothing that needs dropping when pg_re_throw() jumps
+            pg_sys::ffi::pg_guard_ffi_boundary(|| -> String {
+                pg_sys::FlushErrorState();
+                pg_re_throw()
+            })
+        })
+        .catch_others(|e| match e {
+            CaughtError::PostgresError(ereport) => ereport.message().to_string(),
+            e => e.rethrow(),
+        })
+        .execute();
+
+        // SAFETY: as above.  Put the stacks back first, so a failed assertion can raise its ERROR
+        let after = unsafe { (pg_sys::PG_exception_stack, pg_sys::error_context_stack) };
+        unsafe { (pg_sys::PG_exception_stack, pg_sys::error_context_stack) = before };
+        assert_eq!(message, "errstart was not called");
+        assert_eq!(after, before);
+    }
 }
