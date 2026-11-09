@@ -469,7 +469,8 @@ jobs:
         with:
           shared-key: install-regression
           save-if: ${{ env.SAVE_RUST_CACHE == 'true' }}
-      - run: cargo test --locked --package cargo-pgrx --test install_pg_test_regression -- --ignored
+      # The crates jobs skip these tests, so this job runs the ignored one and the others.
+      - run: cargo test --locked --package cargo-pgrx --test install_pg_test_regression -- --include-ignored
 
   runas:
     name: cargo pgrx test --runas

@@ -33,10 +33,15 @@ pub(crate) fn run(packages: &[String]) -> eyre::Result<bool> {
 
     // pgrx-bindgen's fixture builds run Cargo offline, so every locked crate must be present.
     let mut passed = process::run(Command::new("cargo").args(["fetch", "--locked"]))?;
+    // cargo-pgrx's install regression builds and installs pgrx-unit-tests with `cargo pgrx
+    // install --test`, minutes of work here. Every PG job's pg_test harness runs that same
+    // command on pgrx-unit-tests and decodes the same large schema, and the install-regression
+    // job runs these tests themselves, so the crates jobs skip them.
     passed &= process::run(
         Command::new("cargo")
             .args(["nextest", "run", "--locked", "--no-fail-fast", "--no-tests=pass"])
-            .args(&selection),
+            .args(&selection)
+            .args(["-E", "not binary_id(cargo-pgrx::install_pg_test_regression)"]),
     )?;
     // `cargo test --doc` refuses a selection without a library, such as cargo-pgrx alone.
     if libraries {
