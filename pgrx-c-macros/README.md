@@ -193,8 +193,8 @@ an inline function, its return rank or evaluation rules can therefore change wit
 PostgreSQL, and so can whether a call needs `unsafe`. Whether a body is translated
 also depends on the libclang that inspects it: some libclang releases locate a
 statement that starts with a macro at the macro's definition, which keeps the body
-native. An assert-enabled build translates the same bodies as a release build; see
-[Assertions and assert-enabled builds](#assertions-and-assert-enabled-builds). Predicate
+native. An assert-enabled build and a release build translate the same bodies; see
+[Assertions and build flavors](#assertions-and-build-flavors). Predicate
 callers can use `.is_true()` for either C `int` or C `bool`; this explicitly
 converts truth without changing `.get()` or the original C identity. Native calls
 retain generated FFI guards and require the original function's unsafe caller
@@ -427,7 +427,7 @@ The typed expression support also covers:
   Dynamic expectations remain unhinted, with a generated comment explaining why.
 - `ExceptionalCondition`, `abort()`, `__builtin_unreachable()` and MSVC's
   `__assume`, which stop the process; see
-  [Assertions and assert-enabled builds](#assertions-and-assert-enabled-builds).
+  [Assertions and build flavors](#assertions-and-build-flavors).
 - Closed token pastes resolved by Clang, including literal suffixes and fixed
   type, field, function, enum and helper names. Separate compiler probes reject
   pastes that depend on caller operands and discover synthesized dependencies
@@ -458,12 +458,15 @@ thread requirements. PostgreSQL calls retain pgrx's FFI error and panic guard.
 
 Reading a global is the exception when the binding catalog names a thread check, as
 pgrx-pg-sys's does. A macro reads an integer, `_Bool`, enum or data pointer global
-after that check, which panics on any thread but PostgreSQL's, so the read needs no
-`unsafe`. PostgreSQL writes its globals only on that thread, apart from the
-`volatile` flags its signal handlers set, which are read as `volatile` as in C, and
-storage of those types holds a valid Rust value whatever C stored. Enum globals load their compatible integer, never the Rust enum. Writes,
-dereferences, and reads of floating, aggregate or function pointer globals still need
-the caller's `unsafe`. Each read checks the thread, including in release builds.
+after pgrx's active-thread check, so the read needs no `unsafe`. That check is the
+one pgrx relies on for every call into PostgreSQL, which reads and writes its
+globals on the thread that passes it; it panics on another thread. A global that
+PostgreSQL also sets asynchronously is `volatile` in C and is read as `volatile`.
+An object of one of those types loads a valid Rust value from anything C stores in
+it through that type. Enum globals load their compatible integer, never the Rust
+enum. Writes, dereferences, and reads of floating, aggregate or function pointer
+globals still need the caller's `unsafe`. Each read runs the check, including in
+release builds.
 Native adapters convert arguments and check nullable function pointers before
 entering that guard, and decode results after leaving it.
 
@@ -482,52 +485,86 @@ Compatible function pointer types
 with distinct generated signature markers are conservatively rejected in
 operations that would require a proof relating those signatures.
 
-### Assertions and assert-enabled builds
+### Assertions and build flavors
 
-A generated macro has the same name, calling form and need for `unsafe` whether
-PostgreSQL was configured with `--enable-cassert` or not. `USE_ASSERT_CHECKING`
-otherwise changes much of that.
+A program that uses the generated macros compiles against a PostgreSQL configured
+with `--enable-cassert` and against one configured without, when both are the same
+version. A macro has the same name, operands, result and need for `unsafe` against
+both, and the same Rust source apart from layout facts. No macro leaves out a check
+that the assert-enabled headers make. `USE_ASSERT_CHECKING` otherwise changes which
+names the headers declare, how `Assert` and its relatives are defined, and what some
+static inline functions contain.
+
+Inspection therefore parses the headers a second time, in memory, as the other build
+flavor: with `USE_ASSERT_CHECKING` defined on the command line, or with its
+definitions blanked. Both flavors then hold the same two views and decide the same
+things from them:
+
+- A function-like macro that the flavors define differently, such as `Assert`,
+  `AssertMacro` and `pg_unreachable`, is translated from its assert-enabled
+  definition in both. Macros and static inline functions that use it follow. The
+  generated documentation shows that definition and its location.
+- Whether an assertion runs is a constant of the installation,
+  `__pgrx_c_assert_checking!()`, which the generated support defines. Against a
+  release build an `if` statement that only reports a failed assertion, and the
+  `holds || (report, 0)` of `AssertMacro`, are compiled and never evaluated, as in
+  release C. Their operands are still type-checked and still need `unsafe` where
+  they read through a pointer, so `PageValidateSpecialPointer` needs `unsafe`
+  against both builds.
+- A function that only an assert-enabled build declares, where a release build
+  defines a macro that does nothing, becomes a macro that calls the function:
+  `AssertTransactionIdInAllowableRange`, `AssertPendingSyncs_RelationCache` and
+  `SlruPagePrecedesUnitTests`. Against a release build the call is not made and its
+  arguments are not evaluated. The binding generator leaves the function out, and
+  the macro reaches it through a generated adapter, which does nothing in a release
+  build. So does a function that one flavor defines `static inline` and the other
+  only declares, such as `AssertCouldGetRelation`, which both builds bind.
+- A static inline function whose definition differs between the flavors, such as
+  `TupleDescCompactAttr`, is called, not translated, in both.
+- A name that only one flavor declares is generated and bound by neither:
+  `castNodeImpl`, `MemoryContextCheck` and `USE_ASSERT_CHECKING` itself, for example.
+  So is a function whose prototype differs. `FrontendOutput::flavor_specific_names`
+  lists them for the binding generator.
+- A static inline function that only an assert-enabled build defines, such as
+  `castNodeImpl`, is still called by the macros that use it, through a generated
+  adapter. A release build compiles the function's own definition into its native
+  support, where its assertions do nothing. So `intVal` and its relatives, which
+  expand `castNode`, check the node's tag against an assert-enabled build and are
+  the same macros against a release build. `castNode` itself and `lfirst_node`
+  paste `T_` onto a type operand, which no build can translate; see closed token
+  pastes above.
+- A macro whose assert-enabled definition needs any other name that a release build
+  lacks is generated by neither flavor, and neither is a macro that expands it.
+  Their skip code is `build_flavor`. Emitting the release definition instead would
+  leave out a check.
 
 Calls that stop the process lower to safe Rust in pgrx-pg-sys's support, without a
 native call. `ExceptionalCondition`, which `Assert` and its relatives call, writes
 PostgreSQL's `TRAP:` line and a backtrace to stderr and aborts. Its condition text
 is the C text, or the Rust invocation's tokens for a macro operand, and its file and
-line are the Rust invocation's. `abort()` aborts. Reaching `__builtin_unreachable()`,
-or a false MSVC `__assume`, is undefined in C, so it writes a `TRAP:` line and
-aborts. A failed check never unwinds, so it cannot become a recoverable
-PostgreSQL `ERROR`.
+line are those of the Rust code that used the macro. `abort()` aborts. Reaching
+`__builtin_unreachable()`, or a false MSVC `__assume`, is undefined in C, so it
+writes a `TRAP:` line and aborts. A failed check never unwinds, so it cannot become
+a recoverable PostgreSQL `ERROR`. Only a report through `ExceptionalCondition`
+depends on the installation; any other stop, and the condition that guards it, runs
+in every build.
 
-A check is an `if` whose only statement stops, `holds || (stop, 0)`, or
-`__assume(holds)`. A release build omits `Assert`'s checks, so a check whose
-condition needs the caller's `unsafe`, for example to dereference a pointer, is
-omitted when nothing else in the expansion needs `unsafe`. Otherwise the caller
-already holds `unsafe` and every check stays. A checked global read needs no
-`unsafe`, so `BufferIsValid` keeps its checks against `NBuffers` and `NLocBuffer`
-and needs no `unsafe` in either build. Called on another thread against an
-assert-enabled build, it panics at that check, where a release build's expansion
-reads no global.
+A macro that calls an assertion function needs the caller's `unsafe`, as any native
+call does, unless the function is one that generated code may call from safe code.
+Those are listed by name in `emit/assertions.rs`, each with the reason: they take no
+pointer and need only the backend state that pgrx's safe wrappers already assume,
+and the guarded call checks pgrx's active thread. `SlruPagePrecedesUnitTests` takes a
+pointer and needs `unsafe` against both builds.
 
-A macro operand that the expansion never evaluates, because the argument is unused
-or appears only in an omitted check or a stop's text, is checked in dead code. An
-operand that needs `unsafe` needs it whether or not this build's C evaluates it.
+A macro operand that the expansion never names as a value, because the argument is
+unused or appears only in a stop's text, is checked in dead code, so an operand that
+needs `unsafe` needs it although no build's C evaluates it.
 
-Inspecting assert-enabled headers also parses them as a release build would, with
-`USE_ASSERT_CHECKING` removed from `pg_config.h` in memory. Functions and macros
-that only the assert-enabled build declares, such as `castNodeImpl`, are not
-generated. A macro takes its release definition when the assert-enabled build
-declares that name as a function, or when its assert-enabled definition reaches a
-declaration the release build lacks, as `castNode` reaches `castNodeImpl`. A
-release static inline function without parameters, result or `return`, such as
-`AssertCouldGetRelation`, that the assert-enabled build declares only as a function
-becomes a statement macro of its body. These definitions follow the headers in a
-derived main file, so every later compiler pass sees them, and their generated
-documentation names the release definition's location. They lose the
-assert-enabled checks, as a release build does. `pgrx-pg-sys` also leaves out the
-bindings of functions an assert-enabled build declares where a release build defines
-a macro, such as `AssertTransactionIdInAllowableRange`, so each name is called the
-same way in every build; `FrontendOutput::functions_with_release_macros` lists them.
-The emission report records `caller_unsafe` for each emitted macro so that builds can
-be compared.
+Differences that are not names stay: a structure member or enumerator that only one
+flavor has, such as `JumbleState.total_jumble_len`, and the value of an object-like
+macro. The emission report records `caller_unsafe` for each emitted macro, and
+pgrx-pg-sys's macro report records these decisions under `build_flavors`, so that
+builds can be compared.
 
 ## Calling generated macros
 

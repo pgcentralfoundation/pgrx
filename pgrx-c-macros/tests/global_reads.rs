@@ -2,9 +2,9 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
 //! When the catalog names a thread check, a macro reads an integer, enum or data pointer
-//! global after that check, so the read needs no `unsafe` from its caller and a check whose
-//! condition reads a global is kept. Writes, dereferences and function pointer reads still
-//! need the caller's `unsafe`.
+//! global after that check, so the read needs no `unsafe` from its caller, and neither does
+//! an assertion whose condition reads one. Writes, dereferences and function pointer reads
+//! still need the caller's `unsafe`.
 
 #![cfg(all(
     target_pointer_width = "64",
@@ -82,7 +82,8 @@ fn emitted<'a>(generated: &'a MacroGeneration, name: &str) -> (&'a str, bool) {
 fn checked_global_reads_need_no_unsafe() {
     let scanner = MacroScanner::new().expect("libclang must be available");
     let mut arguments = oracle::native_arguments();
-    arguments.push("-std=c17".into());
+    // The check runs only against headers that enable assertions.
+    arguments.extend(["-std=c17".into(), "-DUSE_ASSERT_CHECKING=1".into()]);
     let frontend = inspect(&scanner, &header(), &arguments, None).expect("inspect definitions");
     let names = CHECKED.iter().chain(UNSAFE).chain([&CHECK]).copied().collect::<Vec<_>>();
     let session = AnalysisSession::prepare(&scanner, &frontend, &names).expect("prepare roots");
@@ -94,14 +95,13 @@ fn checked_global_reads_need_no_unsafe() {
         &frontend.profile().target,
     );
 
-    // Without a thread check every read needs `unsafe`, so the check is omitted to keep its
-    // macro safe.
+    // Without a thread check every read needs `unsafe`. The check stays in its macro, which
+    // then needs `unsafe` too.
     let unchecked = generate_with_bindings(&session, &names, &catalog).unwrap();
-    for name in CHECKED.iter().chain(UNSAFE) {
+    for name in CHECKED.iter().chain(UNSAFE).chain([&CHECK]) {
         assert!(emitted(&unchecked, name).1, "{name} needs unsafe without a thread check");
     }
-    let (rust, caller_unsafe) = emitted(&unchecked, CHECK);
-    assert!(!caller_unsafe && !rust.contains("assertion_failure"), "{rust}");
+    assert!(emitted(&unchecked, CHECK).0.contains("assertion_failure"));
 
     catalog.thread_check = Some(vec!["thread_check".into()]);
     let generated = generate_with_bindings(&session, &names, &catalog).unwrap();

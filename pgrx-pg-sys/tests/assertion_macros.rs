@@ -2,40 +2,39 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
-//! Check that PostgreSQL's assertion macros have the same form and safety in every build.
+//! Check that PostgreSQL's assertion macros are the same macros in every build flavor.
 //!
 //! An assert-enabled PostgreSQL checks these conditions and a release build does not. Either
-//! way each macro exists, takes the same operands, and needs `unsafe` only where its release
-//! form does, so every call here is safe code, which `unused_unsafe` would also flag.
-//! Checks that read PostgreSQL globals, such as `BufferIsValid`'s, need a backend, so
-//! `pgrx-unit-tests` covers them.
+//! way each macro exists, takes the same operands, yields the same type and needs `unsafe`
+//! for the same calls. This file compiles against both, and `unused_unsafe` rejects an
+//! `unsafe` block that one of them would not need.
+//!
+//! Macros that call PostgreSQL in an assert-enabled build are used in generic functions that
+//! nothing instantiates. Those are type-checked and linted like any other, and compile to no
+//! code that would need a backend's symbols. `pgrx-unit-tests` runs the macros in a backend,
+//! and the fixtures of `pgrx-c-macros` check that a failed assertion stops the process.
 
 #![cfg(not(docsrs))]
 #![deny(unsafe_op_in_unsafe_fn, unused_unsafe)]
 
 use pgrx_pg_sys as pg;
 
-/// Assertions whose conditions hold return in either build.
+/// `Assert` is a statement in C, so the macro yields `()` and can end a function.
+fn assert_statement(value: i32) {
+    pg::Assert!(value)
+}
+
+/// Assertions whose conditions hold return in either build, from safe code.
 #[test]
 fn assertions_that_hold_need_no_unsafe() {
-    let _ = pg::Assert!(1_i32);
-    let _ = pg::AssertMacro!(1_i32);
+    assert_statement(1);
+    let () = pg::Assert!(1_i32);
     let aligned = 0_u32;
-    let _ = pg::AssertPointerAlignment!(core::ptr::from_ref(&aligned), 4_i32);
-    let xid = pg::TransactionId::from(3_u32);
-    let _ = pg::AssertTransactionIdInAllowableRange!(xid);
+    let () = pg::AssertPointerAlignment!(core::ptr::from_ref(&aligned), 4_i32);
+    let () = pg::AssertMacro!(1_i32).get();
 }
 
-/// Assertion helpers that an assert-enabled build declares as functions are macros in
-/// both builds.
-#[test]
-fn assertion_helpers_are_macros_in_every_build() {
-    let _ = pg::AssertPendingSyncs_RelationCache!();
-    let _ = pg::AssertCouldGetRelation!();
-    let _ = pg::SlruPagePrecedesUnitTests!(core::ptr::null::<u8>(), 1_i32);
-}
-
-/// Checks whose conditions are pure stay in an assert-enabled build without needing `unsafe`.
+/// Checks whose conditions are pure run in an assert-enabled build without needing `unsafe`.
 #[test]
 fn pure_checks_need_no_unsafe() {
     let (older, newer) = (pg::TransactionId::from(3_u32), pg::TransactionId::from(4_u32));
@@ -43,18 +42,39 @@ fn pure_checks_need_no_unsafe() {
     assert_eq!(pg::AttrNumberGetAttrOffset!(1_i16).get(), 0);
 }
 
-/// `castNode` casts without its assert-enabled `castNodeImpl` check.
-#[test]
-fn cast_node_is_a_safe_pointer_cast() {
-    let node = core::ptr::null_mut::<pg::Node>();
-    let query: *mut pg::Query = pg::castNode!(pg::Query, node).get();
-    assert!(query.is_null());
+/// Assertion helpers that an assert-enabled build declares as functions are macros in both
+/// builds. Those that take no pointer need no `unsafe`.
+#[allow(dead_code)]
+fn assertion_functions_are_safe_macros_in_every_build<Uninstantiated>() {
+    let xid = pg::TransactionId::from(3_u32);
+    let () = pg::AssertTransactionIdInAllowableRange!(xid).get();
+    let () = pg::AssertPendingSyncs_RelationCache!().get();
+    let () = pg::AssertCouldGetRelation!().get();
+}
+
+/// A check that reads through a pointer needs `unsafe` in both builds, although only an
+/// assert-enabled PostgreSQL evaluates it.
+///
+/// # Safety
+/// `page` must point to an initialized page and `control` to an initialized SLRU control
+/// structure, as the assert-enabled checks require.
+#[allow(dead_code)]
+unsafe fn checks_through_pointers_need_unsafe_in_every_build<Uninstantiated>(
+    page: pg::Page,
+    control: pg::SlruCtl,
+) {
+    use pg::cmacros::c::Pointer;
+    // SAFETY: the caller provides the page and control structure these checks read.
+    unsafe {
+        let () = pg::PageValidateSpecialPointer!(Pointer::from(page)).get();
+        let () = pg::SlruPagePrecedesUnitTests!(control, 1_i32).get();
+    }
 }
 
 /// `pg_unreachable` exists in both builds; reaching it would abort the process.
 #[test]
 fn unreachable_code_needs_no_unsafe() {
     if core::hint::black_box(false) {
-        let _ = pg::pg_unreachable!();
+        let () = pg::pg_unreachable!().get();
     }
 }

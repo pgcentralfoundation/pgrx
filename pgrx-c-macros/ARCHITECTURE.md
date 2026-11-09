@@ -987,7 +987,7 @@ converts them, so they use the native value profile.
 
 Verified byte-swap builtins lower to Rust operations with the C result identity.
 `__builtin_unreachable()` and `__assume` lower to the stops described in
-[Assertions and assert-enabled builds](#assertions-and-assert-enabled-builds).
+[Assertions and build flavors](#assertions-and-build-flavors).
 Branch hints lower to Rust support with cold paths while preserving C operand
 evaluation and result identity. Compute fixed-value and projected-expectation
 facts bottom-up, then classify hints as `Static`, `Dynamic`, or `Overridden`.
@@ -1102,63 +1102,130 @@ for names containing `RETURN`.
 When `BindingCatalog::thread_check` names a function, a read of a global whose C type
 is an integer, `_Bool`, enum or data pointer renders as that call followed by
 `load_global` in its own `unsafe` block. `load_global` accepts only places whose object
-implements `GlobalObject`: scalar objects, whose storage is valid for every value C
-stores, and enum objects, which load their compatible integer. The check panics off
-PostgreSQL's thread, and PostgreSQL writes globals only on that thread, apart from
-the `volatile` flags its signal handlers set, which are read as `volatile` as in C.
-So the read needs no caller `unsafe`. `emit::checked_global` makes this
-decision once for the renderer and for `emit::assertions`; a type the generator admits
-in error fails to compile rather than becoming an unchecked read. Writes,
-dereferences, and floating, aggregate or function pointer globals keep the caller's
-`unsafe`. Without a thread check, as in most fixtures, every global read does.
+implements `GlobalObject`: integer and data pointer objects, for which every stored
+value is valid, `_Bool`, in which C stores only 0 or 1, and enum objects, which load
+their compatible integer. Floating objects and function pointers do not implement it.
+The function is pgrx's active-thread check, on which pgrx relies for every call into
+PostgreSQL; it panics on another thread. PostgreSQL reads and writes its globals on
+the thread that passes it, and a global it also sets asynchronously is `volatile` in C
+and read as `volatile`. So the read needs no caller `unsafe`. `emit::checked_global`
+makes this decision once for the renderer and for `emit::assertions`; a type the
+generator admits in error fails to compile rather than becoming an unchecked read.
+Writes, dereferences, and floating, aggregate or function pointer globals keep the
+caller's `unsafe`. Without a thread check, as in most fixtures, every global read does.
 
-### Assertions and assert-enabled builds
+### Assertions and build flavors
 
-A generated macro's name, calling form and need for the caller's `unsafe` must not
-depend on `USE_ASSERT_CHECKING`. Three mechanisms provide that.
+A program that compiles against an assert-enabled PostgreSQL must compile against a
+release build of the same version, and the reverse. So a generated macro's name,
+operands, form, result type and need for the caller's `unsafe` must not depend on
+`USE_ASSERT_CHECKING`, and no macro may leave out a check the assert-enabled headers
+make. Both flavors therefore generate the same Rust from the same definitions; the
+only input that differs, apart from layout, is one constant.
+
+**Two views.** `frontend::flavors::reconcile` runs once per inspection, after the
+proofs that compare the headers with their own final macros and before any pass
+that expands macros. It parses the headers again through libclang, in memory, as the
+other flavor: with `-DUSE_ASSERT_CHECKING=1` added, or with the macro's command-line
+definitions dropped and the lines that define it blanked in unsaved copies of their
+files. The main file of that parse exists only in memory. It includes the inspected
+main file and follows it with one `#ifdef` per name the inspected flavor declares or
+ever defined. libclang records each `#ifdef` of a defined macro as a reference to the
+definition in force, which gives the other flavor's final definitions, including one
+that `#pragma pop_macro` restored. The inspected flavor's own view is its final
+macro environment and declaration catalog. Every rule below is a function of the
+assert-enabled view and the release view, whichever of them was inspected, so both
+flavors apply it to the same pair. Nothing is written to disk.
+
+**Rules.**
+
+- A name that the inspected flavor declares and the other does not, of any kind, is
+  flavor-specific, and so is a function whose prototype differs. Root selection
+  skips these names and `FrontendOutput::flavor_specific_names` gives them to the
+  binding generator to leave out.
+- A function-like macro that both flavors define, with different tokens, takes the
+  assert-enabled definition in both. A release inspection replaces its active
+  definition, keeping the assert-enabled definition's tokens and location. This
+  requires that the definition, through the macros it names, reaches no name that
+  the release flavor lacks, declares as another kind, or defines as a different
+  object-like macro. Otherwise the macro is a conflict.
+- A static inline function that only the assert-enabled flavor defines is a helper,
+  and a shared definition may call it, when its prototype uses types the release
+  flavor declares and every identifier in its source text is shared in the same
+  sense and names no member that only one flavor's record has. Both flavors call a
+  helper through a generated adapter, never a binding. The adapter of a release
+  build is preceded, in the C support, by the helper's definition copied from the
+  header, which that build compiles with its own macros. A release inspection adds
+  the helper's prototype to its catalog.
+- A function-like macro of the release flavor whose name the assert-enabled flavor
+  declares as a function becomes, in both, the macro `NAME(formals) (NAME)(formals)`,
+  which calls the function. The function must be external, return nothing, take as
+  many arguments as the macro has formals, and use only parameter types the release
+  flavor declares; otherwise the name is a conflict. A release inspection adds the
+  assert-enabled prototype to its catalog, so both check a call's operands alike.
+  The names are also flavor-specific for the binding generator of an assert-enabled
+  build, which would otherwise bind a function a release build lacks.
+- A function that one flavor defines `static inline` and the other only declares,
+  with the same prototype, gets the same calling macro in both, and both bind it.
+- A conflict is skipped in both flavors with `SkipReasonCode::BuildFlavor`. So is
+  every root whose dependency closure contains one, at expansion, and an inline
+  body that names one keeps only its call root. A flavor that has no macro of a
+  conflict's name adopts the other's definition, so both report the skip. A macro
+  that both flavors define alike and that names `ExceptionalCondition` is also a
+  conflict: release C would run that report, and a generated one runs only with
+  assertions.
+- A static inline function whose definition spans source that only one flavor's
+  preprocessor skips, or whose body names `ExceptionalCondition`, has no translated
+  body in either flavor. Both call it.
+
+The definitions a flavor takes this way follow the main file wherever the compiler
+expands macros: `FrontendOutput::main_source` returns the file followed by an
+`#undef` and `#define` for each, and the expansion, paste, constant and builtin
+probes build on it. The check that an overlay reproduces the final macro
+environment covers them, because the same definitions replace the inspection's
+active ones. A shared definition is spelled from its own source text, so its
+spacing, which a later stringification could show, is the assert-enabled build's.
+
+**Assertions.** A check that ends in `ExceptionalCondition` runs only against an
+installation that enables assertions. `emit::assertions::checking` adds
+`__pgrx_c_assert_checking!()` to the support, expanding to `true` or `false`. An
+`if` statement without `else` whose branch only reports renders as
+`if __pgrx_c_assert_checking!() && truth(condition)`, `holds || (report, 0)`
+renders with `!__pgrx_c_assert_checking!() ||` before `holds`, and the report
+itself is guarded too, for any other position. Against a release build the
+conditions are compiled and never evaluated, as release C never evaluates them.
+`emit::assertions::caller_unsafe` counts every check, so a check that reads through
+a pointer makes its macro need `unsafe` in both flavors.
 
 **Stops.** A call to `ExceptionalCondition` whose arguments are its condition's
 text, optionally PostgreSQL 15's error type, `__FILE__` and `__LINE__`, a call to
 `abort()`, and the builtins `__builtin_unreachable()` and `__assume(holds)` lower to
 safe functions in the support crate's `expression::assertion` module. They write a
 `TRAP:` line and a backtrace to stderr and abort; they never unwind into a
-PostgreSQL `ERROR`. Demand planning requests no native capability for a stop's
-callee, and a stop contributes no panic condition.
+PostgreSQL `ERROR`. They track their caller, so the location is the Rust code that
+used the macro, or the caller of a translated inline function's Rust wrapper. Demand
+planning requests no native capability for a stop's callee, and a stop contributes
+no panic condition. A stop other than an assertion's report, and the condition that
+guards it, runs in every build.
 
-**Checks that keep release safety.** A check is an `if` statement whose only
-statement stops, `holds || (stop, 0)`, or `__assume(holds)`. `emit::assertions`
-decides, per rendering, which checks to omit. It walks the arena in the renderer's
-contexts to find operations that need the caller's `unsafe`: loads, stores,
-member projections, dereferenced values, indirect calls, native calls and calls
-of translations that need it. Caller operands, generated locals, checked global
-reads and unevaluated operands do not count. Checks are decided innermost first. If the expansion
-without the checks whose conditions need `unsafe` needs none, those checks are
-omitted, as a release build omits them; otherwise all stay. Analysis also omits
-an `if` check whose condition reads a local before its definite initialization,
-which would otherwise refuse the body. Batch emission computes each
-translation's need for `unsafe` in callee-first order, beside its panic
-conditions, and records `caller_unsafe` for every emitted macro. An operand the
-rendering never evaluates is borrowed in dead code at the public arm, through
-`finish_checked` or a leading dead block, so its own `unsafe` needs are the
-same in every build.
+**Calls to assertion functions.** A call to a function that only the assert-enabled
+flavor defines renders inside `if __pgrx_c_assert_checking!()`, so a release build
+evaluates no argument. The assert-enabled build has no binding for it and calls it
+through a generated adapter. For a release build `emit::functions` generates that
+adapter with the same Rust signature and an empty body, after the same checks of
+its prototype, and no C. The call needs the caller's `unsafe` unless
+`emit::assertions::safe_call` admits the function: one of the listed names, with no
+result and only integer or enum parameters, called through the defining crate's
+guard. Its arguments are then evaluated outside the generated `unsafe` block, which
+states why the call is sound.
 
-**The release counterpart.** Inspecting assert-enabled headers parses them a
-second time through libclang, with `USE_ASSERT_CHECKING` removed from its
-defining files in memory and from the command line. Names that only the
-assert-enabled build declares are recorded and never selected. A function-like
-macro takes its release definition when the assert-enabled build declares the
-name otherwise, or when its assert-enabled definition reaches, through active
-macros, a name the release build lacks or declares otherwise. A release static
-inline function without parameters, result or `return`, which the
-assert-enabled build declares only as a function, becomes a statement macro of
-its body. Those definitions follow an `#include` of the original main file in a
-derived main file, named by its contents under the temporary directory, which
-is inspected again, so every later compiler pass sees one environment. Their
-provenance is moved to the release definition's header, which keeps ownership,
-module placement and documentation locations. Definitions that stringify or
-paste are left alone. Token-paste validation lets `__FILE__` and `__LINE__`
-expand rather than trapping them, so an assertion's report can share an
-expansion with a closed paste; poison still refuses a paste that forms either.
+Batch emission computes each translation's need for `unsafe` in callee-first order,
+beside its panic conditions, and records `caller_unsafe` for every emitted macro.
+An operand the rendering never names as a value is borrowed in dead code at the
+public arm, through `finish_checked` or a leading dead block. Token-paste
+validation lets `__FILE__` and `__LINE__` expand rather than trapping them, so an
+assertion's report can share an expansion with a closed paste; poison still refuses
+a paste that forms either.
 
 ## 11. Readable symbols, casts, and cross-macro calls
 
@@ -2334,7 +2401,7 @@ generalized; do not add a macro-name exception.
 | Batch lowering and support order | [`src/emit.rs`](src/emit.rs), [`demands.rs`](src/emit/demands.rs). |
 | Documentation shells and witnesses | [`documentation.rs`](src/emit/documentation.rs), [`expression/witness.rs`](../pgrx-pg-sys/src/c_macros/expression/witness.rs), [`macro_snapshot.rs`](../pgrx-bindgen/src/build/macro_snapshot.rs). |
 | Arguments, expressions, statements | [`arguments.rs`](src/emit/arguments.rs), [`typed.rs`](src/emit/typed.rs), [`statements.rs`](src/emit/statements.rs). |
-| Assertions and assert-enabled builds | [`assertions.rs`](src/emit/assertions.rs), [`counterpart.rs`](src/frontend/counterpart.rs), [`expression/assertion.rs`](../pgrx-pg-sys/src/c_macros/expression/assertion.rs). |
+| Assertions and build flavors | [`flavors.rs`](src/frontend/flavors.rs), [`assertions.rs`](src/emit/assertions.rs), [`expression/assertion.rs`](../pgrx-pg-sys/src/c_macros/expression/assertion.rs). |
 | Native/nominal capabilities | [`fields.rs`](src/emit/fields.rs), [`bitfields.rs`](src/emit/bitfields.rs), [`functions.rs`](src/emit/functions.rs), [`addresses.rs`](src/emit/addresses.rs), [`callbacks.rs`](src/emit/callbacks.rs), [`enumerations.rs`](src/emit/enumerations.rs). |
 | Readable delegation and layout | [`src/delegation.rs`](src/delegation.rs), [`src/formatting.rs`](src/formatting.rs). |
 | Runtime target gate/bridges | [`src/support_generation.rs`](src/support_generation.rs). |

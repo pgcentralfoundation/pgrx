@@ -24,8 +24,12 @@ extern GlobalHook GlobalHookValue;
 #define GLOBAL_POINTER() (GlobalPointer)
 #define GLOBAL_BUSY() (GlobalState == GLOBAL_BUSY)
 /* A check whose condition reads a global, shaped like PostgreSQL's AssertMacro. */
+#ifdef USE_ASSERT_CHECKING
 #define GLOBAL_IN_RANGE(value) \
 	((value) <= GlobalCount || (ExceptionalCondition("value <= GlobalCount", __FILE__, __LINE__), 0))
+#else
+#define GLOBAL_IN_RANGE(value) (1)
+#endif
 /* A dereference, a function pointer read and a write still need the caller's unsafe. */
 #define GLOBAL_POINTEE() (*GlobalPointer)
 #define GLOBAL_HOOKED() (GlobalHookValue != 0)

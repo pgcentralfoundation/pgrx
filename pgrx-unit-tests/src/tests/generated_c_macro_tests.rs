@@ -24,8 +24,7 @@ mod tests {
     use pgrx::pg_sys as pg;
     use pgrx::prelude::*;
 
-    // Assertion-enabled C profiles skip this macro's stringification dependency.
-    // Test its generated API only when that API exists in the inspected profile.
+    // Test this macro's generated API only when that API exists in the inspected profile.
     pg::__pgrx_c_classify! { @if_available PageSetPrunable {
     /// Check that the generated page macro short-circuits before a backend comparison.
     #[pg_test]
@@ -210,6 +209,37 @@ mod tests {
         assert!(!pg::BufferIsValid!(0_i32).is_true());
         assert!(pg::BufferIsValid!(1_i32).is_true());
         assert_eq!(pg::BufferGetPageSize!(1_i32).get(), u64::from(pg::BLCKSZ));
+    }
+
+    /// `Assert` is a statement in C, so the macro yields `()` in either build.
+    fn generated_assert_statement(value: i32) {
+        pg::Assert!(value)
+    }
+
+    /// Checks that PostgreSQL's assertion functions are macros that safe code calls in either
+    /// build. An assert-enabled PostgreSQL runs the functions, whose checks hold here; a
+    /// release build has no such functions and evaluates nothing.
+    #[pg_test]
+    fn generated_assertion_functions_run_in_a_backend() {
+        generated_assert_statement(1);
+        // SAFETY: a `#[pg_test]` runs in a transaction on the backend thread, which is all
+        // this function requires.
+        let xid = unsafe { pg::GetTopTransactionId() };
+        let () = pg::AssertTransactionIdInAllowableRange!(xid).get();
+        let () = pg::AssertTransactionIdInAllowableRange!(pg::FrozenTransactionId).get();
+        let () = pg::AssertCouldGetRelation!().get();
+        let () = pg::AssertPendingSyncs_RelationCache!().get();
+    }
+
+    /// Checks that `intVal` reads an integer node in either build. An assert-enabled
+    /// PostgreSQL first checks the node's tag in `castNodeImpl`, which only it defines; a
+    /// release build compiles that function without the check.
+    #[pg_test]
+    fn generated_node_value_checks_its_tag() {
+        // SAFETY: makeInteger returns a valid Integer node allocated in the current memory
+        // context, which outlives this read of its value.
+        let value = unsafe { pg::intVal!(pg::makeInteger(42)).get() };
+        assert_eq!(value, 42);
     }
 
     pg::__pgrx_c_classify! { @if_available INTERRUPTS_PENDING_CONDITION {

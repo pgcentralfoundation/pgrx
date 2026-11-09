@@ -415,14 +415,28 @@ fn postgres_varlena_assertions_match_original_headers() {
         };
         let native = format!(
             r#"
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #undef printf
 static const char *expected_file;
 static int expected_line;
-static unsigned evaluations;
-void assertion_site(const char *file, int line) {{ expected_file = file; expected_line = line; evaluations = 0; }}
+static volatile unsigned evaluations;
+/* Report the operand evaluations when a failed assertion aborts the process. */
+static void assertion_aborted(int signal_number) {{
+    char text[32] = "evaluations\t";
+    char digits[10];
+    unsigned value = evaluations;
+    int length = 12, count = 0;
+    (void) signal_number;
+    do {{ digits[count++] = (char) ('0' + value % 10); value /= 10; }} while (value != 0);
+    while (count != 0) text[length++] = digits[--count];
+    text[length++] = '\n';
+    (void) write(1, text, (size_t) length);
+}}
+void assertion_site(const char *file, int line) {{ signal(SIGABRT, assertion_aborted); expected_file = file; expected_line = line; evaluations = 0; }}
 int assertion_argument(int value) {{ ++evaluations; return value; }}
 unsigned assertion_evaluations(void) {{ return evaluations; }}
 {condition}
@@ -458,7 +472,8 @@ fn main() {{
     // SAFETY: The fixture functions have these exact fixed C prototypes and
     // only borrow static filename storage or increment a process-local counter.
     // Valid tags produce sizes. With assertions, the final invalid tag aborts the
-    // process after reporting its site, which is printed first.
+    // process after reporting its site, which is printed first, and the fixture's
+    // abort handler then prints the operand evaluations.
     unsafe {{
         for tag in [1_i32, 2, 3, 18] {{
             assertion_site(core::ptr::null(), 0);
@@ -503,8 +518,11 @@ fn main() {{
             assert_eq!(lines.next().map(|line| format!("{line}\n")), Some(format!("{failure}\n")));
             continue;
         }
-        // The process aborts, so it cannot report the operand count at the failure; the
-        // valid tags compare those counts.
+        // The fixture's abort handler reports the operand evaluations at the failure.
+        let evaluations = lines
+            .next()
+            .and_then(|count| count.strip_prefix("evaluations\t"))
+            .unwrap_or_else(|| panic!("PG{major} must report its operand evaluations:\n{stdout}"));
         let report = stderr
             .lines()
             .find_map(|line| line.strip_prefix("TRAP: "))
@@ -523,14 +541,13 @@ fn main() {{
         let (trap_file, rest) = rest.split_once("\", Line: ").expect("TRAP line");
         let trap_line = rest.split_once(", PID: ").expect("TRAP process").0;
         let generated = format!(
-            "failure\t{condition}\t{error_type}\t{}\t{}",
+            "failure\t{condition}\t{error_type}\t{}\t{}\t{evaluations}",
             u8::from(trap_file == file),
             u8::from(trap_line == line)
         );
-        let original = failure.rsplit_once('\t').expect("C failure fields").0;
         assert_eq!(
-            generated, original,
-            "PG{major} assertion must preserve condition, error type and invocation site"
+            generated, failure,
+            "PG{major} assertion must preserve condition, error type, invocation site and operand counts"
         );
     }
 }
