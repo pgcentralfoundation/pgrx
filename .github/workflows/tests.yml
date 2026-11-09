@@ -5,6 +5,7 @@ on:
     branches:
       - develop
   pull_request: {}
+  workflow_dispatch: {}
 
 # A new push to a pull request cancels the pull request's earlier run. Each push to develop
 # gets its own group, so develop runs are never cancelled or queued behind each other.
@@ -17,188 +18,243 @@ env:
   # configured by `.cargo/config.toml` on macOS.
   RUST_BACKTRACE: 1
   CARGO_INCREMENTAL: "false"
-  # CARGO_LOG: cargo::core::compiler::fingerprint=info # Uncomment this to output compiler fingerprint info
-  TOOL_DIR: ./tools
+  CARGO_TERM_COLOR: always
+  PYTHONUNBUFFERED: "1"
+  # Only pushes to develop save caches. Pull requests restore develop's newest caches, so their
+  # caches cannot evict develop's from the repository's 10 GB of cache storage.
+  SAVE_RUST_CACHE: ${{ github.ref == 'refs/heads/develop' || github.head_ref == 'ci-ten-minutes' }}
 
 jobs:
-  lintck:
-    name: rustfmt, clippy, et al.
-    runs-on: ubuntu-22.04
+  # Pull requests run only the jobs that test what the change touches; see tools/ci/plan.py.
+  # Pushes to develop run everything.
+  plan:
+    name: Plan
+    runs-on: ubuntu-24.04
     if: "!contains(github.event.head_commit.message, 'nogha')"
-
+    outputs:
+      lint: ${{ steps.plan.outputs.lint }}
+      pg: ${{ steps.plan.outputs.pg }}
+      crates: ${{ steps.plan.outputs.crates }}
+      miri: ${{ steps.plan.outputs.miri }}
+      cmacros_clang14: ${{ steps.plan.outputs.cmacros_clang14 }}
+      bindgen_harness: ${{ steps.plan.outputs.bindgen_harness }}
+      ui: ${{ steps.plan.outputs.ui }}
+      bench: ${{ steps.plan.outputs.bench }}
+      install_regression: ${{ steps.plan.outputs.install_regression }}
+      runas: ${{ steps.plan.outputs.runas }}
+      init: ${{ steps.plan.outputs.init }}
+      variants: ${{ steps.plan.outputs.variants }}
+      schema_release: ${{ steps.plan.outputs.schema_release }}
+      beta: ${{ steps.plan.outputs.beta }}
+      package: ${{ steps.plan.outputs.package }}
     steps:
       - uses: actions/checkout@v4
-
-      - name: Set up prerequisites and environment
+        with:
+          # A pull request's merge commit and its first parent, the base it merges into.
+          fetch-depth: 2
+      - id: plan
+        name: Choose the jobs this change needs
+        env:
+          # `cargo metadata` needs any recent Cargo, not the pinned toolchain.
+          RUSTUP_TOOLCHAIN: stable
         run: |
-          sudo apt-get update -y -qq --fix-missing
+          if [ "${{ github.event_name }}" = pull_request ]; then
+            python3 tools/ci/plan.py --base HEAD^1 --head HEAD
+          else
+            python3 tools/ci/plan.py --all
+          fi
 
-          echo ""
-
-          "$TOOL_DIR"/rustup.sh
-
-          # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions/57969570#57969570
-
-          echo "----- Outputting env -----"
-          env
-          echo ""
-
-      # Only pushes to develop save caches. Pull requests restore develop's newest cache, so
-      # their caches cannot evict develop's from the repository's cache storage.
-      # The cached ~/.cargo/bin keeps cargo-deny installed between runs.
+  lint:
+    name: rustfmt, clippy, licenses, doc links
+    needs: plan
+    if: needs.plan.outputs.lint == 'true'
+    runs-on: ubuntu-24.04
+    env:
+      PG_VER: 18
+      RUST_COMPONENTS: clippy
+    steps:
+      - uses: actions/checkout@v4
+      - run: tools/ci/setup.sh
       - uses: Swatinem/rust-cache@v2
         with:
-          save-if: ${{ github.event_name == 'push' }}
-
-      - name: Install rustfmt & clippy
-        run: |
-          rustup component add rustfmt
-          rustup component add clippy
-
+          shared-key: lint
+          save-if: ${{ env.SAVE_RUST_CACHE == 'true' }}
+      - name: Install cargo-deny
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-deny
       - name: Run rustfmt
         run: cargo fmt --all -- --check
-
       - name: Run license check
-        run: cargo install cargo-deny --locked && "$TOOL_DIR"/license-check.sh
-
-      # We can't lint most crates because they require "cargo pgrx init" to build
+        run: tools/license-check.sh
       - name: Clippy -Dwarnings sql-entity-graph
         run: cargo clippy -p pgrx-sql-entity-graph -- -Dwarnings
-
+      # Every other crate is checked for clippy errors, not warnings.
+      - name: Clippy -Awarnings
+        run: cargo clippy --tests --features pg18 --no-default-features -- -Awarnings
       - name: Check doc-links in pgrx-macros
         run: |
           cargo rustdoc -p pgrx-macros -- \
             --document-private-items \
             -Drustdoc::broken-intra-doc-links \
             -Drustdoc::invalid-html-tags
+      - name: Check doc-links in pgrx
+        run: |
+          cargo rustdoc -p pgrx --features pg18 -- \
+            --document-private-items \
+            -Drustdoc::broken-intra-doc-links \
+            -Drustdoc::invalid-html-tags
 
-  pgrx_tests:
-    name: Linux tests & examples (PG${{ matrix.postgres }}${{ matrix.rust && format(', Rust {0}', matrix.rust) || '' }}${{ matrix.suite == 'compile' && ', build only' || '' }}${{ matrix.suite == 'extras' && ', extras' || '' }})
-    needs: lintck
-    runs-on: ubuntu-22.04
-    if: "!contains(github.event.head_commit.message, 'nogha')"
-    env:
-      PG_VER: ${{ matrix.postgres }}
-      RUST_TOOLCHAIN: ${{ matrix.rust || 'stable' }}
-      CLANG_VER: ${{ matrix.clang }}
-      # The pg_test harness runs the cargo-pgrx installed from this checkout below instead of
-      # building the workspace's copy again.
-      CARGO_PGRX: cargo-pgrx
-
+  # Every package that needs PostgreSQL, against every supported version on every supported
+  # platform. Windows has no PostgreSQL 19 binaries yet.
+  pg:
+    name: ${{ matrix.platform }} PG${{ matrix.pg }}
+    needs: plan
+    if: needs.plan.outputs.pg != ''
+    runs-on: ${{ matrix.os }}
     strategy:
-      # Every entry is listed so each one is its own job. Next to a `postgres` list, an
-      # `include` entry that only adds a key, such as `rust: beta`, joins the matching job
-      # instead of adding one.
-      #
-      # PG18 and PG19 jobs build with a current clang, which the build prefers because it loads
-      # the newest installed libclang. Clang 19 changed libclang's spelling locations and Clang
-      # 20 added predefined macros. The other jobs keep the clang that the system packages
-      # install.
+      fail-fast: false
       matrix:
         include:
-          # Tests run on the oldest and newest supported versions, where version-specific
-          # code differs most.
-          - postgres: 15
-          - postgres: 18
-            clang: 21
-          - postgres: 19
-            clang: 21
-          # Checks that one PostgreSQL version covers run in their own job, in parallel with
-          # the PG18 tests.
-          - postgres: 18
-            suite: extras
-            clang: 21
-          # The versions in between build the tests without running them. So does Rust beta,
-          # since a new compiler almost always breaks the build rather than a test.
-          - postgres: 16
-            suite: compile
-          - postgres: 17
-            suite: compile
-          - postgres: 18
-            rust: beta
-            suite: compile
-            clang: 21
-
+          # Clang 19 changed libclang's spelling locations and Clang 20 added predefined
+          # macros, so PG18 and PG19 build with a current Clang and the older versions keep
+          # Ubuntu 22.04's Clang 14.
+          - { platform: linux-x64, os: ubuntu-22.04, pg: 15, clang: 14 }
+          - { platform: linux-x64, os: ubuntu-22.04, pg: 16, clang: 14 }
+          - { platform: linux-x64, os: ubuntu-22.04, pg: 17, clang: 14 }
+          - { platform: linux-x64, os: ubuntu-22.04, pg: 18, clang: 21 }
+          - { platform: linux-x64, os: ubuntu-22.04, pg: 19, clang: 21 }
+          # aarch64 Linux is an unsigned-char target, so it covers C char semantics in
+          # generated macros and Datum conversions that x86_64 cannot.
+          - { platform: linux-arm64, os: ubuntu-24.04-arm, pg: 15 }
+          - { platform: linux-arm64, os: ubuntu-24.04-arm, pg: 16 }
+          - { platform: linux-arm64, os: ubuntu-24.04-arm, pg: 17 }
+          - { platform: linux-arm64, os: ubuntu-24.04-arm, pg: 18 }
+          - { platform: linux-arm64, os: ubuntu-24.04-arm, pg: 19 }
+          # PostgreSQL 16 and later name extension libraries "dylib" on macOS, and PostgreSQL
+          # 15 used "so" (see https://github.com/pgcentralfoundation/pgrx/pull/1300).
+          - { platform: macos, os: macos-26, pg: 15 }
+          - { platform: macos, os: macos-26, pg: 16 }
+          - { platform: macos, os: macos-26, pg: 17 }
+          - { platform: macos, os: macos-26, pg: 18 }
+          - { platform: macos, os: macos-26, pg: 19 }
+          - { platform: windows, os: windows-2025, pg: 15 }
+          - { platform: windows, os: windows-2025, pg: 16 }
+          - { platform: windows, os: windows-2025, pg: 17 }
+          - { platform: windows, os: windows-2025, pg: 18 }
+    env:
+      PG_VER: ${{ matrix.pg }}
+      CLANG_VER: ${{ matrix.clang }}
+      PG19_CACHE: ${{ github.workspace }}/../pg19
     steps:
       - uses: actions/checkout@v4
-
-      - name: Set up prerequisites and environment
+      - name: Restore the PostgreSQL 19 build
+        if: matrix.platform == 'macos' && matrix.pg == 19
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.PG19_CACHE }}
+          key: pg19-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('pgrx-pg-config/src/lib.rs') }}
+      - name: Set up Rust and PostgreSQL ${{ matrix.pg }}
+        shell: bash
+        run: tools/ci/setup.sh
+      # Third-party crates build the same way for every PostgreSQL version, so all of a
+      # platform's jobs share the cache that its PG18 job saves on pushes to develop.
+      - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: pg-${{ matrix.platform }}
+          workspaces: |
+            . -> target
+            . -> target-ext
+          cache-bin: "false"
+          save-if: ${{ env.SAVE_RUST_CACHE == 'true' && matrix.pg == 18 }}
+      - name: Test the packages that need PostgreSQL
+        shell: bash
         run: |
-          sudo apt-get update -y -qq --fix-missing
+          python=python3; [ "$RUNNER_OS" = Windows ] && python=python
+          cli_checks=; [ "$RUNNER_OS" = Linux ] && cli_checks=--cli-checks
+          "$python" tools/ci/test_pg.py --pg "$PG_VER" --run "${{ needs.plan.outputs.pg }}" $cli_checks
 
-          echo ""
-          echo "----- Set up dynamic variables -----"
-          cat $GITHUB_ENV
-          echo ""
-          
-          echo "----- Remove old postgres -----"
-          sudo apt remove -y '^postgres.*' '^libpq.*' '^clang.*' '^llvm.*' '^libclang.*' '^libllvm.*' '^mono-llvm.*'
-          echo ""
-          
-          echo "----- Install system dependencies -----"
-          sudo apt-get install -y \
-            build-essential \
-            llvm-14-dev libclang-14-dev clang-14 \
-            gcc \
-            libssl-dev \
-            libz-dev \
-            make \
-            pkg-config \
-            strace \
-            zlib1g-dev
-          echo ""
-
-          if [ -n "$CLANG_VER" ]; then
-            echo "----- Install clang $CLANG_VER -----"
-            curl -fsSL https://apt.llvm.org/llvm-snapshot.gpg.key \
-              | sudo tee /etc/apt/trusted.gpg.d/apt.llvm.org.asc > /dev/null
-            echo "deb http://apt.llvm.org/$(lsb_release -cs)/ llvm-toolchain-$(lsb_release -cs)-$CLANG_VER main" \
-              | sudo tee /etc/apt/sources.list.d/llvm.list
-            sudo apt-get update -y -qq
-            sudo apt-get install -y "clang-$CLANG_VER" "libclang-$CLANG_VER-dev" "llvm-$CLANG_VER-dev"
-            echo ""
-          fi
-
-          "$TOOL_DIR"/rustup.sh
-
-          echo "----- Set up cross compilation -----"
-          sudo apt-get install -y --fix-missing crossbuild-essential-arm64
-
-          echo 'CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-linux-gnu-gcc' >> $GITHUB_ENV
-          # TODO: not all of these should be needed, but for now it's likely fine.
-          echo 'BINDGEN_EXTRA_CLANG_ARGS_aarch64-unknown-linux-gnu=-target aarch64-unknown-linux-gnu -isystem /usr/aarch64-linux-gnu/include/ -ccc-gcc-name aarch64-linux-gnu-gcc' >> $GITHUB_ENV
-          
-          echo "----- Print env -----"
-          env
-          echo ""
-
-      - name: Setup release Postgres apt repo
-        if: matrix.postgres != '19'
+  # The packages that don't need PostgreSQL, on each platform. cargo-pgrx's install
+  # regression test installs pgrx-unit-tests, so these jobs still configure PostgreSQL 18.
+  crates:
+    name: ${{ matrix.platform }} crates
+    needs: plan
+    if: needs.plan.outputs.crates != ''
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { platform: linux-x64, os: ubuntu-22.04, clang: 21 }
+          - { platform: linux-arm64, os: ubuntu-24.04-arm }
+          - { platform: macos, os: macos-26 }
+          - { platform: windows, os: windows-2025 }
+    env:
+      PG_VER: 18
+      CLANG_VER: ${{ matrix.clang }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Rust and PostgreSQL 18
+        shell: bash
+        run: tools/ci/setup.sh
+      - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: crates-${{ matrix.platform }}
+          cache-bin: "false"
+          save-if: ${{ env.SAVE_RUST_CACHE == 'true' }}
+      - name: Install cargo-nextest
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-nextest
+      - name: Test the packages that don't need PostgreSQL
+        shell: bash
         run: |
-          sudo apt-get install -y wget gnupg
-          sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
-          wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
-          sudo apt-get update -y -qq --fix-missing
-
-      - name: Setup beta Postgres apt repo
-        if: matrix.postgres == '19'
+          python=python3; [ "$RUNNER_OS" = Windows ] && python=python
+          "$python" tools/ci/test_crates.py ${{ needs.plan.outputs.crates }}
+      # This test builds both slices of a universal installation, so it needs the other
+      # slice's standard library. Its synthetic headers make one job enough.
+      - name: Run universal macOS binding build harness
+        if: matrix.platform == 'macos' && contains(needs.plan.outputs.crates, 'pgrx-bindgen')
         run: |
-          sudo apt-get install -y wget gnupg
-          sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7FCC7D46ACCC4CF8
-          sudo add-apt-repository "deb https://apt.postgresql.org/pub/repos/apt/ $(lsb_release -s -c)-pgdg-snapshot main $PG_VER"
-          sudo add-apt-repository "deb https://apt.postgresql.org/pub/repos/apt/ $(lsb_release -s -c)-pgdg main $PG_VER"
-          wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
-          sudo apt-get update -y -qq --fix-missing
+          rustup target add aarch64-apple-darwin x86_64-apple-darwin
+          cargo test --locked --package pgrx-bindgen --test macro_build \
+            universal_macos_installations_build_both_slices -- --include-ignored --exact --test-threads=1
 
-      - name: Install Postgres
-        run: |
-          sudo apt-get install -y \
-            postgresql-$PG_VER \
-            postgresql-server-dev-$PG_VER
-
-      # Generated C macros are checked against the server headers' target, so
-      # the aarch64 cross build needs headers configured for aarch64. Fetch the
-      # arm64 build of the installed postgresql-server-dev package from PGDG.
+  # Variants of the PG test build that only Linux runs: pgrx-unit-tests without the C shim,
+  # custom_types without schema generation, and a cross build of pgrx-unit-tests for aarch64.
+  variants:
+    name: linux-x64 PG${{ matrix.pg }} variants
+    needs: plan
+    if: needs.plan.outputs.variants == 'true'
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { pg: 15, clang: 14 }
+          - { pg: 16, clang: 14 }
+          - { pg: 17, clang: 14 }
+          - { pg: 18, clang: 21 }
+          - { pg: 19, clang: 21 }
+    env:
+      PG_VER: ${{ matrix.pg }}
+      CLANG_VER: ${{ matrix.clang }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Rust and PostgreSQL ${{ matrix.pg }}
+        run: tools/ci/setup.sh
+      - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: variants
+          workspaces: |
+            . -> target
+            . -> target-ext
+            . -> target-cross
+          cache-bin: "false"
+          save-if: ${{ env.SAVE_RUST_CACHE == 'true' && matrix.pg == 18 }}
+      # Generated C macros are checked against the server headers' target, so the aarch64
+      # cross build needs headers configured for aarch64. Fetch the arm64 build of the
+      # installed postgresql-server-dev package from PGDG.
       - name: Fetch aarch64 PostgreSQL server headers for the cross build
         id: arm64-headers
         run: |
@@ -219,98 +275,44 @@ jobs:
           server="$RUNNER_TEMP/pg-arm64/usr/include/postgresql/$PG_VER/server"
           grep -q 'on aarch64' "$server/pg_config.h" || { echo "fetched headers are not aarch64"; exit 1; }
           echo "server=$server" >> "$GITHUB_OUTPUT"
+          sudo apt-get install -y -qq --no-install-recommends crossbuild-essential-arm64 > /dev/null
+          rustup target add aarch64-unknown-linux-gnu
+      # Only this step sees the target headers; tests elsewhere check that builds without them
+      # refuse. Build scripts still generate bindings and C macros from the aarch64 headers and
+      # compile the aarch64 C shim; checking skips only Rust code generation and linking, which
+      # the arm64 jobs cover natively. It runs beside the other variants, in its own target
+      # directory, because it is mostly single-threaded build scripts.
+      - name: Build the variants
+        env:
+          PGRX_INCLUDEDIR_SERVER_aarch64_unknown_linux_gnu: ${{ steps.arm64-headers.outputs.server }}
+          CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER: aarch64-linux-gnu-gcc
+          BINDGEN_EXTRA_CLANG_ARGS_aarch64-unknown-linux-gnu: -target aarch64-unknown-linux-gnu -isystem /usr/aarch64-linux-gnu/include/ -ccc-gcc-name aarch64-linux-gnu-gcc
+        run: python3 tools/ci/test_variants.py --pg "$PG_VER"
 
-      - name: pg_config details
-        run: |
-          echo ""
-          echo "----- pg_config -----"
-          pg_config
-          echo ""
-
-      - name: Set up PostgreSQL permissions
-        run: sudo chmod a+rwx `/usr/lib/postgresql/$PG_VER/bin/pg_config --pkglibdir` `/usr/lib/postgresql/$PG_VER/bin/pg_config --sharedir`/extension /var/run/postgresql/
-
-      # Third-party crates build the same way for every PostgreSQL version, so every job here
-      # restores the one cache that the PG18 tests job saves on pushes to develop. Pull
-      # requests only restore, so their caches cannot evict develop's. The beta job's
-      # different rustc gives it no matching cache.
+  miri:
+    name: Miri
+    needs: plan
+    if: needs.plan.outputs.miri == 'true'
+    runs-on: ubuntu-24.04
+    env:
+      PG_VER: 18
+      # The nightly is pinned so that a new nightly, or one shipped without Miri, cannot
+      # fail this job on its own.
+      MIRI_TOOLCHAIN: nightly-2026-10-29
+    steps:
+      - uses: actions/checkout@v4
+      - run: tools/ci/setup.sh
+      - run: rustup toolchain install "$MIRI_TOOLCHAIN" --profile minimal --component miri,rust-src,rustfmt
       - uses: Swatinem/rust-cache@v2
         with:
-          shared-key: linux-tests
-          cache-bin: "false"
-          save-if: ${{ github.event_name == 'push' && matrix.postgres == 18 && !matrix.rust && !matrix.suite }}
-
-      - name: Install rustfmt & clippy
-        run: |
-          rustup component add rustfmt
-          rustup component add clippy
-
-      # Building in ./target instead of a temporary directory lets the cache keep
-      # cargo-pgrx's dependencies.
-      - name: Install cargo-pgrx
-        run: cargo install --path cargo-pgrx/ --debug --force --locked --target-dir target
-
-      - name: Run 'cargo pgrx init' against system-level ${{ matrix.postgres }}
-        run: cargo pgrx init --pg$PG_VER /usr/lib/postgresql/$PG_VER/bin/pg_config
-
-      # pgrx-unit-tests runs in the two cshim steps below. Its `proptest` default is a
-      # superset of what this run would test.
-      - name: Run workspace tests
-        if: ${{ !matrix.suite }}
-        run: |
-          CARGO_TARGET_DIR="$(pwd)/target" cargo test --all \
-            --exclude pgrx-unit-tests \
-            --features "pg$PG_VER" \
-            --no-default-features
-
-      # These are the test builds that the test jobs run.
-      - name: Build the workspace tests without running them
-        if: matrix.suite == 'compile'
-        run: |
-          CARGO_TARGET_DIR="$(pwd)/target" cargo test --all --no-run \
-            --exclude pgrx-unit-tests \
-            --features "pg$PG_VER" \
-            --no-default-features
-          cargo test --no-run \
-            --features "pg$PG_VER cshim proptest" \
-            --package pgrx-unit-tests --lib
-          cargo test --no-run \
-            --features "pg$PG_VER proptest" \
-            --package pgrx-unit-tests
-
-      # The workspace run above disables pgrx-c-macros' default `cli` feature.
-      - name: Run pgrx-c-macros CLI tests
-        if: ${{ !matrix.suite }}
-        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --package pgrx-c-macros --test cli
-
-      # The steps above load the newest installed libclang, clang 21 in this job, so only this
-      # step covers Ubuntu 22.04's own clang 14. Its own target directory keeps the changed
-      # LIBCLANG_PATH from rebuilding the other steps' crates.
-      - name: Run pgrx-c-macros tests against clang 14
-        if: matrix.suite == 'extras'
-        env:
-          LIBCLANG_PATH: /usr/lib/llvm-14/lib
-          CLANG_PATH: /usr/bin/clang-14
-        run: CARGO_TARGET_DIR="$(pwd)/target-clang14" cargo test --package pgrx-c-macros
-
-      # These build isolated fixture crates with synthetic headers, so one job covers them.
-      - name: Run binding build harnesses
-        if: matrix.suite == 'extras'
-        run: |
-          CARGO_TARGET_DIR="$(pwd)/target" cargo test --package pgrx-bindgen \
-            --test macro_build --test shipped_macros -- --include-ignored --test-threads=1
-
+          shared-key: miri
+          save-if: ${{ env.SAVE_RUST_CACHE == 'true' }}
       # Only Miri checks that a pointer Datum keeps its provenance through an integer, and its
       # strict provenance mode makes the fcinfo test reject an integer round trip. In the varlena
       # tests, Miri also reports padding that a typed copy left uninitialized, where a native
-      # run reads whatever the stack held. The nightly is pinned so that a new nightly, or one
-      # shipped without Miri, cannot fail this step on its own.
+      # run reads whatever the stack held.
       - name: Check pointer provenance and PgVarlena padding with Miri
-        if: matrix.suite == 'extras'
-        env:
-          MIRI_TOOLCHAIN: nightly-2026-10-29
         run: |
-          rustup toolchain install "$MIRI_TOOLCHAIN" --component miri,rust-src,rustfmt
           cargo "+$MIRI_TOOLCHAIN" miri test --package pgrx-pg-sys \
             --features "pg$PG_VER" --no-default-features --lib datum
           MIRIFLAGS=-Zmiri-strict-provenance cargo "+$MIRI_TOOLCHAIN" miri test --package pgrx \
@@ -318,428 +320,278 @@ jobs:
           MIRIFLAGS=-Zmiri-strict-provenance cargo "+$MIRI_TOOLCHAIN" miri test --package pgrx \
             --features "pg$PG_VER" --no-default-features --lib varlena
 
-      # Only this step sees the target headers; tests above check that builds without them refuse.
-      # Build scripts still generate bindings and C macros from the aarch64 headers and compile
-      # the aarch64 C shim; checking skips only Rust code generation and linking, which the arm64
-      # job covers natively. Rust beta adds no target-specific coverage, so it skips this.
-      - name: Check that pgrx-unit-tests compiles for aarch64
-        if: matrix.suite != 'extras' && !matrix.rust
-        env:
-          PGRX_INCLUDEDIR_SERVER_aarch64_unknown_linux_gnu: ${{ steps.arm64-headers.outputs.server }}
-        run: |
-          cargo check --tests \
-            --features "pg$PG_VER" \
-            --package pgrx-unit-tests \
-            --target aarch64-unknown-linux-gnu
+  # The other jobs load the newest libclang that they install; only this one covers Ubuntu
+  # 22.04's own Clang 14 for the C macro generator's tests.
+  cmacros-clang14:
+    name: pgrx-c-macros with Clang 14
+    needs: plan
+    if: needs.plan.outputs.cmacros_clang14 == 'true'
+    runs-on: ubuntu-22.04
+    env:
+      CLANG_VER: 14
+    steps:
+      - uses: actions/checkout@v4
+      - run: tools/ci/setup.sh
+      - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: cmacros-clang14
+          save-if: ${{ env.SAVE_RUST_CACHE == 'true' }}
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-nextest
+      - run: cargo nextest run --locked --no-fail-fast --package pgrx-c-macros
 
-      - name: Run pgrx-unit-tests with cshim enabled
-        if: ${{ !matrix.suite }}
-        run: |
-          cargo test \
-            --features "pg$PG_VER cshim proptest" \
-            --package pgrx-unit-tests --lib
+  # These build isolated fixture crates with synthetic headers, so one job covers them.
+  bindgen-harness:
+    name: Binding build harnesses
+    needs: plan
+    if: needs.plan.outputs.bindgen_harness == 'true'
+    runs-on: ubuntu-22.04
+    env:
+      CLANG_VER: 21
+    steps:
+      - uses: actions/checkout@v4
+      - run: tools/ci/setup.sh
+      - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: bindgen-harness
+          save-if: ${{ env.SAVE_RUST_CACHE == 'true' }}
+      - run: |
+          cargo test --locked --package pgrx-bindgen \
+            --test macro_build --test shipped_macros -- --include-ignored --test-threads=1
 
-      # Every pgrx-unit-tests target runs here; its ignored UI tests run in the extras job.
-      - name: Run pgrx-unit-tests with cshim disabled
-        if: ${{ !matrix.suite }}
-        run: |
-          cargo test \
-            --features "pg$PG_VER proptest" \
-            --package pgrx-unit-tests
+  # These tests are ignored by default because each compiles its own copy of pgrx. Neither
+  # depends on the PostgreSQL version, so they run once, here.
+  ui:
+    name: UI tests
+    needs: plan
+    if: needs.plan.outputs.ui == 'true'
+    runs-on: ubuntu-22.04
+    env:
+      PG_VER: 18
+      CLANG_VER: 21
+    steps:
+      - uses: actions/checkout@v4
+      - run: tools/ci/setup.sh
+      - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: ui
+          save-if: ${{ env.SAVE_RUST_CACHE == 'true' }}
+      - run: |
+          cargo test --locked --features "pg$PG_VER proptest" \
+            --package pgrx-unit-tests --test ui -- --ignored
 
-      # A debug build reuses this job's artifacts; a release build of pgrx took most of the step.
-      - name: Smoke test cargo pgrx bench against the benching example
-        if: matrix.suite == 'extras'
-        run: |
-          CARGO_TARGET_DIR="$(pwd)/target" cargo pgrx bench pg$PG_VER \
+  # A debug build of the benching example smoke-tests `cargo pgrx bench`.
+  bench:
+    name: cargo pgrx bench
+    needs: plan
+    if: needs.plan.outputs.bench == 'true'
+    runs-on: ubuntu-22.04
+    env:
+      PG_VER: 18
+      CLANG_VER: 21
+    steps:
+      - uses: actions/checkout@v4
+      - run: tools/ci/setup.sh
+      - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: bench
+          save-if: ${{ env.SAVE_RUST_CACHE == 'true' }}
+      - run: |
+          cargo build --locked -p cargo-pgrx
+          target/debug/cargo-pgrx pgrx bench pg$PG_VER \
             bench_normalize_phrase \
             --debug \
             --manifest-path=pgrx-examples/benching/Cargo.toml \
             --group-name ci_benching_smoke
 
-      # These tests are ignored by default because each compiles its own copy of pgrx. Neither
-      # depends on the PostgreSQL version, so they run once, here.
-      - name: Run UI tests
-        if: matrix.suite == 'extras'
-        run: |
-          cargo test \
-            --features "pg$PG_VER proptest" \
-            --package pgrx-unit-tests --test ui -- --ignored
-
-      - name: Run the cargo pgrx install regression from a virtual workspace
-        if: matrix.suite == 'extras'
-        run: cargo test --package cargo-pgrx --test install_pg_test_regression -- --ignored
-
-      - name: Run custom_types without schema generation example tests
-        if: ${{ !matrix.suite }}
-        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/custom_types/Cargo.toml  --features "pg$PG_VER no-schema-generation" --no-default-features
-
-      - name: Run range example regression tests
-        if: ${{ !matrix.suite }}
-        run: CARGO_TARGET_DIR="$(pwd)/target" cargo pgrx regress pg$PG_VER --manifest-path=pgrx-examples/range/Cargo.toml
-
-      - name: Lint and run the migration_fragments example upgrade test
-        if: ${{ !matrix.suite }}
-        run: |
-          CARGO_TARGET_DIR="$(pwd)/target" cargo pgrx migrate check --deny-mixed-objects --manifest-path=pgrx-examples/migration_fragments/Cargo.toml
-          CARGO_TARGET_DIR="$(pwd)/target" cargo pgrx regress pg$PG_VER --manifest-path=pgrx-examples/migration_fragments/Cargo.toml
-
-      - name: Run `cargo pgrx schema` against the versioned_custom_libname_so example
-        if: ${{ !matrix.suite }}
-        run: cd pgrx-examples/versioned_custom_libname_so && cargo pgrx schema pg$PG_VER
-
-  pgrx_tests_arm64:
-    name: Linux arm64 native tests (PG${{ matrix.postgres }})
-    needs: lintck
-    runs-on: ubuntu-24.04-arm
-    if: "!contains(github.event.head_commit.message, 'nogha')"
+  install-regression:
+    name: cargo pgrx install from a virtual workspace
+    needs: plan
+    if: needs.plan.outputs.install_regression == 'true'
+    runs-on: ubuntu-22.04
     env:
-      PG_VER: ${{ matrix.postgres }}
-      RUST_TOOLCHAIN: 'stable'
-      CARGO_PGRX: cargo-pgrx
-
-    # Regression coverage for the `.pgrxsc` ELF-section retention contract on
-    # aarch64 Linux. The bug this is guarding against: without LTO, `#[used]`
-    # statics in `.pgrxsc` rely on `SHF_GNU_RETAIN` surviving through LLVM →
-    # binutils → `ld --gc-sections`. That chain has broken in the wild on
-    # aarch64 (see pglinter 0.18.0 failure), dropping the whole section and
-    # producing "no embedded pgrx schema section found" at schema-generation
-    # time. Running `cargo pgrx schema --release` against pgrx-unit-tests on
-    # a native aarch64 runner directly exercises the broken path.
-    strategy:
-      matrix:
-        postgres: [ 17 ]
-
+      PG_VER: 18
+      CLANG_VER: 21
     steps:
       - uses: actions/checkout@v4
-
-      - name: Set up prerequisites and environment
-        run: |
-          sudo apt-get update -y -qq --fix-missing
-
-          echo "----- Remove old postgres / clang / llvm (best effort) -----"
-          # Each regex can legitimately match zero packages on the arm64
-          # runner image (e.g. no pre-installed `mono-llvm*`), so we treat
-          # every removal as best-effort rather than failing the whole job.
-          for pattern in \
-            '^postgres.*' \
-            '^libpq.*' \
-            '^clang.*' \
-            '^llvm.*' \
-            '^libclang.*' \
-            '^libllvm.*' \
-            '^mono-llvm.*'; do
-            sudo apt remove -y "$pattern" || true
-          done
-
-          echo "----- Install system dependencies -----"
-          sudo apt-get install -y \
-            build-essential \
-            clang \
-            libclang-dev \
-            llvm-dev \
-            gcc \
-            libssl-dev \
-            libz-dev \
-            make \
-            pkg-config \
-            zlib1g-dev
-
-          "$TOOL_DIR"/rustup.sh
-
-          echo "----- Print env -----"
-          env
-          echo ""
-
-      - name: Setup release Postgres apt repo
-        run: |
-          sudo apt-get install -y wget gnupg
-          sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
-          wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
-          sudo apt-get update -y -qq --fix-missing
-
-      - name: Install Postgres
-        run: |
-          sudo apt-get install -y \
-            postgresql-$PG_VER \
-            postgresql-server-dev-$PG_VER
-
-      - name: Set up PostgreSQL permissions
-        run: sudo chmod a+rwx `/usr/lib/postgresql/$PG_VER/bin/pg_config --pkglibdir` `/usr/lib/postgresql/$PG_VER/bin/pg_config --sharedir`/extension /var/run/postgresql/
-
-      # This job finishes well before the x86_64 jobs, so it caches only the registry and
-      # leaves the repository's cache storage to the jobs that set the run's length.
+      - run: tools/ci/setup.sh
       - uses: Swatinem/rust-cache@v2
         with:
-          cache-targets: "false"
-          cache-bin: "false"
-          save-if: ${{ github.event_name == 'push' }}
+          shared-key: install-regression
+          save-if: ${{ env.SAVE_RUST_CACHE == 'true' }}
+      - run: cargo test --locked --package cargo-pgrx --test install_pg_test_regression -- --ignored
 
-      # pgrx-pg-sys's build script formats the bindings it generates with rustfmt.
-      - name: Install rustfmt
-        run: rustup component add rustfmt
-
-      - name: Install cargo-pgrx
-        run: cargo install --path cargo-pgrx/ --debug --force --locked
-
-      - name: Run 'cargo pgrx init' against system-level ${{ matrix.postgres }}
-        run: cargo pgrx init --pg$PG_VER /usr/lib/postgresql/$PG_VER/bin/pg_config
-
-      # aarch64 Linux is an unsigned-char target, so this covers C char
-      # semantics in generated macros and Datum conversions that x86_64 cannot.
-      - name: Run pgrx-unit-tests
+  runas:
+    name: cargo pgrx test --runas
+    needs: plan
+    if: needs.plan.outputs.runas == 'true'
+    runs-on: ubuntu-22.04
+    env:
+      PG_VER: 15
+      CLANG_VER: 14
+    steps:
+      - uses: actions/checkout@v4
+      - run: tools/ci/setup.sh
+      - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: runas
+          save-if: ${{ env.SAVE_RUST_CACHE == 'true' }}
+      - name: Test cargo pgrx test --runas
         run: |
-          cargo test \
-            --features "pg$PG_VER" \
-            --no-default-features \
-            --package pgrx-unit-tests --lib
+          cargo build --locked -p cargo-pgrx
+          echo 0 | sudo tee /proc/sys/fs/protected_fifos
+          cd pgrx-examples/arrays && ../../target/debug/cargo-pgrx pgrx test pg$PG_VER --runas postgres --pgdata=/tmp/pgdata
 
-      # Reproduces the pglinter 0.18.0 failure mode: release build with LTO
-      # off and many codegen units, where `.pgrxsc` retention depends on
-      # `SHF_GNU_RETAIN` surviving the whole LLVM → binutils → `ld
-      # --gc-sections` chain. The env vars below pin the profile shape so
-      # this regression test keeps exercising the broken path even if
-      # someone later edits `[profile.release]` in the workspace Cargo.toml.
-      # pgrx-unit-tests has a large, diverse set of schema entries, so if
-      # the injected `--no-gc-sections` workaround ever regresses, this step
-      # fails with "no embedded pgrx schema section found".
+  # `cargo pgrx init` downloads and compiles PostgreSQL, then a new extension from the
+  # template is tested against this checkout's pgrx.
+  init:
+    name: cargo pgrx init and new
+    needs: plan
+    if: needs.plan.outputs.init == 'true'
+    runs-on: ubuntu-22.04
+    env:
+      PG_VER: 15
+      CLANG_VER: 14
+    steps:
+      - uses: actions/checkout@v4
+      - run: tools/ci/setup.sh
+      - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: init
+          save-if: ${{ env.SAVE_RUST_CACHE == 'true' }}
+      - name: Install PostgreSQL's build dependencies
+        run: |
+          sudo apt-get install -y -qq --no-install-recommends \
+            bison flex libicu-dev libreadline-dev libssl-dev pkg-config zlib1g-dev > /dev/null
+      - name: Install cargo-pgrx
+        run: cargo install --locked --path cargo-pgrx/ --debug --force --target-dir target
+      - name: Run 'cargo pgrx init'
+        run: PGRX_HOME="$RUNNER_TEMP/pgrx-home-download" cargo pgrx init --pg$PG_VER download
+      - name: Create a new extension
+        run: cd "$RUNNER_TEMP" && cargo pgrx new sample
+      - name: Use this checkout's pgrx in the new extension
+        run: |
+          {
+            echo "[patch.crates-io]"
+            echo "pgrx-bench  = { path = \"${GITHUB_WORKSPACE}/pgrx-bench\"  }"
+            echo "pgrx        = { path = \"${GITHUB_WORKSPACE}/pgrx\"        }"
+            echo "pgrx-macros = { path = \"${GITHUB_WORKSPACE}/pgrx-macros\" }"
+            echo "pgrx-tests  = { path = \"${GITHUB_WORKSPACE}/pgrx-tests\"  }"
+          } >> "$RUNNER_TEMP/sample/Cargo.toml"
+          cat "$RUNNER_TEMP/sample/Cargo.toml"
+      # Sharing the workspace's target directory reuses the build dependencies and proc
+      # macros that the steps above compiled, where the sample resolves the same versions.
+      - name: Test the new extension against the downloaded PostgreSQL
+        env:
+          CARGO_TARGET_DIR: ${{ github.workspace }}/target
+        run: cd "$RUNNER_TEMP/sample" && PGRX_HOME="$RUNNER_TEMP/pgrx-home-download" cargo pgrx test pg$PG_VER
+
+  # aarch64 release builds without LTO and with many codegen units keep `.pgrxsc` only if
+  # SHF_GNU_RETAIN survives LLVM, binutils and `ld --gc-sections`, which has broken in the
+  # wild (see the pglinter 0.18.0 failure). If cargo-pgrx's injected `--no-gc-sections`
+  # workaround regresses, schema generation fails with "no embedded pgrx schema section found".
+  schema-release:
+    name: linux-arm64 cargo pgrx schema --release
+    needs: plan
+    if: needs.plan.outputs.schema_release == 'true'
+    runs-on: ubuntu-24.04-arm
+    env:
+      PG_VER: 17
+    steps:
+      - uses: actions/checkout@v4
+      - run: tools/ci/setup.sh
+      - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: schema-release
+          save-if: ${{ env.SAVE_RUST_CACHE == 'true' }}
       - name: Exercise cargo pgrx schema --release against pgrx-unit-tests
         env:
           CARGO_PROFILE_RELEASE_LTO: "false"
           CARGO_PROFILE_RELEASE_CODEGEN_UNITS: "16"
-        run: cd pgrx-unit-tests && cargo pgrx schema pg$PG_VER --release
+        run: |
+          cargo build --locked -p cargo-pgrx
+          cd pgrx-unit-tests && ../target/debug/cargo-pgrx pgrx schema pg$PG_VER --release
 
-  cargo_pgrx_init:
-    name: cargo pgrx init
+  # A new compiler almost always breaks the build rather than a test, so Rust beta only
+  # builds the tests.
+  beta:
+    name: Rust beta build
+    needs: plan
+    if: needs.plan.outputs.beta == 'true'
     runs-on: ubuntu-22.04
-    if: "!contains(github.event.head_commit.message, 'nogha')"
+    env:
+      PG_VER: 18
+      CLANG_VER: 21
+      # rust-toolchain.toml would otherwise select the pinned stable toolchain.
+      RUSTUP_TOOLCHAIN: beta
+    steps:
+      - uses: actions/checkout@v4
+      - run: tools/ci/setup.sh
+      - run: rustup toolchain install beta --profile minimal --component rustfmt && rustc --version
+      - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: beta
+          save-if: ${{ env.SAVE_RUST_CACHE == 'true' }}
+      - name: Build the workspace tests with Rust beta
+        run: |
+          cargo test --locked --workspace --no-run --exclude pgrx-unit-tests \
+            --features "pg$PG_VER" --no-default-features
+          cargo test --locked --no-run --features "pg$PG_VER cshim proptest" --package pgrx-unit-tests --lib
+          cargo test --locked --no-run --features "pg$PG_VER proptest" --package pgrx-unit-tests
+
+  package:
+    name: Package
+    needs: plan
+    if: needs.plan.outputs.package == 'true'
+    runs-on: ubuntu-22.04
     env:
       PG_VER: 15
-      CARGO_PGRX: cargo-pgrx
-
+      CLANG_VER: 14
+      # Any rustc warning or Cargo lint fails this job, including the manifest lints
+      # `cargo publish` reports. Workspace-level lints appear only in builds inside the
+      # workspace, such as installing cargo-pgrx, rather than in packaged-crate builds.
+      CARGO_BUILD_WARNINGS: deny
     steps:
       - uses: actions/checkout@v4
-
-      - name: Set up prerequisites and environment
-        run: |
-          sudo apt-get update -y -qq --fix-missing
-
-          echo ""
-
-          cat $GITHUB_ENV
-          echo ""
-          
-          cat $GITHUB_ENV
-          echo ""
-          
-          echo "----- Remove old postgres -----"
-          sudo apt remove -y '^postgres.*' '^libpq.*' '^clang.*' '^llvm.*' '^libclang.*' '^libllvm.*' '^mono-llvm.*'
-          echo ""
-          
-          echo "----- Install system dependencies -----"
-          sudo apt-get install -y \
-            build-essential \
-            llvm-14-dev libclang-14-dev clang-14 \
-            gcc \
-            libssl-dev \
-            libz-dev \
-            make \
-            pkg-config \
-            strace \
-            zlib1g-dev
-          echo ""
-
-          "$TOOL_DIR"/rustup.sh
-
-          echo "----- Outputting env -----"
-          env
-          echo ""
-
-      # This job runs alongside the hour-long test jobs without setting the run's length, so
-      # it caches only the registry and leaves the repository's cache storage to them.
+      - run: tools/ci/setup.sh
       - uses: Swatinem/rust-cache@v2
         with:
-          cache-targets: "false"
-          cache-bin: "false"
-          save-if: ${{ github.event_name == 'push' }}
-
-      - name: Install rustfmt & clippy
+          shared-key: package
+          save-if: ${{ env.SAVE_RUST_CACHE == 'true' }}
+      - name: Test pgrx can be packaged as a new version
         run: |
-          rustup component add rustfmt
-          rustup component add clippy
+          ./update-versions.sh 0.0.999-rc.999
+          cargo package \
+            --allow-dirty \
+            -p pgrx-pg-config \
+            -p pgrx-c-macros \
+            -p pgrx-bindgen \
+            -p pgrx-sql-entity-graph \
+            -p pgrx-macros \
+            -p pgrx-pg-sys \
+            -p pgrx \
+            -p pgrx-bench \
+            -p pgrx-tests \
+            -p cargo-pgrx \
+            --features "pg$PG_VER"
 
-      - name: Install cargo-pgrx
-        run: cargo install --path cargo-pgrx/ --debug --force --locked
-
-      - name: Run 'cargo pgrx init'
-        run: cargo pgrx init --pg$PG_VER download
-
-      # We can't do this with other lints because we need $PGRX_HOME
-      - name: Clippy -Awarnings
-        run: cargo clippy --tests --features pg$PG_VER --no-default-features -- -Awarnings
-
-      # This also requires $PGRX_HOME
-      - name: Check doc-links
-        run: |
-          cargo rustdoc -p pgrx --features pg$PG_VER -- \
-            --document-private-items \
-            -Drustdoc::broken-intra-doc-links \
-            -Drustdoc::invalid-html-tags
-
-      - name: create new sample extension
-        run: cd /tmp/ && cargo pgrx new sample
-
-      # hack Cargo.toml to use this version of pgrx from github
-      - name: hack Cargo.toml
-        run: |
-          echo "[patch.crates-io]" >> /tmp/sample/Cargo.toml
-          echo "pgrx-bench  = { path = \"${GITHUB_WORKSPACE}/pgrx-bench\"  }" >> /tmp/sample/Cargo.toml
-          echo "pgrx        = { path = \"${GITHUB_WORKSPACE}/pgrx\"        }" >> /tmp/sample/Cargo.toml
-          echo "pgrx-macros = { path = \"${GITHUB_WORKSPACE}/pgrx-macros\" }" >> /tmp/sample/Cargo.toml
-          echo "pgrx-tests  = { path = \"${GITHUB_WORKSPACE}/pgrx-tests\"  }" >> /tmp/sample/Cargo.toml
-
-      - name: show Cargo.toml
-        run: cat /tmp/sample/Cargo.toml
-
-      # Sharing the workspace's target directory reuses the build dependencies and proc
-      # macros that the steps above compiled, where the sample resolves the same versions.
-      - name: Test sample
-        env:
-          CARGO_TARGET_DIR: ${{ github.workspace }}/target
-        run: cd /tmp/sample && cargo pgrx test pg$PG_VER
-
-  build_mac:
-    name: MacOS build & test (${{ matrix.os }}, PG${{ matrix.postgresql }})
-    needs: lintck
-    runs-on: ${{ matrix.os }}
-    if: "!contains(github.event.head_commit.message, 'nogha')"
-    env:
-      CARGO_PGRX: cargo-pgrx
-
-    strategy:
-      matrix:
-        os: [ "macos-26" ] # macos-26 is Apple silicon
-        # The organization runs at most five macOS jobs at once across all of its workflow
-        # runs, so this is a single job. PostgreSQL 16 and later name extension libraries
-        # "dylib" on macOS, and PostgreSQL 15 used "so" (see
-        # https://github.com/pgcentralfoundation/pgrx/pull/1300); this job covers "dylib".
-        postgresql: [ 18 ]
-
-    steps:
-      - uses: Homebrew/actions/setup-homebrew@main
-
-      # install postgres with homebrew, but do't let homebrew do an update too.  The update
-      # process not only takes forever, but it tends to fail when the internet changes
-      #       https://github.com/Homebrew/brew/issues/1670#issuecomment-267096602
-      - name: brew install postgresql
-        run: |
-          HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 brew install ${FORMULA}
-          
-          echo "$(brew --prefix ${FORMULA})/bin" >> $GITHUB_PATH
-        env:
-          FORMULA: postgresql@${{ matrix.postgresql }}
-
-      - uses: actions/checkout@v4
-
-      - name: Set up prerequisites and environment
-        run: |
-          echo ""
-
-          echo "----- Getting pre-installed Postgres major version -----"
-          PG_VER=$(pg_config --version | awk '{split($2,a,"."); print a[1]}')
-          echo "PG_VER=$PG_VER" >> $GITHUB_ENV
-          cat $GITHUB_ENV
-          
-          echo "----- Set up Postgres permissions -----"
-          sudo chmod a+rwx `$(which pg_config) --pkglibdir` `$(which pg_config) --sharedir`/extension
-          # ls -lath `$(which pg_config) --pkglibdir` `$(which pg_config) --sharedir`/extension
-          echo ""
-
-          "$TOOL_DIR"/rustup.sh
-
-          echo "----- Outputting env -----"
-          env
-          echo ""
-
-      # Only pushes to develop save caches. Pull requests restore develop's newest cache, so
-      # their caches cannot evict develop's from the repository's cache storage.
-      - uses: Swatinem/rust-cache@v2
-        with:
-          cache-bin: "false"
-          save-if: ${{ github.event_name == 'push' }}
-
-      - name: Install rustfmt & clippy
-        run: |
-          rustup component add rustfmt
-          rustup component add clippy
-
-      # Building in ./target instead of a temporary directory lets the cache keep
-      # cargo-pgrx's dependencies.
-      - name: Install cargo-pgrx
-        run: cargo install --path cargo-pgrx/ --debug --force --locked --target-dir target
-
-      - name: Run 'cargo pgrx init'
-        run: |
-          set -x
-          cargo pgrx init --pg$PG_VER $(which pg_config)
-
-      - name: Run tests
-        run: cargo test --all --features "pg$PG_VER pg_test cshim proptest" --no-default-features
-
-      # This test compiles only on macOS. It builds both slices of a universal installation, so
-      # it needs the other slice's standard library. Its synthetic headers make one job enough.
-      - name: Run universal macOS binding build harness
-        run: |
-          rustup target add aarch64-apple-darwin x86_64-apple-darwin
-          cargo test --package pgrx-bindgen --test macro_build \
-            universal_macos_installations_build_both_slices -- --include-ignored --exact --test-threads=1
-
-  build_windows:
-    name: Windows build & test (${{ matrix.os }}, PG${{ matrix.postgresql }})
-    needs: lintck
-    runs-on: ${{ matrix.os }}
-    if: "!contains(github.event.head_commit.message, 'nogha')"
-    env:
-      PG_VER: ${{ matrix.postgresql }}
-      CARGO_PGRX: cargo-pgrx
-
-    strategy:
-      matrix:
-        os: [ "windows-2022" ]
-        postgresql: [ 18 ]
-
+  docsrs:
+    name: docs.rs builds
+    needs: plan
+    if: needs.plan.outputs.package == 'true'
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-
-      - name: Set up prerequisites and environment
-        run: |
-          Write-Output ""
-
-          rustup update
-
-          Write-Output "----- Outputting env -----"
-          Get-ChildItem Env:
-          Write-Output ""
-
-      # Only pushes to develop save caches. Pull requests restore develop's newest cache, so
-      # their caches cannot evict develop's from the repository's cache storage.
+      - run: tools/ci/setup.sh
+      - run: rustup toolchain install nightly --profile minimal --component rustfmt
       - uses: Swatinem/rust-cache@v2
         with:
-          cache-bin: "false"
-          save-if: ${{ github.event_name == 'push' }}
-
-      # Building in ./target instead of a temporary directory lets the cache keep
-      # cargo-pgrx's dependencies.
-      - name: Install cargo-pgrx
-        run: cargo install --path cargo-pgrx/ --debug --force --locked --target-dir target
-
-      - name: Install rustfmt & clippy
-        run: |
-          rustup component add rustfmt
-          rustup component add clippy
-
-      - name: Run 'cargo pgrx init'
-        run: cargo pgrx init --pg$env:PG_VER=download
-
-      - name: Run tests
-        run: cargo test --all --no-default-features --features "pg$env:PG_VER pg_test cshim proptest" --all-targets --no-fail-fast
+          shared-key: docsrs
+          save-if: ${{ env.SAVE_RUST_CACHE == 'true' }}
+      # docs.rs builds need neither PostgreSQL nor libclang. This checks every supported
+      # version against the committed bindings and C macro snapshot on docs.rs's target.
+      - name: Type-check the docs.rs builds of pgrx-pg-sys and pgrx
+        run: ./tools/docsrs-typecheck.sh
+      - name: Verify docs.rs build path
+        run: ./tools/docsrs-check.sh

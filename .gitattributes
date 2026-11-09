@@ -10,3 +10,5 @@
 /pgrx-c-macros/tests/fixtures/** text eol=lf
 /pgrx-pg-sys/src/include/*.rs generated
 /pgrx-pg-sys/src/include/cmacros/**/*.rs generated
+# The CI scripts run under bash on Windows too.
+/tools/ci/** text eol=lf
