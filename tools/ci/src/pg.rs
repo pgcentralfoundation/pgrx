@@ -319,9 +319,21 @@ pub(crate) fn run(options: &Options) -> eyre::Result<bool> {
     });
     let mut passed = testbin::passed(&outcomes);
 
-    // Doctests compile against the libraries the test build made. Cargo skips the packages
-    // without a library that doctests can use.
-    passed &= process::run(Command::new("cargo").args(["test", "--doc"]).args(&cargo_args))?;
+    // Only Rust libraries hold doctests; Cargo warns about every extension crate it is asked
+    // to test this way. Their default features name no PostgreSQL version and keep pgrx's C
+    // shim, as the test build did, so the libraries it made are reused.
+    let mut doctests = Command::new("cargo");
+    doctests.args(["test", "--locked", "--doc", "--features", &feature]);
+    let mut any = false;
+    for package in pg_packages.iter().filter(|p| wanted.contains(p.name.as_str())) {
+        if workspace::only_rust_library(package) {
+            doctests.args(["-p", &package.name]);
+            any = true;
+        }
+    }
+    if any {
+        passed &= process::run(&mut doctests)?;
+    }
 
     if options.cli_checks {
         for (example, commands) in CLI_CHECKS {

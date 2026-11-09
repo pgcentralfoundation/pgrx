@@ -62,6 +62,15 @@ pub(crate) fn has_rust_library(package: &Package) -> bool {
     })
 }
 
+/// Whether a package's library is only a Rust library. Cargo runs no doctests for a library
+/// that is also a `cdylib`, and warns that it doesn't.
+pub(crate) fn only_rust_library(package: &Package) -> bool {
+    package.targets.iter().any(|target| {
+        target.kind.iter().any(|kind| matches!(kind, TargetKind::Lib | TargetKind::RLib))
+            && target.kind.iter().all(|kind| matches!(kind, TargetKind::Lib | TargetKind::RLib))
+    })
+}
+
 /// The directory that holds a package's manifest.
 pub(crate) fn package_dir(package: &Package) -> &Utf8Path {
     package.manifest_path.parent().expect("a manifest path names a file in a directory")
