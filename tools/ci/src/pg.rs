@@ -7,17 +7,18 @@
 //! Test the packages that need PostgreSQL against one PostgreSQL version.
 //!
 //! The pg_test harness installs each extension with `cargo pgrx install`, which builds the
-//! extension with only its own package's features. pgrx-unit-tests' build nearly matches the
-//! workspace's test build and reuses it. The examples' builds don't: the test build's
-//! dev-dependencies enable more features of crates that pgrx-pg-sys and pgrx depend on, such as
-//! serde_json, so those rebuild. So the test binaries build in `target` while cargo-pgrx and the
-//! examples' extensions build in `target-ext`, each group of examples with the same
-//! dependencies in one Cargo invocation, and then the test binaries run in parallel.
+//! extension with only its own package's features. The test binaries build first, and then the
+//! examples' extension libraries build in the same target directory, each group of examples
+//! with the same dependencies in one Cargo invocation. The test build's dev-dependencies enable
+//! more features of a few crates that pgrx-pg-sys and pgrx depend on, such as serde_json, so
+//! those two recompile for the extensions, but the build scripts, procedural macros and
+//! generated bindings are reused. pgrx-unit-tests' extension build matches the test build and
+//! needs only its own crate. cargo-pgrx shares nothing with these, so it builds in `target-ext`
+//! at the same time. Then the test binaries run in parallel.
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
 use std::process::Command;
-use std::sync::mpsc;
 use std::time::Instant;
 
 use cargo_metadata::camino::{Utf8Path, Utf8PathBuf};
@@ -28,8 +29,9 @@ use crate::process::{self, log};
 use crate::testbin;
 use crate::workspace::{self, Workspace};
 
-/// Packages whose extension builds share the test build's target directory.
-const SHARES_TEST_TARGET: &[&str] = &["pgrx-unit-tests"];
+/// Extensions whose builds reuse everything the test build compiled but their own crate, so
+/// they need no library build ahead of the harness.
+const REUSES_TEST_BUILD: &[&str] = &["pgrx-unit-tests"];
 
 /// Binaries that run longest, so they start first.
 const FIRST: &[&str] = &["pgrx-unit-tests", "pgrx-pg-sys"];
@@ -253,8 +255,8 @@ pub(crate) fn run(options: &Options) -> eyre::Result<bool> {
     }
 
     let test_target = workspace.target_dir("target");
-    let ext_target = workspace.target_dir("target-ext");
-    let cargo_pgrx = cargo_pgrx_in(&ext_target);
+    let tool_target = workspace.target_dir("target-ext");
+    let cargo_pgrx = cargo_pgrx_in(&tool_target);
 
     // Every package that needs PostgreSQL builds, whatever runs, so the build matches the cache.
     let mut features = vec![feature.clone()];
@@ -267,44 +269,31 @@ pub(crate) fn run(options: &Options) -> eyre::Result<bool> {
         cargo_args.extend(["-p".to_owned(), package.name.to_string()]);
     }
 
-    let (ready, cargo_pgrx_built) = mpsc::channel();
     let binaries = std::thread::scope(|scope| -> eyre::Result<_> {
-        let examples = scope.spawn(|| -> eyre::Result<()> {
-            let built = build_cargo_pgrx(&ext_target);
-            let succeeded = matches!(built, Ok(true));
-            // The receiver outlives this thread; a send can only fail after a panic there.
-            let _ = ready.send(succeeded);
-            if !built? {
-                return Err(eyre!("building cargo-pgrx failed"));
+        let tool = scope.spawn(|| build_cargo_pgrx(&tool_target));
+        let binaries = testbin::build(&workspace, &cargo_args)?;
+        let examples: Vec<&Package> = extensions
+            .iter()
+            .copied()
+            .filter(|package| !REUSES_TEST_BUILD.contains(&package.name.as_str()))
+            .collect();
+        let groups = dependency_groups(&examples);
+        for group in &groups {
+            if !INSTALL_RECOMPILES || group.len() > 1 {
+                postgres.build_libraries(&test_target, group);
             }
-            let examples: Vec<&Package> = extensions
-                .iter()
-                .copied()
-                .filter(|package| !SHARES_TEST_TARGET.contains(&package.name.as_str()))
-                .collect();
-            for group in dependency_groups(&examples) {
-                if !INSTALL_RECOMPILES || group.len() > 1 {
-                    postgres.build_libraries(&ext_target, &group);
-                }
-                if INSTALL_RECOMPILES {
-                    for package in group {
-                        postgres.install(&cargo_pgrx, &ext_target, package);
-                    }
-                }
-            }
-            Ok(())
-        });
-        let binaries = testbin::build(&workspace, &cargo_args);
-        // These extensions' builds reuse the test build, so they install right after it.
-        if INSTALL_RECOMPILES && cargo_pgrx_built.recv().unwrap_or(false) {
-            for package in
-                extensions.iter().filter(|p| SHARES_TEST_TARGET.contains(&p.name.as_str()))
-            {
+        }
+        if !tool.join().map_err(|_| eyre!("the cargo-pgrx build thread panicked"))?? {
+            return Err(eyre!("building cargo-pgrx failed"));
+        }
+        if INSTALL_RECOMPILES {
+            let reusers =
+                extensions.iter().filter(|p| REUSES_TEST_BUILD.contains(&p.name.as_str()));
+            for package in groups.iter().flatten().chain(reusers) {
                 postgres.install(&cargo_pgrx, &test_target, package);
             }
         }
-        examples.join().map_err(|_| eyre!("the extension build thread panicked"))??;
-        binaries
+        Ok(binaries)
     })?;
 
     let mut binaries: Vec<_> =
@@ -313,16 +302,11 @@ pub(crate) fn run(options: &Options) -> eyre::Result<bool> {
         FIRST.iter().position(|first| *first == binary.package).unwrap_or(FIRST.len())
     });
     let outcomes = testbin::run_all(binaries, parallelism(), |binary, command| {
-        let target = if SHARES_TEST_TARGET.contains(&binary.package.as_str()) {
-            &test_target
-        } else {
-            &ext_target
-        };
         postgres.configure(
             command,
             &binary.package,
             cargo_pgrx.as_std_path(),
-            target.as_std_path(),
+            test_target.as_std_path(),
         );
     });
     let mut passed = testbin::passed(&outcomes);
@@ -358,7 +342,7 @@ pub(crate) fn run(options: &Options) -> eyre::Result<bool> {
                     .arg("--manifest-path")
                     .arg(&package.manifest_path)
                     .current_dir(workspace::package_dir(package))
-                    .env("CARGO_TARGET_DIR", &ext_target);
+                    .env("CARGO_TARGET_DIR", &test_target);
                 passed &= process::run(&mut check)?;
             }
         }
