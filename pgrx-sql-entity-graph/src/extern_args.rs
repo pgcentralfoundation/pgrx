@@ -235,33 +235,15 @@ pub fn parse_extern_attributes(attr: TokenStream) -> HashSet<ExternArgs> {
                     "parallel_restricted" => args.insert(ExternArgs::ParallelRestricted),
                     "error" | "expected" => {
                         let _punc = itr.next().unwrap();
-                        let literal = itr.next().unwrap();
-                        let message = literal.to_string();
-                        let message = unescape::unescape(&message).expect("failed to unescape");
-
-                        // trim leading/trailing quotes around the literal
-                        let message = message[1..message.len() - 1].to_string();
-                        args.insert(ExternArgs::ShouldPanic(message.to_string()))
+                        args.insert(ExternArgs::ShouldPanic(string_value(itr.next().unwrap())))
                     }
                     "schema" => {
                         let _punc = itr.next().unwrap();
-                        let literal = itr.next().unwrap();
-                        let schema = literal.to_string();
-                        let schema = unescape::unescape(&schema).expect("failed to unescape");
-
-                        // trim leading/trailing quotes around the literal
-                        let schema = schema[1..schema.len() - 1].to_string();
-                        args.insert(ExternArgs::Schema(schema.to_string()))
+                        args.insert(ExternArgs::Schema(string_value(itr.next().unwrap())))
                     }
                     "name" => {
                         let _punc = itr.next().unwrap();
-                        let literal = itr.next().unwrap();
-                        let name = literal.to_string();
-                        let name = unescape::unescape(&name).expect("failed to unescape");
-
-                        // trim leading/trailing quotes around the literal
-                        let name = name[1..name.len() - 1].to_string();
-                        args.insert(ExternArgs::Name(name.to_string()))
+                        args.insert(ExternArgs::Name(string_value(itr.next().unwrap())))
                     }
                     // Recognized, but not handled as an extern argument
                     "sql" => {
@@ -279,6 +261,15 @@ pub fn parse_extern_attributes(attr: TokenStream) -> HashSet<ExternArgs> {
     args
 }
 
+/// The value of a string literal argument, with its escapes resolved as rustc resolves them.
+#[track_caller]
+fn string_value(literal: TokenTree) -> String {
+    match syn::parse2::<syn::LitStr>(literal.into()) {
+        Ok(literal) => literal.value(),
+        Err(error) => panic!("expected a string literal: {error}"),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use std::str::FromStr;
@@ -294,5 +285,15 @@ mod tests {
         assert!(
             args.contains(&ExternArgs::ShouldPanic("syntax error at or near \"THIS\"".to_string()))
         );
+    }
+
+    #[test]
+    fn parse_raw_and_unicode_escaped_strings() {
+        let s = r##"name = r#"a"b"#, schema = "caf\u{e9}\t""##;
+        let ts = proc_macro2::TokenStream::from_str(s).unwrap();
+
+        let args = parse_extern_attributes(ts);
+        assert!(args.contains(&ExternArgs::Name("a\"b".to_string())));
+        assert!(args.contains(&ExternArgs::Schema("café\t".to_string())));
     }
 }

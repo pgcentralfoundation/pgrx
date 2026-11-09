@@ -32,7 +32,6 @@ syn.workspace = true
 thiserror.workspace = true
 
 convert_case = "0.12.0"
-unescape = "0.1.0" # for escaped-character-handling
 
 [lints.clippy]
 assigning_clones = "allow" # wrong diagnosis and wrong suggestions
