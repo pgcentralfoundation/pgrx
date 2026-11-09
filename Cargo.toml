@@ -23,6 +23,7 @@ members = [
     "pgrx-bindgen",
     "pgrx-c-macros",
     "pgrx-examples/*",
+    "tools/ci",
     "tools/version-updater",
 ]
 exclude = [

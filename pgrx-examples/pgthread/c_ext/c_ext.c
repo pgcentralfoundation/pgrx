@@ -7,7 +7,7 @@
 
 #include <pthread.h>
 
-PG_FUNCTION_INFO_V1(start_thread);
+void pgthread_run_spi_in_thread(void);
 
 typedef struct ThreadResult
 {
@@ -87,8 +87,12 @@ static void *spi_thread_main(void *arg)
     return NULL;
 }
 
-PGDLLEXPORT Datum
-start_thread(PG_FUNCTION_ARGS)
+/*
+ * Run SPI on a new thread and wait for it. The `start_thread()` SQL function, a
+ * `#[pg_extern]` in src/lib.rs, calls this; it raises an ERROR when the work fails.
+ */
+void
+pgthread_run_spi_in_thread(void)
 {
     pthread_t tid;
     ThreadResult res;
@@ -104,6 +108,4 @@ start_thread(PG_FUNCTION_ARGS)
     if (!res.ok)
         ereport(ERROR, (errmsg("pthread SPI work failed (spi_rc=%d exec_rc=%d)",
                                res.spi_rc, res.exec_rc)));
-
-    PG_RETURN_VOID();
 }

@@ -722,6 +722,13 @@ fn probe_values(
             });
             Ok(constants)
         })?;
+    // Each constant's checks reuse its probe's presumed file, so a check the compiler rejects
+    // names its own constant. The caller then drops just that constant instead of bisecting
+    // the batch to find it.
+    let probe_files = probes
+        .iter()
+        .map(|(probe, name)| (name.as_str(), probe.as_str()))
+        .collect::<HashMap<_, _>>();
     let mut checks = original.to_vec();
     for (name, constant) in &constants {
         let TypeCategory::Integer(kind) = constant.ty.category else {
@@ -732,8 +739,11 @@ fn probe_values(
             IntegerValue::Signed(value) => format!("({value}LL)"),
             IntegerValue::Unsigned(value) => format!("{value}ULL"),
         };
+        let probe = probe_files
+            .get(name.as_str())
+            .expect("the visitor admits only constants that one of the probes names");
         let declaration = format!(
-            "_Static_assert(_Generic(({name}), {}: 1, default: 0), \"pgrx_constant_type\");\n_Static_assert(({name}) == ({value}), \"pgrx_constant_value\");\n",
+            "#line 1 \"{probe}\"\n_Static_assert(_Generic(({name}), {}: 1, default: 0), \"pgrx_constant_type\");\n_Static_assert(({name}) == ({value}), \"pgrx_constant_value\");\n",
             c_integer_name(kind),
         );
         checks.extend_from_slice(declaration.as_bytes());
