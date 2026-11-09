@@ -18,7 +18,6 @@ env:
   # configured by `.cargo/config.toml` on macOS.
   RUST_BACKTRACE: 1
   CARGO_INCREMENTAL: "false"
-  CARGO_TERM_COLOR: always
   # Only pushes to develop save caches. Pull requests restore develop's newest caches, so their
   # caches cannot evict develop's from the repository's 10 GB of cache storage.
   SAVE_RUST_CACHE: ${{ github.ref == 'refs/heads/develop' || github.head_ref == 'ci-ten-minutes' }}
@@ -92,7 +91,14 @@ jobs:
         with:
           shared-key: lint
           save-if: ${{ env.SAVE_RUST_CACHE == 'true' }}
+      - name: Restore cargo-deny
+        id: deny
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/bin/cargo-deny
+          key: cargo-deny-v1-${{ runner.os }}-${{ runner.arch }}
       - name: Install cargo-deny
+        if: steps.deny.outputs.cache-hit != 'true'
         uses: taiki-e/install-action@v2
         with:
           tool: cargo-deny
@@ -215,7 +221,15 @@ jobs:
           shared-key: crates-${{ matrix.platform }}
           cache-bin: "false"
           save-if: ${{ env.SAVE_RUST_CACHE == 'true' }}
+      # A cached binary spares every run a download that GitHub's release CDN sometimes refuses.
+      - name: Restore cargo-nextest
+        id: nextest
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/bin/cargo-nextest${{ runner.os == 'Windows' && '.exe' || '' }}
+          key: cargo-nextest-v1-${{ runner.os }}-${{ runner.arch }}
       - name: Install cargo-nextest
+        if: steps.nextest.outputs.cache-hit != 'true'
         uses: taiki-e/install-action@v2
         with:
           tool: cargo-nextest
@@ -351,7 +365,15 @@ jobs:
         with:
           shared-key: cmacros-clang14
           save-if: ${{ env.SAVE_RUST_CACHE == 'true' }}
-      - uses: taiki-e/install-action@v2
+      - name: Restore cargo-nextest
+        id: nextest
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/bin/cargo-nextest
+          key: cargo-nextest-v1-${{ runner.os }}-${{ runner.arch }}
+      - name: Install cargo-nextest
+        if: steps.nextest.outputs.cache-hit != 'true'
+        uses: taiki-e/install-action@v2
         with:
           tool: cargo-nextest
       - run: cargo nextest run --locked --no-fail-fast --package pgrx-c-macros
