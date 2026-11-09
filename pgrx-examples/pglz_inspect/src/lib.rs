@@ -639,13 +639,17 @@ mod tests {
     #[pg_test]
     fn analyze_column_unknown_strategy_errors() {
         Spi::run("CREATE TABLE _t_strat (v text); INSERT INTO _t_strat VALUES ('x');").unwrap();
-        let res = std::panic::catch_unwind(|| {
-            Spi::get_one::<i32>(
+        // PgTryBuilder clears Postgres' error state after its handler returns
+        let raised = PgTryBuilder::new(|| {
+            let _ = Spi::get_one::<i32>(
                 "SELECT sampled_rows
                  FROM pglz_analyze_column('_t_strat'::regclass, 'v', 1, 'alwyas')",
-            )
-        });
-        assert!(res.is_err(), "expected unknown strategy to raise PG ERROR");
+            );
+            false
+        })
+        .catch_others(|_| true)
+        .execute();
+        assert!(raised, "expected unknown strategy to raise PG ERROR");
     }
 
     /// Verify the installed header's output bound at allocation and wrap boundaries.
