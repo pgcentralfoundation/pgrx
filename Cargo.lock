@@ -2010,7 +2010,6 @@ dependencies = [
 name = "pgrx-pg-config"
 version = "0.20.0-beta.0"
 dependencies = [
- "cargo_toml",
  "codepage",
  "encoding_rs",
  "eyre",

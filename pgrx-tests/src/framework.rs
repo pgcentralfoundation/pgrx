@@ -13,9 +13,7 @@ use std::process::{Command, Stdio};
 use eyre::{WrapErr, eyre};
 use owo_colors::OwoColorize;
 use pgrx::prelude::*;
-use pgrx_pg_config::{
-    PgConfig, Pgrx, cargo::PgrxManifestExt, createdb, get_c_locale_flags, get_target_dir,
-};
+use pgrx_pg_config::{PgConfig, Pgrx, createdb, get_c_locale_flags, get_target_dir};
 use postgres::error::DbError;
 use std::collections::HashMap;
 use std::env::VarError;
@@ -933,7 +931,7 @@ fn get_extension_name() -> eyre::Result<String> {
     // Cargo.toml is case sensitive atm so this is ok.
     // https://github.com/rust-lang/cargo/issues/45
     let path = PathBuf::from(dir).join("Cargo.toml");
-    let name = pgrx_pg_config::cargo::read_manifest(path)?.lib_name()?;
+    let name = pgrx_pg_config::cargo::lib_name(path)?;
     Ok(name)
 }
 
