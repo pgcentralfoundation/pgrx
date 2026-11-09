@@ -1295,11 +1295,24 @@ mod tests {
 }
 
 pub mod pipe {
-    use rand::RngExt;
-    use rand::distr::Alphanumeric;
     use std::fs::File;
     use std::io::Error;
     use std::path::{Path, PathBuf};
+
+    /// A random name for a FIFO or named pipe, so concurrent test processes don't collide.
+    fn random_name() -> String {
+        use std::hash::{BuildHasher, RandomState};
+        use std::sync::atomic::{AtomicU64, Ordering};
+        use std::time::SystemTime;
+
+        static COUNTER: AtomicU64 = AtomicU64::new(0);
+        let hash = RandomState::new().hash_one((
+            std::process::id(),
+            SystemTime::now(),
+            COUNTER.fetch_add(1, Ordering::Relaxed),
+        ));
+        format!("{hash:016x}")
+    }
 
     #[cfg(target_family = "unix")]
     pub struct UnixFifo {
@@ -1310,9 +1323,7 @@ pub mod pipe {
     impl UnixFifo {
         pub fn create() -> std::io::Result<Self> {
             use std::ffi::CString;
-            let filename: String =
-                rand::rng().sample_iter(Alphanumeric).map(char::from).take(6).collect();
-            let path = format!(r"/tmp/{filename}");
+            let path = format!(r"/tmp/{}", random_name());
             let arg = CString::new(path.clone()).unwrap();
             let mode = libc::S_IRUSR
                 | libc::S_IWUSR
@@ -1368,9 +1379,7 @@ pub mod pipe {
     #[cfg(target_os = "windows")]
     impl WindowsNamedPipe {
         pub fn create() -> std::io::Result<Self> {
-            let filename: String =
-                rand::rng().sample_iter(Alphanumeric).map(char::from).take(6).collect();
-            let path = format!(r"\\.\pipe\{filename}");
+            let path = format!(r"\\.\pipe\{}", random_name());
             let server = unsafe {
                 use std::os::windows::ffi::OsStrExt;
                 use std::os::windows::io::FromRawHandle;

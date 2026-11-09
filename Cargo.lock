@@ -2041,7 +2041,6 @@ dependencies = [
  "pgrx-pg-config",
  "postgres",
  "proptest",
- "rand",
  "regex",
  "shlex",
  "sysinfo",
