@@ -28,6 +28,33 @@ github_env() {
     export "${1?}"
 }
 
+# Download a URL to a file. Network errors, stalled transfers, and HTTP 408, 429 and 5xx
+# responses are retried; other HTTP errors fail at once, so a caller can probe for a file
+# that may not exist. Each attempt rewrites the file, which output to a pipe could not undo.
+download() {
+    local url="$1" out="$2" attempt=1 status code
+    while :; do
+        status=0
+        code="$(curl -fsSL --connect-timeout 30 --speed-limit 1024 --speed-time 30 \
+            -o "$out" -w '%{response_code}' "$url")" || status=$?
+        # Judge HTTP errors by their status: over HTTP/2, some curl releases report one as a
+        # receive error (56) instead of 22.
+        case "$status/$code" in
+            0/*) return 0 ;;
+            */408 | */429 | */5??) ;;
+            */4??) return "$status" ;;
+            # Host lookup, connect, HTTP/2, truncated, timeout, TLS, empty reply, send and
+            # receive errors.
+            6/* | 7/* | 16/* | 18/* | 28/* | 35/* | 52/* | 55/* | 56/* | 92/*) ;;
+            *) return "$status" ;;
+        esac
+        (( attempt < 5 )) || return "$status"
+        echo "retrying $url after curl exit $status" >&2
+        sleep $((attempt * 5))
+        attempt=$((attempt + 1))
+    done
+}
+
 # Only the pinned toolchain: rust-toolchain.toml overrides `rustup default`, so installing
 # other toolchains would only cost time. The bindings build script formats with rustfmt.
 toolchain="$(tr -d '\r' < rust-toolchain.toml | sed -n 's/^channel *= *"\(.*\)"/\1/p')"
@@ -67,8 +94,8 @@ setup_linux() {
     if [[ -n "${CLANG_VER:-}" ]]; then
         packages+=("clang-$CLANG_VER" "libclang-$CLANG_VER-dev" "llvm-$CLANG_VER-dev")
         if ! apt-cache policy "clang-$CLANG_VER" 2> /dev/null | grep -q 'Candidate: [0-9]'; then
-            curl -fsSL https://apt.llvm.org/llvm-snapshot.gpg.key \
-                | sudo tee /etc/apt/trusted.gpg.d/apt.llvm.org.asc > /dev/null
+            download https://apt.llvm.org/llvm-snapshot.gpg.key "$RUNNER_TEMP/llvm.asc"
+            sudo install -m 644 "$RUNNER_TEMP/llvm.asc" /etc/apt/trusted.gpg.d/apt.llvm.org.asc
             echo "deb http://apt.llvm.org/$codename/ llvm-toolchain-$codename-$CLANG_VER main" \
                 | sudo tee /etc/apt/sources.list.d/llvm.list > /dev/null
         fi
@@ -83,7 +110,8 @@ setup_linux() {
         local repo="https://apt.postgresql.org/pub/repos/apt"
         local key="/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc"
         sudo install -d "$(dirname "$key")" /etc/postgresql-common/createcluster.d
-        sudo curl -fsSL -o "$key" https://www.postgresql.org/media/keys/ACCC4CF8.asc
+        download https://www.postgresql.org/media/keys/ACCC4CF8.asc "$RUNNER_TEMP/pgdg.asc"
+        sudo install -m 644 "$RUNNER_TEMP/pgdg.asc" "$key"
         # Tests start their own servers, so the package's default cluster would only cost time.
         echo "create_main_cluster = false" \
             | sudo tee /etc/postgresql-common/createcluster.d/ci.conf > /dev/null
@@ -132,9 +160,10 @@ setup_windows() {
     [[ -n "${PG_VER:-}" ]] || return 0
     # EnterpriseDB publishes binaries a few days after a release, so fall back a minor
     # version when the newest one is missing.
-    local latest minor url archive="$RUNNER_TEMP/postgresql.zip"
-    latest="$(curl -fsSL --retry 3 https://www.postgresql.org/versions.rss \
-        | grep -o "[0-9.]* is the latest release in the $PG_VER series" | head -1 | cut -d' ' -f1)"
+    local latest minor url archive="$RUNNER_TEMP/postgresql.zip" rss="$RUNNER_TEMP/versions.rss"
+    download https://www.postgresql.org/versions.rss "$rss"
+    latest="$(grep -o "[0-9.]* is the latest release in the $PG_VER series" "$rss" \
+        | head -1 | cut -d' ' -f1)"
     if [[ -z "$latest" ]]; then
         echo "versions.rss names no PostgreSQL $PG_VER release" >&2
         exit 1
@@ -142,7 +171,7 @@ setup_windows() {
     minor="${latest#*.}"
     while (( minor >= 0 )); do
         url="https://get.enterprisedb.com/postgresql/postgresql-$PG_VER.$minor-1-windows-x64-binaries.zip"
-        if curl -fsSL --retry 3 -o "$archive" "$url"; then
+        if download "$url" "$archive"; then
             break
         fi
         echo "no $url; trying the previous minor version"
