@@ -22,7 +22,7 @@ env:
   CARGO_INCREMENTAL: "false"
   # Only pushes to develop save caches. Pull requests restore develop's newest caches, so their
   # caches cannot evict develop's from the repository's 10 GB of cache storage.
-  SAVE_RUST_CACHE: ${{ github.ref == 'refs/heads/develop' || github.head_ref == 'ci-ten-minutes' }}
+  SAVE_RUST_CACHE: ${{ github.ref == 'refs/heads/develop' }}
 
 jobs:
   # Pull requests run only the jobs that test what the change touches; see tools/ci/src/plan.rs.
@@ -199,10 +199,6 @@ jobs:
           cargo build --locked -p pgrx-ci
           cli_checks=; [ "$RUNNER_OS" = Linux ] && cli_checks=--cli-checks
           target/debug/pgrx-ci test-pg --pg "$PG_VER" --run "${{ needs.plan.outputs.pg }}" $cli_checks
-      # TEMPORARY: whether macOS runners, with 7 GB of memory, swap during the two builds.
-      - name: Report memory pressure
-        if: always() && runner.os == 'macOS'
-        run: sysctl vm.swapusage && vm_stat
 
   # The packages that don't need PostgreSQL, on each platform. cargo-pgrx's install
   # regression test installs pgrx-unit-tests, so these jobs still configure PostgreSQL 18.
