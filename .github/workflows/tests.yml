@@ -13,6 +13,8 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
+# Each job stops after 30 minutes, so a hung test cannot hold a runner for GitHub's default of
+# six hours. A cold run of the slowest job takes about 20.
 env:
   # NB: Don't modify `RUSTFLAGS` here, since it would override the ones
   # configured by `.cargo/config.toml` on macOS.
@@ -28,6 +30,7 @@ jobs:
   plan:
     name: Plan
     runs-on: ubuntu-24.04
+    timeout-minutes: 30
     if: "!contains(github.event.head_commit.message, 'nogha')"
     outputs:
       lint: ${{ steps.plan.outputs.lint }}
@@ -81,6 +84,7 @@ jobs:
     needs: plan
     if: needs.plan.outputs.lint == 'true'
     runs-on: ubuntu-24.04
+    timeout-minutes: 30
     env:
       PG_VER: 18
       RUST_COMPONENTS: clippy
@@ -131,6 +135,7 @@ jobs:
     needs: plan
     if: needs.plan.outputs.pg != ''
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
@@ -202,6 +207,7 @@ jobs:
     needs: plan
     if: needs.plan.outputs.crates != ''
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
@@ -256,6 +262,7 @@ jobs:
     needs: plan
     if: needs.plan.outputs.variants == 'true'
     runs-on: ubuntu-22.04
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
@@ -325,6 +332,7 @@ jobs:
     needs: plan
     if: needs.plan.outputs.miri == 'true'
     runs-on: ubuntu-24.04
+    timeout-minutes: 30
     env:
       PG_VER: 18
       # The nightly is pinned so that a new nightly, or one shipped without Miri, cannot
@@ -358,6 +366,7 @@ jobs:
     needs: plan
     if: needs.plan.outputs.cmacros_clang14 == 'true'
     runs-on: ubuntu-22.04
+    timeout-minutes: 30
     env:
       CLANG_VER: 14
     steps:
@@ -386,6 +395,7 @@ jobs:
     needs: plan
     if: needs.plan.outputs.bindgen_harness == 'true'
     runs-on: ubuntu-22.04
+    timeout-minutes: 30
     env:
       CLANG_VER: 21
     steps:
@@ -416,6 +426,7 @@ jobs:
     needs: plan
     if: needs.plan.outputs.ui == 'true'
     runs-on: ubuntu-22.04
+    timeout-minutes: 30
     env:
       PG_VER: 18
       CLANG_VER: 21
@@ -436,6 +447,7 @@ jobs:
     needs: plan
     if: needs.plan.outputs.bench == 'true'
     runs-on: ubuntu-22.04
+    timeout-minutes: 30
     env:
       PG_VER: 18
       CLANG_VER: 21
@@ -459,6 +471,7 @@ jobs:
     needs: plan
     if: needs.plan.outputs.install_regression == 'true'
     runs-on: ubuntu-22.04
+    timeout-minutes: 30
     env:
       PG_VER: 18
       CLANG_VER: 21
@@ -477,6 +490,7 @@ jobs:
     needs: plan
     if: needs.plan.outputs.runas == 'true'
     runs-on: ubuntu-22.04
+    timeout-minutes: 30
     env:
       PG_VER: 15
       CLANG_VER: 14
@@ -500,6 +514,7 @@ jobs:
     needs: plan
     if: needs.plan.outputs.init == 'true'
     runs-on: ubuntu-22.04
+    timeout-minutes: 30
     env:
       PG_VER: 15
       CLANG_VER: 14
@@ -546,6 +561,7 @@ jobs:
     needs: plan
     if: needs.plan.outputs.schema_release == 'true'
     runs-on: ubuntu-24.04-arm
+    timeout-minutes: 30
     env:
       PG_VER: 17
     steps:
@@ -570,6 +586,7 @@ jobs:
     needs: plan
     if: needs.plan.outputs.beta == 'true'
     runs-on: ubuntu-22.04
+    timeout-minutes: 30
     env:
       PG_VER: 18
       CLANG_VER: 21
@@ -595,6 +612,7 @@ jobs:
     needs: plan
     if: needs.plan.outputs.package == 'true'
     runs-on: ubuntu-22.04
+    timeout-minutes: 30
     env:
       PG_VER: 15
       CLANG_VER: 14
@@ -631,6 +649,7 @@ jobs:
     needs: plan
     if: needs.plan.outputs.package == 'true'
     runs-on: ubuntu-24.04
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - run: tools/ci/setup.sh
