@@ -2057,6 +2057,43 @@ pub unsafe fn load<P: ReadPlace>(place: P) -> <P::Type as CType>::Value {
     unsafe { place.load() }
 }
 
+/// A C object type whose initialized storage loads as a valid Rust value whatever C stored
+/// there: integers, `_Bool`, data pointers, and enums, which load their compatible integer.
+///
+/// # Safety
+/// Loading initialized storage of this type that C wrote must produce a valid Rust value.
+pub unsafe trait GlobalObject: CType {}
+// SAFETY: Scalar objects load integer bits, `_Bool` bits that C keeps 0 or 1, or raw pointer
+// bits, each a valid Rust value. `CVolatile` scalars are scalar objects too.
+unsafe impl<M: ScalarObject> GlobalObject for M {}
+// SAFETY: An enum object loads its compatible integer and never materializes the Rust enum.
+unsafe impl<I: EnumIdentity, K: CInteger, R: EnumStorage<I, K>> GlobalObject
+    for CEnumObject<I, K, R>
+{
+}
+// SAFETY: As for the unqualified enum object; volatility changes only how it is read.
+unsafe impl<I: EnumIdentity, K: CInteger, R: EnumStorage<I, K>> GlobalObject
+    for CVolatile<CEnumObject<I, K, R>>
+{
+}
+
+/// Read a PostgreSQL global variable, which generated macros do after checking that they run
+/// on the backend thread, so their callers need no `unsafe` for the read.
+///
+/// # Safety
+/// `place` must address a C global variable as its declared type, and the caller must run on
+/// the thread PostgreSQL runs on. PostgreSQL writes globals only on that thread, apart from the
+/// `volatile` flags its signal handlers set, which the place's declared access reads as
+/// `volatile` as C does.
+pub unsafe fn load_global<P: ReadPlace<Object: GlobalObject>>(
+    place: P,
+) -> <P::Type as CType>::Value {
+    // SAFETY: A global's storage is live, aligned and initialized for the whole process, the
+    // caller excludes writes from other threads, and `GlobalObject` storage is valid for every
+    // value C stores. The place's declared access honors a `volatile` global.
+    unsafe { place.load() }
+}
+
 /// An explicit C conversion whose target identity is established by analysis.
 pub trait CastTo<M: CType>: CExprValue {
     /// Apply the explicit conversion admitted for this source/destination C type pair.

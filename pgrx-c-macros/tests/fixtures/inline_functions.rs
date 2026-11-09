@@ -12,7 +12,8 @@ mod ffi {
     }
 }
 
-/// Times a generated function checked its thread. Only those that touch a global check.
+/// Times a generated function or global read checked its thread. Only functions that touch
+/// a global check, and each read of the global checks.
 static CHECKS: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
 
 /// Count thread checks instead of comparing threads.

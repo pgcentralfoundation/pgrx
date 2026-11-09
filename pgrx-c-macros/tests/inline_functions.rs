@@ -215,9 +215,11 @@ fn translated_inline_functions_replace_their_bindings() {
         &format!("{}\nint WrapCounter = 5;\n", generated.support.c_source),
         &arguments,
     );
+    // Each function that writes the global checks once, and each read of the global in a
+    // translation checks again: once in `WrapBump`, and twice in `WrapBumpTwice`.
     assert_eq!(
         output,
-        "add\t5\nnext\t1\nstore\t7\nkeyword\t42\nbump\t7\nbump twice\t9\nchecks\t2\n"
+        "add\t5\nnext\t1\nstore\t7\nkeyword\t42\nbump\t7\nbump twice\t9\nchecks\t5\n"
     );
     session.verify_inputs().expect("original profile stayed unchanged");
     // libclang allows one runtime per process, so the LLP64 case shares this test's scanner.

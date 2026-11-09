@@ -7,6 +7,8 @@
 //! An assert-enabled PostgreSQL checks these conditions and a release build does not. Either
 //! way each macro exists, takes the same operands, and needs `unsafe` only where its release
 //! form does, so every call here is safe code, which `unused_unsafe` would also flag.
+//! Checks that read PostgreSQL globals, such as `BufferIsValid`'s, need a backend, so
+//! `pgrx-unit-tests` covers them.
 
 #![cfg(not(docsrs))]
 #![deny(unsafe_op_in_unsafe_fn, unused_unsafe)]
@@ -33,20 +35,12 @@ fn assertion_helpers_are_macros_in_every_build() {
     let _ = pg::SlruPagePrecedesUnitTests!(core::ptr::null::<u8>(), 1_i32);
 }
 
-/// A check that reads a global keeps no `unsafe` requirement when nothing else needs one.
-#[test]
-fn checks_that_read_globals_do_not_need_unsafe() {
-    assert!(!pg::BufferIsValid!(0_i32).is_true());
-}
-
 /// Checks whose conditions are pure stay in an assert-enabled build without needing `unsafe`.
 #[test]
 fn pure_checks_need_no_unsafe() {
     let (older, newer) = (pg::TransactionId::from(3_u32), pg::TransactionId::from(4_u32));
     assert!(pg::NormalTransactionIdPrecedes!(older, newer).is_true());
     assert_eq!(pg::AttrNumberGetAttrOffset!(1_i16).get(), 0);
-    // Its check calls BufferIsValid, whose own checks are omitted.
-    assert!(pg::BufferGetPageSize!(1_i32).get() > 0);
 }
 
 /// `castNode` casts without its assert-enabled `castNodeImpl` check.

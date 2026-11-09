@@ -511,7 +511,7 @@ fn emit_prepared_batch(
         available.macros.remove(name);
     }
     let mut translated = translated_callees(session, &initial, &available.macros);
-    let mut translations = translation_facts(session, &initial, &translated);
+    let mut translations = translation_facts(session, &available, &initial, &translated);
     let finish = |translations: &BTreeMap<String, assertions::Translation>| {
         let generated = Generated { adapters, translations };
         let mut emissions = emit_in_parallel(initial.len(), |index, lowering| {
@@ -602,7 +602,7 @@ fn emit_prepared_batch(
             return emissions;
         }
         translated.retain(|name| !lost.contains(name));
-        translations = translation_facts(session, &initial, &translated);
+        translations = translation_facts(session, &available, &initial, &translated);
         emissions = finish(&translations);
     }
 }
@@ -679,10 +679,35 @@ fn translated_callees(
         .collect()
 }
 
+/// Whether reading the C global `name` needs no caller `unsafe`.
+///
+/// The rendering checks the thread before such a read, and PostgreSQL writes its globals only
+/// on that thread, apart from the `volatile` flags its signal handlers set, which are read as
+/// `volatile` as in C. So no other thread writes the global during the read. Integer, enum and data
+/// pointer storage holds a valid Rust value whatever C stored there; aggregates, floating
+/// values and function pointers are left to the caller. Writes always are.
+fn checked_global(
+    declarations: &crate::DeclarationCatalog,
+    bindings: &BindingCatalog,
+    name: &str,
+) -> bool {
+    bindings.thread_check.is_some()
+        && declarations.variables.get(name).is_some_and(|ty| match ty.category {
+            crate::TypeCategory::Integer(_) | crate::TypeCategory::Enum => true,
+            crate::TypeCategory::Pointer => matches!(
+                declarations.type_shapes.get(&ty.canonical_spelling).map(|shape| &shape.kind),
+                Some(crate::TypeShapeKind::Pointer { pointee })
+                    if pointee.category != crate::TypeCategory::Function
+            ),
+            _ => false,
+        })
+}
+
 /// The panic conditions and caller safety of each translation in `translated`, which lists
 /// every function after the translated functions it calls.
 fn translation_facts(
     session: &AnalysisSession<'_>,
+    bindings: &BindingCatalog,
     emissions: &[MacroEmission],
     translated: &[String],
 ) -> BTreeMap<String, assertions::Translation> {
@@ -695,7 +720,8 @@ fn translation_facts(
         let analysis = analyses[name.as_str()];
         let translation = assertions::Translation {
             panics: panic_conditions(session, analysis, &facts),
-            caller_unsafe: assertions::plan(session.frontend(), analysis, &facts).caller_unsafe,
+            caller_unsafe: assertions::plan(session.frontend(), bindings, analysis, &facts)
+                .caller_unsafe,
         };
         facts.insert(name.clone(), translation);
     }

@@ -190,6 +190,7 @@ pub(super) struct Plan {
 /// otherwise all checks stay.
 pub(super) fn plan(
     frontend: &FrontendOutput,
+    bindings: &super::BindingCatalog,
     analysis: &MacroAnalysis,
     translations: &BTreeMap<String, Translation>,
 ) -> Plan {
@@ -198,6 +199,7 @@ pub(super) fn plan(
     let body = expression.syntax.statement_body.as_ref();
     let safety = Safety {
         frontend,
+        bindings,
         nodes,
         translations,
         locals: body
@@ -379,10 +381,13 @@ pub(crate) fn stops(
 ///
 /// This follows the renderer's contexts. Loads, stores, member projections, dereferenced
 /// values, indirect calls and native calls need `unsafe`; caller operands are the caller's
-/// own, generated locals are owned, and unevaluated operands sit in generated `unsafe`.
+/// own, generated locals are owned, unevaluated operands sit in generated `unsafe`, and
+/// the rendering checks the thread before reading a global that `checked_global` admits.
 struct Safety<'a> {
     /// Declarations that distinguish globals, builtins and stopping calls.
     frontend: &'a FrontendOutput,
+    /// Bindings, which decide whether the rendering can check the thread before a read.
+    bindings: &'a super::BindingCatalog,
     /// The analyzed expression arena.
     nodes: &'a [ExpressionNode],
     /// Translated inline functions whose calls expand their translation.
@@ -426,9 +431,11 @@ impl Safety<'_> {
             match &self.nodes[index].kind {
                 ExpressionKind::Group { operand } => pending.push((*operand, context)),
                 ExpressionKind::Identifier { name } => {
+                    let declarations = self.frontend.declarations();
                     if matches!(context, Context::Value | Context::Discard)
                         && !self.locals.contains(name.as_str())
-                        && self.frontend.declarations().variables.contains_key(name)
+                        && declarations.variables.contains_key(name)
+                        && !super::checked_global(declarations, self.bindings, name)
                     {
                         return true;
                     }

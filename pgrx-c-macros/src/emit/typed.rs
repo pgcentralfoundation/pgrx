@@ -212,7 +212,8 @@ impl<'a> Renderer<'a> {
             &locals.iter().map(|(name, local)| (name.clone(), local.ty.clone())).collect(),
         );
         let expectations = super::expectation::plan(frontend, analysis);
-        let assertions = super::assertions::plan(frontend, analysis, generated.translations);
+        let assertions =
+            super::assertions::plan(frontend, bindings, analysis, generated.translations);
         Self {
             frontend,
             analysis,
@@ -746,7 +747,24 @@ impl<'a> Renderer<'a> {
                                     .resolve_with_storage(declaration, &binding.ty)
                                     .map_err(failure)?;
                                 let path = rust_path(&binding.path).map_err(failure)?;
-                                if matches!(context, Context::Value) {
+                                // A global that `checked_global` admits is read after a thread
+                                // check, so the read needs no `unsafe` from the caller.
+                                let check = match &self.bindings.thread_check {
+                                    Some(check)
+                                        if matches!(context, Context::Value)
+                                            && super::checked_global(
+                                                frontend.declarations(),
+                                                self.bindings,
+                                                name,
+                                            ) =>
+                                    {
+                                        Some(rust_path(check).map_err(failure)?)
+                                    }
+                                    _ => None,
+                                };
+                                if let Some(check) = &check {
+                                    write!(rust, "{{ {check}(); /* SAFETY: the place is this global, and the check above established PostgreSQL's thread, as load_global requires. */ #[allow(unused_unsafe)] unsafe {{ {EXPRESSION}::load_global(").expect("String output");
+                                } else if matches!(context, Context::Value) {
                                     write!(rust, "{EXPRESSION}::load(").expect("String output");
                                 }
                                 write!(
@@ -765,7 +783,9 @@ impl<'a> Renderer<'a> {
                                     }
                                 )
                                 .expect("String output");
-                                if matches!(context, Context::Value) {
+                                if check.is_some() {
+                                    rust.push_str(") } }");
+                                } else if matches!(context, Context::Value) {
                                     rust.push(')');
                                 }
                             } else {

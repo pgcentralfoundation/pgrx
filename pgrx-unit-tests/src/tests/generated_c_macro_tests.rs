@@ -202,19 +202,29 @@ mod tests {
     }
     } }
 
+    /// Checks that `BufferIsValid`, whose assert-enabled checks read `NBuffers` and
+    /// `NLocBuffer`, needs no `unsafe` in either build, nor does `BufferGetPageSize`, whose
+    /// check calls it.
+    #[pg_test]
+    fn generated_buffer_checks_read_globals_without_unsafe() {
+        assert!(!pg::BufferIsValid!(0_i32).is_true());
+        assert!(pg::BufferIsValid!(1_i32).is_true());
+        assert_eq!(pg::BufferGetPageSize!(1_i32).get(), u64::from(pg::BLCKSZ));
+    }
+
     pg::__pgrx_c_classify! { @if_available INTERRUPTS_PENDING_CONDITION {
-    #[allow(dead_code)] // Compile the real backend-global expansion; never execute it here.
-    /// Keep the generated interrupt predicate typechecked where its backend globals exist.
-    ///
-    /// # Safety
-    /// Requires PostgreSQL's initialized backend thread and signal/interrupt state.
-    unsafe fn generated_interrupt_condition_requires_backend() -> bool {
-        // SAFETY: the caller establishes the backend and signal-global access contract.
-        unsafe {
-            pg::__pgrx_c_macros::expression::truth(
-                pg::INTERRUPTS_PENDING_CONDITION!().into_value()
-            )
-        }
+    /// Checks that the interrupt predicate reads `InterruptPending` from safe code on the
+    /// backend thread, and panics before reading it on any other thread.
+    #[pg_test]
+    fn generated_interrupt_condition_checks_the_thread() {
+        let pending = || {
+            pg::__pgrx_c_macros::expression::truth(pg::INTERRUPTS_PENDING_CONDITION!().into_value())
+        };
+        // The first checked call claims its thread as the one allowed to read PostgreSQL's
+        // globals, so this one must come before the read on another thread.
+        pending();
+        let off_thread = std::thread::scope(|scope| scope.spawn(pending).join());
+        assert!(off_thread.is_err(), "INTERRUPTS_PENDING_CONDITION read a global off the backend thread");
     }
     } }
     pg::__pgrx_c_classify! { @if_available CHECK_FOR_INTERRUPTS {

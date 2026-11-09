@@ -455,6 +455,15 @@ outside C's defined domain is rejected by the safe scalar support. Pointer and
 storage operations require the caller's `unsafe` context; the generated macro does
 not discharge allocation bounds, initialization, aliasing, provenance or backend
 thread requirements. PostgreSQL calls retain pgrx's FFI error and panic guard.
+
+Reading a global is the exception when the binding catalog names a thread check, as
+pgrx-pg-sys's does. A macro reads an integer, `_Bool`, enum or data pointer global
+after that check, which panics on any thread but PostgreSQL's, so the read needs no
+`unsafe`. PostgreSQL writes its globals only on that thread, apart from the
+`volatile` flags its signal handlers set, which are read as `volatile` as in C, and
+storage of those types holds a valid Rust value whatever C stored. Enum globals load their compatible integer, never the Rust enum. Writes,
+dereferences, and reads of floating, aggregate or function pointer globals still need
+the caller's `unsafe`. Each read checks the thread, including in release builds.
 Native adapters convert arguments and check nullable function pointers before
 entering that guard, and decode results after leaving it.
 
@@ -490,11 +499,13 @@ PostgreSQL `ERROR`.
 
 A check is an `if` whose only statement stops, `holds || (stop, 0)`, or
 `__assume(holds)`. A release build omits `Assert`'s checks, so a check whose
-condition needs the caller's `unsafe`, for example to read a global or a pointer, is
+condition needs the caller's `unsafe`, for example to dereference a pointer, is
 omitted when nothing else in the expansion needs `unsafe`. Otherwise the caller
-already holds `unsafe` and every check stays. `BufferIsValid`, which checks its
-argument against `NBuffers`, therefore needs no `unsafe` in either build. C still
-checks it when PostgreSQL calls it.
+already holds `unsafe` and every check stays. A checked global read needs no
+`unsafe`, so `BufferIsValid` keeps its checks against `NBuffers` and `NLocBuffer`
+and needs no `unsafe` in either build. Called on another thread against an
+assert-enabled build, it panics at that check, where a release build's expansion
+reads no global.
 
 A macro operand that the expansion never evaluates, because the argument is unused
 or appears only in an omitted check or a stop's text, is checked in dead code. An

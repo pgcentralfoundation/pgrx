@@ -1097,6 +1097,21 @@ Some expression-like return helpers can be used with a caller-written Rust
 return itself. These are different analysis contracts, not one blanket rule
 for names containing `RETURN`.
 
+### Checked global reads
+
+When `BindingCatalog::thread_check` names a function, a read of a global whose C type
+is an integer, `_Bool`, enum or data pointer renders as that call followed by
+`load_global` in its own `unsafe` block. `load_global` accepts only places whose object
+implements `GlobalObject`: scalar objects, whose storage is valid for every value C
+stores, and enum objects, which load their compatible integer. The check panics off
+PostgreSQL's thread, and PostgreSQL writes globals only on that thread, apart from
+the `volatile` flags its signal handlers set, which are read as `volatile` as in C.
+So the read needs no caller `unsafe`. `emit::checked_global` makes this
+decision once for the renderer and for `emit::assertions`; a type the generator admits
+in error fails to compile rather than becoming an unchecked read. Writes,
+dereferences, and floating, aggregate or function pointer globals keep the caller's
+`unsafe`. Without a thread check, as in most fixtures, every global read does.
+
 ### Assertions and assert-enabled builds
 
 A generated macro's name, calling form and need for the caller's `unsafe` must not
@@ -1115,8 +1130,8 @@ statement stops, `holds || (stop, 0)`, or `__assume(holds)`. `emit::assertions`
 decides, per rendering, which checks to omit. It walks the arena in the renderer's
 contexts to find operations that need the caller's `unsafe`: loads, stores,
 member projections, dereferenced values, indirect calls, native calls and calls
-of translations that need it. Caller operands, generated locals and unevaluated
-operands do not count. Checks are decided innermost first. If the expansion
+of translations that need it. Caller operands, generated locals, checked global
+reads and unevaluated operands do not count. Checks are decided innermost first. If the expansion
 without the checks whose conditions need `unsafe` needs none, those checks are
 omitted, as a release build omits them; otherwise all stay. Analysis also omits
 an `if` check whose condition reads a local before its definite initialization,
