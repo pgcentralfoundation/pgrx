@@ -245,6 +245,11 @@ jobs:
         uses: taiki-e/install-action@v2
         with:
           tool: cargo-nextest
+      # On macOS install-action puts tools in ~/.install-action/bin, where the cache doesn't
+      # look. Cargo finds subcommands in ~/.cargo/bin even when it isn't on PATH.
+      - name: Keep cargo-nextest where the cache saves it
+        if: runner.os == 'macOS' && steps.nextest.outputs.cache-hit != 'true'
+        run: mkdir -p ~/.cargo/bin && cp "$(command -v cargo-nextest)" ~/.cargo/bin/
       - name: Test the packages that don't need PostgreSQL
         shell: bash
         run: |
