@@ -64,7 +64,7 @@ mod frontend;
 mod graph;
 pub use frontend::{
     FrontendError, SystemIncludeDirectory, SystemIncludes, c_header_path, compile_native_support,
-    inspect, split_recorded_cflags,
+    inspect, sha256_hex, split_recorded_cflags,
 };
 /// Parse bounded source syntax while preserving formal holes, grouping, and structural operands.
 mod syntax;

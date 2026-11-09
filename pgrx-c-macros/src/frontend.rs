@@ -38,6 +38,7 @@ mod builtins;
 mod definitions;
 /// Recheck complete input bytes with a host-appropriate SHA-256 backend and per-pass alias sharing.
 mod fingerprints;
+pub use fingerprints::sha256_hex;
 pub(crate) use fingerprints::{file_identities, fingerprint_files};
 /// Copy canonical C shape graphs while translation-unit handles remain live, preserving nominal
 /// identity and layout.
