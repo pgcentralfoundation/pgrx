@@ -461,6 +461,13 @@ pub fn register_pg_guard_panic_hook() {
 /// which has the same SQLSTATE, message, DETAIL, HINT, and location, takes its CONTEXT from where
 /// it is raised, and lacks Postgres' other fields, such as the constraint name.
 ///
+/// A [`CaughtError::PostgresError`] that is neither rethrown nor handled by [`PgTryBuilder`],
+/// for example one caught by [`std::panic::catch_unwind()`] and dropped, keeps its stack entry.
+/// Postgres has room for five entries and PANICs when an error needs a sixth, so call
+/// [`crate::FlushErrorState()`] after swallowing one.  That and [`PgTryBuilder`] both empty the
+/// whole stack, including an ERROR that C code which called into Rust is still handling, such as
+/// one that a `PG_FINALLY()` block will rethrow.
+///
 /// [`PgTryBuilder`]: crate::PgTryBuilder
 #[derive(Debug)]
 pub enum CaughtError {

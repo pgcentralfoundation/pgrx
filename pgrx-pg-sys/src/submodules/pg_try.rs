@@ -16,6 +16,10 @@ use std::panic::{AssertUnwindSafe, RefUnwindSafe, UnwindSafe, catch_unwind, resu
 ///
 /// A primary difference is that the [`PgTryBuilder::finally()`] block runs even if a catch handler
 /// rethrows (or throws a new) error.
+///
+/// Catch a Postgres ERROR that you don't rethrow with [`PgTryBuilder`], not
+/// [`std::panic::catch_unwind()`], so that Postgres' error state is cleared afterward.  See
+/// [`CaughtError`](CaughtError#postgres-errors).
 pub struct PgTryBuilder<'a, R, F: FnOnce() -> R + UnwindSafe> {
     func: F,
     when: BTreeMap<
