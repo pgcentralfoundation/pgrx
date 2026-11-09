@@ -19,7 +19,6 @@ use clang::{Entity, EntityKind, EntityVisitResult, Index, TypeKind};
 use std::collections::BTreeMap;
 use std::fmt::Write;
 use std::fs;
-use std::io::Read;
 use std::path::PathBuf;
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -727,21 +726,12 @@ impl ProbeFiles {
     }
 }
 
-/// Read the inspected main file, within the probe source budget, for probes that append to it.
+/// Read the main file as macro-expanding passes do, within the probe source budget, for
+/// probes that append to it.
 fn original_header(frontend: &FrontendOutput) -> Result<String, FrontendError> {
-    let header = &frontend.profile().header;
-    let io_error = |source| FrontendError::FileIo { path: header.clone(), source };
-    let mut original = Vec::new();
-    fs::File::open(header)
-        .map_err(io_error)?
-        .take(MAX_SOURCE_BYTES as u64 + 1)
-        .read_to_end(&mut original)
-        .map_err(io_error)?;
-    if original.len() > MAX_SOURCE_BYTES {
-        return Err(FrontendError::Output(
-            "builtin main file exceeds the 4 MiB source budget".into(),
-        ));
-    }
+    let original = frontend.main_source(MAX_SOURCE_BYTES)?.ok_or_else(|| {
+        FrontendError::Output("builtin main file exceeds the 4 MiB source budget".into())
+    })?;
     String::from_utf8(original)
         .map_err(|_| FrontendError::Output("builtin main file is not UTF-8".into()))
 }

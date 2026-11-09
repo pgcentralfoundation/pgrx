@@ -161,6 +161,9 @@ pub enum SkipReasonCode {
     BindingValueMismatch,
     /// An immediate dependency was refused, so its callers cannot be emitted reliably.
     DependencySkipped,
+    /// Assert-enabled and release PostgreSQL define the macro, or one it expands, in ways no
+    /// single definition serves, so neither build flavor generates it.
+    BuildFlavor,
 }
 
 /// Describe one formal or explicit caller capture and the syntactic capabilities required by all its
@@ -342,10 +345,6 @@ pub struct AnalyzedExpression {
     /// Pure integer subexpressions whose zero ICE value both Clang frontends proved.
     /// Native operands and stored values never acquire this source-level identity.
     pub integer_zero_constants: BTreeSet<NodeId>,
-    /// Conditions of `if` statements that only stop the process, as `Assert` does, which
-    /// read a local before its definite initialization. A release build omits such a
-    /// check, and so does the translation.
-    pub omitted_checks: BTreeSet<NodeId>,
 }
 
 /// Symbolic C result types retain promotion/common-type rules instead of selecting a
@@ -786,7 +785,7 @@ pub(crate) fn analyze_active_with_constants(
     let atomic_arguments =
         result.parameters.iter().flat_map(|parameter| &parameter.uses).any(|usage| !usage.grouped);
     match analyze_types(&syntax, catalog, &profile.target, object_constants) {
-        Ok((types, constants, mut helpers, omitted_checks)) => {
+        Ok((types, constants, mut helpers)) => {
             let root = &syntax.nodes[syntax.root];
             let statements = syntax.statement_body.is_some();
             let returning =
@@ -826,7 +825,6 @@ pub(crate) fn analyze_active_with_constants(
                 types,
                 constants,
                 integer_zero_constants: BTreeSet::new(),
-                omitted_checks,
             });
             result.required_helpers = helpers.into_iter().collect();
             result.invocation = if statement_boundary {
@@ -1047,8 +1045,7 @@ fn validate_diagnostic_strings(
     Ok(())
 }
 /// Parallel symbolic result types and resolved constants returned by the type-analysis pass.
-type TypeAnalysis =
-    (Vec<TypeExpression>, Vec<ResolvedConstant>, BTreeSet<HelperRequirement>, BTreeSet<NodeId>);
+type TypeAnalysis = (Vec<TypeExpression>, Vec<ResolvedConstant>, BTreeSet<HelperRequirement>);
 
 /// Constant probes accept only expressions already covered by the integer model.
 /// In particular, evaluating a variable or a function is never a way to discover a constant.
@@ -1060,7 +1057,7 @@ pub(crate) fn validate_constant_expression(
     let target = &frontend.profile().target;
     let expression = parse_expression(tokens, &[], |name| recognized_type(name, catalog, target))
         .map_err(|error| error.message)?;
-    let (types, ..) = analyze_types(&expression, catalog, target, &BTreeMap::new())
+    let (types, _, _) = analyze_types(&expression, catalog, target, &BTreeMap::new())
         .map_err(|(_, message, _)| message)?;
     for (index, node) in expression.nodes.iter().enumerate() {
         if !matches!(
@@ -1183,7 +1180,7 @@ fn analyze_types(
         }
         locals.insert(name.as_str(), ty);
     }
-    let omitted_checks = validate_local_initialization(expression, &locals, catalog)?;
+    validate_local_initialization(expression, &locals)?;
     let mut types = Vec::<TypeExpression>::with_capacity(expression.nodes.len());
     let mut constants = Vec::new();
     let mut helpers = BTreeSet::new();
@@ -1552,24 +1549,18 @@ fn analyze_types(
         };
         types.push(ty);
     }
-    Ok((types, constants, helpers, omitted_checks))
+    Ok((types, constants, helpers))
 }
 
 /// Initialization is proved at complete statement and condition boundaries.
 /// Every path that can continue must initialize a local before its later read.
 /// Taking an address or passing it to a function does not prove that C wrote it.
-///
-/// An `if` statement that only stops the process, as `Assert` does, is omitted rather
-/// than refused when its condition reads a local that is not yet initialized. A release
-/// build has no such check. The omitted conditions are returned.
 fn validate_local_initialization(
     expression: &Expression,
     locals: &HashMap<&str, TypeInfo>,
-    catalog: &DeclarationCatalog,
-) -> Result<BTreeSet<NodeId>, TypeFailure> {
-    let mut omitted = BTreeSet::new();
+) -> Result<(), TypeFailure> {
     let Some(body) = expression.statement_body.as_ref().filter(|_| !locals.is_empty()) else {
-        return Ok(omitted);
+        return Ok(());
     };
     /// Reject full-expression combinations whose evaluation or mutation constraints cannot be safely
     /// established.
@@ -1606,18 +1597,9 @@ fn validate_local_initialization(
         statements: &'a [Statement],
         locals: &HashMap<&'a str, TypeInfo>,
         initialized: &mut HashSet<&'a str>,
-        catalog: &DeclarationCatalog,
-        omitted: &mut BTreeSet<NodeId>,
     ) -> Result<bool, TypeFailure> {
         for statement in statements {
             match statement {
-                Statement::If { condition, then_branch, else_branch: None, .. }
-                    if crate::emit::stops(catalog, &expression.nodes, then_branch)
-                        && check_local_reads(expression, *condition, locals, initialized)
-                            .is_err() =>
-                {
-                    omitted.insert(*condition);
-                }
                 Statement::Declaration { name, initializer, .. } => {
                     if let Some(initializer) = initializer {
                         check_full_expression(expression, *initializer, locals, initialized)?;
@@ -1628,14 +1610,7 @@ fn validate_local_initialization(
                     check_full_expression(expression, *root, locals, initialized)?;
                 }
                 Statement::Block { statements, .. } => {
-                    if check_statements(
-                        expression,
-                        statements,
-                        locals,
-                        initialized,
-                        catalog,
-                        omitted,
-                    )? {
+                    if check_statements(expression, statements, locals, initialized)? {
                         return Ok(true);
                     }
                 }
@@ -1651,8 +1626,6 @@ fn validate_local_initialization(
                         std::slice::from_ref(then_branch.as_ref()),
                         locals,
                         &mut then_initialized,
-                        catalog,
-                        omitted,
                     )?;
                     let mut else_initialized = initialized.clone();
                     let else_returns = if let Some(else_branch) = else_branch {
@@ -1661,8 +1634,6 @@ fn validate_local_initialization(
                             std::slice::from_ref(else_branch.as_ref()),
                             locals,
                             &mut else_initialized,
-                            catalog,
-                            omitted,
                         )?
                     } else {
                         false
@@ -1681,15 +1652,7 @@ fn validate_local_initialization(
         }
         Ok(false)
     }
-    check_statements(
-        expression,
-        &body.statements,
-        locals,
-        &mut HashSet::new(),
-        catalog,
-        &mut omitted,
-    )?;
-    Ok(omitted)
+    check_statements(expression, &body.statements, locals, &mut HashSet::new()).map(|_| ())
 }
 
 /// Require supported straight-line initialization before a local read can become a generated Rust
@@ -2392,7 +2355,7 @@ mod tests {
                 unsupported_options: Vec::new(),
                 inputs: BuildInputs::default(),
             },
-            assertions: Default::default(),
+            flavors: Default::default(),
             dependencies: crate::MacroDependencyGraph::from_environment(&environment),
             environment,
             declarations: DeclarationCatalog::default(),

@@ -27,14 +27,20 @@ pub(super) const STRINGIFICATION: &str = "Dependency stringification retains the
 pub(super) const CALLER_RETURNS: &str = "C return statements in this macro exit the enclosing Rust function or closure. Call it directly, without an outer `return`. The enclosing result must have an unambiguous C identity; otherwise use `@__pgrx_c_return_as [CMarker];` before the arguments to specify the original C function's return type. Return conversion uses C assignment rules, including truncation and pointer qualification. Rust caller cleanup follows normal Rust return behavior. Pointer access and native calls keep their usual caller safety obligations.";
 /// How statement macros execute.
 pub(super) const STATEMENTS: &str = "This macro executes C statements in order and yields no value. Local blocks retain their C scope. Pointer access and native calls keep their usual caller safety obligations.";
+/// How assertions behave against either build flavor of PostgreSQL.
+pub(super) const ASSERTIONS: &str = "This macro makes the checks of PostgreSQL's assert-enabled definition. Against a PostgreSQL built with assertions, a failed check writes a `TRAP:` line and a backtrace to stderr and aborts the process. Against one built without them, each check is compiled and never evaluated, as in C. The macro has the same operands, result and need for `unsafe` against both, so what a check reads is part of its safety contract in every build.";
+/// What a macro that calls the function of its own name stands for.
+pub(super) const FLAVOR_CALL: &str = "PostgreSQL declares this name as a function in one build flavor and as a macro or static inline function in the other. This macro is defined here, for both, to call that function. Where only a PostgreSQL built with assertions has the function, the macro evaluates nothing against a build without them.";
 /// Caller obligations shared by every generated macro.
-pub(super) const SAFETY: &str = "Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and global writes require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions; checked global reads verify the thread themselves. Generated guards preserve error boundaries; they do not prove these obligations.";
+pub(super) const SAFETY: &str = "Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation, including the operations of an assertion that this PostgreSQL build does not evaluate. Mutation requires writable storage. Native calls and global writes require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions; checked global reads run pgrx's active-thread check themselves and panic when it fails. Generated guards preserve error boundaries; they do not prove these obligations.";
 
 /// Documentation paragraphs that many generated macros repeat verbatim.
 ///
 /// Documentation shells refer to each one through the macro named here instead of
 /// repeating its text; [`documentation_shell_support`] defines those macros.
-const SHARED_PARAGRAPHS: [(&str, &str); 7] = [
+const SHARED_PARAGRAPHS: [(&str, &str); 9] = [
+    ("__pgrx_c_doc_assertions", ASSERTIONS),
+    ("__pgrx_c_doc_flavor_call", FLAVOR_CALL),
     ("__pgrx_c_doc_inline_call", INLINE_CALL),
     ("__pgrx_c_doc_inline_body", INLINE_BODY),
     ("__pgrx_c_doc_invocation_diagnostics", INVOCATION_DIAGNOSTICS),

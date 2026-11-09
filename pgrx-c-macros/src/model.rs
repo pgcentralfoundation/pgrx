@@ -33,10 +33,8 @@ pub struct FrontendOutput {
     /// augmentation.
     #[serde(skip)]
     pub(crate) dependencies: MacroDependencyGraph,
-    /// For assert-enabled headers, the names only that build declares and the macros
-    /// defined as in a release build.
-    #[serde(skip)]
-    pub(crate) assertions: crate::frontend::AssertionMode,
+    /// What comparing the assert-enabled and release flavors of these headers decided.
+    pub(crate) flavors: crate::frontend::Flavors,
 }
 
 /// Expose the inspection bundle without allowing its compiler facts to be assembled independently.
@@ -67,18 +65,54 @@ impl FrontendOutput {
         &self.dependencies
     }
 
-    /// Functions that these assert-enabled headers declare where a release build of the same
-    /// headers defines a macro, such as `AssertTransactionIdInAllowableRange`.
+    /// What comparing the assert-enabled and release flavors of these headers decided,
+    /// for a report.
+    pub fn flavors(&self) -> &crate::Flavors {
+        &self.flavors
+    }
+
+    /// Whether these headers enable PostgreSQL's assertions, by defining
+    /// `USE_ASSERT_CHECKING`. Generated macros run their assertions only then.
+    pub fn assert_enabled(&self) -> bool {
+        self.flavors.assert_enabled
+    }
+
+    /// Names a binding generator must leave out so that an assert-enabled and a release
+    /// build of the same PostgreSQL version expose the same items.
     ///
-    /// Generated code defines and calls that macro instead in either build. A binding generator
-    /// that leaves these functions out calls each name the same way in every build.
-    pub fn functions_with_release_macros(&self) -> impl Iterator<Item = &str> {
-        self.assertions.release_definitions.keys().map(String::as_str).filter(|name| {
-            self.declarations
-                .function_signatures
-                .get(*name)
-                .is_some_and(|function| !(function.is_static && function.is_inline))
-        })
+    /// These are the functions, variables, types, enumerators and macros that only the
+    /// inspected build flavor declares, and the functions that only an assert-enabled
+    /// build defines where a release build defines a macro, such as
+    /// `AssertTransactionIdInAllowableRange`. Generated macros reach the latter through
+    /// their own adapters.
+    pub fn flavor_specific_names(&self) -> impl Iterator<Item = &str> {
+        self.flavors
+            .flavor_specific
+            .iter()
+            .chain(self.flavors.assert_functions.iter().filter(|_| self.flavors.assert_enabled))
+            .map(String::as_str)
+    }
+
+    /// The main file as every pass that expands macros reads it: the inspected file, then
+    /// the definitions both build flavors share. `None` when it exceeds `limit` bytes.
+    pub(crate) fn main_source(
+        &self,
+        limit: usize,
+    ) -> Result<Option<Vec<u8>>, crate::FrontendError> {
+        use std::io::Read as _;
+        let header = &self.profile.header;
+        let error = |source| crate::FrontendError::FileIo { path: header.clone(), source };
+        let mut source = Vec::new();
+        std::fs::File::open(header)
+            .map_err(error)?
+            .take(u64::try_from(limit).unwrap_or(u64::MAX).saturating_add(1))
+            .read_to_end(&mut source)
+            .map_err(error)?;
+        if !self.flavors.definitions.is_empty() {
+            source.push(b'\n');
+            source.extend_from_slice(self.flavors.definitions.as_bytes());
+        }
+        Ok((source.len() <= limit).then_some(source))
     }
 }
 

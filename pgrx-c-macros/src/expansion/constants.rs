@@ -24,7 +24,6 @@ use crate::{
 use clang::{EntityKind, EntityVisitResult, EvaluationResult};
 use std::collections::{BTreeMap, BTreeSet, HashMap};
 use std::fmt::Write;
-use std::io::Read;
 use std::path::Path;
 
 /// Bound retry isolation during optional object-constant proof so malformed candidates cannot cause
@@ -74,23 +73,14 @@ pub fn probe_integer_object_constants(
     super::verify_environment(frontend)?;
     crate::frontend::verify_input_files(&frontend.profile().inputs)?;
     let directory = ProbeDirectory::new()?;
-    let mut original = Vec::new();
-    std::fs::File::open(&frontend.profile().header)
-        .map_err(|source| FrontendError::FileIo {
-            path: frontend.profile().header.clone(),
-            source,
-        })?
-        .take(u64::try_from(limits.source_bytes).unwrap_or(u64::MAX).saturating_add(1))
-        .read_to_end(&mut original)
-        .map_err(|source| FrontendError::FileIo {
-            path: frontend.profile().header.clone(),
-            source,
-        })?;
-    if original.len().saturating_add(2) > limits.source_bytes || names.len() > limits.macros {
+    let original = frontend
+        .main_source(limits.source_bytes.saturating_sub(2))?
+        .filter(|_| names.len() <= limits.macros);
+    let Some(mut original) = original else {
         return Err(FrontendError::Output(
             "object constant probe exceeds its source/count budget".into(),
         ));
-    }
+    };
     original.extend_from_slice(b"\n\n");
     verify_original_environment(
         scanner,
@@ -198,23 +188,14 @@ pub(crate) fn retain_integer_constants(
         return Ok(BTreeMap::new());
     }
     let mut rejected = BTreeMap::<String, String>::new();
-    let mut original = Vec::new();
-    std::fs::File::open(&frontend.profile().header)
-        .map_err(|source| FrontendError::FileIo {
-            path: frontend.profile().header.clone(),
-            source,
-        })?
-        .take(u64::try_from(limits.source_bytes).unwrap_or(u64::MAX).saturating_add(1))
-        .read_to_end(&mut original)
-        .map_err(|source| FrontendError::FileIo {
-            path: frontend.profile().header.clone(),
-            source,
-        })?;
-    if original.len().saturating_add(2) > limits.source_bytes || names.len() > limits.macros {
+    let original = frontend
+        .main_source(limits.source_bytes.saturating_sub(2))?
+        .filter(|_| names.len() <= limits.macros);
+    let Some(mut original) = original else {
         reject_all(&names, &mut rejected, "constant discovery exceeds its source/count budget");
         record_fallbacks(batch, &rejected);
         return Ok(BTreeMap::new());
-    }
+    };
     original.extend_from_slice(b"\n\n");
     let directory = ProbeDirectory::new()?;
     verify_original_environment(scanner, frontend, &directory.0, &original, &batch.inputs)?;

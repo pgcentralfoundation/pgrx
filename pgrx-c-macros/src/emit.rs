@@ -48,11 +48,11 @@ enum InvocationSource<'a> {
 
 /// Original-function address adapters that bypass callable thunks and Rust guard wrappers.
 mod addresses;
-/// Safe stops for assertions and unreachable code, and assertions that keep release safety.
-mod assertions;
-pub(crate) use assertions::stops;
 /// Token normalization that preserves contextual C substitution at Rust macro call sites.
 mod arguments;
+/// Safe stops for assertions and unreachable code, and assertions that run only where
+/// PostgreSQL runs them.
+mod assertions;
 /// Compiler-owned storage access for fields Rust cannot project directly.
 mod bitfields;
 /// Prototype identity and native callback ABI reconciliation.
@@ -681,11 +681,12 @@ fn translated_callees(
 
 /// Whether reading the C global `name` needs no caller `unsafe`.
 ///
-/// The rendering checks the thread before such a read, and PostgreSQL writes its globals only
-/// on that thread, apart from the `volatile` flags its signal handlers set, which are read as
-/// `volatile` as in C. So no other thread writes the global during the read. Integer, enum and data
-/// pointer storage holds a valid Rust value whatever C stored there; aggregates, floating
-/// values and function pointers are left to the caller. Writes always are.
+/// The rendering runs pgrx's active-thread check before such a read. pgrx relies on that
+/// check for every call into PostgreSQL, which reads and writes its globals on the thread
+/// that passes it. A global PostgreSQL also sets asynchronously is `volatile` in C and is
+/// read as `volatile` here. Integer, `_Bool`, enum and data pointer objects load a valid
+/// Rust value from anything C stores in them; aggregates, floating values and function
+/// pointers are left to the caller. Writes always are.
 fn checked_global(
     declarations: &crate::DeclarationCatalog,
     bindings: &BindingCatalog,
@@ -720,8 +721,12 @@ fn translation_facts(
         let analysis = analyses[name.as_str()];
         let translation = assertions::Translation {
             panics: panic_conditions(session, analysis, &facts),
-            caller_unsafe: assertions::plan(session.frontend(), bindings, analysis, &facts)
-                .caller_unsafe,
+            caller_unsafe: assertions::caller_unsafe(
+                session.frontend(),
+                bindings,
+                analysis,
+                &facts,
+            ),
         };
         facts.insert(name.clone(), translation);
     }
@@ -898,6 +903,7 @@ pub fn generate_with_bindings(
     }
     let functions = wrappers::render(session, &macros, bindings, &adapters)?;
     let mut support = render_adapters(adapters, &macros)?;
+    support.rust.push_str(&assertions::checking(session.frontend().assert_enabled()));
     if let Ok(alignment) = crate::support_alignment_profile(session.frontend().profile()) {
         support.rust.push_str(&alignment);
     }
@@ -1047,6 +1053,7 @@ fn generated_adapters(
         &requests.functions,
         &requests.called_functions,
         &frontend.profile().target,
+        &frontend.flavors,
     )?;
     // Later adapter passes read replacement storage from `functions`. Rendering
     // instead receives the generated adapters beside the caller's catalog.
@@ -1381,6 +1388,19 @@ fn render(
         matches!(node.kind, ExpressionKind::StringLiteral { .. } | ExpressionKind::InvocationFile)
     }) {
         comment.push_str(" String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.");
+    }
+    if session.frontend().flavors.calls.contains(&analysis.name) {
+        comment.push_str("\n\n");
+        comment.push_str(documentation::FLAVOR_CALL);
+    }
+    if (0..expression.syntax.nodes.len()).any(|index| {
+        matches!(
+            assertions::stop(session.frontend().declarations(), &expression.syntax.nodes, index),
+            Some(assertions::Stop::Assertion { .. })
+        )
+    }) {
+        comment.push_str("\n\n");
+        comment.push_str(documentation::ASSERTIONS);
     }
     if returning {
         comment.push_str("\n\n");

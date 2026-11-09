@@ -63,8 +63,8 @@ mod frontend;
 /// Index directed edges in both directions and find strongly connected components in a fixed order.
 mod graph;
 pub use frontend::{
-    FrontendError, SystemIncludeDirectory, SystemIncludes, c_header_path, compile_native_support,
-    inspect, sha256_hex, split_recorded_cflags,
+    Flavors, FrontendError, SystemIncludeDirectory, SystemIncludes, c_header_path,
+    compile_native_support, inspect, sha256_hex, split_recorded_cflags,
 };
 /// Parse bounded source syntax while preserving formal holes, grouping, and structural operands.
 mod syntax;
@@ -586,66 +586,75 @@ fn collect_macro_inventory(
         if entity.get_kind() != EntityKind::MacroDefinition {
             return EntityVisitResult::Continue;
         }
-        let Some(name) = entity.get_name() else {
-            error = Some(Error::InvalidDefinition("macro name is missing".into()));
-            return EntityVisitResult::Break;
-        };
-        let Some(range) = entity.get_range() else {
-            error = Some(Error::InvalidDefinition(format!("source range for {name} is missing")));
-            return EntityVisitResult::Break;
-        };
-        let provenance = match SourceSpan::from_range(range, directory) {
-            Ok(provenance) => provenance,
-            Err(cause) => {
-                error = Some(Error::InvalidDefinition(format!("{name}: {cause}")));
-                return EntityVisitResult::Break;
+        match macro_definition(entity, directory) {
+            Ok(definition) => {
+                macros.push(definition);
+                EntityVisitResult::Continue
             }
-        };
-        let tokens = range
-            .tokenize()
-            .into_iter()
-            .map(|token| {
-                // Some Clang token spellings retain physical line continuations, including
-                // a continuation between a macro name and its opening parenthesis.
-                let spelling = unspliced(token.get_spelling());
-                Token {
-                    kind: match token.get_kind() {
-                        clang::token::TokenKind::Comment => TokenKind::Comment,
-                        clang::token::TokenKind::Identifier => TokenKind::Identifier,
-                        clang::token::TokenKind::Keyword => TokenKind::Keyword,
-                        clang::token::TokenKind::Literal => TokenKind::Literal,
-                        clang::token::TokenKind::Punctuation => TokenKind::Punctuation,
-                    },
-                    spelling,
-                }
-            })
-            .collect::<Vec<_>>();
-        // Clang distinguishes dynamic builtin macros from ordinary compiler predefines.
-        // The latter originate in its synthetic buffer, which has no physical file.
-        let builtin = entity.is_builtin_macro()
-            || entity.get_location().is_some_and(|location| {
-                location.get_file_location().file.is_none()
-                    && location.get_presumed_location().0 == "<built-in>"
-            });
-        macros.push(MacroDefinition {
-            name,
-            kind: if entity.is_function_like_macro() {
-                MacroKind::FunctionLike
-            } else {
-                MacroKind::ObjectLike
-            },
-            location: entity.get_location().and_then(source_location),
-            provenance,
-            tokens,
-            builtin,
-            main_file: entity.is_in_main_file(),
-        });
-        EntityVisitResult::Continue
+            Err(cause) => {
+                error = Some(cause);
+                EntityVisitResult::Break
+            }
+        }
     });
     if let Some(error) = error {
         return Err(error);
     }
     Ok(MacroInventory { macros, diagnostics })
+}
+
+/// Copy one macro definition's name, kind, tokens and physical source out of its entity.
+pub(crate) fn macro_definition(
+    entity: clang::Entity<'_>,
+    directory: &Path,
+) -> Result<MacroDefinition, Error> {
+    let name = entity
+        .get_name()
+        .ok_or_else(|| Error::InvalidDefinition("macro name is missing".into()))?;
+    let range = entity
+        .get_range()
+        .ok_or_else(|| Error::InvalidDefinition(format!("source range for {name} is missing")))?;
+    let provenance = SourceSpan::from_range(range, directory)
+        .map_err(|cause| Error::InvalidDefinition(format!("{name}: {cause}")))?;
+    let tokens = range
+        .tokenize()
+        .into_iter()
+        .map(|token| {
+            // Some Clang token spellings retain physical line continuations, including
+            // a continuation between a macro name and its opening parenthesis.
+            let spelling = unspliced(token.get_spelling());
+            Token {
+                kind: match token.get_kind() {
+                    clang::token::TokenKind::Comment => TokenKind::Comment,
+                    clang::token::TokenKind::Identifier => TokenKind::Identifier,
+                    clang::token::TokenKind::Keyword => TokenKind::Keyword,
+                    clang::token::TokenKind::Literal => TokenKind::Literal,
+                    clang::token::TokenKind::Punctuation => TokenKind::Punctuation,
+                },
+                spelling,
+            }
+        })
+        .collect::<Vec<_>>();
+    // Clang distinguishes dynamic builtin macros from ordinary compiler predefines.
+    // The latter originate in its synthetic buffer, which has no physical file.
+    let builtin = entity.is_builtin_macro()
+        || entity.get_location().is_some_and(|location| {
+            location.get_file_location().file.is_none()
+                && location.get_presumed_location().0 == "<built-in>"
+        });
+    Ok(MacroDefinition {
+        name,
+        kind: if entity.is_function_like_macro() {
+            MacroKind::FunctionLike
+        } else {
+            MacroKind::ObjectLike
+        },
+        location: entity.get_location().and_then(source_location),
+        provenance,
+        tokens,
+        builtin,
+        main_file: entity.is_in_main_file(),
+    })
 }
 
 /// A token's spelling without line splices.

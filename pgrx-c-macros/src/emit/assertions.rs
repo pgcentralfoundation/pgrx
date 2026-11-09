@@ -2,19 +2,17 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
-//! Lower PostgreSQL's process-stopping calls, and keep assertions from changing safety.
+//! Lower PostgreSQL's process-stopping calls, and run assertions only where PostgreSQL does.
 //!
 //! An assert-enabled PostgreSQL defines `Assert` and its relatives to call
-//! `ExceptionalCondition`, and `pg_unreachable()` to call `abort()`. A release build omits
-//! the assertions and marks unreachable code with `__builtin_unreachable()`, or MSVC's
-//! `__assume`. These calls lower to safe support functions that stop the process, so
-//! neither build makes a native call to stop.
+//! `ExceptionalCondition`, and `pg_unreachable()` to call `abort()`. These calls lower to
+//! safe support functions that stop the process, so no build makes a native call to stop.
 //!
-//! A generated macro needs the caller's `unsafe` in an assert-enabled build exactly when
-//! it does in a release build. A check whose condition needs `unsafe`, such as one that
-//! reads a global or a pointer, is therefore omitted when nothing else in the expansion
-//! needs `unsafe`, as a release build omits it. Otherwise the caller already holds
-//! `unsafe` for the rest, and every check stays.
+//! Both build flavors translate the assert-enabled definitions, so a macro has one form,
+//! one set of operands and one need for the caller's `unsafe`. Whether a check that ends in
+//! `ExceptionalCondition` runs is a constant of the installation, which the generated
+//! `__pgrx_c_assert_checking!()` supplies. No check is ever left out of a macro: against a
+//! release installation its condition is compiled and never evaluated, as in release C.
 
 use super::typed::Context;
 use crate::syntax::{
@@ -26,6 +24,64 @@ use crate::{
 };
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt::Write;
+
+/// The generated constant that says whether the installation enables assertions.
+pub(super) const CHECKING: &str = "$crate::__pgrx_c_assert_checking!()";
+
+/// Define the constant [`CHECKING`] names, for the support of one generated macro set.
+///
+/// It is the only difference between the macros of an assert-enabled and a release build
+/// of one PostgreSQL version, apart from layout facts.
+pub(super) fn checking(enabled: bool) -> String {
+    format!(
+        "/// Whether the PostgreSQL these macros were generated for enables assertions.\n#[doc(hidden)]\n#[macro_export]\nmacro_rules! __pgrx_c_assert_checking {{\n    () => {{\n        {enabled}\n    }};\n}}\n"
+    )
+}
+
+/// Functions a generated macro calls from safe code, each with the reason that is sound.
+///
+/// They are PostgreSQL's assertion functions that take no pointer, as defined in
+/// PostgreSQL 18's `varsup.c`, `relcache.c` and `bufmgr.c`. Each needs only what pgrx's safe
+/// wrappers already assume: a backend attached to shared memory, on the thread that passes
+/// pgrx's active-thread check. A check that fails aborts the process or raises an error; it
+/// does not corrupt memory. [`safe_call`] also requires the reviewed prototype and the
+/// guarded binding, which makes that thread check and turns an error into a panic.
+const SAFE_CALLS: &[(&str, &str)] = &[
+    (
+        "AssertCouldGetRelation",
+        "it takes no argument, asserts that a transaction is in progress, and compares the buffer locks this backend holds with the shared buffer descriptors",
+    ),
+    (
+        "AssertPendingSyncs_RelationCache",
+        "it takes no argument, opens the relations this transaction has locked through the relation cache, and compares each cache entry with the pending syncs, raising an error or aborting when it cannot",
+    ),
+    (
+        "AssertTransactionIdInAllowableRange",
+        "it takes a transaction id by value and compares it with the oldest and next transaction ids in shared memory",
+    ),
+];
+
+/// Why a call to the function `name` needs no `unsafe` from the caller, when it needs none.
+///
+/// The reason holds for the reviewed prototype only: no result and no parameter but integers
+/// and enums. It also needs the defining crate's guard around the native call.
+pub(super) fn safe_call(
+    declarations: &DeclarationCatalog,
+    bindings: &super::BindingCatalog,
+    name: &str,
+) -> Option<&'static str> {
+    let (_, reason) = SAFE_CALLS.iter().find(|(function, _)| *function == name)?;
+    let signature = &declarations.function_signatures.get(name)?.signature;
+    let scalar =
+        |ty: &TypeInfo| matches!(ty.category, TypeCategory::Integer(_) | TypeCategory::Enum);
+    let guarded = bindings.ffi_boundary.is_some()
+        && bindings.functions.get(name).is_none_or(|binding| binding.guarded);
+    (guarded
+        && signature.result.category == TypeCategory::Void
+        && !signature.variadic
+        && signature.parameters.as_ref().is_some_and(|parameters| parameters.iter().all(scalar)))
+    .then_some(*reason)
+}
 
 /// What batch generation knows about a translated inline function that its callers expand.
 #[derive(Clone, Debug, Default)]
@@ -82,7 +138,7 @@ pub(crate) fn stop(
     }
     match name.as_str() {
         "abort" => parameters.is_empty().then_some(Stop::Abort),
-        "ExceptionalCondition" => {
+        crate::frontend::ASSERTION_REPORT => {
             let (text, location) = parameters.split_at(parameters.len().checked_sub(2)?);
             let [file, line] = location else { return None };
             if !matches!(text.len(), 1 | 2)
@@ -125,19 +181,17 @@ pub(super) fn render_stop(
     let support = format!("{}::assertion", super::types::EXPRESSION);
     match stop {
         Stop::Abort => write!(rust, "{support}::abort()"),
-        Stop::Unreachable => write!(
-            rust,
-            "{support}::unreachable_reached(::core::file!(), ::core::line!())"
-        ),
+        Stop::Unreachable => write!(rust, "{support}::unreachable_reached()"),
         Stop::Assertion { condition, error_type } => {
             let condition = text(nodes, condition, &operand);
             let error_type = error_type.map_or_else(
                 || "::core::option::Option::None".to_owned(),
                 |node| format!("::core::option::Option::Some({})", text(nodes, node, &operand)),
             );
+            // The report runs only against an installation that enables assertions.
             write!(
                 rust,
-                "{support}::assertion_failure({condition}, {error_type}, ::core::file!(), ::core::line!())"
+                "if {CHECKING} {{ {support}::assertion_failure({condition}, {error_type}) }}"
             )
         }
     }
@@ -172,35 +226,22 @@ fn text(nodes: &[ExpressionNode], node: NodeId, operand: &impl Fn(usize) -> Stri
     }
 }
 
-/// Which checks a rendering omits, and whether the rest needs the caller's `unsafe`.
-#[derive(Default)]
-pub(super) struct Plan {
-    /// Omitted checks: an `if` statement's condition, a `||` node, or an `__assume` call.
-    pub(super) dropped: BTreeSet<NodeId>,
-    /// Whether the rendering needs the caller's `unsafe`.
-    pub(super) caller_unsafe: bool,
-}
-
-/// Decide which checks to omit so the expansion needs `unsafe` only where its release
-/// form does.
+/// Whether rendering an analysis needs the caller's `unsafe`.
 ///
-/// A check is an `if` whose only statement stops, `holds || (stop, 0)`, or
-/// `__assume(holds)`. Nested checks are decided first. When the expansion without the
-/// checks whose conditions need `unsafe` needs no `unsafe`, those checks are omitted;
-/// otherwise all checks stay.
-pub(super) fn plan(
+/// Every check counts, whether or not the installation runs it, so the answer is the same
+/// for both build flavors.
+pub(super) fn caller_unsafe(
     frontend: &FrontendOutput,
     bindings: &super::BindingCatalog,
     analysis: &MacroAnalysis,
     translations: &BTreeMap<String, Translation>,
-) -> Plan {
-    let Some(expression) = &analysis.expression else { return Plan::default() };
-    let nodes = &expression.syntax.nodes;
+) -> bool {
+    let Some(expression) = &analysis.expression else { return false };
     let body = expression.syntax.statement_body.as_ref();
     let safety = Safety {
         frontend,
         bindings,
-        nodes,
+        nodes: &expression.syntax.nodes,
         translations,
         locals: body
             .iter()
@@ -211,51 +252,20 @@ pub(super) fn plan(
             })
             .collect(),
     };
-    // Children precede parents in the arena, and statements hold no expression checks'
-    // parents, so expression checks in arena order and then statement checks in source
-    // order decide nested checks first.
-    let mut checks = Vec::new();
-    for (index, node) in nodes.iter().enumerate() {
-        if let Some(holds) = expression_check(frontend, nodes, node) {
-            checks.push((index, holds));
-        }
-    }
-    for statement in body.iter().flat_map(|body| body.walk()) {
-        if let Statement::If { condition, then_branch, else_branch: None, .. } = statement
-            && stops(frontend.declarations(), nodes, then_branch)
-        {
-            checks.push((*condition, *condition));
-        }
-    }
-    // Analysis already omitted checks that read a local before its initialization.
-    let omitted = &expression.omitted_checks;
-    let mut unsafe_checks = omitted.clone();
-    for (check, holds) in checks {
-        if !omitted.contains(&check) && safety.expression(holds, Context::Value, &unsafe_checks) {
-            unsafe_checks.insert(check);
-        }
-    }
-    let rest = match body {
-        Some(body) => safety.statements(&body.statements, &unsafe_checks),
-        None => safety.expression(expression.syntax.root, Context::Value, &unsafe_checks),
-    };
-    if rest {
-        Plan { dropped: omitted.clone(), caller_unsafe: true }
-    } else {
-        Plan { dropped: unsafe_checks, caller_unsafe: false }
+    match body {
+        Some(body) => safety.statements(&body.statements),
+        None => safety.expression(expression.syntax.root, Context::Value),
     }
 }
 
-/// Parameters whose operands a rendering never evaluates: unused ones, and those that
-/// appear only in omitted checks or a stop's diagnostic text.
+/// Parameters whose operands a rendering never names as values: unused ones, and those
+/// that appear only in a stop's diagnostic text.
 ///
 /// Their operands are checked in dead code, so an operand that needs `unsafe` needs it
-/// whether or not a build's C evaluates it, as `Assert` does only when assertions are
-/// enabled.
+/// although the C never evaluates it.
 pub(super) fn unevaluated_parameters(
     frontend: &FrontendOutput,
     analysis: &MacroAnalysis,
-    dropped: &BTreeSet<NodeId>,
 ) -> Vec<usize> {
     use crate::ParameterRole;
     let Some(expression) = &analysis.expression else { return Vec::new() };
@@ -270,7 +280,6 @@ pub(super) fn unevaluated_parameters(
                     | Statement::Return { expression, .. } => pending.push(*expression),
                     Statement::Declaration { initializer, .. } => pending.extend(*initializer),
                     Statement::Block { statements: inner, .. } => statements.extend(inner),
-                    Statement::If { condition, .. } if dropped.contains(condition) => {}
                     Statement::If { condition, then_branch, else_branch, .. } => {
                         pending.push(*condition);
                         statements.push(then_branch);
@@ -283,7 +292,7 @@ pub(super) fn unevaluated_parameters(
     }
     let mut evaluated = BTreeSet::new();
     while let Some(index) = pending.pop() {
-        if dropped.contains(&index) || stop(frontend.declarations(), nodes, index).is_some() {
+        if stop(frontend.declarations(), nodes, index).is_some() {
             continue;
         }
         match &nodes[index].kind {
@@ -329,50 +338,46 @@ pub(super) fn unevaluated_parameters(
         .collect()
 }
 
-/// The condition of a `holds || (stop, 0)` or `__assume(holds)` check.
-fn expression_check(
-    frontend: &FrontendOutput,
+/// Whether a `||` node is `holds || (report, 0)`, as `AssertMacro` expands: an expression
+/// that is true unless its report of a failed assertion stops the process.
+///
+/// Against an installation without assertions the node is true and `holds` is not
+/// evaluated.
+pub(super) fn assertion_alternative(
+    declarations: &DeclarationCatalog,
     nodes: &[ExpressionNode],
-    node: &ExpressionNode,
-) -> Option<NodeId> {
-    match &node.kind {
-        ExpressionKind::Binary { operator: BinaryOperator::LogicalOr, left, right } => {
-            let ExpressionKind::Comma { left: call, right: zero } =
-                &nodes[ungroup(nodes, *right)].kind
-            else {
-                return None;
-            };
-            let zero = matches!(&nodes[ungroup(nodes, *zero)].kind, ExpressionKind::IntegerLiteral { literal } if literal.value == 0);
-            (zero && stop(frontend.declarations(), nodes, ungroup(nodes, *call)).is_some())
-                .then_some(*left)
-        }
-        ExpressionKind::Call { callee, arguments } => {
-            let ExpressionKind::Identifier { name } = &nodes[ungroup(nodes, *callee)].kind else {
-                return None;
-            };
-            let builtin = frontend.declarations().builtins.get(name)?;
-            match (builtin.kind, arguments.as_slice()) {
-                (BuiltinKind::Assume, [holds]) => Some(*holds),
-                _ => None,
-            }
-        }
-        _ => None,
-    }
+    node: NodeId,
+) -> bool {
+    let ExpressionKind::Binary { operator: BinaryOperator::LogicalOr, right, .. } =
+        &nodes[node].kind
+    else {
+        return false;
+    };
+    let ExpressionKind::Comma { left: call, right: zero } = &nodes[ungroup(nodes, *right)].kind
+    else {
+        return false;
+    };
+    matches!(&nodes[ungroup(nodes, *zero)].kind, ExpressionKind::IntegerLiteral { literal } if literal.value == 0)
+        && matches!(stop(declarations, nodes, ungroup(nodes, *call)), Some(Stop::Assertion { .. }))
 }
 
-/// Whether a branch only stops the process, as the failure branch of `Assert` does.
-pub(crate) fn stops(
+/// Whether a branch only reports a failed assertion, as the failure branch of `Assert` does.
+///
+/// Against an installation without assertions the `if` statement that guards it does not
+/// evaluate its condition.
+pub(super) fn reports(
     declarations: &DeclarationCatalog,
     nodes: &[ExpressionNode],
     statement: &Statement,
 ) -> bool {
     match statement {
         Statement::Block { statements, .. } => {
-            matches!(statements.as_slice(), [only] if stops(declarations, nodes, only))
+            matches!(statements.as_slice(), [only] if reports(declarations, nodes, only))
         }
-        Statement::Expression { expression, .. } => {
-            stop(declarations, nodes, ungroup(nodes, *expression)).is_some()
-        }
+        Statement::Expression { expression, .. } => matches!(
+            stop(declarations, nodes, ungroup(nodes, *expression)),
+            Some(Stop::Assertion { .. })
+        ),
         _ => false,
     }
 }
@@ -381,8 +386,9 @@ pub(crate) fn stops(
 ///
 /// This follows the renderer's contexts. Loads, stores, member projections, dereferenced
 /// values, indirect calls and native calls need `unsafe`; caller operands are the caller's
-/// own, generated locals are owned, unevaluated operands sit in generated `unsafe`, and
-/// the rendering checks the thread before reading a global that `checked_global` admits.
+/// own, generated locals are owned, unevaluated operands sit in generated `unsafe`, the
+/// rendering checks pgrx's active thread before reading a global that `checked_global`
+/// admits, and it wraps a call that `safe_call` admits.
 struct Safety<'a> {
     /// Declarations that distinguish globals, builtins and stopping calls.
     frontend: &'a FrontendOutput,
@@ -397,34 +403,32 @@ struct Safety<'a> {
 }
 
 impl Safety<'_> {
-    /// Whether evaluating `statements` needs `unsafe`, without the checks in `dropped`.
-    fn statements(&self, statements: &[Statement], dropped: &BTreeSet<NodeId>) -> bool {
+    /// Whether rendering `statements` needs `unsafe`.
+    fn statements(&self, statements: &[Statement]) -> bool {
         statements.iter().any(|statement| match statement {
             Statement::Expression { expression, .. } => {
-                self.expression(*expression, Context::Discard, dropped)
+                self.expression(*expression, Context::Discard)
             }
-            Statement::Declaration { initializer, .. } => initializer
-                .is_some_and(|initializer| self.expression(initializer, Context::Value, dropped)),
-            Statement::Return { expression, .. } => {
-                self.expression(*expression, Context::Value, dropped)
+            Statement::Declaration { initializer, .. } => {
+                initializer.is_some_and(|initializer| self.expression(initializer, Context::Value))
             }
-            Statement::Block { statements, .. } => self.statements(statements, dropped),
-            Statement::If { condition, .. } if dropped.contains(condition) => false,
+            Statement::Return { expression, .. } => self.expression(*expression, Context::Value),
+            Statement::Block { statements, .. } => self.statements(statements),
             Statement::If { condition, then_branch, else_branch, .. } => {
-                self.expression(*condition, Context::Value, dropped)
-                    || self.statements(std::slice::from_ref(then_branch), dropped)
+                self.expression(*condition, Context::Value)
+                    || self.statements(std::slice::from_ref(then_branch))
                     || else_branch.as_ref().is_some_and(|branch| {
-                        self.statements(std::slice::from_ref(branch.as_ref()), dropped)
+                        self.statements(std::slice::from_ref(branch.as_ref()))
                     })
             }
         })
     }
 
-    /// Whether evaluating `root` in `context` needs `unsafe`, without the checks in `dropped`.
-    fn expression(&self, root: NodeId, context: Context, dropped: &BTreeSet<NodeId>) -> bool {
+    /// Whether rendering `root` in `context` needs `unsafe`.
+    fn expression(&self, root: NodeId, context: Context) -> bool {
         let mut pending = vec![(root, context)];
         while let Some((index, context)) = pending.pop() {
-            if dropped.contains(&index) || matches!(context, Context::Size) {
+            if matches!(context, Context::Size) {
                 continue;
             }
             let value = |node: &NodeId| (*node, Context::Value);
@@ -482,11 +486,12 @@ impl Safety<'_> {
                     else {
                         return true;
                     };
-                    let builtin = self.frontend.declarations().builtins.contains_key(name);
+                    let declarations = self.frontend.declarations();
                     match self.translations.get(name) {
                         Some(translation) if translation.caller_unsafe => return true,
                         Some(_) => {}
-                        None if builtin => {}
+                        None if declarations.builtins.contains_key(name) => {}
+                        None if safe_call(declarations, self.bindings, name).is_some() => {}
                         None => return true,
                     }
                     pending.extend(arguments.iter().map(value));

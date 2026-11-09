@@ -293,6 +293,7 @@ impl<'a> AnalysisSession<'a> {
                             ExpansionSkipCode::UnrecognizedOutput => {
                                 SkipReasonCode::UnrecognizedExpansion
                             }
+                            ExpansionSkipCode::BuildFlavor => SkipReasonCode::BuildFlavor,
                         },
                         message: reason.message.clone(),
                         tokens: None,

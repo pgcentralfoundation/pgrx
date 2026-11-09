@@ -1404,13 +1404,14 @@ fn run_bindgen(
     // The bindgen invocation is independent of macro CFLAGS, compiler-driver
     // discovery and native support. Inspection still verifies the fresh Rust
     // storage against the full recorded PostgreSQL C profile.
-    let generate = |release_macros: Vec<String>| -> eyre::Result<String> {
+    let generate = |flavor_specific: Vec<String>| -> eyre::Result<String> {
         let overrides = BindingOverride::new_from(Rc::clone(&enum_names));
-        // An assert-enabled build declares these where a release build defines macros, which
-        // the generated macros of both builds follow. Bind neither, as a release build can't.
-        let binder = release_macros
+        // An assert-enabled and a release build of one PostgreSQL version bind the same
+        // items, so a program that compiles against one compiles against the other. Names
+        // that only this build flavor declares are therefore left out.
+        let binder = flavor_specific
             .iter()
-            .fold(binder, |binder, name| binder.blocklist_function(format!("^{name}$")));
+            .fold(binder, |binder, name| binder.blocklist_item(format!("^{name}$")));
         let bindings = binder
             .header(include_h.display().to_string())
             .clang_args(arguments)
@@ -1560,6 +1561,9 @@ struct MacroReport<'a> {
     profile: &'a CompilationProfile,
     /// Header, compiler, search-root, and environment dependencies needed to invalidate output.
     inputs: &'a BuildInputs,
+    /// What comparing these headers with their other build flavor decided: the names left
+    /// out, the macros no flavor generates, and the definitions both share.
+    build_flavors: &'a pgrx_c_macros::Flavors,
     /// Original frontend warnings retained for audit without repairing the source.
     diagnostics: &'a [Diagnostic],
     /// Every selected candidate, including provenance and structured emission or skip result.
@@ -1664,7 +1668,7 @@ fn generate_macros(
     let mut source = pg_sys_integer_bridges(&frontend)?;
     // Macros require an unchanged input window around binding generation.
     let mut bindings =
-        generate_bindings(frontend.functions_with_release_macros().map(str::to_owned).collect())?;
+        generate_bindings(frontend.flavor_specific_names().map(str::to_owned).collect())?;
     session.verify_inputs().wrap_err("C inputs changed during binding generation")?;
     let mut parsed_bindings =
         syn::parse_file(&bindings).wrap_err("could not parse bindings for C symbol references")?;
@@ -1825,6 +1829,7 @@ fn generate_macros(
         include_detection,
         profile: frontend.profile(),
         inputs: session.inputs(),
+        build_flavors: frontend.flavors(),
         diagnostics: &frontend.inventory().diagnostics,
         macros: &emissions,
         integer_constants: session.integer_constants(),

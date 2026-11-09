@@ -55,6 +55,11 @@ impl FunctionAdapters {
 ///
 /// Each adapter is named after its C function. One build links one profile's
 /// adapters, so a function name identifies its adapter within that link.
+///
+/// `flavors` names the functions the installation does not have: those that only an
+/// assert-enabled PostgreSQL defines, inspected in a release build. The adapter of an
+/// external one has the same Rust signature as an assert-enabled build's and does nothing.
+/// The adapter of a static inline one compiles the function's own definition first.
 pub(super) fn generate(
     declarations: &DeclarationCatalog,
     bindings: &BindingCatalog,
@@ -62,6 +67,7 @@ pub(super) fn generate(
     used_functions: &BTreeSet<String>,
     called_functions: &BTreeSet<String>,
     target: &TargetFacts,
+    flavors: &crate::Flavors,
 ) -> Result<FunctionAdapters, String> {
     let lowering = Lowering::new_native(declarations, bindings, generated, target);
     let mut result = FunctionAdapters {
@@ -87,8 +93,17 @@ pub(super) fn generate(
             &lowering,
             target,
             called_functions.contains(name),
+            flavors.lacks_function(name),
         ) {
-            Ok((rust, c_source, binding)) => {
+            Ok((rust, mut c_source, binding)) => {
+                if let Some(definition) = flavors.helper_definition(name) {
+                    c_source.insert_str(
+                        0,
+                        &format!(
+                            "/* Only PostgreSQL built with assertions defines {name}. This build compiles its definition here. */\n{definition}\n"
+                        ),
+                    );
+                }
                 result.rust.push_str(&rust);
                 result.c_source.push_str(&c_source);
                 if !called_functions.contains(name) {
@@ -134,6 +149,7 @@ fn adapter(
     lowering: &Lowering<'_>,
     target: &TargetFacts,
     emit_call: bool,
+    lacking: bool,
 ) -> Result<(String, String, FunctionBinding), String> {
     if !c_identifier(name) {
         return Err("C function has no usable identifier".into());
@@ -291,6 +307,20 @@ fn adapter(
         abi_assertions(&mut rust, &rust_result, &signature.result);
         alias
     };
+    if lacking {
+        // The same checks as an assert-enabled build's adapter have passed, so both
+        // flavors admit or refuse the call alike. This installation has no such function:
+        // nothing is declared, compiled or called.
+        if !emit_call || rust_result != "()" {
+            return Err("this PostgreSQL build has no such function".into());
+        }
+        let rust_signature = rust_signature.join(", ");
+        let documentation = format!(
+            "Stand in for the C function `{name}`, which only a PostgreSQL built with assertions defines. This does nothing.\n\n# Safety\nThe caller must meet the requirements `{name}` has in a PostgreSQL built with assertions, so that the same call is sound there."
+        );
+        writeln!(rust, "#[doc = {documentation:?}]\n#[inline]\n#[allow(unused_variables)]\npub unsafe fn {wrapper}({rust_signature}) {{}}").expect("String output");
+        return Ok((rust, String::new(), binding));
+    }
     if !emit_call {
         // Address getters need the complete native storage witness and ABI
         // assertions, but their callback shells contain no callable thunk.

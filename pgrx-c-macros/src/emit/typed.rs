@@ -118,9 +118,8 @@ pub(super) struct Renderer<'a> {
     expectations: Vec<super::expectation::Decision>,
     /// Whether this renders the macro or a documentation shell's type witness.
     mode: RenderMode,
-    /// The checks this rendering omits to keep release PostgreSQL's safety, and whether
-    /// the rest needs the caller's `unsafe`.
-    assertions: super::assertions::Plan,
+    /// Whether this rendering needs the caller's `unsafe`.
+    caller_unsafe: bool,
 }
 
 /// Lower each expression occurrence under its own C context with shared trusted object facts.
@@ -212,8 +211,8 @@ impl<'a> Renderer<'a> {
             &locals.iter().map(|(name, local)| (name.clone(), local.ty.clone())).collect(),
         );
         let expectations = super::expectation::plan(frontend, analysis);
-        let assertions =
-            super::assertions::plan(frontend, bindings, analysis, generated.translations);
+        let caller_unsafe =
+            super::assertions::caller_unsafe(frontend, bindings, analysis, generated.translations);
         Self {
             frontend,
             analysis,
@@ -230,27 +229,25 @@ impl<'a> Renderer<'a> {
             locals,
             expectations,
             mode: RenderMode::Macro,
-            assertions,
+            caller_unsafe,
         }
-    }
-
-    /// Whether this rendering omits the check keyed by `node`.
-    pub(super) fn drops(&self, node: NodeId) -> bool {
-        self.assertions.dropped.contains(&node)
     }
 
     /// Whether this rendering needs the caller's `unsafe`.
     pub(super) fn caller_unsafe(&self) -> bool {
-        self.assertions.caller_unsafe
+        self.caller_unsafe
     }
 
-    /// Parameters whose operands this rendering never evaluates.
+    /// Parameters whose operands this rendering never names as values.
     pub(super) fn unevaluated_parameters(&self) -> Vec<usize> {
-        super::assertions::unevaluated_parameters(
-            self.frontend,
-            self.analysis,
-            &self.assertions.dropped,
-        )
+        super::assertions::unevaluated_parameters(self.frontend, self.analysis)
+    }
+
+    /// Whether the branch of an `if` statement only reports a failed assertion, so the
+    /// statement runs only against an installation that enables assertions.
+    pub(super) fn reports(&self, branch: &crate::syntax::Statement) -> bool {
+        let expression = self.analysis.expression.as_ref().expect("candidate expression");
+        super::assertions::reports(self.frontend.declarations(), &expression.syntax.nodes, branch)
     }
 
     /// Render documentation-shell type witnesses instead of macro arms.
@@ -763,7 +760,7 @@ impl<'a> Renderer<'a> {
                                     _ => None,
                                 };
                                 if let Some(check) = &check {
-                                    write!(rust, "{{ {check}(); /* SAFETY: the place is this global, and the check above established PostgreSQL's thread, as load_global requires. */ #[allow(unused_unsafe)] unsafe {{ {EXPRESSION}::load_global(").expect("String output");
+                                    write!(rust, "{{ {check}(); /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */ #[allow(unused_unsafe)] unsafe {{ {EXPRESSION}::load_global(").expect("String output");
                                 } else if matches!(context, Context::Value) {
                                     write!(rust, "{EXPRESSION}::load(").expect("String output");
                                 }
@@ -970,14 +967,6 @@ impl<'a> Renderer<'a> {
                             rust.push('(');
                             tasks.extend([text(")"), value(*operand)]);
                         }
-                        ExpressionKind::Binary { operator: BinaryOperator::LogicalOr, .. }
-                            if self.drops(index) =>
-                        {
-                            // An omitted `holds || (stop, 0)` check is true, as release
-                            // PostgreSQL's `AssertMacro` is.
-                            write!(rust, "{SUPPORT}::CValue::<{SUPPORT}::CInt>::new(1i32)")
-                                .expect("String output");
-                        }
                         ExpressionKind::Binary {
                             operator:
                                 BinaryOperator::Less
@@ -997,7 +986,18 @@ impl<'a> Renderer<'a> {
                                 operator,
                                 BinaryOperator::LogicalAnd | BinaryOperator::LogicalOr
                             ) {
-                                write!(rust, "{SUPPORT}::CValue::<{SUPPORT}::CInt>::new(if {EXPRESSION}::truth(").expect("String output");
+                                // `holds || (report, 0)` is true, without evaluating
+                                // `holds`, against an installation without assertions.
+                                let unchecked = if super::assertions::assertion_alternative(
+                                    frontend.declarations(),
+                                    &expression.syntax.nodes,
+                                    index,
+                                ) {
+                                    format!("!{} || ", super::assertions::CHECKING)
+                                } else {
+                                    String::new()
+                                };
+                                write!(rust, "{SUPPORT}::CValue::<{SUPPORT}::CInt>::new(if {unchecked}{EXPRESSION}::truth(").expect("String output");
                                 tasks.extend([
                                     text(") { 1 } else { 0 })"),
                                     value(*right),
@@ -1240,7 +1240,7 @@ impl<'a> Renderer<'a> {
                                                 "{name}: an assumption requires one operand"
                                             )));
                                         };
-                                        if self.collapses(context) || self.drops(index) {
+                                        if self.collapses(context) {
                                             rust.push_str("()");
                                             continue;
                                         }
@@ -1249,7 +1249,7 @@ impl<'a> Renderer<'a> {
                                             .expect("String output");
                                         tasks.extend([
                                             Task::Text(format!(
-                                                ") {{ {EXPRESSION}::assertion::unreachable_reached(::core::file!(), ::core::line!()) }}"
+                                                ") {{ {EXPRESSION}::assertion::unreachable_reached() }}"
                                             )),
                                             value(*holds),
                                         ]);
@@ -1488,17 +1488,43 @@ impl<'a> Renderer<'a> {
                                 );
                                 continue;
                             }
-                            if let Some(result) = &result {
-                                write!(
-                                    rust,
-                                    "<{} as {EXPRESSION}::CType>::from_storage(",
-                                    result.marker
-                                )
-                                .expect("String output");
+                            // A function that only an assert-enabled build defines is
+                            // called, and its arguments evaluated, only against one.
+                            if result.is_none() && frontend.flavors.assert_functions.contains(name)
+                            {
+                                write!(rust, "if {} {{ ", super::assertions::CHECKING)
+                                    .expect("String output");
+                                tasks.push(text("; }"));
+                            }
+                            let safe = super::assertions::safe_call(
+                                frontend.declarations(),
+                                self.bindings,
+                                name,
+                            )
+                            .filter(|_| result.is_none());
+                            if let Some(reason) = safe {
+                                // The arguments are evaluated outside the generated
+                                // `unsafe`, which must cover only the call.
+                                let names = (0..arguments.len())
+                                    .map(|index| format!("__pgrx_c_argument{index}, "))
+                                    .collect::<String>();
+                                rust.push_str("match (");
+                                tasks.push(Task::Text(format!(
+                                    ") {{ ({names}) => {{ /* SAFETY: {name} needs no more than pgrx's safe wrappers assume of a backend: {reason}. The guarded binding checks pgrx's active thread before it calls PostgreSQL. */ #[allow(unused_unsafe)] unsafe {{ {path}({names}) }} }} }}"
+                                )));
+                            } else {
+                                if let Some(result) = &result {
+                                    write!(
+                                        rust,
+                                        "<{} as {EXPRESSION}::CType>::from_storage(",
+                                        result.marker
+                                    )
+                                    .expect("String output");
+                                    tasks.push(text(")"));
+                                }
+                                write!(rust, "{path}(").expect("String output");
                                 tasks.push(text(")"));
                             }
-                            write!(rust, "{path}(").expect("String output");
-                            tasks.push(text(")"));
                             for (argument, lowered) in arguments {
                                 tasks.push(text(", "));
                                 tasks.push(text("))"));
