@@ -415,33 +415,19 @@ fn postgres_varlena_assertions_match_original_headers() {
         };
         let native = format!(
             r#"
-#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 #undef printf
 static const char *expected_file;
 static int expected_line;
-static volatile unsigned evaluations;
-/* Report the operand evaluations when a failed assertion aborts the process. */
-static char assertion_text[32] = "evaluations\t";
-static char assertion_digits[10];
-static void assertion_aborted(int signal_number) {{
-    /* Static buffers: a local array would make the compiler reference its stack guard, which
-     * this standalone link does not provide on every platform. */
-    char *text = assertion_text;
-    char *digits = assertion_digits;
-    unsigned value = evaluations;
-    int length = 12, count = 0;
-    (void) signal_number;
-    do {{ digits[count++] = (char) ('0' + value % 10); value /= 10; }} while (value != 0);
-    while (count != 0) text[length++] = digits[--count];
-    text[length++] = '\n';
-    (void) write(1, text, (size_t) length);
-}}
-void assertion_site(const char *file, int line) {{ signal(SIGABRT, assertion_aborted); expected_file = file; expected_line = line; evaluations = 0; }}
-int assertion_argument(int value) {{ ++evaluations; return value; }}
+static unsigned evaluations;
+/* Whether each operand evaluation is also written to stdout at once, so that the count
+ * survives a failed assertion that aborts the process. */
+static int tracing;
+void assertion_trace(void) {{ tracing = 1; }}
+void assertion_site(const char *file, int line) {{ expected_file = file; expected_line = line; evaluations = 0; }}
+int assertion_argument(int value) {{ ++evaluations; if (tracing) {{ fputs("evaluation\n", stdout); fflush(stdout); }} return value; }}
 unsigned assertion_evaluations(void) {{ return evaluations; }}
 {condition}
 "#
@@ -471,13 +457,15 @@ unsafe extern "C" {{
     fn assertion_argument(value: core::ffi::c_int) -> core::ffi::c_int;
     /// Read only the native fixture counter updated by the preceding argument calls.
     fn assertion_evaluations() -> core::ffi::c_uint;
+    /// Make each later argument call also write a line to stdout.
+    fn assertion_trace();
 }}
 fn main() {{
     // SAFETY: The fixture functions have these exact fixed C prototypes and
     // only borrow static filename storage or increment a process-local counter.
     // Valid tags produce sizes. With assertions, the final invalid tag aborts the
-    // process after reporting its site, which is printed first, and the fixture's
-    // abort handler then prints the operand evaluations.
+    // process after reporting its site, which is printed first, and each operand
+    // evaluation of that call is traced because the process cannot report a count.
     unsafe {{
         for tag in [1_i32, 2, 3, 18] {{
             assertion_site(core::ptr::null(), 0);
@@ -485,6 +473,7 @@ fn main() {{
             println!("size\t{{}}\t{{}}", size.get(), assertion_evaluations());
         }}
         assertion_site(core::ptr::null(), 0);
+        assertion_trace();
         println!("site\t{{}}\t{{}}", file!(), line!() + 1);
         let invalid = VARTAG_SIZE!(assertion_argument(0_i32));
         println!("unasserted\t{{}}\t{{}}", invalid.get(), assertion_evaluations());
@@ -518,15 +507,16 @@ fn main() {{
             .next()
             .and_then(|site| site.strip_prefix("site\t")?.split_once('\t'))
             .expect("the Rust oracle reports its assertion site");
+        // Each operand evaluation of the invalid call wrote one line before any failure.
+        let mut lines = lines.peekable();
+        let mut evaluations = 0_u32;
+        while lines.next_if_eq(&"evaluation").is_some() {
+            evaluations += 1;
+        }
         if !asserted {
             assert_eq!(lines.next().map(|line| format!("{line}\n")), Some(format!("{failure}\n")));
             continue;
         }
-        // The fixture's abort handler reports the operand evaluations at the failure.
-        let evaluations = lines
-            .next()
-            .and_then(|count| count.strip_prefix("evaluations\t"))
-            .unwrap_or_else(|| panic!("PG{major} must report its operand evaluations:\n{stdout}"));
         let report = stderr
             .lines()
             .find_map(|line| line.strip_prefix("TRAP: "))
