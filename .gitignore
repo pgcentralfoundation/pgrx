@@ -9,6 +9,8 @@ target/
 cmake*/
 .direnv
 pgrx-examples/*/target
+**/tests/pg_regress/results/
+**/tests/pg_regress/regression.*
 /bin
 rustup-init.sh
 .claude/
