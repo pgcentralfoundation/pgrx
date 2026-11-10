@@ -667,9 +667,15 @@ fn llvm_witness(ir: &str, witness: &str, bits: u16, kind: BuiltinKind) -> Result
         }
         let (destination, operation) =
             line.split_once(" = ").map_or((None, line), |(name, op)| (Some(name), op));
-        if operation.starts_with("call void @llvm.dbg.declare(")
-            || operation.starts_with("call void @llvm.dbg.value(")
-            || operation.starts_with("call void @llvm.dbg.assign(")
+        // Call-site markers don't change what the callee does. Clang 18 marks debug
+        // intrinsic calls in optimized code `tail`, and Clang 19 prints debug records instead.
+        let unmarked = operation
+            .strip_prefix("tail ")
+            .or_else(|| operation.strip_prefix("notail "))
+            .unwrap_or(operation);
+        if unmarked.starts_with("call void @llvm.dbg.declare(")
+            || unmarked.starts_with("call void @llvm.dbg.value(")
+            || unmarked.starts_with("call void @llvm.dbg.assign(")
         {
             continue;
         }
@@ -731,16 +737,12 @@ fn llvm_witness(ir: &str, witness: &str, bits: u16, kind: BuiltinKind) -> Result
                 returned = true;
             }
             _ => {
-                let operation = operation
-                    .strip_prefix("tail ")
-                    .or_else(|| operation.strip_prefix("notail "))
-                    .unwrap_or(operation);
                 let intrinsic = match kind {
                     BuiltinKind::ByteSwap { .. } => "bswap",
                     BuiltinKind::Expect => "expect",
                 };
                 let Some(call) =
-                    operation.strip_prefix(&format!("call {ty} @llvm.{intrinsic}.{ty}("))
+                    unmarked.strip_prefix(&format!("call {ty} @llvm.{intrinsic}.{ty}("))
                 else {
                     return Err(format!(
                         "LLVM builtin witness has unsupported effects: {operation}"
@@ -861,6 +863,8 @@ mod tests {
             "  %1 = tail call i32 @llvm.bswap.i32(i32 %0)\n  ret i32 %1",
             "  %2 = alloca i32, align 4\n  store i32 %0, ptr %2, align 4\n  #dbg_declare(ptr %2, !1, !DIExpression(), !2)\n  %3 = load i32, ptr %2, align 4, !dbg !2\n  %4 = call i32 @llvm.bswap.i32(i32 %3), !dbg !2\n  ret i32 %4, !dbg !2",
             "entry:\n  %2 = alloca i32, align 4\n  store i32 %0, i32* %2, align 4\n  call void @llvm.dbg.declare(metadata i32* %2, metadata !1, metadata !DIExpression())\n  %3 = load i32, i32* %2, align 4\n  %4 = call i32 @llvm.bswap.i32(i32 %3)\n  ret i32 %4",
+            // Clang 18 at -g -O2.
+            "  tail call void @llvm.dbg.value(metadata i32 %0, metadata !16, metadata !DIExpression()), !dbg !17\n  %2 = tail call i32 @llvm.bswap.i32(i32 %0), !dbg !18\n  ret i32 %2, !dbg !19",
         ] {
             llvm_witness(&witness(body), "probe", 32, BuiltinKind::ByteSwap { bits: 32 }).unwrap();
         }
@@ -942,6 +946,14 @@ mod tests {
             BuiltinKind::Expect,
         )
         .unwrap();
+        // Clang 18 at -g -O2 marks the debug intrinsic calls `tail`.
+        llvm_witness(
+            "define dso_local noundef i64 @probe(i64 noundef returned %0, i64 noundef %1) local_unnamed_addr #0 !dbg !14 {\n  tail call void @llvm.dbg.value(metadata i64 %0, metadata !20, metadata !DIExpression()), !dbg !22\n  tail call void @llvm.dbg.value(metadata i64 %1, metadata !21, metadata !DIExpression()), !dbg !22\n  ret i64 %0, !dbg !23\n}\n",
+            "probe",
+            64,
+            BuiltinKind::Expect,
+        )
+        .unwrap();
     }
 
     /// Checks expect rejects reversed identity arithmetic and non hint effects.
@@ -959,6 +971,7 @@ mod tests {
             "  %2 = alloca i64, align 8\n  %3 = load i64, ptr %2, align 8\n  ret i64 %3",
             "  %2 = alloca i64, align 8\n  store i64 %0, ptr %2, align 8\n  store i64 %1, ptr %2, align 8\n  %3 = load i64, ptr %2, align 8\n  ret i64 %3",
             "  store i64 %1, ptr @global, align 8\n  ret i64 %0",
+            "  tail call void @effect(i64 %1)\n  ret i64 %0",
         ] {
             assert!(
                 llvm_witness(&expect_witness(body), "probe", 64, BuiltinKind::Expect).is_err(),
