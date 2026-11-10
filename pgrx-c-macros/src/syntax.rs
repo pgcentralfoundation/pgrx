@@ -31,19 +31,22 @@ const MAX_DEPTH: usize = 64;
 /// statement nesting budgets, and analysis and emission recurse once into each.
 const MAX_STATEMENT_EXPRESSIONS: usize = 8;
 
-/// The spelling of the keyword token that opens a [`Statement::BuildFlavor`].
+/// The spelling of the keyword token that opens a [`Statement::BuildFlavor`] and, after a
+/// `(`, an [`ExpressionKind::BuildFlavor`].
 ///
 /// A C lexer gives this spelling the kind of an identifier, never of a keyword, so no token
-/// read from a header opens the statement. `frontend::flavors` writes the token into the
-/// body it merges from a static inline function's two definitions.
+/// read from a header opens either. `frontend::flavors` writes the token into the body it
+/// merges from a static inline function's two definitions, and into the one definition it
+/// gives a macro that the build flavors define differently.
 pub(crate) const BUILD_FLAVOR: &str = "__pgrx_c_assert_checking";
 
-/// Whether `token` opens a [`Statement::BuildFlavor`].
+/// Whether `token` opens a [`Statement::BuildFlavor`] or an [`ExpressionKind::BuildFlavor`].
 pub(crate) fn opens_build_flavor(token: &Token) -> bool {
     token.kind == TokenKind::Keyword && token.spelling == BUILD_FLAVOR
 }
 
-/// The keyword token that opens a [`Statement::BuildFlavor`].
+/// The keyword token that opens a [`Statement::BuildFlavor`] or an
+/// [`ExpressionKind::BuildFlavor`].
 pub(crate) fn build_flavor_keyword() -> Token {
     Token { kind: TokenKind::Keyword, spelling: BUILD_FLAVOR.into() }
 }
@@ -331,6 +334,19 @@ pub enum ExpressionKind {
         then_value: NodeId,
         /// Value node evaluated only for a C false condition.
         else_value: NodeId,
+    },
+    /// The value of the installation's build flavor, where a macro's definition differs
+    /// between a PostgreSQL built with assertions and one built without:
+    /// `( __pgrx_c_assert_checking ? ( checked ) : ( unchecked ) )`.
+    ///
+    /// Like `__builtin_choose_expr`, it is the chosen operand and nothing else: no
+    /// conversion brings the two to a common type, so both must have one type. It is
+    /// never a place.
+    BuildFlavor {
+        /// The parenthesized definition of a build with assertions.
+        checked: NodeId,
+        /// The parenthesized definition of a build without assertions.
+        unchecked: NodeId,
     },
     /// C sequencing of a discarded left expression followed by the right value.
     Comma {
@@ -695,6 +711,8 @@ pub(crate) enum SyntaxErrorKind {
     CommaExpression,
     /// Source, token, dependency, depth, or compiler-pass work exceeded a finite configured limit.
     BudgetExceeded,
+    /// The definitions of the two build flavors cannot stand where the macro is used.
+    BuildFlavor,
 }
 
 /// A significant token paired with its original replacement-list index after comments are filtered.
@@ -1053,6 +1071,13 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
             {
                 return self.statement_expression();
             }
+            "(" if self
+                .tokens
+                .get(self.position + 1)
+                .is_some_and(|next| opens_build_flavor(next.token)) =>
+            {
+                return self.build_flavor_value(depth);
+            }
             "(" => {
                 if let Some((end, type_name)) = self.flat_type(")") {
                     self.position = end + 1;
@@ -1220,6 +1245,12 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
                 "C23 boolean and nullptr literals require a dedicated type and value contract",
             ));
         }
+        if opens_build_flavor(lexeme.token) {
+            return Err(self.error(
+                SyntaxErrorKind::BuildFlavor,
+                "the definitions of the two build flavors are used where they are not one operand",
+            ));
+        }
         if matches!(lexeme.token.kind, TokenKind::Identifier | TokenKind::Keyword) {
             // These constructs are declarations or compile-time selectors, never
             // runtime calls. Some preprocessor token streams label their names as
@@ -1263,6 +1294,45 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
             return Ok(self.push(kind, TokenRange { start, end: start + 1 }));
         }
         Err(self.unexpected())
+    }
+
+    /// Parse `( __pgrx_c_assert_checking ? ( checked ) : ( unchecked ) )` at its opening
+    /// parenthesis.
+    ///
+    /// The keyword is read only here, after a parenthesis that begins an operand. So the
+    /// parentheses around the whole can never be a call's argument list or a cast's type,
+    /// and each definition keeps the parentheses that close it against its context.
+    fn build_flavor_value(&mut self, depth: usize) -> Result<NodeId, SyntaxError> {
+        let start = self.tokens[self.position].index;
+        self.position += 2;
+        self.expect("?")?;
+        let checked = self.build_flavor_operand(depth)?;
+        self.expect(":")?;
+        let unchecked = self.build_flavor_operand(depth)?;
+        self.expect(")")?;
+        let end = self.tokens[self.position - 1].index + 1;
+        Ok(self.push(ExpressionKind::BuildFlavor { checked, unchecked }, TokenRange { start, end }))
+    }
+
+    /// Parse one parenthesized definition of a build flavor, which must be an operand by
+    /// itself.
+    fn build_flavor_operand(&mut self, depth: usize) -> Result<NodeId, SyntaxError> {
+        let refuse = |parser: &Self| {
+            parser.error(
+                SyntaxErrorKind::BuildFlavor,
+                "a definition of one build flavor is not one parenthesized expression",
+            )
+        };
+        if self.spelling() != Some("(") {
+            return Err(refuse(self));
+        }
+        let operand = self.prefix(depth + 1)?;
+        if !matches!(self.nodes[operand].kind, ExpressionKind::Group { .. })
+            || !matches!(self.spelling(), Some(":" | ")"))
+        {
+            return Err(refuse(self));
+        }
+        Ok(operand)
     }
 
     /// Parse offsetof record and field designators as structural operands rather than evaluated
@@ -1617,6 +1687,11 @@ fn parse_integer_literal(spelling: &str) -> Result<IntegerLiteral, String> {
     };
     let suffix = IntegerSuffix { unsigned, size };
     Ok(IntegerLiteral { spelling: spelling.into(), value, radix: radix as u8, suffix })
+}
+
+/// The value of an integer constant's spelling, or `None` for any other token.
+pub(crate) fn integer_literal_value(spelling: &str) -> Option<u128> {
+    parse_integer_literal(spelling).ok().map(|literal| literal.value)
 }
 
 /// Recognize a lowercased Microsoft sized suffix as Clang lexes one: `i8`, `i16`, `i32`, or
@@ -3092,6 +3167,77 @@ mod tests {
         // An identifier of the keyword's spelling, as C source could hold, opens nothing.
         let identifier = tokens(&["{", BUILD_FLAVOR, "{", "x", "++", ";", "}", "{", "}", "}"]);
         assert!(parse_replacement(&identifier, &["x".into()], |_| false).is_err());
+    }
+
+    /// The definitions of two build flavors are one operand, opened only by the keyword token
+    /// after a parenthesis that begins an operand, and each is one parenthesized expression.
+    #[test]
+    fn build_flavor_values_are_one_operand_opened_by_a_keyword() {
+        let flavored = |spellings: &[&str]| {
+            let mut source = tokens(spellings);
+            for token in &mut source {
+                if token.spelling == "FLAVOR" {
+                    *token = build_flavor_keyword();
+                }
+            }
+            parse_replacement(&source, &["x".into()], |name| name == "int")
+        };
+        let parsed =
+            flavored(&["(", "FLAVOR", "?", "(", "x", "+", "1", ")", ":", "(", "x", ")", ")"])
+                .unwrap();
+        let root = &parsed.nodes[parsed.root];
+        let ExpressionKind::BuildFlavor { checked, unchecked } = root.kind else {
+            panic!("{root:?}")
+        };
+        assert_eq!(root.tokens, TokenRange { start: 0, end: 13 });
+        assert_eq!(parsed.nodes[checked].tokens, TokenRange { start: 3, end: 8 });
+        assert_eq!(parsed.nodes[unchecked].tokens, TokenRange { start: 9, end: 12 });
+        for node in [checked, unchecked] {
+            assert!(matches!(parsed.nodes[node].kind, ExpressionKind::Group { .. }));
+        }
+        // It is an operand like any other parenthesized expression.
+        for admitted in [
+            vec!["2", "*", "(", "FLAVOR", "?", "(", "x", ")", ":", "(", "x", ")", ")"],
+            vec!["f", "(", "(", "FLAVOR", "?", "(", "x", ")", ":", "(", "x", ")", ")", ")"],
+            vec![
+                "(", "FLAVOR", "?", "(", "(", "int", ")", "x", ")", ":", "(", "x", ",", "x", ")",
+                ")",
+            ],
+        ] {
+            assert!(flavored(&admitted).is_ok(), "{admitted:?}");
+        }
+        for refused in [
+            // The parentheses of a call's arguments are not an operand's.
+            vec!["f", "(", "FLAVOR", "?", "(", "x", ")", ":", "(", "x", ")", ")"],
+            // The keyword is no operand by itself.
+            vec!["FLAVOR", "?", "(", "x", ")", ":", "(", "x", ")"],
+            vec!["(", "x", "+", "FLAVOR", ")"],
+            // Each definition is one parenthesized expression and nothing else.
+            vec!["(", "FLAVOR", "?", "x", ":", "(", "x", ")", ")"],
+            vec!["(", "FLAVOR", "?", "(", "x", ")", ":", "x", ")"],
+            vec!["(", "FLAVOR", "?", "(", "x", ")", "+", "1", ":", "(", "x", ")", ")"],
+            vec!["(", "FLAVOR", "?", "(", "x", ")", ":", "(", "x", ")", "+", "1", ")"],
+            vec!["(", "FLAVOR", "?", "(", "int", ")", "x", ":", "(", "x", ")", ")"],
+        ] {
+            let error = flavored(&refused).unwrap_err();
+            assert_eq!(error.kind, SyntaxErrorKind::BuildFlavor, "{refused:?}: {error:?}");
+        }
+        // Both definitions are required.
+        assert!(flavored(&["(", "FLAVOR", "?", "(", "x", ")", ")"]).is_err());
+        assert!(flavored(&["(", "FLAVOR", ")"]).is_err());
+        // An identifier of the keyword's spelling, as C source could hold, is the condition
+        // of an ordinary conditional.
+        let identifier = tokens(&["(", BUILD_FLAVOR, "?", "(", "x", ")", ":", "(", "x", ")", ")"]);
+        let parsed = parse_replacement(&identifier, &["x".into()], |_| false).unwrap();
+        assert!(
+            parsed.nodes.iter().any(|node| matches!(node.kind, ExpressionKind::Conditional { .. }))
+        );
+        assert!(
+            !parsed
+                .nodes
+                .iter()
+                .any(|node| matches!(node.kind, ExpressionKind::BuildFlavor { .. }))
+        );
     }
 
     /// Checks conditionals attach else to the nearest if and group condition tokens.

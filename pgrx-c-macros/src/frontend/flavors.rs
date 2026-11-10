@@ -15,19 +15,23 @@
 //! pair, so both reach it:
 //!
 //! - A name that one flavor alone declares is generated and bound by neither.
-//! - A function-like macro that the flavors define differently takes its assert-enabled
-//!   definition in both. Whether its assertions run is a constant of the installation, not a
-//!   difference in the generated code. When that definition reaches a name the release
-//!   flavor lacks or declares otherwise, neither flavor generates the macro. A static
-//!   inline function that only an assert-enabled build defines is the exception: a release
-//!   build compiles that definition itself, where its assertions do nothing.
+//! - A function-like macro that the flavors define differently gets one definition in both,
+//!   under which each build does what its own C definition does. A macro that is nothing
+//!   but checks, beside a release definition that does nothing, keeps its assert-enabled
+//!   definition: whether a check runs is a constant of the installation. Any other gets a
+//!   definition that holds both, in which that constant selects the installation's own.
+//!   When no one definition can hold both, or one of them reaches a name the other flavor
+//!   lacks or declares otherwise, neither flavor generates the macro. A static inline
+//!   function that only an assert-enabled build defines is the exception: a release build
+//!   compiles that definition itself, where its assertions do nothing, so code that names
+//!   it compiles there.
 //! - A function that an assert-enabled build declares where a release build defines a macro
 //!   that does nothing, or the reverse of a static inline function, becomes a macro that
 //!   calls the function in both. A release macro that does anything is a conflict.
 //! - An external function that only an assert-enabled build declares, and that returns
-//!   nothing, is called in both by a merged inline body, from the statements that only an
-//!   assert-enabled build has. A release build's call does nothing. A macro is never shared
-//!   on that ground: its release definition may do work that the call would leave out.
+//!   nothing, is called in both by the code that only an assert-enabled build has: the
+//!   statements of a merged inline body and a macro's assert-enabled definition. A release
+//!   build's call does nothing.
 //! - A static inline function whose definition differs between the flavors is translated
 //!   from one body merged from both definitions, in which the installation's flavor selects
 //!   the statements that only one of them has. When the definitions do not merge, both
@@ -49,6 +53,10 @@ use std::path::{Path, PathBuf};
 
 /// Merge the two definitions of a static inline function's body into one.
 mod merge;
+/// Give a macro that the build flavors define differently one definition.
+mod share;
+
+pub(crate) use share::Inert;
 
 /// The macro whose definition selects PostgreSQL's assertion-enabled declarations.
 const ASSERT_CHECKING: &str = "USE_ASSERT_CHECKING";
@@ -94,11 +102,34 @@ pub struct Flavors {
     /// selects the statements that only one of them has. Both translate that body, or call
     /// the function when it cannot be translated.
     pub(crate) merged: BTreeSet<String>,
+    /// Function-like macros that the flavors define differently and that keep the
+    /// assert-enabled definition in both, each with what its release definition yields.
+    /// That definition does nothing, and the assert-enabled one is nothing but checks, so
+    /// with its checks off it does nothing either. The emitter proves that on the analyzed
+    /// definition before it generates anything that expands the macro.
+    pub(crate) checked: BTreeMap<String, Inert>,
+    /// Function-like macros that the flavors define differently and that have one
+    /// definition holding both, in which the installation's flavor selects its own.
+    pub(crate) selected: BTreeMap<String, Selected>,
+    /// Whether the keyword that selects a build flavor is a token no header can produce:
+    /// no flavor declares its spelling and no macro definition spells it. Every token so
+    /// spelled in a compiler expansion then comes from a definition written here.
+    #[serde(skip)]
+    pub(crate) keyword_free: bool,
     /// Definitions that follow the main file wherever the compiler expands macros.
     pub(crate) definitions: String,
     /// Source the inspected flavor's preprocessor skipped.
     #[serde(skip)]
     pub(crate) skipped: BTreeSet<Skipped>,
+}
+
+/// The two definitions of a macro that has one definition holding both.
+#[derive(Clone, Debug, serde::Serialize)]
+pub struct Selected {
+    /// The definition of a PostgreSQL built with assertions.
+    pub(crate) assert_enabled: String,
+    /// The definition of a PostgreSQL built without assertions.
+    pub(crate) release: String,
 }
 
 /// A range of lines the preprocessor skipped: its file and first and last line.
@@ -109,6 +140,12 @@ impl Flavors {
     /// assert-enabled build declares, inspected in a release build.
     pub(crate) fn lacks_function(&self, name: &str) -> bool {
         !self.assert_enabled && self.assert_functions.contains(name)
+    }
+
+    /// Whether both flavors expand the macro `name` to a definition written for them: the
+    /// assert-enabled definition, or one that holds both definitions.
+    pub(crate) fn shares_definition(&self, name: &str) -> bool {
+        self.checked.contains_key(name) || self.selected.contains_key(name)
     }
 
     /// The C definition of a static inline function that the inspected headers lack and
@@ -135,6 +172,9 @@ struct Other {
     /// one flavor's preprocessor skips, where its parse proves them as the inspected
     /// flavor's parse proves a retained body.
     bodies: BTreeMap<String, Body>,
+    /// Whether any macro definition it ever had spells the keyword that selects a build
+    /// flavor.
+    spells_keyword: bool,
 }
 
 /// A static inline function's body in the other build flavor.
@@ -275,7 +315,7 @@ pub(super) fn reconcile(
         let formals = formals(definition);
         // A release build's call to the function does nothing, so it can stand only for a
         // release macro that does nothing.
-        let callable = if does_nothing(release, definition) {
+        let callable = if nothing(release, definition).is_some() {
             assertion_function(function, Some(&formals), release.declarations)
         } else {
             Err("the macro does work that a call a release build does not make would leave out"
@@ -406,8 +446,11 @@ pub(super) fn reconcile(
             }
             (Some(_), None) => Some("which a release build does not define"),
             (None, Some(_)) => Some("which only a release build defines as a macro"),
-            (None, None) => (assert.declares(name) && !release.declares(name))
-                .then_some("which a release build does not declare"),
+            (None, None) => match (assert.declares(name), release.declares(name)) {
+                (true, false) => Some("which a release build does not declare"),
+                (false, true) => Some("which an assert-enabled build does not declare"),
+                _ => None,
+            },
         }
     };
     // A candidate is shared once everything its definition names is. One candidate may
@@ -432,24 +475,33 @@ pub(super) fn reconcile(
         }
         flavors.helpers.extend(added);
     }
-    // A macro's release definition is its own text, which nothing here compares with the
-    // assert-enabled one. A release build's call to an assertion function does nothing, so
-    // sharing an assert-enabled definition that makes one could leave out work the release
-    // definition does. Such a macro stays a conflict.
-    let unshared_macro = |name: &str| unshared_given(name, &flavors.helpers, false);
-    // A merged inline body holds each flavor's own statements, so a call there is one that
-    // only an assert-enabled build compiles.
+    // A translated definition calls an assertion function through its adapter, which does
+    // nothing in a release build. So a macro definition or a merged inline body may name one.
     let unshared = |name: &str| unshared_given(name, &flavors.helpers, true);
-    // Function-like macros the flavors define differently take the assert-enabled
-    // definition when a release build can expand it.
-    let mut shared = BTreeMap::<String, MacroDefinition>::new();
+    // The keyword that selects a build flavor must be a token that no header can produce.
+    let spells = |definition: &MacroDefinition| {
+        definition
+            .tokens
+            .iter()
+            .any(|token| token.kind != TokenKind::Comment && token.spelling == BUILD_FLAVOR)
+    };
+    let keyword_free = !assert.declares(BUILD_FLAVOR)
+        && !release.declares(BUILD_FLAVOR)
+        && !other.spells_keyword
+        && !own_macros
+            .values()
+            .chain(&frontend.inventory.macros)
+            .chain(other.macros.values())
+            .any(spells);
+    // Function-like macros the flavors define differently, whose assert-enabled definition
+    // a release build can expand.
+    let mut differing = Vec::new();
     for (name, asserted) in assert.macros {
         let Some(released) = release.function_like(name) else { continue };
         if asserted.kind != MacroKind::FunctionLike || flavors.conflicts.contains_key(name) {
             continue;
         }
-        let differs = significant(asserted) != significant(released);
-        if !differs {
+        if significant(asserted) == significant(released) {
             // Release C compiles such a report whether or not assertions are enabled, and
             // the generated one would run only when they are.
             if significant(asserted).contains(&ASSERTION_REPORT) {
@@ -462,17 +514,103 @@ pub(super) fn reconcile(
             }
             continue;
         }
-        match reaches(assert, name, &unshared_macro) {
-            Some((reached, reason)) => {
+        let reason = match (reaches(assert, name, &unshared), member(asserted, &members)) {
+            (Some((reached, reason)), _) => format!("uses {reached}, {reason}"),
+            (None, Some(member)) => {
+                format!("names {member}, a member that only one build flavor's record has")
+            }
+            (None, None) => {
+                differing.push((name, asserted, released));
+                continue;
+            }
+        };
+        flavors.conflicts.insert(
+            name.clone(),
+            format!(
+                "the assert-enabled definition of {name} differs from the release definition and {reason}"
+            ),
+        );
+    }
+    // A macro that is nothing but checks, beside a release definition that does nothing,
+    // keeps the assert-enabled definition in both. One such macro may invoke another, so
+    // repeat until none is added.
+    loop {
+        let before = flavors.checked.len();
+        differing.retain(|(name, asserted, released)| {
+            let off = share::checks(&parameters_and_body(asserted).1, &flavors.checked);
+            match (off, nothing(release, released)) {
+                (Some(off), Some(nothing)) if off == nothing => {
+                    flavors.checked.insert((*name).clone(), nothing);
+                    false
+                }
+                _ => true,
+            }
+        });
+        if flavors.checked.len() == before {
+            break;
+        }
+    }
+    // Any other gets one definition that holds both, in which each build evaluates its own.
+    let mut selected = Vec::new();
+    for (name, asserted, released) in differing {
+        let select = || {
+            if !keyword_free {
+                return Err(format!(
+                    "the headers use the name {BUILD_FLAVOR}, which would select between its definitions"
+                ));
+            }
+            if let Some((reached, reason)) = reaches(release, name, &unshared) {
+                return Err(format!("its release definition uses {reached}, {reason}"));
+            }
+            if let Some(member) = member(released, &members) {
+                return Err(format!(
+                    "its release definition names {member}, a member that only one build flavor's record has"
+                ));
+            }
+            let parameters =
+                "its two definitions do not take the same parameters under names that both can use";
+            let (formals, checked) = replacement(asserted).ok_or(parameters)?;
+            let (release_formals, unchecked) = replacement(released).ok_or(parameters)?;
+            let unchecked =
+                share::rename(&unchecked, &release_formals, &formals).ok_or(parameters)?;
+            let formal = |name: &str| formals.contains(&name);
+            let body = share::select(
+                &side(assert, checked, &formal, nothing(assert, asserted).is_some()),
+                &side(
+                    release,
+                    unchecked.iter().collect(),
+                    &formal,
+                    nothing(release, released).is_some(),
+                ),
+            )?;
+            // The signature and location stay the assert-enabled definition's.
+            let mut definition = asserted.clone();
+            let mut signature = Vec::new();
+            for token in asserted.tokens.iter().filter(|token| token.kind != TokenKind::Comment) {
+                signature.push(token.clone());
+                if token.spelling == ")" {
+                    break;
+                }
+            }
+            definition.tokens = signature.into_iter().chain(body).collect();
+            Ok(definition)
+        };
+        match select() {
+            Ok(definition) => {
+                flavors.selected.insert(
+                    name.clone(),
+                    Selected {
+                        assert_enabled: asserted.to_string(),
+                        release: released.to_string(),
+                    },
+                );
+                selected.push(definition);
+            }
+            Err(reason) => {
                 flavors.conflicts.insert(
                     name.clone(),
-                    format!(
-                        "the assert-enabled definition of {name} differs from the release definition and uses {reached}, {reason}"
-                    ),
+                    format!("the build flavors define {name} differently, and {reason}"),
                 );
-            }
-            None => {
-                shared.insert(name.clone(), asserted.clone());
             }
         }
     }
@@ -492,8 +630,6 @@ pub(super) fn reconcile(
     };
     let reports =
         |token: &Token| token.kind == TokenKind::Identifier && token.spelling == ASSERTION_REPORT;
-    // The keyword that a merged body gives its statements must name nothing else.
-    let keyword_free = !assert.declares(BUILD_FLAVOR) && !release.declares(BUILD_FLAVOR);
     let mut merged = BTreeMap::new();
     for (name, function) in &frontend.declarations.function_signatures {
         let Some(definition) = &function.definition else { continue };
@@ -562,9 +698,14 @@ pub(super) fn reconcile(
         })
         .collect::<Vec<_>>();
     // Definitions the inspected headers lack. An assert-enabled build already has the
-    // shared definitions. A macro that only the other flavor defines, and that neither
-    // can generate, is defined so that both report why.
-    let mut adopted = if assert_enabled { BTreeMap::new() } else { shared };
+    // definitions that are nothing but checks. A macro that only the other flavor defines,
+    // and that neither can generate, is defined so that both report why.
+    let mut adopted = flavors
+        .checked
+        .keys()
+        .filter(|_| !assert_enabled)
+        .map(|name| (name.clone(), assert.macros[name].clone()))
+        .collect::<BTreeMap<_, _>>();
     for name in flavors.conflicts.keys() {
         if !own.macros.contains_key(name)
             && let Some(definition) = counterpart.function_like(name)
@@ -585,6 +726,10 @@ pub(super) fn reconcile(
     for (name, definition) in adopted {
         define_macro(other.texts.get(&name).cloned(), definition);
     }
+    // Both flavors take the definitions that hold both of theirs.
+    for definition in selected {
+        define_macro(None, definition);
+    }
     flavors.calls = calls.keys().cloned().collect();
     for definition in calls.into_values() {
         define_macro(None, definition);
@@ -604,6 +749,7 @@ pub(super) fn reconcile(
         flavors.merged.insert(name);
     }
     flavors.definitions = definitions;
+    flavors.keyword_free = keyword_free;
     frontend.dependencies = crate::MacroDependencyGraph::from_environment_with_constants(
         &frontend.environment,
         &frontend.declarations.integer_constants,
@@ -683,40 +829,98 @@ fn identifiers(text: &str) -> impl Iterator<Item = &str> {
         .filter(|word| word.bytes().next().is_some_and(|byte| !byte.is_ascii_digit()))
 }
 
-/// Whether a macro of `view` does nothing wherever it is used: its replacement list names
-/// no parameter, function or variable and writes nothing.
-///
-/// PostgreSQL defines such a macro as `((void)true)`, `((void)0)` or `do {} while (0)` where
-/// a release build has no assertion to make. Only grouping, an empty `do`/`while` body, a
-/// cast to `void`, integer constants, and object-like macros that are themselves nothing
-/// but those are accepted, so a macro that evaluates an operand does something.
-fn does_nothing(view: View<'_>, definition: &MacroDefinition) -> bool {
-    let mut pending = vec![definition];
-    let mut visited = BTreeSet::new();
-    while let Some(definition) = pending.pop() {
-        let (_, body) = parameters_and_body(definition);
-        for token in body {
-            let constant = token.bytes().next().is_some_and(|byte| byte.is_ascii_digit())
-                && token.bytes().all(|byte| byte.is_ascii_alphanumeric());
-            if constant
-                || matches!(
-                    token,
-                    "(" | ")" | "{" | "}" | ";" | "void" | "do" | "while" | "true" | "false"
-                )
-            {
-                continue;
-            }
-            match view.macros.get(token) {
-                Some(named) if named.kind == MacroKind::ObjectLike => {
-                    if visited.insert(token) {
-                        pending.push(named);
-                    }
-                }
-                _ => return false,
-            }
+/// What a macro of `view` yields when it does nothing wherever it is used: its replacement
+/// list names no parameter, function or variable and writes nothing, also through the
+/// object-like macros it names. See [`share::nothing`].
+fn nothing<'a>(view: View<'a>, definition: &'a MacroDefinition) -> Option<Inert> {
+    let (parameters, body) = parameters_and_body(definition);
+    // A parameter's operand may have an effect, whatever the parameter is called.
+    if body.iter().any(|token| parameters.contains(token)) {
+        return None;
+    }
+    let object = |name: &str| {
+        view.macros
+            .get(name)
+            .filter(|named| named.kind == MacroKind::ObjectLike)
+            .map(|named| parameters_and_body(named).1)
+    };
+    share::nothing(&body, &object)
+}
+
+/// Whether the identifier `name` of `view` stands for itself or for a closed expression,
+/// so that it can be a closed expression's callee: it is no macro, or a function-like
+/// macro whose replacement list is closed.
+fn closed(view: View<'_>, name: &str, depth: usize) -> bool {
+    let Some(definition) = view.macros.get(name) else { return true };
+    let Some((formals, body)) = replacement(definition).filter(|_| depth < 16) else {
+        return false;
+    };
+    share::closed_expression(&body, &|name| formals.contains(&name), &|name| {
+        closed(view, name, depth + 1)
+    })
+}
+
+/// A name in a definition's replacement list that selects a member only one flavor's
+/// record has: after `.` or `->`, or anywhere in a definition that takes a member's offset.
+fn member<'a>(definition: &'a MacroDefinition, members: &BTreeSet<String>) -> Option<&'a str> {
+    let (parameters, body) = parameters_and_body(definition);
+    let offsets = body.iter().any(|token| matches!(*token, "offsetof" | "__builtin_offsetof"));
+    body.iter().enumerate().find_map(|(index, token)| {
+        let selected = offsets
+            || index.checked_sub(1).is_some_and(|before| matches!(body[before], "." | "->"));
+        (selected && members.contains(*token) && !parameters.contains(token)).then_some(*token)
+    })
+}
+
+/// One flavor's replacement list `body` for [`share::select`], whose identifiers `view`
+/// defines. `formal` names the macro's parameters and `nothing` says that it does nothing.
+fn side<'a>(
+    view: View<'_>,
+    body: Vec<&'a Token>,
+    formal: &impl Fn(&str) -> bool,
+    nothing: bool,
+) -> share::Side<'a> {
+    share::Side {
+        expression: share::closed_expression(&body, formal, &|name| closed(view, name, 0)),
+        statement: share::closed_statement(&body)
+            || share::invoked(&body).is_some_and(|name| !formal(name) && statement(view, name, 0)),
+        nothing,
+        body,
+    }
+}
+
+/// Whether the function-like macro `name` of `view` is one statement wherever it is
+/// invoked: its replacement list is `do { } while (0)`, or one invocation of such a macro.
+fn statement(view: View<'_>, name: &str, depth: usize) -> bool {
+    let Some((formals, body)) = view.macros.get(name).and_then(replacement).filter(|_| depth < 16)
+    else {
+        return false;
+    };
+    share::closed_statement(&body)
+        || share::invoked(&body)
+            .is_some_and(|name| !formals.contains(&name) && statement(view, name, depth + 1))
+}
+
+/// A function-like definition's parameter names and the tokens of its replacement list.
+fn replacement(definition: &MacroDefinition) -> Option<(Vec<&str>, Vec<&Token>)> {
+    if definition.kind != MacroKind::FunctionLike {
+        return None;
+    }
+    let mut tokens =
+        definition.tokens.iter().filter(|token| token.kind != TokenKind::Comment).skip(1);
+    if tokens.next()?.spelling != "(" {
+        return None;
+    }
+    let mut formals = Vec::new();
+    loop {
+        let token = tokens.next()?;
+        match token.spelling.as_str() {
+            ")" => break,
+            "," => {}
+            name => formals.push(name),
         }
     }
-    true
+    Some((formals, tokens.collect()))
 }
 
 /// A function's result and parameter types, by canonical spelling.
@@ -832,6 +1036,12 @@ fn inspect_other(
             let Definitions { inline, texts, finals, conditional, records, mut files } =
                 definitions(unit, &directory, &main_file, &differing)?;
             let defined = finals.contains_key(ASSERT_CHECKING);
+            let spells_keyword = inventory.macros.iter().any(|definition| {
+                definition
+                    .tokens
+                    .iter()
+                    .any(|token| token.kind != TokenKind::Comment && token.spelling == BUILD_FLAVOR)
+            });
             let mut macros = BTreeMap::new();
             for definition in inventory.macros {
                 // A name the inspected flavor never mentions has no probe; its last
@@ -888,6 +1098,7 @@ fn inspect_other(
                 inline_definitions: inline,
                 texts,
                 bodies,
+                spells_keyword,
             };
             Ok((other, defined))
         })
@@ -1151,7 +1362,7 @@ fn define(definition: &MacroDefinition) -> Option<String> {
 
 #[cfg(test)]
 mod tests {
-    use super::{View, does_nothing};
+    use super::{Inert, View, closed, nothing, replacement, statement};
     use crate::{DeclarationCatalog, MacroDefinition, MacroKind, Token, TokenKind};
     use std::collections::BTreeMap;
 
@@ -1171,34 +1382,37 @@ mod tests {
         }
     }
 
+    /// The macros of one build flavor, by name.
+    fn macros(definitions: Vec<MacroDefinition>) -> BTreeMap<String, MacroDefinition> {
+        definitions.into_iter().map(|definition| (definition.name.clone(), definition)).collect()
+    }
+
     /// A release macro does nothing only when it names no operand, function or variable
     /// and writes nothing, also through the object-like macros it names.
     #[test]
     fn a_release_macro_does_nothing_only_without_operands_calls_and_writes() {
-        let macros = [
+        let macros = macros(vec![
             definition(MacroKind::ObjectLike, &["true", "1"]),
             definition(MacroKind::ObjectLike, &["NOTHING", "(", "(", "void", ")", "true", ")"]),
             definition(MacroKind::ObjectLike, &["COUNTED", "counter", "++"]),
             definition(MacroKind::ObjectLike, &["LOOP", "LOOP"]),
             definition(MacroKind::FunctionLike, &["CALLED", "(", ")", "0"]),
-        ]
-        .into_iter()
-        .map(|definition| (definition.name.clone(), definition))
-        .collect::<BTreeMap<_, _>>();
+        ]);
         let declarations = DeclarationCatalog::default();
         let view = View { macros: &macros, declarations: &declarations };
-        for nothing in [
-            vec!["F", "(", "x", ")"],
-            vec!["F", "(", "x", ")", "(", "(", "void", ")", "true", ")"],
-            vec!["F", "(", "x", ")", "(", "(", "void", ")", "0", ")"],
-            vec!["F", "(", "a", ",", "b", ")", "do", "{", "}", "while", "(", "0", ")"],
-            vec!["F", "(", ")", "NOTHING"],
-            vec!["F", "(", ")", "LOOP"],
+        for (replacement, yields) in [
+            (vec!["F", "(", "x", ")"], Inert::Nothing),
+            (vec!["F", "(", "x", ")", "(", "(", "void", ")", "true", ")"], Inert::Nothing),
+            (vec!["F", "(", "x", ")", "(", "(", "void", ")", "0", ")"], Inert::Nothing),
+            (
+                vec!["F", "(", "a", ",", "b", ")", "do", "{", "}", "while", "(", "0", ")"],
+                Inert::Nothing,
+            ),
+            (vec!["F", "(", ")", "NOTHING"], Inert::Nothing),
+            (vec!["F", "(", "x", ")", "(", "true", ")"], Inert::Integer(1)),
         ] {
-            assert!(
-                does_nothing(view, &definition(MacroKind::FunctionLike, &nothing)),
-                "{nothing:?}"
-            );
+            let definition = definition(MacroKind::FunctionLike, &replacement);
+            assert_eq!(nothing(view, &definition), Some(yields), "{replacement:?}");
         }
         for work in [
             // It evaluates its operand, which may have an effect.
@@ -1209,8 +1423,72 @@ mod tests {
             vec!["F", "(", ")", "COUNTED"],
             vec!["F", "(", ")", "CALLED", "(", ")"],
             vec!["F", "(", ")", "(", "(", "void", ")", "\"text\"", ")"],
+            // A macro that names itself leaves an identifier, which names something.
+            vec!["F", "(", ")", "LOOP"],
+            // An operand is an operand, whatever the parameter is called.
+            vec!["F", "(", "true", ")", "(", "(", "void", ")", "true", ")"],
+            // This loop never ends.
+            vec!["F", "(", ")", "do", "{", "}", "while", "(", "1", ")"],
         ] {
-            assert!(!does_nothing(view, &definition(MacroKind::FunctionLike, &work)), "{work:?}");
+            let definition = definition(MacroKind::FunctionLike, &work);
+            assert_eq!(nothing(view, &definition), None, "{work:?}");
+        }
+    }
+
+    /// A definition's parameters and replacement list are told apart, and a callee is
+    /// closed when no macro's replacement list can open it.
+    #[test]
+    fn a_callee_is_closed_through_the_macros_it_names() {
+        let macros = macros(vec![
+            definition(MacroKind::FunctionLike, &["GROUPED", "(", "x", ")", "(", "x", ")"]),
+            definition(MacroKind::FunctionLike, &["OPEN", "(", "x", ")", "x", "+", "1"]),
+            definition(
+                MacroKind::FunctionLike,
+                &["CALLS", "(", "x", ")", "GROUPED", "(", "x", ")"],
+            ),
+            definition(MacroKind::FunctionLike, &["OPENS", "(", "x", ")", "OPEN", "(", "x", ")"]),
+            definition(MacroKind::FunctionLike, &["SELF", "(", ")", "SELF", "(", ")"]),
+            definition(MacroKind::ObjectLike, &["OBJECT", "(", "1", ")"]),
+        ]);
+        let declarations = DeclarationCatalog::default();
+        let view = View { macros: &macros, declarations: &declarations };
+        let (formals, body) = replacement(&macros["CALLS"]).unwrap();
+        assert_eq!(formals, ["x"]);
+        assert_eq!(
+            body.iter().map(|token| token.spelling.as_str()).collect::<Vec<_>>(),
+            ["GROUPED", "(", "x", ")"]
+        );
+        assert_eq!(replacement(&macros["SELF"]).unwrap().0, Vec::<&str>::new());
+        assert!(replacement(&macros["OBJECT"]).is_none());
+        for name in ["function", "GROUPED", "CALLS"] {
+            assert!(closed(view, name, 0), "{name}");
+        }
+        for name in ["OPEN", "OPENS", "SELF", "OBJECT"] {
+            assert!(!closed(view, name, 0), "{name}");
+        }
+    }
+
+    /// A macro is one statement when its replacement list is, or invokes a macro that is.
+    #[test]
+    fn a_macro_is_a_statement_through_the_macros_it_invokes() {
+        let looped = ["do", "{", "work", "(", "x", ")", ";", "}", "while", "(", "0", ")"];
+        let macros = macros(vec![
+            definition(MacroKind::FunctionLike, &[&["LOOP", "(", "x", ")"][..], &looped].concat()),
+            definition(MacroKind::FunctionLike, &["INVOKES", "(", "x", ")", "LOOP", "(", "x", ")"]),
+            definition(
+                MacroKind::FunctionLike,
+                &["AFTER", "(", "x", ")", "LOOP", "(", "x", ")", ";"],
+            ),
+            definition(MacroKind::FunctionLike, &["APPLIES", "(", "x", ")", "x", "(", "1", ")"]),
+            definition(MacroKind::FunctionLike, &["VALUE", "(", "x", ")", "(", "x", ")"]),
+        ]);
+        let declarations = DeclarationCatalog::default();
+        let view = View { macros: &macros, declarations: &declarations };
+        for name in ["LOOP", "INVOKES"] {
+            assert!(statement(view, name, 0), "{name}");
+        }
+        for name in ["AFTER", "APPLIES", "VALUE", "function"] {
+            assert!(!statement(view, name, 0), "{name}");
         }
     }
 }

@@ -848,6 +848,7 @@ fn mask_constants(
     let mut total_tokens = 0usize;
     for (item, mut body) in prepared.into_iter().zip(bodies) {
         super::restore_invocation_diagnostics(&mut body, prefix);
+        super::restore_build_flavor(frontend, &mut body);
         let Some(ExpansionResult::Expanded { expansion }) =
             batch.results.get_mut(&item.definition.name)
         else {

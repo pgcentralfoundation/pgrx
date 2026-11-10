@@ -54,6 +54,7 @@ mod arguments;
 /// Safe stops for assertions and unreachable code, and assertions that run only where
 /// PostgreSQL runs them.
 mod assertions;
+pub(crate) use assertions::unchecked;
 /// Compiler-owned storage access for fields Rust cannot project directly.
 mod bitfields;
 /// Prototype identity and native callback ABI reconciliation.
@@ -418,6 +419,20 @@ fn lower<'a>(
     }
     if let AnalysisStatus::Skipped { reason } = &analysis.status {
         return Err(reason.clone());
+    }
+    if let Some(expression) = &analysis.expression
+        && let Some(report) =
+            assertions::unguarded_report(session.frontend().declarations(), expression)
+    {
+        return Err(skip(
+            analysis,
+            SkipReasonCode::BuildFlavor,
+            format!(
+                "a call to {} is not an assertion's report with its condition's text, `__FILE__` and `__LINE__`, so a build without assertions would make it",
+                crate::frontend::ASSERTION_REPORT
+            ),
+            Some(expression.syntax.nodes[report].tokens),
+        ));
     }
     let original = match session.frontend().environment().active.get(&analysis.name) {
         Some(active) => InvocationSource::Macro(&active.definition),
@@ -1488,7 +1503,21 @@ fn render(
     // the locations of identical definitions from several PostgreSQL versions.
     let mut comment = String::new();
     let definition = match original {
-        InvocationSource::Macro(definition) => definition_comment(definition),
+        InvocationSource::Macro(definition) => {
+            match session.frontend().flavors.selected.get(&analysis.name) {
+                // The definition both build flavors expand holds these two.
+                Some(selected) => source_comment(&selected.assert_enabled, "text")
+                    .zip(source_comment(&selected.release, "text"))
+                    .map(|(assert_enabled, release)| {
+                        format!(
+                            "{assert_enabled}\n{}{release}\n{}",
+                            documentation::FLAVOR_RELEASE,
+                            documentation::FLAVOR_DEFINITIONS
+                        )
+                    }),
+                None => definition_comment(definition),
+            }
+        }
         InvocationSource::Inline(definition) => {
             definition.source.as_deref().and_then(|source| source_comment(source, "c"))
         }

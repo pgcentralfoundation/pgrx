@@ -4,7 +4,8 @@
 //! One set of headers, inspected with and without `USE_ASSERT_CHECKING`, generates the same
 //! macros: the same names, operands, results and needs for `unsafe`, from the same Rust
 //! source. Only the constant that says whether assertions run differs. With assertions every
-//! check runs and a failed one stops the process; without them no check is evaluated.
+//! check runs and a failed one stops the process; without them no check is evaluated. A
+//! macro that the two flavors define differently does in each what that flavor's C does.
 
 #![cfg(all(
     target_pointer_width = "64",
@@ -70,6 +71,8 @@ struct Flavor {
     support: String,
     /// The C support of the macro set.
     c_support: String,
+    /// What comparing the two flavors decided, as a report shows it.
+    flavors: serde_json::Value,
 }
 
 impl Flavor {
@@ -131,6 +134,20 @@ impl Flavor {
             macros: generated.macros,
             support: generated.support.rust,
             c_support: generated.support.c_source,
+            flavors: serde_json::to_value(frontend.flavors()).unwrap(),
+        }
+    }
+
+    /// The names under `key` of the build flavor decisions.
+    fn decided(&self, key: &str) -> Vec<&str> {
+        self.flavors[key].as_object().unwrap().keys().map(String::as_str).collect()
+    }
+
+    /// Why a root that no flavor generates is skipped.
+    fn skipped(&self, name: &str) -> (SkipReasonCode, &str) {
+        match &self.emission(name).status {
+            EmissionStatus::Skipped { reason } => (reason.code, &reason.message),
+            EmissionStatus::Emitted { .. } => panic!("{name} was emitted"),
         }
     }
 
@@ -174,7 +191,7 @@ impl Flavor {
     fn run(&self, main: &str) -> (std::process::ExitStatus, String, String) {
         let arguments = self.arguments.iter().map(String::as_str).collect::<Vec<_>>();
         let c = format!(
-            "{}\n#include <stdio.h>\n#include <stdlib.h>\nvoid ExceptionalCondition(const char *c, const char *f, int l) {{ abort(); }}\nint *PointerVariable = 0;\n#ifdef USE_ASSERT_CHECKING\nvoid AssertTransactionIdInAllowableRange(unsigned int xid) {{ printf(\"called range\\t%u\\n\", xid); fflush(stdout); }}\nvoid SlruPagePrecedesUnitTests(const int *ctl, int per_page) {{ printf(\"called slru\\t%d\\t%d\\n\", *ctl, per_page); fflush(stdout); }}\nvoid AssertCouldGetRelation(void) {{ printf(\"called relation\\n\"); fflush(stdout); }}\nvoid VerifyElement(const int *elements, int index) {{ printf(\"called element\\t%d\\n\", elements[index]); fflush(stdout); }}\nvoid VerifyValue(int value) {{ printf(\"called value\\t%d\\n\", value); fflush(stdout); }}\nint AssertOnlyFunction(int value) {{ return 100; }}\nint AssertOnlyVariable = 0;\n#else\nint ReleaseOnlyFunction(int value) {{ return value; }}\n#endif\n{C_BODIES}",
+            "{}\n#include <stdio.h>\n#include <stdlib.h>\nvoid ExceptionalCondition(const char *c, const char *f, int l) {{ abort(); }}\nint *PointerVariable = 0;\nint WorkCounterVariable = 0;\n#ifdef USE_ASSERT_CHECKING\nvoid AssertTransactionIdInAllowableRange(unsigned int xid) {{ printf(\"called range\\t%u\\n\", xid); fflush(stdout); }}\nvoid SlruPagePrecedesUnitTests(const int *ctl, int per_page) {{ printf(\"called slru\\t%d\\t%d\\n\", *ctl, per_page); fflush(stdout); }}\nvoid AssertCouldGetRelation(void) {{ printf(\"called relation\\n\"); fflush(stdout); }}\nvoid VerifyElement(const int *elements, int index) {{ printf(\"called element\\t%d\\n\", elements[index]); fflush(stdout); }}\nvoid VerifyValue(int value) {{ printf(\"called value\\t%d\\n\", value); fflush(stdout); }}\nint AssertOnlyFunction(int value) {{ return 100; }}\nint AssertOnlyVariable = 0;\n#else\nint ReleaseOnlyFunction(int value) {{ return value; }}\n#endif\n{C_BODIES}",
             self.c_support
         );
         rust_oracle::run_rust_linked_status(
@@ -187,8 +204,9 @@ impl Flavor {
     }
 }
 
-/// What this flavor's C compiler makes of each inline function whose definition differs
-/// between the flavors, in the order and form in which `MAIN` reports its translations.
+/// What this flavor's C compiler makes of each inline function and macro whose definition
+/// differs between the flavors, in the order and form in which `MAIN` reports its
+/// translations.
 const C_BODIES: &str = r#"
 void c_bodies(void)
 {
@@ -200,6 +218,21 @@ void c_bodies(void)
 	printf("operand\t%d\n", ConditionalOperand(1));
 	printf("branch\t%d\t%d\n", ConditionalBranch(1), ConditionalBranch(-1));
 	printf("local\t%d\n", ConditionalLocal(1));
+	printf("verified\t%d\n", VERIFIED_ELEMENT(elements, 2));
+	printf("slot\t%d\t%d\n", NEXT_SLOT(3), SLOT_AFTER(3));
+	{
+		int before = WorkCounterVariable;
+		COUNT_CHECKED(1);
+		COUNT_STATEMENT(1);
+		COUNT_IF(1, 1);
+		COUNT_IF(0, 1);
+		CHECK_IF(1, 1);
+		CHECK_IF(0, 1);
+		printf("work\t%d\n", WorkCounterVariable - before);
+	}
+	printf("then\t%d\n", CHECK_THEN(5));
+	printf("renamed\t%d\n", RENAMED(5, 3));
+	printf("helper\t%d\t%d\n", CHECKED(5), USES_CHECKED(5));
 	fflush(stdout);
 }
 "#;
@@ -243,6 +276,11 @@ fn main() {
     println!("half\t{half}\t{}", evaluations());
     let trapped: bool = TrapMacro!(counted(0));
     println!("trap\t{trapped}\t{}", evaluations());
+    // An operand is evaluated as often as the installation's own definition names it.
+    println!("slot\t{}\t{}", NEXT_SLOT!(counted(3)).get(), evaluations());
+    println!("then\t{}\t{}", CHECK_THEN!(counted(5)).get(), evaluations());
+    flavor_assume!(counted(1) != 0);
+    println!("assume\t{}", evaluations());
     let () = AssertTransactionIdInAllowableRange!(counted(7) as u32).get();
     println!("range\t{}", evaluations());
     let () = AssertCouldGetRelation!().get();
@@ -255,6 +293,9 @@ fn main() {
         SlruPagePrecedesUnitTests!(&raw const object, counted(2));
         println!("slru\t{}", evaluations());
         COUNT_OR_ABORT!(&raw mut counter);
+        COUNT_CHECKED!(counted(1));
+        CHECK_IF!(counted(1), counted(1));
+        println!("work\t{}", evaluations());
         println!("body\t{}", ConditionalBody!(1_i32).get());
         println!("checked\t{}\t{}", USES_CHECKED!(counted(5)).get(), evaluations());
     }
@@ -270,6 +311,19 @@ fn main() {
         println!("operand\t{}", ConditionalOperand!(1_i32).get());
         println!("branch\t{}\t{}", ConditionalBranch!(1_i32).get(), ConditionalBranch!(-1_i32).get());
         println!("local\t{}", ConditionalLocal!(1_i32).get());
+        println!("verified\t{}", VERIFIED_ELEMENT!(elements.as_ptr(), 2_i32).get());
+        println!("slot\t{}\t{}", NEXT_SLOT!(3_i32).get(), SLOT_AFTER!(3_i32).get());
+        let before = WorkCounterVariable;
+        COUNT_CHECKED!(1_i32);
+        COUNT_STATEMENT!(1_i32);
+        COUNT_IF!(1_i32, 1_i32);
+        COUNT_IF!(0_i32, 1_i32);
+        CHECK_IF!(1_i32, 1_i32);
+        CHECK_IF!(0_i32, 1_i32);
+        println!("work\t{}", WorkCounterVariable - before);
+        println!("then\t{}", CHECK_THEN!(5_i32).get());
+        println!("renamed\t{}", RENAMED!(5_i32, 3_i32).get());
+        println!("helper\t{}\t{}", CHECKED!(5_i32).get(), USES_CHECKED!(5_i32).get());
         println!("bodies\t{}", evaluations());
         c_bodies();
     }
@@ -306,7 +360,12 @@ fn both_build_flavors_generate_the_same_macros() {
             "CHECKED",
             "CHECKED_HALF",
             "CHECKED_TAG",
+            "CHECK_IF",
+            "CHECK_THEN",
+            "COUNT_CHECKED",
+            "COUNT_IF",
             "COUNT_OR_ABORT",
+            "COUNT_STATEMENT",
             "CheckedElement",
             "ConditionalBody",
             "ConditionalBraces",
@@ -315,14 +374,27 @@ fn both_build_flavors_generate_the_same_macros() {
             "ConditionalMacro",
             "ConditionalOperand",
             "FlavoredValue",
+            "MIXED_FORMS",
+            "MIXED_TYPES",
             "NEEDS_ASSERT_ONLY",
+            "NEEDS_RELEASE_ONLY",
+            "NEXT_SLOT",
+            "OPEN_SUM",
             "PLAIN_SIZE",
+            "RENAMED",
+            "SLOT_AFTER",
             "SlruPagePrecedesUnitTests",
             "TrapMacro",
+            "UNREACHABLE_UNLESS",
             "USES_CHECKED",
+            "USES_MIXED_FORMS",
+            "USES_MIXED_TYPES",
             "USES_NEEDS_ASSERT_ONLY",
+            "USES_OPEN_SUM",
             "VERIFIED_ELEMENT",
             "ValidateObject",
+            "WIDENED",
+            "flavor_assume",
             "flavor_unreachable",
         ]
     );
@@ -374,6 +446,65 @@ fn both_build_flavors_generate_the_same_macros() {
     }
     assert_ne!(asserted.support, released.support);
     assert!(asserted.support.contains("macro_rules! __pgrx_c_assert_checking"));
+
+    // Both flavors decide alike which macros keep an assert-enabled definition that is
+    // nothing but checks, which hold both definitions, and which no definition serves.
+    for key in ["checked", "selected", "conflicts"] {
+        assert_eq!(asserted.flavors[key], released.flavors[key], "{key}");
+    }
+    assert_eq!(asserted.decided("checked"), ["Assert", "AssertMacro", "TrapMacro"]);
+    assert_eq!(
+        asserted.decided("selected"),
+        [
+            "CHECKED",
+            "CHECKED_TAG",
+            "COUNT_CHECKED",
+            "COUNT_STATEMENT",
+            "MIXED_TYPES",
+            "NEXT_SLOT",
+            "RENAMED",
+            "VERIFIED_ELEMENT",
+            "WIDENED",
+            "flavor_assume",
+            "flavor_unreachable",
+        ]
+    );
+    assert_eq!(
+        asserted.decided("conflicts"),
+        ["AssertOrClear", "MIXED_FORMS", "NEEDS_ASSERT_ONLY", "NEEDS_RELEASE_ONLY", "OPEN_SUM"]
+    );
+    // A macro that holds both definitions selects one by the installation's constant, and
+    // its documentation shows both.
+    let checking = "$crate::__pgrx_c_assert_checking!()";
+    for name in ["NEXT_SLOT", "SLOT_AFTER", "RENAMED", "CHECKED", "COUNT_STATEMENT", "COUNT_IF"] {
+        let (rust, _) = asserted.emitted(name);
+        assert!(rust.contains(&format!("if {checking} {{")), "{name}: {rust}");
+    }
+    let (slot, _) = asserted.emitted("NEXT_SLOT");
+    assert!(slot.contains("( ( ( slot ) + 1 ) % SLOT_LIMIT )"), "{slot}");
+    assert!(slot.contains("A PostgreSQL built without assertions defines this macro as:"));
+    // No one definition holds a statement beside a value, two types, a replacement list
+    // that its use could bind, or a name one flavor lacks. Neither flavor generates such
+    // a macro or a macro that expands it.
+    for (name, reason) in [
+        ("MIXED_FORMS", "one build flavor defines it as a statement and the other as a value"),
+        ("USES_MIXED_FORMS", "one build flavor defines it as a statement and the other as a value"),
+        ("MIXED_TYPES", "have different C types"),
+        ("USES_MIXED_TYPES", "have different C types"),
+        ("OPEN_SUM", "not each one parenthesized expression"),
+        ("USES_OPEN_SUM", "not each one parenthesized expression"),
+        (
+            "NEEDS_RELEASE_ONLY",
+            "ReleaseOnlyFunction, which an assert-enabled build does not declare",
+        ),
+    ] {
+        for flavor in [&asserted, &released] {
+            let (code, message) = flavor.skipped(name);
+            assert_eq!(code, SkipReasonCode::BuildFlavor, "{name}: {message}");
+            assert!(message.contains(reason), "{name}: {message}");
+        }
+    }
+
     // A release build defines `TrapMacro` as the constant `1`, which is a number. Both
     // flavors translate the assert-enabled definition, a cast to `bool`, so both return a
     // Rust `bool`.
@@ -414,6 +545,12 @@ fn both_build_flavors_generate_the_same_macros() {
         "AssertCouldGetRelation",
         "ASSERTED_SIZE",
         "PLAIN_SIZE",
+        "NEXT_SLOT",
+        "SLOT_AFTER",
+        "CHECK_THEN",
+        "RENAMED",
+        "UNREACHABLE_UNLESS",
+        "flavor_assume",
     ] {
         assert!(!asserted.emitted(name).1, "{name} needs no unsafe");
     }
@@ -431,6 +568,13 @@ fn both_build_flavors_generate_the_same_macros() {
         "COUNT_OR_ABORT",
         "ConditionalBody",
         "CHECKED",
+        // Only one flavor's definition writes the counter or calls a function, and the
+        // other flavor compiles it.
+        "COUNT_CHECKED",
+        "COUNT_STATEMENT",
+        "COUNT_IF",
+        "CHECK_IF",
+        "VERIFIED_ELEMENT",
     ] {
         assert!(asserted.emitted(name).1, "{name} needs unsafe");
     }
@@ -441,7 +585,6 @@ fn both_build_flavors_generate_the_same_macros() {
     // can: the constant selects the statements of the installation's flavor. A call to a
     // function that only an assert-enabled build declares is one such statement.
     let translated = "Translates the original function definition";
-    let checking = "$crate::__pgrx_c_assert_checking!()";
     for flavor in [&asserted, &released] {
         let (element, caller_unsafe) = flavor.emitted("CheckedElement");
         assert!(element.contains(translated) && caller_unsafe, "{element}");
@@ -452,13 +595,11 @@ fn both_build_flavors_generate_the_same_macros() {
         assert!(flavored.contains(translated) && !caller_unsafe, "{flavored}");
         assert!(flavored.contains(&format!("if {checking} {{")), "{flavored}");
         assert!(flavored.contains("} else {"), "{flavored}");
-        // A macro whose assert-enabled definition makes such a call is not shared: its
-        // release definition is other text, which could do work the call leaves out.
-        let EmissionStatus::Skipped { reason } = &flavor.emission("VERIFIED_ELEMENT").status else {
-            panic!("VERIFIED_ELEMENT was emitted");
-        };
-        assert_eq!(reason.code, SkipReasonCode::BuildFlavor, "{reason:?}");
-        assert!(reason.message.contains("VerifyElement"), "{reason:?}");
+        // A macro whose assert-enabled definition makes such a call holds both of its
+        // definitions, so a release build evaluates its own and never the call.
+        let (verified, _) = flavor.emitted("VERIFIED_ELEMENT");
+        assert!(verified.contains("Inline_VerifyElement"), "{verified}");
+        assert!(verified.contains(&format!("if {checking} {{")), "{verified}");
         // Nor does a call stand for a release macro that does work.
         let EmissionStatus::Skipped { reason } = &flavor.emission("AssertOrClear").status else {
             panic!("AssertOrClear was emitted");
@@ -492,11 +633,13 @@ fn both_build_flavors_generate_the_same_macros() {
     assert!(!status.success(), "{stdout}\n{stderr}");
     // Each inline function whose definition differs does what this flavor's C does, first
     // as generated and then as compiled. The checks that only this flavor has are made.
-    let bodies = "called element\t20\nelement\t20\nflavored\t101\nmacro\t3\nbraces\t2\t1\noperand\t11\ncalled value\t1\nbranch\t6\t4\nlocal\t2\n";
+    // So does each macro that holds both definitions: this flavor checks the slot, counts,
+    // subtracts and calls the helper.
+    let bodies = "called element\t20\nelement\t20\nflavored\t101\nmacro\t3\nbraces\t2\t1\noperand\t11\ncalled value\t1\nbranch\t6\t4\nlocal\t2\ncalled element\t30\nverified\t30\nslot\t4\t5\nwork\t115\nthen\t6\nrenamed\t2\nhelper\t5\t6\n";
     assert_eq!(
         stdout,
         format!(
-            "assert\t2\npositive\t1\nhalf\t2\t2\ntrap\ttrue\t1\ncalled range\t7\nrange\t1\ncalled relation\ncalled slru\t3\t2\nslru\t1\nbody\t102\nchecked\t6\t1\ncounter\t1\n{bodies}bodies\t1\n{bodies}sizes\t1\t8\nbefore\n"
+            "assert\t2\npositive\t1\nhalf\t2\t2\ntrap\ttrue\t1\nslot\t4\t2\nthen\t6\t3\nassume\t1\ncalled range\t7\nrange\t1\ncalled relation\ncalled slru\t3\t2\nslru\t1\nwork\t3\nbody\t102\nchecked\t6\t1\ncounter\t1\n{bodies}bodies\t1\n{bodies}sizes\t1\t8\nbefore\n"
         )
     );
     let trap = stderr
@@ -510,16 +653,63 @@ fn both_build_flavors_generate_the_same_macros() {
     // does, and an operand of a check that is not made is still evaluated once.
     let (status, stdout, stderr) = released.run(MAIN);
     assert!(status.success(), "{stdout}\n{stderr}");
-    let bodies = "element\t20\nflavored\t201\nmacro\t2\nbraces\t4\t-1\noperand\t1\nbranch\t6\t-1\nlocal\t3\n";
+    // Each macro that holds both definitions does what release C does: the slot is not
+    // checked, nothing is counted where only an assert-enabled build counts, the release
+    // definition's own arithmetic runs, and the helper is not called.
+    let bodies = "element\t20\nflavored\t201\nmacro\t2\nbraces\t4\t-1\noperand\t1\nbranch\t6\t-1\nlocal\t3\nverified\t30\nslot\t4\t5\nwork\t110\nthen\t6\nrenamed\t102\nhelper\t5\t6\n";
     assert_eq!(
         stdout,
         format!(
-            "assert\t0\npositive\t0\nhalf\t2\t1\ntrap\ttrue\t0\nrange\t0\nslru\t0\nbody\t2\nchecked\t6\t1\ncounter\t1\n{bodies}bodies\t1\n{bodies}sizes\t1\t8\nbefore\nafter\t0\n"
+            "assert\t0\npositive\t0\nhalf\t2\t1\ntrap\ttrue\t0\nslot\t4\t1\nthen\t6\t1\nassume\t1\nrange\t0\nslru\t0\nwork\t1\nbody\t2\nchecked\t6\t1\ncounter\t1\n{bodies}bodies\t1\n{bodies}sizes\t1\t8\nbefore\nafter\t0\n"
         )
     );
 
-    // The helper's own assertion runs in the function PostgreSQL compiled with assertions,
-    // and does nothing in the copy a release build compiles.
+    // Where an assert-enabled build checks the next slot, a release build wraps.
+    let wrapped = "fn main() { println!(\"wrapped\\t{}\", NEXT_SLOT!(7_i32).get()); }\n";
+    let (status, stdout, stderr) = asserted.run(wrapped);
+    assert!(!status.success() && stdout.is_empty(), "{stdout}\n{stderr}");
+    assert!(stderr.contains("TRAP: failed Assert(\"( 7_i32 ) + 1 < SLOT_LIMIT\")"), "{stderr}");
+    let (status, stdout, stderr) = released.run(wrapped);
+    assert!(status.success(), "{stdout}\n{stderr}");
+    assert_eq!(stdout, "wrapped\t0\n");
+
+    // Unreachable code stops both: an assert-enabled build aborts, and a release build,
+    // where reaching it is undefined, reports that it was reached.
+    let unreachable = "fn main() {\n    UNREACHABLE_UNLESS!(1_i32);\n    println!(\"reachable\");\n    UNREACHABLE_UNLESS!(0_i32);\n    println!(\"unreachable\");\n}\n";
+    let reached = "TRAP: reached unreachable C code";
+    let (status, stdout, stderr) = asserted.run(unreachable);
+    assert!(!status.success() && stdout == "reachable\n", "{stdout}\n{stderr}");
+    assert!(!stderr.contains(reached), "{stderr}");
+    let (status, stdout, stderr) = released.run(unreachable);
+    assert!(!status.success() && stdout == "reachable\n", "{stdout}\n{stderr}");
+    assert!(stderr.contains(reached), "{stderr}");
+
+    // The value is its own definition's, with no conversion to a common type. An operand
+    // that gives the two definitions one C type is accepted, and one that gives them two
+    // compiles against neither build.
+    let widened = "fn main() {\n    let five = __pgrx_c_macros::CValue::<__pgrx_c_macros::CLong>::new(5);\n    println!(\"widened\\t{}\", WIDENED!(five).get());\n}\n";
+    let (status, stdout, stderr) = asserted.run(widened);
+    assert!(status.success() && stdout == "widened\t6\n", "{stdout}\n{stderr}");
+    let (status, stdout, stderr) = released.run(widened);
+    assert!(status.success() && stdout == "widened\t5\n", "{stdout}\n{stderr}");
+    let two_types = "fn main() { let five = 5_i32; let _ = WIDENED!(five); }";
+    let rejections =
+        [&asserted, &released].map(|flavor| rust_oracle::reject_rust(&flavor.program(two_types)));
+    assert!(rejections[0].contains("SameType"), "{}", rejections[0]);
+    assert_eq!(diagnostics(&rejections[0]), diagnostics(&rejections[1]));
+
+    // An assumption that fails is a failed assertion with assertions and unreachable code
+    // without, where the operand is still evaluated.
+    let assumed = "fn main() {\n    flavor_assume!({ println!(\"evaluated\"); 0_i32 });\n    println!(\"assumed\");\n}\n";
+    let (status, stdout, stderr) = asserted.run(assumed);
+    assert!(!status.success() && stdout == "evaluated\n", "{stdout}\n{stderr}");
+    assert!(stderr.contains("TRAP: failed Assert(") && !stderr.contains(reached), "{stderr}");
+    let (status, stdout, stderr) = released.run(assumed);
+    assert!(!status.success() && stdout == "evaluated\n", "{stdout}\n{stderr}");
+    assert!(stderr.contains(reached), "{stderr}");
+
+    // The helper's own assertion runs in the function PostgreSQL compiled with assertions.
+    // A release build evaluates its own definition, which never calls the helper.
     let tagged = "fn main() {\n    // SAFETY: the helper reads only its arguments.\n    println!(\"tagged\\t{}\", unsafe { CHECKED_TAG!(2_i32, 7_i32) }.get());\n}\n";
     let (status, stdout, stderr) = asserted.run(tagged);
     assert!(!status.success() && stdout.is_empty(), "{stdout}\n{stderr}");
@@ -541,9 +731,9 @@ fn both_build_flavors_generate_the_same_macros() {
 
 /// meson writes an active `#undef USE_ASSERT_CHECKING` into the `pg_config.h` of a build
 /// without assertions, which undoes a command-line definition. Such headers still show
-/// their assert-enabled flavor, so a release build takes its definitions from it.
+/// their assert-enabled flavor, so a release build reads that flavor's definitions too.
 #[test]
-fn headers_that_undefine_assertions_still_share_assert_enabled_definitions() {
+fn headers_that_undefine_assertions_still_show_their_assert_enabled_definitions() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
     let directory = tempfile::tempdir().unwrap();
     // The definition shares its file with the line that is blanked to read it, so its text
@@ -562,7 +752,53 @@ fn headers_that_undefine_assertions_still_share_assert_enabled_definitions() {
     else {
         panic!("FLAVORED must be emitted");
     };
-    assert!(rust.contains("( ( value ) + 1 )"), "{rust}");
+    // The macro holds both definitions and selects one by the installation's constant.
+    assert!(rust.contains("#define FLAVORED( value ) ( ( value ) + 1 )"), "{rust}");
+    assert!(rust.contains("#define FLAVORED( value ) ( value )"), "{rust}");
+    assert!(rust.contains("if $crate::__pgrx_c_assert_checking!() {"), "{rust}");
+}
+
+/// A macro that keeps its assert-enabled definition is proved on its own operands. Whether
+/// its report is recognized as an assertion's also depends on the operands of each use, as
+/// with the error type that PostgreSQL 15's `Trap` passes on. A use whose report is not
+/// recognized would call `ExceptionalCondition` in a release build, where C calls nothing,
+/// so neither flavor generates it.
+#[test]
+fn a_use_whose_report_is_not_an_assertions_is_generated_by_neither_flavor() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let directory = tempfile::tempdir().unwrap();
+    let header = directory.path().join("main.h");
+    std::fs::write(
+        &header,
+        "extern void ExceptionalCondition(const char *conditionName, const char *errorType, const char *fileName, int lineNumber);\nextern const char *error_name(void);\n#ifdef USE_ASSERT_CHECKING\n#define Trap(condition, errorType) do { if (condition) ExceptionalCondition(#condition, (errorType), __FILE__, __LINE__); } while (0)\n#else\n#define Trap(condition, errorType) ((void)1)\n#endif\n#define TRAP_NAMED(condition) Trap(condition, \"Named\")\n#define TRAP_COMPUTED(condition) Trap(condition, error_name())\n",
+    )
+    .unwrap();
+    let scanner = MacroScanner::new().expect("libclang must be available");
+    let outcomes = [false, true].map(|assert_enabled| {
+        let mut arguments = oracle::native_arguments();
+        if assert_enabled {
+            arguments.push("-DUSE_ASSERT_CHECKING=1".into());
+        }
+        let frontend = inspect(&scanner, &header, &arguments, None).unwrap();
+        assert_eq!(frontend.assert_enabled(), assert_enabled);
+        let flavors = serde_json::to_value(frontend.flavors()).unwrap();
+        assert_eq!(flavors["checked"], serde_json::json!({ "Trap": "nothing" }));
+        let names = ["Trap", "TRAP_NAMED", "TRAP_COMPUTED"];
+        let session = AnalysisSession::prepare(&scanner, &frontend, &names).unwrap();
+        names.map(|name| match pgrx_c_macros::emit(&session, name).status {
+            EmissionStatus::Emitted { rust, .. } => Ok(rust),
+            EmissionStatus::Skipped { reason } => Err((reason.code, reason.message)),
+        })
+    });
+    assert_eq!(outcomes[0], outcomes[1]);
+    let [trap, named, computed] = &outcomes[0];
+    for emitted in [trap, named] {
+        let rust = emitted.as_ref().unwrap();
+        assert!(rust.contains("if $crate::__pgrx_c_assert_checking!() &&"), "{rust}");
+    }
+    let (code, message) = computed.as_ref().unwrap_err();
+    assert_eq!(*code, SkipReasonCode::BuildFlavor, "{message}");
+    assert!(message.contains("a build without assertions would make it"), "{message}");
 }
 
 /// Both flavors must prove a body that they merge. Only the inspected flavor's proof can

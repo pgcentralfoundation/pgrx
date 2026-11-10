@@ -849,10 +849,17 @@ impl<'a> Constraints<'a> {
                     index,
                     vec![root, self.representative[*base], self.representative[*offset]],
                 )),
-                ExpressionKind::Conditional { then_value, else_value, .. } => relations.push((
-                    index,
-                    vec![root, self.representative[*then_value], self.representative[*else_value]],
-                )),
+                ExpressionKind::Conditional { then_value, else_value, .. }
+                | ExpressionKind::BuildFlavor { checked: then_value, unchecked: else_value } => {
+                    relations.push((
+                        index,
+                        vec![
+                            root,
+                            self.representative[*then_value],
+                            self.representative[*else_value],
+                        ],
+                    ))
+                }
                 ExpressionKind::Comma { right: value, .. }
                 | ExpressionKind::StatementExpression { value, .. } => {
                     relations.push((index, vec![root, self.representative[*value]]))
@@ -890,6 +897,14 @@ impl<'a> Constraints<'a> {
                             binary_category(*operator, left, right)
                         }
                         ExpressionKind::Conditional { .. } => common_category(left, right),
+                        // The definitions of two build flavors have one type.
+                        ExpressionKind::BuildFlavor { .. } => {
+                            if left == right {
+                                left
+                            } else {
+                                0
+                            }
+                        }
                         ExpressionKind::Index { .. } => {
                             if matches!((left, right), (INTEGER, POINTER) | (POINTER, INTEGER)) {
                                 masks[nodes[0]]

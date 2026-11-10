@@ -28,6 +28,7 @@
 use super::{
     ExpansionLimits, ExpansionSkipCode, PROBE_PRAGMAS, ParameterPaste, Prepared, overlay, probe_tag,
 };
+use crate::syntax::BUILD_FLAVOR;
 use crate::{FrontendError, FrontendOutput, MacroKind};
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::Path;
@@ -136,6 +137,9 @@ pub(super) fn prove(
 
     let mut poisoned = frontend.environment().active.keys().cloned().collect::<BTreeSet<_>>();
     poisoned.extend(BUILTINS.iter().map(|name| (*name).to_owned()));
+    // The keyword that selects a build flavor is written only by `frontend::flavors`, in
+    // definitions that precede the poison. A paste must not form its spelling.
+    poisoned.insert(BUILD_FLAVOR.to_owned());
     for (index, item) in prepared.iter().enumerate() {
         poisoned.extend(item.markers.iter().cloned());
         poisoned.insert(item.begin.clone());
@@ -356,6 +360,13 @@ pub(super) fn prove(
                         Some((
                             ExpansionSkipCode::TokenPaste,
                             "token pasting fabricated a symbolic probe identifier".into(),
+                        ))
+                    } else if name == BUILD_FLAVOR {
+                        Some((
+                            ExpansionSkipCode::TokenPaste,
+                            format!(
+                                "token pasting forms {BUILD_FLAVOR}, which selects a build flavor's definition"
+                            ),
                         ))
                     } else {
                         None

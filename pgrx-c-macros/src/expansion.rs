@@ -15,6 +15,7 @@
 //! closed token pasting and atomic constant retention. Temporary overlays preserve the main
 //! file context, and original-environment checks reject observations from changed inputs.
 
+use crate::syntax::BUILD_FLAVOR;
 use crate::{
     ActiveProvenance, BuildInputs, FrontendError, FrontendOutput, MacroDefinition, MacroKind,
     MacroScanner, SourceSpan, TokenKind,
@@ -790,6 +791,30 @@ fn expand_prepared<'a>(
             continue;
         }
         restore_invocation_diagnostics(&mut body, prefix);
+        // A string that spells the keyword stringified a definition that holds both build
+        // flavors' definitions, where C spells the one definition of its build.
+        if body
+            .iter()
+            .any(|token| token.kind == TokenKind::Literal && token.spelling.contains(BUILD_FLAVOR))
+        {
+            record_skip(
+                &mut results,
+                &item.definition.name,
+                skip(
+                    ExpansionSkipCode::BuildFlavor,
+                    "the expansion stringifies a macro that the build flavors define differently",
+                    Some(&item.definition.name),
+                    frontend,
+                ),
+                frontend,
+            );
+            continue;
+        }
+        restore_build_flavor(frontend, &mut body);
+        if let Some(reason) = flavor_stringification(frontend, &dependencies, &item) {
+            record_skip(&mut results, &item.definition.name, reason, frontend);
+            continue;
+        }
         let pastes = operand_pastes.remove(&item.definition.name).unwrap_or_default();
         let mut occurrences = Vec::new();
         let mut surviving = BTreeSet::new();
@@ -1218,6 +1243,45 @@ fn flavor_conflict<'a>(
     Some(skip(ExpansionSkipCode::BuildFlavor, reason, Some(name), frontend))
 }
 
+/// Why no build flavor generates a probe that could stringify the expansion of a macro both
+/// flavors expand to a definition written for them.
+///
+/// C spells such a string from the definition of its own build, and the shared definition
+/// spells other text. `#` spells its operand unexpanded, so the expansion of a macro reaches
+/// one only as an operand that another macro forwards. That takes a macro in the probe's
+/// closure that stringifies, which this refuses beside any shared definition. A macro
+/// that stringifies only the condition `ExceptionalCondition` reports is exempt: that text
+/// is shown only by a build with assertions, whose own definition a shared assert-enabled
+/// definition is. A string that spells a definition holding both flavors' is refused where
+/// the expansion is read.
+fn flavor_stringification(
+    frontend: &FrontendOutput,
+    dependencies: &Dependencies<'_>,
+    item: &Prepared<'_>,
+) -> Option<ExpansionSkip> {
+    let names = || {
+        std::iter::once(item.definition.name.as_str())
+            .chain(item.dependencies.iter().map(|dependency| dependency.name.as_str()))
+    };
+    let shared = names().find(|name| frontend.flavors.shares_definition(name))?;
+    let stringifier = names().find(|name| {
+        dependencies.nodes.get(name).is_some_and(|node| node.stringifies)
+            && frontend
+                .environment()
+                .active
+                .get(*name)
+                .is_some_and(|active| !stringifies_diagnostics(&active.definition))
+    })?;
+    Some(skip(
+        ExpansionSkipCode::BuildFlavor,
+        format!(
+            "{stringifier} stringifies an operand, which could hold the expansion of {shared}, and the build flavors define {shared} differently"
+        ),
+        Some(shared),
+        frontend,
+    ))
+}
+
 /// Attach a structured refusal to one requested macro while preserving dependency source spans.
 fn record_skip(
     results: &mut BTreeMap<String, ExpansionResult>,
@@ -1619,6 +1683,24 @@ pub(super) fn restore_invocation_diagnostics(tokens: &mut [crate::Token], prefix
             token.spelling = "__FILE__".into();
         } else if token.spelling == line {
             token.spelling = "__LINE__".into();
+        }
+    }
+}
+
+/// Make the keyword that selects a build flavor a keyword again in `tokens`, which the
+/// compiler read back from an expansion's text.
+///
+/// The compiler reads the keyword's spelling as an identifier. The frontend established
+/// that no header declares the spelling and that no macro definition spells it, the paste
+/// proof refuses a paste that forms it, and a translated function body that spells it is
+/// never expanded. So each token with that spelling was written by `frontend::flavors`.
+pub(super) fn restore_build_flavor(frontend: &FrontendOutput, tokens: &mut [crate::Token]) {
+    if !frontend.flavors.keyword_free {
+        return;
+    }
+    for token in tokens {
+        if token.kind == TokenKind::Identifier && token.spelling == BUILD_FLAVOR {
+            token.kind = TokenKind::Keyword;
         }
     }
 }

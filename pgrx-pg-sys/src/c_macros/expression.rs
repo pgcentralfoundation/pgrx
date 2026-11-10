@@ -3514,6 +3514,70 @@ pub fn select<L: Select<R>, R: CExprValue>(arm: super::Either<L, R>) -> L::Outpu
     L::select(arm)
 }
 
+/// The one C type of a macro's two definitions, where a PostgreSQL built with assertions and
+/// one built without define the macro differently.
+///
+/// Generated code evaluates the definition of the PostgreSQL it was generated for and
+/// returns that value as it is. C's conditional operator would convert both definitions to
+/// a common type, which can change a value, as a negative `int` beside an `unsigned int`,
+/// or the arithmetic that follows, as an `int` beside a `long`. So the two definitions
+/// must have one type, and two that do not fail to compile.
+///
+/// Only what the spelling of a value carries is dropped: an integer value becomes its
+/// ordinary identity, as it does when it is stored, so a literal and a computed value of
+/// one C type agree.
+pub trait SameType<Rhs: CExprValue>: CExprValue + Sized {
+    /// The type both definitions have.
+    type Output: CExprValue;
+    /// Return the value of the definition that was evaluated.
+    fn same(arm: super::Either<Self, Rhs>) -> Self::Output;
+}
+/// Two integers of one ordinary C identity. Each must promote as that identity does, which
+/// a bit-field narrower than `int` does not, so no later arithmetic can tell them apart.
+impl<L, R> SameType<CValue<R>> for CValue<L>
+where
+    L: CInteger,
+    R: CInteger<Boundary = L::Boundary, Promoted = L::Promoted>,
+    L::Boundary: CInteger<Promoted = L::Promoted>,
+{
+    /// The ordinary identity both integers share.
+    type Output = CValue<L::Boundary>;
+    /// Keep the evaluated integer's bits, which its ordinary identity stores alike.
+    fn same(arm: super::Either<Self, CValue<R>>) -> Self::Output {
+        let bits = match arm {
+            super::Either::Left(value) => L::encode(value.get()),
+            super::Either::Right(value) => R::encode(value.get()),
+        };
+        CValue::new(<L::Boundary as CInteger>::decode(bits))
+    }
+}
+/// Admit a family whose values of one Rust type have one C type.
+macro_rules! same_type {
+    ($value:ty $(, $($bound:tt)*)?) => {
+        /// Two values of this one type.
+        impl$(<$($bound)*>)? SameType<$value> for $value {
+            /// The type itself.
+            type Output = Self;
+            /// Return the evaluated value unchanged.
+            fn same(arm: super::Either<Self, Self>) -> Self {
+                match arm {
+                    super::Either::Left(value) | super::Either::Right(value) => value,
+                }
+            }
+        }
+    };
+}
+same_type!(());
+same_type!(Pointer<M, Q>, M: CType, Q: Qualifier);
+same_type!(FunctionValue<S>, S: FunctionSignature);
+same_type!(RecordValue<R>, R: Copy);
+same_type!(FloatValue<F>, F: FloatType);
+/// Return the value of whichever of a macro's two definitions was evaluated, where the
+/// build flavors of PostgreSQL define the macro differently. See [`SameType`].
+pub fn select_flavor<L: SameType<R>, R: CExprValue>(arm: super::Either<L, R>) -> L::Output {
+    L::same(arm)
+}
+
 /// Read, compute and write once for a compound C assignment.
 ///
 /// # Safety
@@ -4350,6 +4414,32 @@ mod tests {
         );
         assert_eq!(<CLongLong as CType>::C_ALIGNMENT, <CLongLong as CInteger>::ALIGNMENT);
         assert_eq!(<CDouble as CType>::C_ALIGNMENT, align_of::<CDouble>().get() as usize);
+    }
+
+    /// The value of whichever build flavor's definition was evaluated comes back as it is.
+    #[test]
+    fn select_flavor_returns_the_evaluated_definition_unchanged() {
+        use super::super::Either;
+        // A literal and a computed value of one C type agree, and neither is converted:
+        // a negative `int` stays negative, where a conditional beside an `unsigned int`
+        // would not keep it.
+        let literal = CValue::<literal::CIntegerLiteral<CInt, false>>::new(-1);
+        let computed = CValue::<CInt>::new(7);
+        let checked: CValue<CInt> = select_flavor(Either::Left::<_, CValue<CInt>>(literal));
+        let unchecked: CValue<CInt> = select_flavor(Either::Right::<
+            CValue<literal::CIntegerLiteral<CInt, false>>,
+            _,
+        >(computed));
+        assert_eq!((checked.get(), unchecked.get()), (-1, 7));
+        let zero: CValue<CInt> = select_flavor(Either::Left::<_, CValue<CInt>>(CValue::<
+            literal::CIntegerLiteral<CInt, true>,
+        >::new(0)));
+        assert_eq!(zero.get(), 0);
+        let () = select_flavor(Either::Left::<(), ()>(()));
+        let mut storage = 3_i32;
+        let pointer = Pointer::<CInt>::new(&raw mut storage);
+        let same: Pointer<CInt> = select_flavor(Either::Right::<Pointer<CInt>, _>(pointer));
+        assert_eq!(eq(same, pointer).get(), 1);
     }
 
     /// Check pointer-sized binding bridges preserve the inspected size/difference rank and all bits.
