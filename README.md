@@ -323,6 +323,8 @@ cargo pgrx init
 | `NULL`                     | `Option::None`                                          |
 | `internal`                 | `pgrx::Internal`                                        |
 | `uuid`                     | `pgrx::Uuid([u8; 16])`                                  |
+| `tsvector`                 | `&pgrx::TsVector` or `pgrx::TsVectorBuf`                |
+| `tsquery`                  | `&pgrx::TsQuery` or `pgrx::TsQueryBuf`                  |
 
 There are also `IntoDatum` and `FromDatum` traits for implementing additional type conversions,
 along with `#[derive(PostgresType)]` and `#[derive(PostgresEnum)]` for automatic conversion of

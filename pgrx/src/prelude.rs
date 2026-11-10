@@ -34,7 +34,8 @@ pub use crate::{
     datum::{
         AnyNumeric, Array, ArraySliceError, Bytea, Date, FromDatum, Interval, IntoDatum, Numeric,
         PgVarlena, PostgresType, Range, RangeBound, RangeSubType, Time, TimeWithTimeZone,
-        Timestamp, TimestampWithTimeZone, VariadicArray, datetime_support::*,
+        Timestamp, TimestampWithTimeZone, TsQuery, TsQueryBuf, TsVector, TsVectorBuf,
+        VariadicArray, datetime_support::*,
     },
     oids_of,
 };

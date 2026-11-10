@@ -74,6 +74,7 @@ mod struct_type_tests;
 mod text_encoding_tests;
 mod tree_walker_tests;
 mod trigger_tests;
+mod tsearch_tests;
 mod tupdesc_tests;
 #[cfg(test)]
 mod type_ident_tests;

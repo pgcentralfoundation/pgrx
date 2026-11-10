@@ -28,6 +28,7 @@ pub mod numeric;
 pub mod numeric_support;
 #[deny(unsafe_op_in_unsafe_fn)]
 mod range;
+pub mod tsearch;
 mod tuples;
 mod unbox;
 mod uuid;
@@ -48,6 +49,7 @@ pub use into::*;
 pub use json::*;
 pub use numeric::{AnyNumeric, Numeric};
 pub use range::*;
+pub use tsearch::{TsQuery, TsQueryBuf, TsVector, TsVectorBuf};
 pub use unbox::*;
 pub use varlena::*;
 
