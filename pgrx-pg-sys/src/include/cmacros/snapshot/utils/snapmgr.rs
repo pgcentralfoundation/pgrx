@@ -309,15 +309,21 @@ macro_rules! OLD_SNAPSHOT_TIME_MAP_ENTRIES {
                             _
                         >(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                $crate::__pgrx_c_macros::expression::load(
-                                    $crate::__pgrx_c_macros::expression::place::<
-                                        $crate::__pgrx_c_macros::CInt
-                                    >(
-                                        ::core::ptr::addr_of_mut!(
-                                            $crate::__pgrx_c_bindings::old_snapshot_threshold
+                                {
+                                    $crate::submodules::thread_check::check_active_thread();
+                                    /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                    #[allow(unused_unsafe)] unsafe {
+                                        $crate::__pgrx_c_macros::expression::load_global(
+                                            $crate::__pgrx_c_macros::expression::place::<
+                                                $crate::__pgrx_c_macros::CInt
+                                            >(
+                                                ::core::ptr::addr_of_mut!(
+                                                    $crate::__pgrx_c_bindings::old_snapshot_threshold
+                                                )
+                                            )
                                         )
-                                    )
-                                )
+                                    }
+                                }
                             ),
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(

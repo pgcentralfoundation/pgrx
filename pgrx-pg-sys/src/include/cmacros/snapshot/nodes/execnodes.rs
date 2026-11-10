@@ -178,7 +178,7 @@ macro_rules! ScanTupleHashTable {
 /// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! TermTupleHashIterator {
-    ($($iter:tt)*) => {
+    ($iter:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 ($crate::__pgrx_c_macros::expression::profile_value::<true, _>(()))

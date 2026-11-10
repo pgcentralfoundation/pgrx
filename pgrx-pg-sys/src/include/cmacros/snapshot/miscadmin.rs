@@ -598,6 +598,8 @@ macro_rules! CHECK_FOR_INTERRUPTS {
 ///
 /// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
+#[doc = crate::__pgrx_c_doc_assertions!()]
+///
 #[doc = crate::__pgrx_c_doc_statements!()]
 ///
 /// # Safety
@@ -606,7 +608,7 @@ macro_rules! CHECK_FOR_INTERRUPTS {
 ///
 /// # Panics
 ///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! END_CRIT_SECTION {
     () => {
@@ -629,14 +631,20 @@ macro_rules! GetProcessingMode {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::load(
-                        $crate::__pgrx_c_macros::expression::place::<
-                            $crate::__pgrx_c_macros::expression::CEnumObject<
-                                $crate::__pgrx_c_generated::EnumIdentity_enum__ProcessingMode,
-                                $crate::__pgrx_c_macros::CUnsignedInt,
-                                u32
-                            >>(::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::Mode))
-                    )
+                    {
+                        $crate::submodules::thread_check::check_active_thread();
+                        /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                        #[allow(unused_unsafe)] unsafe {
+                            $crate::__pgrx_c_macros::expression::load_global(
+                                $crate::__pgrx_c_macros::expression::place::<
+                                    $crate::__pgrx_c_macros::expression::CEnumObject<
+                                        $crate::__pgrx_c_generated::EnumIdentity_enum__ProcessingMode,
+                                        $crate::__pgrx_c_macros::CUnsignedInt,
+                                        u32
+                                    >>(::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::Mode))
+                            )
+                        }
+                    }
                 )
             }
         )
@@ -905,6 +913,8 @@ macro_rules! IsNormalProcessingMode {
 ///
 /// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
+#[doc = crate::__pgrx_c_doc_assertions!()]
+///
 #[doc = crate::__pgrx_c_doc_statements!()]
 ///
 /// # Safety
@@ -913,7 +923,7 @@ macro_rules! IsNormalProcessingMode {
 ///
 /// # Panics
 ///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! RESUME_CANCEL_INTERRUPTS {
     () => {
@@ -929,6 +939,8 @@ macro_rules! RESUME_CANCEL_INTERRUPTS {
 ///
 /// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
+#[doc = crate::__pgrx_c_doc_assertions!()]
+///
 #[doc = crate::__pgrx_c_doc_statements!()]
 ///
 /// # Safety
@@ -937,7 +949,7 @@ macro_rules! RESUME_CANCEL_INTERRUPTS {
 ///
 /// # Panics
 ///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! RESUME_INTERRUPTS {
     () => {
@@ -1002,15 +1014,13 @@ macro_rules! START_CRIT_SECTION {
 ///
 /// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
+#[doc = crate::__pgrx_c_doc_assertions!()]
+///
 #[doc = crate::__pgrx_c_doc_statements!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! SetProcessingMode {
     ($mode:expr $(,)?) => {
@@ -1031,15 +1041,13 @@ macro_rules! SetProcessingMode {
 ///
 /// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
+#[doc = crate::__pgrx_c_doc_assertions!()]
+///
 #[doc = crate::__pgrx_c_doc_statements!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! SetProcessingMode {
     ($mode:expr $(,)?) => {

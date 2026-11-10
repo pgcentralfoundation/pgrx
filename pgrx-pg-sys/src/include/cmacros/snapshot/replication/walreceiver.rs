@@ -61,19 +61,25 @@ macro_rules! walrcv_alter_slot {
                                             true,
                                             _
                                         >(
-                                            $crate::__pgrx_c_macros::expression::load(
-                                                $crate::__pgrx_c_macros::expression::place::<
-                                                    $crate::__pgrx_c_macros::expression::CPointer<
-                                                        $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::__pgrx_c_bindings::WalReceiverFunctionsType
-                                                        >,
-                                                        $crate::__pgrx_c_macros::expression::ReadWrite
-                                                    >>(
-                                                    ::core::ptr::addr_of_mut!(
-                                                        $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                            {
+                                                $crate::submodules::thread_check::check_active_thread();
+                                                /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                                #[allow(unused_unsafe)] unsafe {
+                                                    $crate::__pgrx_c_macros::expression::load_global(
+                                                        $crate::__pgrx_c_macros::expression::place::<
+                                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                                $crate::__pgrx_c_macros::expression::CRecord<
+                                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
+                                                                >,
+                                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                                            >>(
+                                                            ::core::ptr::addr_of_mut!(
+                                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                                            )
+                                                        )
                                                     )
-                                                )
-                                            )
+                                                }
+                                            }
                                         )
                                     )
                                 )
@@ -130,19 +136,25 @@ macro_rules! walrcv_alter_slot {
                                             true,
                                             _
                                         >(
-                                            $crate::__pgrx_c_macros::expression::load(
-                                                $crate::__pgrx_c_macros::expression::place::<
-                                                    $crate::__pgrx_c_macros::expression::CPointer<
-                                                        $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::__pgrx_c_bindings::WalReceiverFunctionsType
-                                                        >,
-                                                        $crate::__pgrx_c_macros::expression::ReadWrite
-                                                    >>(
-                                                    ::core::ptr::addr_of_mut!(
-                                                        $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                            {
+                                                $crate::submodules::thread_check::check_active_thread();
+                                                /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                                #[allow(unused_unsafe)] unsafe {
+                                                    $crate::__pgrx_c_macros::expression::load_global(
+                                                        $crate::__pgrx_c_macros::expression::place::<
+                                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                                $crate::__pgrx_c_macros::expression::CRecord<
+                                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
+                                                                >,
+                                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                                            >>(
+                                                            ::core::ptr::addr_of_mut!(
+                                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                                            )
+                                                        )
                                                     )
-                                                )
-                                            )
+                                                }
+                                            }
                                         )
                                     )
                                 )
@@ -202,19 +214,25 @@ macro_rules! walrcv_check_conninfo {
                                             true,
                                             _
                                         >(
-                                            $crate::__pgrx_c_macros::expression::load(
-                                                $crate::__pgrx_c_macros::expression::place::<
-                                                    $crate::__pgrx_c_macros::expression::CPointer<
-                                                        $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::__pgrx_c_bindings::WalReceiverFunctionsType
-                                                        >,
-                                                        $crate::__pgrx_c_macros::expression::ReadWrite
-                                                    >>(
-                                                    ::core::ptr::addr_of_mut!(
-                                                        $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                            {
+                                                $crate::submodules::thread_check::check_active_thread();
+                                                /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                                #[allow(unused_unsafe)] unsafe {
+                                                    $crate::__pgrx_c_macros::expression::load_global(
+                                                        $crate::__pgrx_c_macros::expression::place::<
+                                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                                $crate::__pgrx_c_macros::expression::CRecord<
+                                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
+                                                                >,
+                                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                                            >>(
+                                                            ::core::ptr::addr_of_mut!(
+                                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                                            )
+                                                        )
                                                     )
-                                                )
-                                            )
+                                                }
+                                            }
                                         )
                                     )
                                 )
@@ -265,19 +283,25 @@ macro_rules! walrcv_check_conninfo {
                                             true,
                                             _
                                         >(
-                                            $crate::__pgrx_c_macros::expression::load(
-                                                $crate::__pgrx_c_macros::expression::place::<
-                                                    $crate::__pgrx_c_macros::expression::CPointer<
-                                                        $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::__pgrx_c_bindings::WalReceiverFunctionsType
-                                                        >,
-                                                        $crate::__pgrx_c_macros::expression::ReadWrite
-                                                    >>(
-                                                    ::core::ptr::addr_of_mut!(
-                                                        $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                            {
+                                                $crate::submodules::thread_check::check_active_thread();
+                                                /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                                #[allow(unused_unsafe)] unsafe {
+                                                    $crate::__pgrx_c_macros::expression::load_global(
+                                                        $crate::__pgrx_c_macros::expression::place::<
+                                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                                $crate::__pgrx_c_macros::expression::CRecord<
+                                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
+                                                                >,
+                                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                                            >>(
+                                                            ::core::ptr::addr_of_mut!(
+                                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                                            )
+                                                        )
                                                     )
-                                                )
-                                            )
+                                                }
+                                            }
                                         )
                                     )
                                 )
@@ -377,19 +401,25 @@ macro_rules! walrcv_connect {
                                             true,
                                             _
                                         >(
-                                            $crate::__pgrx_c_macros::expression::load(
-                                                $crate::__pgrx_c_macros::expression::place::<
-                                                    $crate::__pgrx_c_macros::expression::CPointer<
-                                                        $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::__pgrx_c_bindings::WalReceiverFunctionsType
-                                                        >,
-                                                        $crate::__pgrx_c_macros::expression::ReadWrite
-                                                    >>(
-                                                    ::core::ptr::addr_of_mut!(
-                                                        $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                            {
+                                                $crate::submodules::thread_check::check_active_thread();
+                                                /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                                #[allow(unused_unsafe)] unsafe {
+                                                    $crate::__pgrx_c_macros::expression::load_global(
+                                                        $crate::__pgrx_c_macros::expression::place::<
+                                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                                $crate::__pgrx_c_macros::expression::CRecord<
+                                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
+                                                                >,
+                                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                                            >>(
+                                                            ::core::ptr::addr_of_mut!(
+                                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                                            )
+                                                        )
                                                     )
-                                                )
-                                            )
+                                                }
+                                            }
                                         )
                                     )
                                 )
@@ -449,19 +479,25 @@ macro_rules! walrcv_connect {
                                             true,
                                             _
                                         >(
-                                            $crate::__pgrx_c_macros::expression::load(
-                                                $crate::__pgrx_c_macros::expression::place::<
-                                                    $crate::__pgrx_c_macros::expression::CPointer<
-                                                        $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::__pgrx_c_bindings::WalReceiverFunctionsType
-                                                        >,
-                                                        $crate::__pgrx_c_macros::expression::ReadWrite
-                                                    >>(
-                                                    ::core::ptr::addr_of_mut!(
-                                                        $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                            {
+                                                $crate::submodules::thread_check::check_active_thread();
+                                                /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                                #[allow(unused_unsafe)] unsafe {
+                                                    $crate::__pgrx_c_macros::expression::load_global(
+                                                        $crate::__pgrx_c_macros::expression::place::<
+                                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                                $crate::__pgrx_c_macros::expression::CRecord<
+                                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
+                                                                >,
+                                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                                            >>(
+                                                            ::core::ptr::addr_of_mut!(
+                                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                                            )
+                                                        )
                                                     )
-                                                )
-                                            )
+                                                }
+                                            }
                                         )
                                     )
                                 )
@@ -534,19 +570,25 @@ macro_rules! walrcv_connect {
                                             true,
                                             _
                                         >(
-                                            $crate::__pgrx_c_macros::expression::load(
-                                                $crate::__pgrx_c_macros::expression::place::<
-                                                    $crate::__pgrx_c_macros::expression::CPointer<
-                                                        $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::__pgrx_c_bindings::WalReceiverFunctionsType
-                                                        >,
-                                                        $crate::__pgrx_c_macros::expression::ReadWrite
-                                                    >>(
-                                                    ::core::ptr::addr_of_mut!(
-                                                        $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                            {
+                                                $crate::submodules::thread_check::check_active_thread();
+                                                /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                                #[allow(unused_unsafe)] unsafe {
+                                                    $crate::__pgrx_c_macros::expression::load_global(
+                                                        $crate::__pgrx_c_macros::expression::place::<
+                                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                                $crate::__pgrx_c_macros::expression::CRecord<
+                                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
+                                                                >,
+                                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                                            >>(
+                                                            ::core::ptr::addr_of_mut!(
+                                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                                            )
+                                                        )
                                                     )
-                                                )
-                                            )
+                                                }
+                                            }
                                         )
                                     )
                                 )
@@ -622,19 +664,25 @@ macro_rules! walrcv_create_slot {
                                             true,
                                             _
                                         >(
-                                            $crate::__pgrx_c_macros::expression::load(
-                                                $crate::__pgrx_c_macros::expression::place::<
-                                                    $crate::__pgrx_c_macros::expression::CPointer<
-                                                        $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::__pgrx_c_bindings::WalReceiverFunctionsType
-                                                        >,
-                                                        $crate::__pgrx_c_macros::expression::ReadWrite
-                                                    >>(
-                                                    ::core::ptr::addr_of_mut!(
-                                                        $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                            {
+                                                $crate::submodules::thread_check::check_active_thread();
+                                                /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                                #[allow(unused_unsafe)] unsafe {
+                                                    $crate::__pgrx_c_macros::expression::load_global(
+                                                        $crate::__pgrx_c_macros::expression::place::<
+                                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                                $crate::__pgrx_c_macros::expression::CRecord<
+                                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
+                                                                >,
+                                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                                            >>(
+                                                            ::core::ptr::addr_of_mut!(
+                                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                                            )
+                                                        )
                                                     )
-                                                )
-                                            )
+                                                }
+                                            }
                                         )
                                     )
                                 )
@@ -711,19 +759,25 @@ macro_rules! walrcv_create_slot {
                                             true,
                                             _
                                         >(
-                                            $crate::__pgrx_c_macros::expression::load(
-                                                $crate::__pgrx_c_macros::expression::place::<
-                                                    $crate::__pgrx_c_macros::expression::CPointer<
-                                                        $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::__pgrx_c_bindings::WalReceiverFunctionsType
-                                                        >,
-                                                        $crate::__pgrx_c_macros::expression::ReadWrite
-                                                    >>(
-                                                    ::core::ptr::addr_of_mut!(
-                                                        $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                            {
+                                                $crate::submodules::thread_check::check_active_thread();
+                                                /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                                #[allow(unused_unsafe)] unsafe {
+                                                    $crate::__pgrx_c_macros::expression::load_global(
+                                                        $crate::__pgrx_c_macros::expression::place::<
+                                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                                $crate::__pgrx_c_macros::expression::CRecord<
+                                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
+                                                                >,
+                                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                                            >>(
+                                                            ::core::ptr::addr_of_mut!(
+                                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                                            )
+                                                        )
                                                     )
-                                                )
-                                            )
+                                                }
+                                            }
                                         )
                                     )
                                 )
@@ -794,19 +848,25 @@ macro_rules! walrcv_disconnect {
                                             true,
                                             _
                                         >(
-                                            $crate::__pgrx_c_macros::expression::load(
-                                                $crate::__pgrx_c_macros::expression::place::<
-                                                    $crate::__pgrx_c_macros::expression::CPointer<
-                                                        $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::__pgrx_c_bindings::WalReceiverFunctionsType
-                                                        >,
-                                                        $crate::__pgrx_c_macros::expression::ReadWrite
-                                                    >>(
-                                                    ::core::ptr::addr_of_mut!(
-                                                        $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                            {
+                                                $crate::submodules::thread_check::check_active_thread();
+                                                /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                                #[allow(unused_unsafe)] unsafe {
+                                                    $crate::__pgrx_c_macros::expression::load_global(
+                                                        $crate::__pgrx_c_macros::expression::place::<
+                                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                                $crate::__pgrx_c_macros::expression::CRecord<
+                                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
+                                                                >,
+                                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                                            >>(
+                                                            ::core::ptr::addr_of_mut!(
+                                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                                            )
+                                                        )
                                                     )
-                                                )
-                                            )
+                                                }
+                                            }
                                         )
                                     )
                                 )
@@ -856,19 +916,25 @@ macro_rules! walrcv_endstreaming {
                                             true,
                                             _
                                         >(
-                                            $crate::__pgrx_c_macros::expression::load(
-                                                $crate::__pgrx_c_macros::expression::place::<
-                                                    $crate::__pgrx_c_macros::expression::CPointer<
-                                                        $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::__pgrx_c_bindings::WalReceiverFunctionsType
-                                                        >,
-                                                        $crate::__pgrx_c_macros::expression::ReadWrite
-                                                    >>(
-                                                    ::core::ptr::addr_of_mut!(
-                                                        $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                            {
+                                                $crate::submodules::thread_check::check_active_thread();
+                                                /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                                #[allow(unused_unsafe)] unsafe {
+                                                    $crate::__pgrx_c_macros::expression::load_global(
+                                                        $crate::__pgrx_c_macros::expression::place::<
+                                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                                $crate::__pgrx_c_macros::expression::CRecord<
+                                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
+                                                                >,
+                                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                                            >>(
+                                                            ::core::ptr::addr_of_mut!(
+                                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                                            )
+                                                        )
                                                     )
-                                                )
-                                            )
+                                                }
+                                            }
                                         )
                                     )
                                 )
@@ -921,19 +987,25 @@ macro_rules! walrcv_exec {
                                             true,
                                             _
                                         >(
-                                            $crate::__pgrx_c_macros::expression::load(
-                                                $crate::__pgrx_c_macros::expression::place::<
-                                                    $crate::__pgrx_c_macros::expression::CPointer<
-                                                        $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::__pgrx_c_bindings::WalReceiverFunctionsType
-                                                        >,
-                                                        $crate::__pgrx_c_macros::expression::ReadWrite
-                                                    >>(
-                                                    ::core::ptr::addr_of_mut!(
-                                                        $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                            {
+                                                $crate::submodules::thread_check::check_active_thread();
+                                                /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                                #[allow(unused_unsafe)] unsafe {
+                                                    $crate::__pgrx_c_macros::expression::load_global(
+                                                        $crate::__pgrx_c_macros::expression::place::<
+                                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                                $crate::__pgrx_c_macros::expression::CRecord<
+                                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
+                                                                >,
+                                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                                            >>(
+                                                            ::core::ptr::addr_of_mut!(
+                                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                                            )
+                                                        )
                                                     )
-                                                )
-                                            )
+                                                }
+                                            }
                                         )
                                     )
                                 )
@@ -992,19 +1064,25 @@ macro_rules! walrcv_get_backend_pid {
                                             true,
                                             _
                                         >(
-                                            $crate::__pgrx_c_macros::expression::load(
-                                                $crate::__pgrx_c_macros::expression::place::<
-                                                    $crate::__pgrx_c_macros::expression::CPointer<
-                                                        $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::__pgrx_c_bindings::WalReceiverFunctionsType
-                                                        >,
-                                                        $crate::__pgrx_c_macros::expression::ReadWrite
-                                                    >>(
-                                                    ::core::ptr::addr_of_mut!(
-                                                        $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                            {
+                                                $crate::submodules::thread_check::check_active_thread();
+                                                /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                                #[allow(unused_unsafe)] unsafe {
+                                                    $crate::__pgrx_c_macros::expression::load_global(
+                                                        $crate::__pgrx_c_macros::expression::place::<
+                                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                                $crate::__pgrx_c_macros::expression::CRecord<
+                                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
+                                                                >,
+                                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                                            >>(
+                                                            ::core::ptr::addr_of_mut!(
+                                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                                            )
+                                                        )
                                                     )
-                                                )
-                                            )
+                                                }
+                                            }
                                         )
                                     )
                                 )
@@ -1054,19 +1132,25 @@ macro_rules! walrcv_get_conninfo {
                                             true,
                                             _
                                         >(
-                                            $crate::__pgrx_c_macros::expression::load(
-                                                $crate::__pgrx_c_macros::expression::place::<
-                                                    $crate::__pgrx_c_macros::expression::CPointer<
-                                                        $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::__pgrx_c_bindings::WalReceiverFunctionsType
-                                                        >,
-                                                        $crate::__pgrx_c_macros::expression::ReadWrite
-                                                    >>(
-                                                    ::core::ptr::addr_of_mut!(
-                                                        $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                            {
+                                                $crate::submodules::thread_check::check_active_thread();
+                                                /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                                #[allow(unused_unsafe)] unsafe {
+                                                    $crate::__pgrx_c_macros::expression::load_global(
+                                                        $crate::__pgrx_c_macros::expression::place::<
+                                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                                $crate::__pgrx_c_macros::expression::CRecord<
+                                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
+                                                                >,
+                                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                                            >>(
+                                                            ::core::ptr::addr_of_mut!(
+                                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                                            )
+                                                        )
                                                     )
-                                                )
-                                            )
+                                                }
+                                            }
                                         )
                                     )
                                 )
@@ -1117,19 +1201,25 @@ macro_rules! walrcv_get_dbname_from_conninfo {
                                             true,
                                             _
                                         >(
-                                            $crate::__pgrx_c_macros::expression::load(
-                                                $crate::__pgrx_c_macros::expression::place::<
-                                                    $crate::__pgrx_c_macros::expression::CPointer<
-                                                        $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::__pgrx_c_bindings::WalReceiverFunctionsType
-                                                        >,
-                                                        $crate::__pgrx_c_macros::expression::ReadWrite
-                                                    >>(
-                                                    ::core::ptr::addr_of_mut!(
-                                                        $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                            {
+                                                $crate::submodules::thread_check::check_active_thread();
+                                                /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                                #[allow(unused_unsafe)] unsafe {
+                                                    $crate::__pgrx_c_macros::expression::load_global(
+                                                        $crate::__pgrx_c_macros::expression::place::<
+                                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                                $crate::__pgrx_c_macros::expression::CRecord<
+                                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
+                                                                >,
+                                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                                            >>(
+                                                            ::core::ptr::addr_of_mut!(
+                                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                                            )
+                                                        )
                                                     )
-                                                )
-                                            )
+                                                }
+                                            }
                                         )
                                     )
                                 )
@@ -1179,19 +1269,25 @@ macro_rules! walrcv_get_senderinfo {
                                             true,
                                             _
                                         >(
-                                            $crate::__pgrx_c_macros::expression::load(
-                                                $crate::__pgrx_c_macros::expression::place::<
-                                                    $crate::__pgrx_c_macros::expression::CPointer<
-                                                        $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::__pgrx_c_bindings::WalReceiverFunctionsType
-                                                        >,
-                                                        $crate::__pgrx_c_macros::expression::ReadWrite
-                                                    >>(
-                                                    ::core::ptr::addr_of_mut!(
-                                                        $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                            {
+                                                $crate::submodules::thread_check::check_active_thread();
+                                                /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                                #[allow(unused_unsafe)] unsafe {
+                                                    $crate::__pgrx_c_macros::expression::load_global(
+                                                        $crate::__pgrx_c_macros::expression::place::<
+                                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                                $crate::__pgrx_c_macros::expression::CRecord<
+                                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
+                                                                >,
+                                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                                            >>(
+                                                            ::core::ptr::addr_of_mut!(
+                                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                                            )
+                                                        )
                                                     )
-                                                )
-                                            )
+                                                }
+                                            }
                                         )
                                     )
                                 )
@@ -1248,19 +1344,25 @@ macro_rules! walrcv_identify_system {
                                             true,
                                             _
                                         >(
-                                            $crate::__pgrx_c_macros::expression::load(
-                                                $crate::__pgrx_c_macros::expression::place::<
-                                                    $crate::__pgrx_c_macros::expression::CPointer<
-                                                        $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::__pgrx_c_bindings::WalReceiverFunctionsType
-                                                        >,
-                                                        $crate::__pgrx_c_macros::expression::ReadWrite
-                                                    >>(
-                                                    ::core::ptr::addr_of_mut!(
-                                                        $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                            {
+                                                $crate::submodules::thread_check::check_active_thread();
+                                                /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                                #[allow(unused_unsafe)] unsafe {
+                                                    $crate::__pgrx_c_macros::expression::load_global(
+                                                        $crate::__pgrx_c_macros::expression::place::<
+                                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                                $crate::__pgrx_c_macros::expression::CRecord<
+                                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
+                                                                >,
+                                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                                            >>(
+                                                            ::core::ptr::addr_of_mut!(
+                                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                                            )
+                                                        )
                                                     )
-                                                )
-                                            )
+                                                }
+                                            }
                                         )
                                     )
                                 )
@@ -1314,19 +1416,25 @@ macro_rules! walrcv_identify_system {
                                             true,
                                             _
                                         >(
-                                            $crate::__pgrx_c_macros::expression::load(
-                                                $crate::__pgrx_c_macros::expression::place::<
-                                                    $crate::__pgrx_c_macros::expression::CPointer<
-                                                        $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::__pgrx_c_bindings::WalReceiverFunctionsType
-                                                        >,
-                                                        $crate::__pgrx_c_macros::expression::ReadWrite
-                                                    >>(
-                                                    ::core::ptr::addr_of_mut!(
-                                                        $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                            {
+                                                $crate::submodules::thread_check::check_active_thread();
+                                                /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                                #[allow(unused_unsafe)] unsafe {
+                                                    $crate::__pgrx_c_macros::expression::load_global(
+                                                        $crate::__pgrx_c_macros::expression::place::<
+                                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                                $crate::__pgrx_c_macros::expression::CRecord<
+                                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
+                                                                >,
+                                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                                            >>(
+                                                            ::core::ptr::addr_of_mut!(
+                                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                                            )
+                                                        )
                                                     )
-                                                )
-                                            )
+                                                }
+                                            }
                                         )
                                     )
                                 )
@@ -1382,19 +1490,25 @@ macro_rules! walrcv_readtimelinehistoryfile {
                                             true,
                                             _
                                         >(
-                                            $crate::__pgrx_c_macros::expression::load(
-                                                $crate::__pgrx_c_macros::expression::place::<
-                                                    $crate::__pgrx_c_macros::expression::CPointer<
-                                                        $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::__pgrx_c_bindings::WalReceiverFunctionsType
-                                                        >,
-                                                        $crate::__pgrx_c_macros::expression::ReadWrite
-                                                    >>(
-                                                    ::core::ptr::addr_of_mut!(
-                                                        $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                            {
+                                                $crate::submodules::thread_check::check_active_thread();
+                                                /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                                #[allow(unused_unsafe)] unsafe {
+                                                    $crate::__pgrx_c_macros::expression::load_global(
+                                                        $crate::__pgrx_c_macros::expression::place::<
+                                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                                $crate::__pgrx_c_macros::expression::CRecord<
+                                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
+                                                                >,
+                                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                                            >>(
+                                                            ::core::ptr::addr_of_mut!(
+                                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                                            )
+                                                        )
                                                     )
-                                                )
-                                            )
+                                                }
+                                            }
                                         )
                                     )
                                 )
@@ -1456,19 +1570,25 @@ macro_rules! walrcv_receive {
                                             true,
                                             _
                                         >(
-                                            $crate::__pgrx_c_macros::expression::load(
-                                                $crate::__pgrx_c_macros::expression::place::<
-                                                    $crate::__pgrx_c_macros::expression::CPointer<
-                                                        $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::__pgrx_c_bindings::WalReceiverFunctionsType
-                                                        >,
-                                                        $crate::__pgrx_c_macros::expression::ReadWrite
-                                                    >>(
-                                                    ::core::ptr::addr_of_mut!(
-                                                        $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                            {
+                                                $crate::submodules::thread_check::check_active_thread();
+                                                /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                                #[allow(unused_unsafe)] unsafe {
+                                                    $crate::__pgrx_c_macros::expression::load_global(
+                                                        $crate::__pgrx_c_macros::expression::place::<
+                                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                                $crate::__pgrx_c_macros::expression::CRecord<
+                                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
+                                                                >,
+                                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                                            >>(
+                                                            ::core::ptr::addr_of_mut!(
+                                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                                            )
+                                                        )
                                                     )
-                                                )
-                                            )
+                                                }
+                                            }
                                         )
                                     )
                                 )
@@ -1524,19 +1644,25 @@ macro_rules! walrcv_send {
                                             true,
                                             _
                                         >(
-                                            $crate::__pgrx_c_macros::expression::load(
-                                                $crate::__pgrx_c_macros::expression::place::<
-                                                    $crate::__pgrx_c_macros::expression::CPointer<
-                                                        $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::__pgrx_c_bindings::WalReceiverFunctionsType
-                                                        >,
-                                                        $crate::__pgrx_c_macros::expression::ReadWrite
-                                                    >>(
-                                                    ::core::ptr::addr_of_mut!(
-                                                        $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                            {
+                                                $crate::submodules::thread_check::check_active_thread();
+                                                /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                                #[allow(unused_unsafe)] unsafe {
+                                                    $crate::__pgrx_c_macros::expression::load_global(
+                                                        $crate::__pgrx_c_macros::expression::place::<
+                                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                                $crate::__pgrx_c_macros::expression::CRecord<
+                                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
+                                                                >,
+                                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                                            >>(
+                                                            ::core::ptr::addr_of_mut!(
+                                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                                            )
+                                                        )
                                                     )
-                                                )
-                                            )
+                                                }
+                                            }
                                         )
                                     )
                                 )
@@ -1592,19 +1718,25 @@ macro_rules! walrcv_server_version {
                                             true,
                                             _
                                         >(
-                                            $crate::__pgrx_c_macros::expression::load(
-                                                $crate::__pgrx_c_macros::expression::place::<
-                                                    $crate::__pgrx_c_macros::expression::CPointer<
-                                                        $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::__pgrx_c_bindings::WalReceiverFunctionsType
-                                                        >,
-                                                        $crate::__pgrx_c_macros::expression::ReadWrite
-                                                    >>(
-                                                    ::core::ptr::addr_of_mut!(
-                                                        $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                            {
+                                                $crate::submodules::thread_check::check_active_thread();
+                                                /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                                #[allow(unused_unsafe)] unsafe {
+                                                    $crate::__pgrx_c_macros::expression::load_global(
+                                                        $crate::__pgrx_c_macros::expression::place::<
+                                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                                $crate::__pgrx_c_macros::expression::CRecord<
+                                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
+                                                                >,
+                                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                                            >>(
+                                                            ::core::ptr::addr_of_mut!(
+                                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                                            )
+                                                        )
                                                     )
-                                                )
-                                            )
+                                                }
+                                            }
                                         )
                                     )
                                 )
@@ -1654,19 +1786,25 @@ macro_rules! walrcv_startstreaming {
                                             true,
                                             _
                                         >(
-                                            $crate::__pgrx_c_macros::expression::load(
-                                                $crate::__pgrx_c_macros::expression::place::<
-                                                    $crate::__pgrx_c_macros::expression::CPointer<
-                                                        $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::__pgrx_c_bindings::WalReceiverFunctionsType
-                                                        >,
-                                                        $crate::__pgrx_c_macros::expression::ReadWrite
-                                                    >>(
-                                                    ::core::ptr::addr_of_mut!(
-                                                        $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                            {
+                                                $crate::submodules::thread_check::check_active_thread();
+                                                /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                                #[allow(unused_unsafe)] unsafe {
+                                                    $crate::__pgrx_c_macros::expression::load_global(
+                                                        $crate::__pgrx_c_macros::expression::place::<
+                                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                                $crate::__pgrx_c_macros::expression::CRecord<
+                                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
+                                                                >,
+                                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                                            >>(
+                                                            ::core::ptr::addr_of_mut!(
+                                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                                            )
+                                                        )
                                                     )
-                                                )
-                                            )
+                                                }
+                                            }
                                         )
                                     )
                                 )

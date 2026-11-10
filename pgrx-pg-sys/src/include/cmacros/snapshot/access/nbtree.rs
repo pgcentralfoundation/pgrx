@@ -70,13 +70,15 @@ macro_rules! BTCommuteStrategyNumber {
 ///
 /// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
+#[doc = crate::__pgrx_c_doc_assertions!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BTGetDeduplicateItems {
     ($relation:expr $(,)?) => {
@@ -181,13 +183,15 @@ macro_rules! BTGetDeduplicateItems {
 ///
 /// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
+#[doc = crate::__pgrx_c_doc_assertions!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BTGetFillFactor {
     ($relation:expr $(,)?) => {
@@ -291,13 +295,15 @@ macro_rules! BTGetFillFactor {
 ///
 /// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
+#[doc = crate::__pgrx_c_doc_assertions!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. Integer division/remainder rejects zero divisors and signed MIN / -1 overflow. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Integer division/remainder rejects zero divisors and signed MIN / -1 overflow. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BTGetTargetPageFreeSpace {
     ($relation:expr $(,)?) => {
@@ -845,13 +851,15 @@ macro_rules! BTPageGetMeta {
 ///
 /// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
+#[doc = crate::__pgrx_c_doc_assertions!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BTPageGetOpaque {
     ($page:expr $(,)?) => {
@@ -887,7 +895,7 @@ macro_rules! BTPageGetOpaque {
 ///
 /// # Panics
 ///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BTPageGetOpaque {
     ($page:expr $(,)?) => {
@@ -910,7 +918,7 @@ macro_rules! BTPageGetOpaque {
     };
 }
 #[cfg(feature = "pg15")]
-/// Typed call adapter for C inline function BTPageIsRecyclable from nbtree.h:291 (PostgreSQL 15)
+/// C inline function BTPageIsRecyclable from nbtree.h:291 (PostgreSQL 15)
 ///
 /// ```c
 /// static inline bool
@@ -946,7 +954,11 @@ macro_rules! BTPageGetOpaque {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+///
+#[doc = crate::__pgrx_c_doc_assertions!()]
 ///
 /// # Safety
 ///
@@ -954,24 +966,20 @@ macro_rules! BTPageGetOpaque {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BTPageIsRecyclable {
     ($page:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$page;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function BTPageIsRecyclable from nbtree.h:290 (PostgreSQL 16–17), nbtree.h:291 (PostgreSQL 18–19)
+/// C inline function BTPageIsRecyclable from nbtree.h:290 (PostgreSQL 16–17), nbtree.h:291 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline bool
@@ -1006,7 +1014,11 @@ macro_rules! BTPageIsRecyclable {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+///
+#[doc = crate::__pgrx_c_doc_assertions!()]
 ///
 /// # Safety
 ///
@@ -1014,7 +1026,7 @@ macro_rules! BTPageIsRecyclable {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BTPageIsRecyclable {
     ($page:expr, $heaprel:expr $(,)?) => {
@@ -1022,11 +1034,7 @@ macro_rules! BTPageIsRecyclable {
             @value {
                 let _ = &$page;
                 let _ = &$heaprel;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
@@ -1132,13 +1140,15 @@ macro_rules! BTScanPosInvalidate {
 ///
 /// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
+#[doc = crate::__pgrx_c_doc_assertions!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BTScanPosIsPinned {
     ($scanpos:expr $(,)?) => {
@@ -1181,13 +1191,15 @@ macro_rules! BTScanPosIsPinned {
 ///
 /// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
+#[doc = crate::__pgrx_c_doc_assertions!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BTScanPosIsPinned {
     ($scanpos:expr $(,)?) => {
@@ -1221,13 +1233,15 @@ macro_rules! BTScanPosIsPinned {
 ///
 /// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
+#[doc = crate::__pgrx_c_doc_assertions!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BTScanPosIsValid {
     ($scanpos:expr $(,)?) => {
@@ -1263,13 +1277,15 @@ macro_rules! BTScanPosIsValid {
 ///
 /// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
+#[doc = crate::__pgrx_c_doc_assertions!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BTScanPosIsValid {
     ($scanpos:expr $(,)?) => {
@@ -1315,8 +1331,7 @@ macro_rules! BTScanPosUnpin {
         })
     };
 }
-#[cfg(feature = "pg15")]
-/// C macro BTScanPosUnpinIfPinned from nbtree.h:1001 (PostgreSQL 15)
+/// C macro BTScanPosUnpinIfPinned from nbtree.h:1001 (PostgreSQL 15), nbtree.h:1006 (PostgreSQL 16), nbtree.h:1010 (PostgreSQL 17), nbtree.h:1015 (PostgreSQL 18–19)
 ///
 /// ```text
 /// #define BTScanPosUnpinIfPinned( scanpos ) do { if ( BTScanPosIsPinned ( scanpos ) ) BTScanPosUnpin ( scanpos ) ; } while ( 0 )
@@ -1326,6 +1341,8 @@ macro_rules! BTScanPosUnpin {
 #[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
 ///
 /// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+///
+#[doc = crate::__pgrx_c_doc_assertions!()]
 ///
 #[doc = crate::__pgrx_c_doc_statements!()]
 ///
@@ -1336,35 +1353,6 @@ macro_rules! BTScanPosUnpin {
 /// # Panics
 ///
 /// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! BTScanPosUnpinIfPinned {
-    ($scanpos:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(@unit {
-            let _ = &$scanpos;
-        })
-    };
-}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro BTScanPosUnpinIfPinned from nbtree.h:1006 (PostgreSQL 16), nbtree.h:1010 (PostgreSQL 17), nbtree.h:1015 (PostgreSQL 18–19)
-///
-/// ```text
-/// #define BTScanPosUnpinIfPinned( scanpos ) do { if ( BTScanPosIsPinned ( scanpos ) ) BTScanPosUnpin ( scanpos ) ; } while ( 0 )
-/// ```
-///
-///
-#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
-///
-/// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
-///
-#[doc = crate::__pgrx_c_doc_statements!()]
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BTScanPosUnpinIfPinned {
     ($scanpos:expr $(,)?) => {
@@ -1406,62 +1394,7 @@ macro_rules! BTreeTupleGetDownLink {
         )
     };
 }
-#[cfg(any(feature = "pg15", feature = "pg19"))]
-/// Typed call adapter for C inline function BTreeTupleGetHeapTID from nbtree.h:632 (PostgreSQL 15), nbtree.h:638 (PostgreSQL 19)
-///
-/// ```c
-/// static inline ItemPointer
-/// BTreeTupleGetHeapTID(IndexTuple itup)
-/// {
-/// 	if (BTreeTupleIsPivot(itup))
-/// 	{
-/// 		/* Pivot tuple heap TID representation? */
-/// 		if ((ItemPointerGetOffsetNumberNoCheck(&itup->t_tid) &
-/// 			 BT_PIVOT_HEAP_TID_ATTR) != 0)
-/// 			return (ItemPointer) ((char *) itup + IndexTupleSize(itup) -
-/// 								  sizeof(ItemPointerData));
-///
-/// 		/* Heap TID attribute was truncated */
-/// 		return NULL;
-/// 	}
-/// 	else if (BTreeTupleIsPosting(itup))
-/// 		return BTreeTupleGetPosting(itup);
-///
-/// 	return &itup->t_tid;
-/// }
-/// ```
-///
-///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! BTreeTupleGetHeapTID {
-    ($itup:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$itup;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CRecord<
-                                $crate::__pgrx_c_bindings::ItemPointerData
-                            >,
-                            $crate::__pgrx_c_macros::expression::ReadWrite
-                        >>()
-                )
-            }
-        )
-    };
-}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C inline function BTreeTupleGetHeapTID from nbtree.h:637 (PostgreSQL 16–17), nbtree.h:638 (PostgreSQL 18)
+/// C inline function BTreeTupleGetHeapTID from nbtree.h:632 (PostgreSQL 15), nbtree.h:637 (PostgreSQL 16–17), nbtree.h:638 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline ItemPointer
@@ -1494,7 +1427,7 @@ macro_rules! BTreeTupleGetHeapTID {
 ///
 /// # Panics
 ///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BTreeTupleGetHeapTID {
     ($itup:expr $(,)?) => {
@@ -1512,7 +1445,7 @@ macro_rules! BTreeTupleGetHeapTID {
         )
     };
 }
-/// Typed call adapter for C inline function BTreeTupleGetMaxHeapTID from nbtree.h:658 (PostgreSQL 15), nbtree.h:663 (PostgreSQL 16–17), nbtree.h:664 (PostgreSQL 18–19)
+/// C inline function BTreeTupleGetMaxHeapTID from nbtree.h:658 (PostgreSQL 15), nbtree.h:663 (PostgreSQL 16–17), nbtree.h:664 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline ItemPointer
@@ -1532,7 +1465,11 @@ macro_rules! BTreeTupleGetHeapTID {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+///
+#[doc = crate::__pgrx_c_doc_assertions!()]
 ///
 /// # Safety
 ///
@@ -1540,22 +1477,20 @@ macro_rules! BTreeTupleGetHeapTID {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BTreeTupleGetMaxHeapTID {
     ($itup:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$itup;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CRecord<
-                                $crate::__pgrx_c_bindings::ItemPointerData
-                            >,
-                            $crate::__pgrx_c_macros::expression::ReadWrite
-                        >>()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_macros::expression::CPointer<
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::ItemPointerData
+                        >,
+                        $crate::__pgrx_c_macros::expression::ReadWrite
+                    >>()
             }
         )
     };
@@ -1826,7 +1761,7 @@ macro_rules! BTreeTupleGetNAtts {
         )
     };
 }
-/// Typed call adapter for C inline function BTreeTupleGetNPosting from nbtree.h:512 (PostgreSQL 15), nbtree.h:517 (PostgreSQL 16–17), nbtree.h:518 (PostgreSQL 18–19)
+/// C inline function BTreeTupleGetNPosting from nbtree.h:512 (PostgreSQL 15), nbtree.h:517 (PostgreSQL 16–17), nbtree.h:518 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline uint16
@@ -1842,26 +1777,22 @@ macro_rules! BTreeTupleGetNAtts {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+///
+#[doc = crate::__pgrx_c_doc_assertions!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BTreeTupleGetNPosting {
     ($posting:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$posting;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_types::uint16
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_types::uint16>()
             }
         )
     };
@@ -1886,7 +1817,7 @@ macro_rules! BTreeTupleGetNPosting {
 ///
 /// # Panics
 ///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BTreeTupleGetPosting {
     ($posting:expr $(,)?) => {
@@ -1923,7 +1854,7 @@ macro_rules! BTreeTupleGetPosting {
 ///
 /// # Panics
 ///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BTreeTupleGetPostingN {
     ($posting:expr, $n:expr $(,)?) => {
@@ -1942,7 +1873,7 @@ macro_rules! BTreeTupleGetPostingN {
         )
     };
 }
-/// Typed call adapter for C inline function BTreeTupleGetPostingOffset from nbtree.h:523 (PostgreSQL 15), nbtree.h:528 (PostgreSQL 16–17), nbtree.h:529 (PostgreSQL 18–19)
+/// C inline function BTreeTupleGetPostingOffset from nbtree.h:523 (PostgreSQL 15), nbtree.h:528 (PostgreSQL 16–17), nbtree.h:529 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline uint32
@@ -1955,7 +1886,11 @@ macro_rules! BTreeTupleGetPostingN {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+///
+#[doc = crate::__pgrx_c_doc_assertions!()]
 ///
 /// # Safety
 ///
@@ -1963,18 +1898,14 @@ macro_rules! BTreeTupleGetPostingN {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BTreeTupleGetPostingOffset {
     ($posting:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$posting;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_types::uint32
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_types::uint32>()
             }
         )
     };
@@ -2079,7 +2010,7 @@ macro_rules! BTreeTupleIsPosting {
     };
 }
 #[cfg(feature = "pg15")]
-/// Typed call adapter for C inline function BTreeTupleSetDownLink from nbtree.h:556 (PostgreSQL 15)
+/// C inline function BTreeTupleSetDownLink from nbtree.h:556 (PostgreSQL 15)
 ///
 /// ```c
 /// static inline void
@@ -2090,7 +2021,11 @@ macro_rules! BTreeTupleIsPosting {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+///
+#[doc = crate::__pgrx_c_doc_assertions!()]
 ///
 /// # Safety
 ///
@@ -2098,21 +2033,19 @@ macro_rules! BTreeTupleIsPosting {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BTreeTupleSetDownLink {
     ($pivot:expr, $blkno:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$pivot;
-                let _ = &$blkno;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
-            }
-        )
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$pivot;
+            let _ = &$blkno;
+            ()
+        })
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C inline function BTreeTupleSetDownLink from nbtree.h:561 (PostgreSQL 16–17), nbtree.h:562 (PostgreSQL 18–19)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
+/// C inline function BTreeTupleSetDownLink from nbtree.h:561 (PostgreSQL 16–17), nbtree.h:562 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline void
@@ -2131,7 +2064,7 @@ macro_rules! BTreeTupleSetDownLink {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BTreeTupleSetDownLink {
     ($pivot:expr, $blkno:expr $(,)?) => {
@@ -2142,7 +2075,39 @@ macro_rules! BTreeTupleSetDownLink {
         })
     };
 }
-/// Typed call adapter for C inline function BTreeTupleSetNAtts from nbtree.h:589 (PostgreSQL 15), nbtree.h:594 (PostgreSQL 16–17), nbtree.h:595 (PostgreSQL 18–19)
+#[cfg(feature = "pg19")]
+/// C inline function BTreeTupleSetDownLink from nbtree.h:562 (PostgreSQL 19)
+///
+/// ```c
+/// static inline void
+/// BTreeTupleSetDownLink(IndexTuple pivot, BlockNumber blkno)
+/// {
+/// 	ItemPointerSetBlockNumber(&pivot->t_tid, blkno);
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! BTreeTupleSetDownLink {
+    ($pivot:expr, $blkno:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$pivot;
+            let _ = &$blkno;
+            ()
+        })
+    };
+}
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
+/// C inline function BTreeTupleSetNAtts from nbtree.h:589 (PostgreSQL 15), nbtree.h:594 (PostgreSQL 16–17), nbtree.h:595 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline void
@@ -2165,7 +2130,11 @@ macro_rules! BTreeTupleSetDownLink {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+///
+#[doc = crate::__pgrx_c_doc_assertions!()]
 ///
 /// # Safety
 ///
@@ -2173,7 +2142,7 @@ macro_rules! BTreeTupleSetDownLink {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BTreeTupleSetNAtts {
     ($itup:expr, $nkeyatts:expr, $heaptid:expr $(,)?) => {
@@ -2182,12 +2151,58 @@ macro_rules! BTreeTupleSetNAtts {
                 let _ = &$itup;
                 let _ = &$nkeyatts;
                 let _ = &$heaptid;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+                ()
             }
         )
     };
 }
-/// Typed call adapter for C inline function BTreeTupleSetPosting from nbtree.h:498 (PostgreSQL 15), nbtree.h:503 (PostgreSQL 16–17), nbtree.h:504 (PostgreSQL 18–19)
+#[cfg(feature = "pg19")]
+/// C inline function BTreeTupleSetNAtts from nbtree.h:595 (PostgreSQL 19)
+///
+/// ```c
+/// static inline void
+/// BTreeTupleSetNAtts(IndexTuple itup, uint16 nkeyatts, bool heaptid)
+/// {
+/// 	Assert(nkeyatts <= INDEX_MAX_KEYS);
+/// 	Assert((nkeyatts & BT_STATUS_OFFSET_MASK) == 0);
+/// 	Assert(!heaptid || nkeyatts > 0);
+/// 	Assert(!BTreeTupleIsPivot(itup) || nkeyatts == 0);
+///
+/// 	itup->t_info |= INDEX_ALT_TID_MASK;
+///
+/// 	if (heaptid)
+/// 		nkeyatts |= BT_PIVOT_HEAP_TID_ATTR;
+///
+/// 	/* BT_IS_POSTING bit is deliberately unset here */
+/// 	ItemPointerSetOffsetNumber(&itup->t_tid, nkeyatts);
+/// 	Assert(BTreeTupleIsPivot(itup));
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+///
+#[doc = crate::__pgrx_c_doc_assertions!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+#[macro_export]
+macro_rules! BTreeTupleSetNAtts {
+    ($itup:expr, $nkeyatts:expr, $heaptid:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$itup;
+                let _ = &$nkeyatts;
+                let _ = &$heaptid;
+                ()
+            }
+        )
+    };
+}
+/// C inline function BTreeTupleSetPosting from nbtree.h:498 (PostgreSQL 15), nbtree.h:503 (PostgreSQL 16–17), nbtree.h:504 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline void
@@ -2206,7 +2221,11 @@ macro_rules! BTreeTupleSetNAtts {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+///
+#[doc = crate::__pgrx_c_doc_assertions!()]
 ///
 /// # Safety
 ///
@@ -2214,7 +2233,7 @@ macro_rules! BTreeTupleSetNAtts {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BTreeTupleSetPosting {
     ($itup:expr, $nhtids:expr, $postingoffset:expr $(,)?) => {
@@ -2223,13 +2242,13 @@ macro_rules! BTreeTupleSetPosting {
                 let _ = &$itup;
                 let _ = &$nhtids;
                 let _ = &$postingoffset;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+                ()
             }
         )
     };
 }
 #[cfg(feature = "pg15")]
-/// Typed call adapter for C inline function BTreeTupleSetTopParent from nbtree.h:620 (PostgreSQL 15)
+/// C inline function BTreeTupleSetTopParent from nbtree.h:620 (PostgreSQL 15)
 ///
 /// ```c
 /// static inline void
@@ -2241,7 +2260,11 @@ macro_rules! BTreeTupleSetPosting {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+///
+#[doc = crate::__pgrx_c_doc_assertions!()]
 ///
 /// # Safety
 ///
@@ -2249,21 +2272,19 @@ macro_rules! BTreeTupleSetPosting {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BTreeTupleSetTopParent {
     ($leafhikey:expr, $blkno:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$leafhikey;
-                let _ = &$blkno;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
-            }
-        )
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$leafhikey;
+            let _ = &$blkno;
+            ()
+        })
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C inline function BTreeTupleSetTopParent from nbtree.h:625 (PostgreSQL 16–17), nbtree.h:626 (PostgreSQL 18–19)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
+/// C inline function BTreeTupleSetTopParent from nbtree.h:625 (PostgreSQL 16–17), nbtree.h:626 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline void
@@ -2283,7 +2304,39 @@ macro_rules! BTreeTupleSetTopParent {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! BTreeTupleSetTopParent {
+    ($leafhikey:expr, $blkno:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$leafhikey;
+            let _ = &$blkno;
+            ()
+        })
+    };
+}
+#[cfg(feature = "pg19")]
+/// C inline function BTreeTupleSetTopParent from nbtree.h:626 (PostgreSQL 19)
+///
+/// ```c
+/// static inline void
+/// BTreeTupleSetTopParent(IndexTuple leafhikey, BlockNumber blkno)
+/// {
+/// 	ItemPointerSetBlockNumber(&leafhikey->t_tid, blkno);
+/// 	BTreeTupleSetNAtts(leafhikey, 0, false);
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BTreeTupleSetTopParent {
     ($leafhikey:expr, $blkno:expr $(,)?) => {

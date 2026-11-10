@@ -34,7 +34,7 @@ macro_rules! am_leader_apply_worker {
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function am_leader_apply_worker from worker_internal.h:339 (PostgreSQL 17), worker_internal.h:340 (PostgreSQL 18), worker_internal.h:382 (PostgreSQL 19)
+/// C inline function am_leader_apply_worker from worker_internal.h:339 (PostgreSQL 17), worker_internal.h:340 (PostgreSQL 18), worker_internal.h:382 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -46,25 +46,21 @@ macro_rules! am_leader_apply_worker {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+///
+#[doc = crate::__pgrx_c_doc_assertions!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! am_leader_apply_worker {
     () => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
@@ -101,7 +97,7 @@ macro_rules! am_parallel_apply_worker {
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function am_parallel_apply_worker from worker_internal.h:346 (PostgreSQL 17), worker_internal.h:347 (PostgreSQL 18), worker_internal.h:389 (PostgreSQL 19)
+/// C inline function am_parallel_apply_worker from worker_internal.h:346 (PostgreSQL 17), worker_internal.h:347 (PostgreSQL 18), worker_internal.h:389 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -113,25 +109,21 @@ macro_rules! am_parallel_apply_worker {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+///
+#[doc = crate::__pgrx_c_doc_assertions!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! am_parallel_apply_worker {
     () => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
@@ -249,7 +241,7 @@ macro_rules! am_tablesync_worker {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function get_logical_worker_type from worker_internal.h:396 (PostgreSQL 19)
+/// C inline function get_logical_worker_type from worker_internal.h:396 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline LogicalRepWorkerType
@@ -261,28 +253,26 @@ macro_rules! am_tablesync_worker {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+///
+#[doc = crate::__pgrx_c_doc_assertions!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! get_logical_worker_type {
     () => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CEnumObject<
-                            $crate::__pgrx_c_generated::EnumIdentity_enum__LogicalRepWorkerType,
-                            $crate::__pgrx_c_macros::CUnsignedInt,
-                            u32
-                        >>()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_macros::expression::CEnumObject<
+                        $crate::__pgrx_c_generated::EnumIdentity_enum__LogicalRepWorkerType,
+                        $crate::__pgrx_c_macros::CUnsignedInt,
+                        u32
+                    >>()
             }
         )
     };

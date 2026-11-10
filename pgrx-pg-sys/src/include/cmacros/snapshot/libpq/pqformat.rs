@@ -20,7 +20,7 @@
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! pq_sendbyte {
     ($buf:expr, $byt:expr $(,)?) => {
@@ -98,7 +98,7 @@ macro_rules! pq_sendint {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! pq_sendint16 {
     ($buf:expr, $i:expr $(,)?) => {
@@ -129,7 +129,7 @@ macro_rules! pq_sendint16 {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! pq_sendint32 {
     ($buf:expr, $i:expr $(,)?) => {
@@ -160,7 +160,7 @@ macro_rules! pq_sendint32 {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! pq_sendint64 {
     ($buf:expr, $i:expr $(,)?) => {
@@ -191,7 +191,7 @@ macro_rules! pq_sendint64 {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! pq_sendint8 {
     ($buf:expr, $i:expr $(,)?) => {
@@ -203,7 +203,7 @@ macro_rules! pq_sendint8 {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function pq_writeint16 from pqformat.h:60 (PostgreSQL 15–16), pqformat.h:59 (PostgreSQL 17–18)
+/// C inline function pq_writeint16 from pqformat.h:60 (PostgreSQL 15–16), pqformat.h:59 (PostgreSQL 17–18)
 ///
 /// ```c
 /// static inline void
@@ -218,7 +218,11 @@ macro_rules! pq_sendint8 {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+///
+#[doc = crate::__pgrx_c_doc_assertions!()]
 ///
 /// # Safety
 ///
@@ -226,21 +230,19 @@ macro_rules! pq_sendint8 {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! pq_writeint16 {
     ($buf:expr, $i:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$buf;
-                let _ = &$i;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
-            }
-        )
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$buf;
+            let _ = &$i;
+            ()
+        })
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function pq_writeint16 from pqformat.h:59 (PostgreSQL 19)
+/// C inline function pq_writeint16 from pqformat.h:59 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -255,7 +257,11 @@ macro_rules! pq_writeint16 {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+///
+#[doc = crate::__pgrx_c_doc_assertions!()]
 ///
 /// # Safety
 ///
@@ -263,21 +269,19 @@ macro_rules! pq_writeint16 {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! pq_writeint16 {
     ($buf:expr, $i:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$buf;
-                let _ = &$i;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
-            }
-        )
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$buf;
+            let _ = &$i;
+            ()
+        })
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function pq_writeint32 from pqformat.h:74 (PostgreSQL 15–16), pqformat.h:73 (PostgreSQL 17–18)
+/// C inline function pq_writeint32 from pqformat.h:74 (PostgreSQL 15–16), pqformat.h:73 (PostgreSQL 17–18)
 ///
 /// ```c
 /// static inline void
@@ -292,7 +296,11 @@ macro_rules! pq_writeint16 {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+///
+#[doc = crate::__pgrx_c_doc_assertions!()]
 ///
 /// # Safety
 ///
@@ -300,21 +308,19 @@ macro_rules! pq_writeint16 {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! pq_writeint32 {
     ($buf:expr, $i:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$buf;
-                let _ = &$i;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
-            }
-        )
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$buf;
+            let _ = &$i;
+            ()
+        })
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function pq_writeint32 from pqformat.h:73 (PostgreSQL 19)
+/// C inline function pq_writeint32 from pqformat.h:73 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -329,7 +335,11 @@ macro_rules! pq_writeint32 {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+///
+#[doc = crate::__pgrx_c_doc_assertions!()]
 ///
 /// # Safety
 ///
@@ -337,21 +347,19 @@ macro_rules! pq_writeint32 {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! pq_writeint32 {
     ($buf:expr, $i:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$buf;
-                let _ = &$i;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
-            }
-        )
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$buf;
+            let _ = &$i;
+            ()
+        })
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function pq_writeint64 from pqformat.h:88 (PostgreSQL 15–16), pqformat.h:87 (PostgreSQL 17–18)
+/// C inline function pq_writeint64 from pqformat.h:88 (PostgreSQL 15–16), pqformat.h:87 (PostgreSQL 17–18)
 ///
 /// ```c
 /// static inline void
@@ -366,7 +374,11 @@ macro_rules! pq_writeint32 {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+///
+#[doc = crate::__pgrx_c_doc_assertions!()]
 ///
 /// # Safety
 ///
@@ -374,21 +386,19 @@ macro_rules! pq_writeint32 {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! pq_writeint64 {
     ($buf:expr, $i:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$buf;
-                let _ = &$i;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
-            }
-        )
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$buf;
+            let _ = &$i;
+            ()
+        })
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function pq_writeint64 from pqformat.h:87 (PostgreSQL 19)
+/// C inline function pq_writeint64 from pqformat.h:87 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -403,7 +413,11 @@ macro_rules! pq_writeint64 {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+///
+#[doc = crate::__pgrx_c_doc_assertions!()]
 ///
 /// # Safety
 ///
@@ -411,21 +425,19 @@ macro_rules! pq_writeint64 {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! pq_writeint64 {
     ($buf:expr, $i:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$buf;
-                let _ = &$i;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
-            }
-        )
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$buf;
+            let _ = &$i;
+            ()
+        })
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function pq_writeint8 from pqformat.h:46 (PostgreSQL 15–16), pqformat.h:45 (PostgreSQL 17–18)
+/// C inline function pq_writeint8 from pqformat.h:46 (PostgreSQL 15–16), pqformat.h:45 (PostgreSQL 17–18)
 ///
 /// ```c
 /// static inline void
@@ -440,7 +452,11 @@ macro_rules! pq_writeint64 {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+///
+#[doc = crate::__pgrx_c_doc_assertions!()]
 ///
 /// # Safety
 ///
@@ -448,21 +464,19 @@ macro_rules! pq_writeint64 {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! pq_writeint8 {
     ($buf:expr, $i:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$buf;
-                let _ = &$i;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
-            }
-        )
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$buf;
+            let _ = &$i;
+            ()
+        })
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function pq_writeint8 from pqformat.h:45 (PostgreSQL 19)
+/// C inline function pq_writeint8 from pqformat.h:45 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -477,7 +491,11 @@ macro_rules! pq_writeint8 {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+///
+#[doc = crate::__pgrx_c_doc_assertions!()]
 ///
 /// # Safety
 ///
@@ -485,21 +503,19 @@ macro_rules! pq_writeint8 {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! pq_writeint8 {
     ($buf:expr, $i:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$buf;
-                let _ = &$i;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
-            }
-        )
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$buf;
+            let _ = &$i;
+            ()
+        })
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function pq_writestring from pqformat.h:108 (PostgreSQL 15–16), pqformat.h:107 (PostgreSQL 17–18)
+/// C inline function pq_writestring from pqformat.h:108 (PostgreSQL 15–16), pqformat.h:107 (PostgreSQL 17–18)
 ///
 /// ```c
 /// static inline void
@@ -523,7 +539,11 @@ macro_rules! pq_writeint8 {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+///
+#[doc = crate::__pgrx_c_doc_assertions!()]
 ///
 /// # Safety
 ///
@@ -531,21 +551,19 @@ macro_rules! pq_writeint8 {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! pq_writestring {
     ($buf:expr, $str:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$buf;
-                let _ = &$str;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
-            }
-        )
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$buf;
+            let _ = &$str;
+            ()
+        })
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function pq_writestring from pqformat.h:107 (PostgreSQL 19)
+/// C inline function pq_writestring from pqformat.h:107 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -569,7 +587,11 @@ macro_rules! pq_writestring {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+///
+#[doc = crate::__pgrx_c_doc_assertions!()]
 ///
 /// # Safety
 ///
@@ -577,17 +599,15 @@ macro_rules! pq_writestring {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! pq_writestring {
     ($buf:expr, $str:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$buf;
-                let _ = &$str;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
-            }
-        )
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$buf;
+            let _ = &$str;
+            ()
+        })
     };
 }
 pub use pq_sendbyte;

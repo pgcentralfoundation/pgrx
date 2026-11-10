@@ -290,19 +290,25 @@ macro_rules! BufMappingPartitionLock {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::add::<
@@ -430,19 +436,25 @@ macro_rules! BufMappingPartitionLockByIndex {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::add::<
@@ -962,19 +974,25 @@ macro_rules! BufferDescriptorGetIOCV {
                                             true,
                                             _
                                         >(
-                                            $crate::__pgrx_c_macros::expression::load(
-                                                $crate::__pgrx_c_macros::expression::place::<
-                                                    $crate::__pgrx_c_macros::expression::CPointer<
-                                                        $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::__pgrx_c_bindings::ConditionVariableMinimallyPadded
-                                                        >,
-                                                        $crate::__pgrx_c_macros::expression::ReadWrite
-                                                    >>(
-                                                    ::core::ptr::addr_of_mut!(
-                                                        $crate::__pgrx_c_bindings::BufferIOCVArray
+                                            {
+                                                $crate::submodules::thread_check::check_active_thread();
+                                                /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                                #[allow(unused_unsafe)] unsafe {
+                                                    $crate::__pgrx_c_macros::expression::load_global(
+                                                        $crate::__pgrx_c_macros::expression::place::<
+                                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                                $crate::__pgrx_c_macros::expression::CRecord<
+                                                                    $crate::__pgrx_c_bindings::ConditionVariableMinimallyPadded
+                                                                >,
+                                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                                            >>(
+                                                            ::core::ptr::addr_of_mut!(
+                                                                $crate::__pgrx_c_bindings::BufferIOCVArray
+                                                            )
+                                                        )
                                                     )
-                                                )
-                                            )
+                                                }
+                                            }
                                         ),
                                         $crate::__pgrx_c_macros::expression::profile_value::<
                                             true,
@@ -1178,19 +1196,25 @@ macro_rules! GetBufferDescriptor {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::BufferDescPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::BufferDescriptors
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::BufferDescPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::BufferDescriptors
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     (
                                         $crate::__pgrx_c_macros::expression::profile_value::<
@@ -1262,19 +1286,25 @@ macro_rules! GetLocalBufferDescriptor {
                         $crate::__pgrx_c_macros::expression::address(
                             $crate::__pgrx_c_macros::expression::index(
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                    $crate::__pgrx_c_macros::expression::load(
-                                        $crate::__pgrx_c_macros::expression::place::<
-                                            $crate::__pgrx_c_macros::expression::CPointer<
-                                                $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::__pgrx_c_bindings::BufferDesc
-                                                >,
-                                                $crate::__pgrx_c_macros::expression::ReadWrite
-                                            >>(
-                                            ::core::ptr::addr_of_mut!(
-                                                $crate::__pgrx_c_bindings::LocalBufferDescriptors
+                                    {
+                                        $crate::submodules::thread_check::check_active_thread();
+                                        /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                        #[allow(unused_unsafe)] unsafe {
+                                            $crate::__pgrx_c_macros::expression::load_global(
+                                                $crate::__pgrx_c_macros::expression::place::<
+                                                    $crate::__pgrx_c_macros::expression::CPointer<
+                                                        $crate::__pgrx_c_macros::expression::CRecord<
+                                                            $crate::__pgrx_c_bindings::BufferDesc
+                                                        >,
+                                                        $crate::__pgrx_c_macros::expression::ReadWrite
+                                                    >>(
+                                                    ::core::ptr::addr_of_mut!(
+                                                        $crate::__pgrx_c_bindings::LocalBufferDescriptors
+                                                    )
+                                                )
                                             )
-                                        )
-                                    )
+                                        }
+                                    }
                                 ),
                                 (
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(

@@ -100,13 +100,15 @@ macro_rules! GISTSearchItemIsHeap {
 ///
 /// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
+#[doc = crate::__pgrx_c_doc_assertions!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! GistTupleIsInvalid {
     ($itup:expr $(,)?) => {
@@ -124,8 +126,8 @@ macro_rules! GistTupleIsInvalid {
         )
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro GistTupleIsInvalid from gist_private.h:288 (PostgreSQL 16–19)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
+/// C macro GistTupleIsInvalid from gist_private.h:288 (PostgreSQL 16–18)
 ///
 /// ```text
 /// #define GistTupleIsInvalid( itup ) ( ItemPointerGetOffsetNumber ( & ( ( itup ) -> t_tid ) ) == TUPLE_IS_INVALID )
@@ -138,7 +140,35 @@ macro_rules! GistTupleIsInvalid {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! GistTupleIsInvalid {
+    ($itup:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$itup;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
+    };
+}
+#[cfg(feature = "pg19")]
+/// C macro GistTupleIsInvalid from gist_private.h:288 (PostgreSQL 19)
+///
+/// ```text
+/// #define GistTupleIsInvalid( itup ) ( ItemPointerGetOffsetNumber ( & ( ( itup ) -> t_tid ) ) == TUPLE_IS_INVALID )
+/// ```
+///
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! GistTupleIsInvalid {
     ($itup:expr $(,)?) => {
@@ -168,13 +198,15 @@ macro_rules! GistTupleIsInvalid {
 ///
 /// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
+#[doc = crate::__pgrx_c_doc_assertions!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! GistTupleSetValid {
     ($itup:expr $(,)?) => {
@@ -242,8 +274,8 @@ macro_rules! GistTupleSetValid {
         )
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro GistTupleSetValid from gist_private.h:289 (PostgreSQL 16–19)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
+/// C macro GistTupleSetValid from gist_private.h:289 (PostgreSQL 16–18)
 ///
 /// ```text
 /// #define GistTupleSetValid( itup ) ItemPointerSetOffsetNumber ( & ( ( itup ) -> t_tid ) , TUPLE_IS_VALID )
@@ -256,7 +288,29 @@ macro_rules! GistTupleSetValid {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! GistTupleSetValid {
+    ($itup:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$itup;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
+    };
+}
+#[cfg(feature = "pg19")]
+/// C macro GistTupleSetValid from gist_private.h:289 (PostgreSQL 19)
+///
+/// ```text
+/// #define GistTupleSetValid( itup ) ItemPointerSetOffsetNumber ( & ( ( itup ) -> t_tid ) , TUPLE_IS_VALID )
+/// ```
+///
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! GistTupleSetValid {
     ($itup:expr $(,)?) => {

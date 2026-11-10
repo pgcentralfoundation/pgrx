@@ -1,5 +1,436 @@
 // Shared generated C macro support.
 
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::WalReceiverFunctionsType, <<c::expression::CRecord<crate::__pgrx_c_bindings::WalReceiverFunctionsType> as c::expression::OrdinaryField<Field_walrcv_exec>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).walrcv_exec) };
+#[doc(hidden)]
+pub struct Field_walrcv_disconnect;
+#[cfg(any(feature = "pg15", feature = "pg16"))]
+const _: () = assert!(
+    ::core::mem::offset_of!(crate::__pgrx_c_bindings::WalReceiverFunctionsType, walrcv_disconnect)
+        == 112
+);
+const _: () = {
+    assert!(
+        ::core::mem::size_of::<
+            ::core::option::Option<
+                unsafe extern "C-unwind" fn(*mut crate::__pgrx_c_bindings::WalReceiverConn) -> (),
+            >,
+        >() == 8
+    );
+    assert!(
+        ::core::mem::align_of::<
+            ::core::option::Option<
+                unsafe extern "C-unwind" fn(*mut crate::__pgrx_c_bindings::WalReceiverConn) -> (),
+            >,
+        >() == 8
+    );
+};
+#[cfg(any(feature = "pg15", feature = "pg16"))]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_walrcv_disconnect>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::WalReceiverFunctionsType>
+{
+    type Member = c::expression::CFunction<
+        crate::__pgrx_c_generated::Signature_void__0l__struct__WalReceiverConn__0p__0r,
+    >;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 112;
+}
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::WalReceiverFunctionsType, <<c::expression::CRecord<crate::__pgrx_c_bindings::WalReceiverFunctionsType> as c::expression::OrdinaryField<Field_walrcv_disconnect>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).walrcv_disconnect) };
+#[cfg(any(feature = "pg15", feature = "pg18", feature = "pg19"))]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::WalSnd>() == 96);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::WalSnd>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::WalSnd {}
+const _: () = assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::WalSnd, pid) == 0);
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_pid>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::WalSnd>
+{
+    type Member = c::CInt;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 0;
+}
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<
+    crate::__pgrx_c_bindings::WalSnd,
+    <<c::expression::CRecord<crate::__pgrx_c_bindings::WalSnd> as c::expression::OrdinaryField<
+        Field_pid,
+    >>::Member as c::expression::CType>::Storage,
+> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).pid) };
+const _: () = assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::WalSnd, state) == 4);
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_state>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::WalSnd>
+{
+    type Member = c::expression::CEnumObject<
+        crate::__pgrx_c_generated::EnumIdentity_enum__WalSndState,
+        c::CUnsignedInt,
+        u32,
+    >;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 4;
+}
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<
+    crate::__pgrx_c_bindings::WalSnd,
+    <<c::expression::CRecord<crate::__pgrx_c_bindings::WalSnd> as c::expression::OrdinaryField<
+        Field_state,
+    >>::Member as c::expression::CType>::Storage,
+> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).state) };
+#[doc(hidden)]
+pub struct Field_sentPtr;
+const _: () = assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::WalSnd, sentPtr) == 8);
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_sentPtr>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::WalSnd>
+{
+    type Member = c::CUnsignedLong;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 8;
+}
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<
+    crate::__pgrx_c_bindings::WalSnd,
+    <<c::expression::CRecord<crate::__pgrx_c_bindings::WalSnd> as c::expression::OrdinaryField<
+        Field_sentPtr,
+    >>::Member as c::expression::CType>::Storage,
+> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).sentPtr) };
+#[doc(hidden)]
+pub struct Field_needreload;
+const _: () = assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::WalSnd, needreload) == 16);
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_needreload>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::WalSnd>
+{
+    type Member = c::CBool;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 16;
+}
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<
+    crate::__pgrx_c_bindings::WalSnd,
+    <<c::expression::CRecord<crate::__pgrx_c_bindings::WalSnd> as c::expression::OrdinaryField<
+        Field_needreload,
+    >>::Member as c::expression::CType>::Storage,
+> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).needreload) };
+const _: () = assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::WalSnd, write) == 24);
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_write>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::WalSnd>
+{
+    type Member = c::CUnsignedLong;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 24;
+}
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<
+    crate::__pgrx_c_bindings::WalSnd,
+    <<c::expression::CRecord<crate::__pgrx_c_bindings::WalSnd> as c::expression::OrdinaryField<
+        Field_write,
+    >>::Member as c::expression::CType>::Storage,
+> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).write) };
+const _: () = assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::WalSnd, flush) == 32);
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_flush>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::WalSnd>
+{
+    type Member = c::CUnsignedLong;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 32;
+}
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<
+    crate::__pgrx_c_bindings::WalSnd,
+    <<c::expression::CRecord<crate::__pgrx_c_bindings::WalSnd> as c::expression::OrdinaryField<
+        Field_flush,
+    >>::Member as c::expression::CType>::Storage,
+> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).flush) };
+const _: () = assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::WalSnd, apply) == 40);
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_apply>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::WalSnd>
+{
+    type Member = c::CUnsignedLong;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 40;
+}
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<
+    crate::__pgrx_c_bindings::WalSnd,
+    <<c::expression::CRecord<crate::__pgrx_c_bindings::WalSnd> as c::expression::OrdinaryField<
+        Field_apply,
+    >>::Member as c::expression::CType>::Storage,
+> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).apply) };
+#[doc(hidden)]
+pub struct Field_writeLag;
+const _: () = assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::WalSnd, writeLag) == 48);
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_writeLag>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::WalSnd>
+{
+    type Member = c::CLong;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 48;
+}
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<
+    crate::__pgrx_c_bindings::WalSnd,
+    <<c::expression::CRecord<crate::__pgrx_c_bindings::WalSnd> as c::expression::OrdinaryField<
+        Field_writeLag,
+    >>::Member as c::expression::CType>::Storage,
+> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).writeLag) };
+#[doc(hidden)]
+pub struct Field_flushLag;
+const _: () = assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::WalSnd, flushLag) == 56);
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_flushLag>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::WalSnd>
+{
+    type Member = c::CLong;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 56;
+}
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<
+    crate::__pgrx_c_bindings::WalSnd,
+    <<c::expression::CRecord<crate::__pgrx_c_bindings::WalSnd> as c::expression::OrdinaryField<
+        Field_flushLag,
+    >>::Member as c::expression::CType>::Storage,
+> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).flushLag) };
+#[doc(hidden)]
+pub struct Field_applyLag;
+const _: () = assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::WalSnd, applyLag) == 64);
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_applyLag>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::WalSnd>
+{
+    type Member = c::CLong;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 64;
+}
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<
+    crate::__pgrx_c_bindings::WalSnd,
+    <<c::expression::CRecord<crate::__pgrx_c_bindings::WalSnd> as c::expression::OrdinaryField<
+        Field_applyLag,
+    >>::Member as c::expression::CType>::Storage,
+> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).applyLag) };
+const _: () =
+    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::WalSnd, sync_standby_priority) == 72);
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_sync_standby_priority>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::WalSnd>
+{
+    type Member = c::CInt;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 72;
+}
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<
+    crate::__pgrx_c_bindings::WalSnd,
+    <<c::expression::CRecord<crate::__pgrx_c_bindings::WalSnd> as c::expression::OrdinaryField<
+        Field_sync_standby_priority,
+    >>::Member as c::expression::CType>::Storage,
+> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).sync_standby_priority) };
+const _: () = assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::WalSnd, mutex) == 76);
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_mutex>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::WalSnd>
+{
+    type Member = c::CUnsignedChar;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 76;
+}
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<
+    crate::__pgrx_c_bindings::WalSnd,
+    <<c::expression::CRecord<crate::__pgrx_c_bindings::WalSnd> as c::expression::OrdinaryField<
+        Field_mutex,
+    >>::Member as c::expression::CType>::Storage,
+> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).mutex) };
+#[doc(hidden)]
+pub struct Field_replyTime;
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
+const _: () = assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::WalSnd, replyTime) == 88);
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_replyTime>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::WalSnd>
+{
+    type Member = c::CLong;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 88;
+}
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<
+    crate::__pgrx_c_bindings::WalSnd,
+    <<c::expression::CRecord<crate::__pgrx_c_bindings::WalSnd> as c::expression::OrdinaryField<
+        Field_replyTime,
+    >>::Member as c::expression::CType>::Storage,
+> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).replyTime) };
+#[doc(hidden)]
+pub struct Field_winref;
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::WindowAgg>() == 224);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::WindowAgg>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::WindowAgg {}
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
+const _: () = assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::WindowAgg, winref) == 104);
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_winref>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::WindowAgg>
+{
+    type Member = c::CUnsignedInt;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 104;
+}
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<
+    crate::__pgrx_c_bindings::WindowAgg,
+    <<c::expression::CRecord<crate::__pgrx_c_bindings::WindowAgg> as c::expression::OrdinaryField<
+        Field_winref,
+    >>::Member as c::expression::CType>::Storage,
+> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).winref) };
+#[doc(hidden)]
+pub struct Field_partNumCols;
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
+const _: () =
+    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::WindowAgg, partNumCols) == 108);
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_partNumCols>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::WindowAgg>
+{
+    type Member = c::CInt;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 108;
+}
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<
+    crate::__pgrx_c_bindings::WindowAgg,
+    <<c::expression::CRecord<crate::__pgrx_c_bindings::WindowAgg> as c::expression::OrdinaryField<
+        Field_partNumCols,
+    >>::Member as c::expression::CType>::Storage,
+> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).partNumCols) };
+#[doc(hidden)]
+pub struct Field_ordNumCols;
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
+const _: () =
+    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::WindowAgg, ordNumCols) == 136);
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_ordNumCols>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::WindowAgg>
+{
+    type Member = c::CInt;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 136;
+}
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<
+    crate::__pgrx_c_bindings::WindowAgg,
+    <<c::expression::CRecord<crate::__pgrx_c_bindings::WindowAgg> as c::expression::OrdinaryField<
+        Field_ordNumCols,
+    >>::Member as c::expression::CType>::Storage,
+> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).ordNumCols) };
+#[doc(hidden)]
+pub struct Field_frameOptions;
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
+const _: () =
+    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::WindowAgg, frameOptions) == 168);
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_frameOptions>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::WindowAgg>
+{
+    type Member = c::CInt;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 168;
+}
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<
+    crate::__pgrx_c_bindings::WindowAgg,
+    <<c::expression::CRecord<crate::__pgrx_c_bindings::WindowAgg> as c::expression::OrdinaryField<
+        Field_frameOptions,
+    >>::Member as c::expression::CType>::Storage,
+> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).frameOptions) };
+#[doc(hidden)]
+pub struct Field_runCondition;
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
+const _: () =
+    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::WindowAgg, runCondition) == 192);
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_runCondition>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::WindowAgg>
+{
+    type Member = c::expression::CPointer<
+        c::expression::CRecord<crate::__pgrx_c_bindings::List>,
+        c::expression::ReadWrite,
+    >;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 192;
+}
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<
+    crate::__pgrx_c_bindings::WindowAgg,
+    <<c::expression::CRecord<crate::__pgrx_c_bindings::WindowAgg> as c::expression::OrdinaryField<
+        Field_runCondition,
+    >>::Member as c::expression::CType>::Storage,
+> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).runCondition) };
+#[doc(hidden)]
+pub struct Field_runConditionOrig;
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
+const _: () =
+    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::WindowAgg, runConditionOrig) == 200);
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_runConditionOrig>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::WindowAgg>
+{
+    type Member = c::expression::CPointer<
+        c::expression::CRecord<crate::__pgrx_c_bindings::List>,
+        c::expression::ReadWrite,
+    >;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 200;
+}
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<
+    crate::__pgrx_c_bindings::WindowAgg,
+    <<c::expression::CRecord<crate::__pgrx_c_bindings::WindowAgg> as c::expression::OrdinaryField<
+        Field_runConditionOrig,
+    >>::Member as c::expression::CType>::Storage,
+> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).runConditionOrig) };
+#[doc(hidden)]
+pub struct Field_startInRangeFunc;
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
+const _: () =
+    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::WindowAgg, startInRangeFunc) == 208);
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_startInRangeFunc>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::WindowAgg>
+{
+    type Member = c::expression::CIntegerStorage<c::CUnsignedInt, crate::__pgrx_c_bindings::Oid>;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 208;
+}
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<
+    crate::__pgrx_c_bindings::WindowAgg,
+    <<c::expression::CRecord<crate::__pgrx_c_bindings::WindowAgg> as c::expression::OrdinaryField<
+        Field_startInRangeFunc,
+    >>::Member as c::expression::CType>::Storage,
+> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).startInRangeFunc) };
+#[doc(hidden)]
+pub struct Field_endInRangeFunc;
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
 const _: () =
     assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::WindowAgg, endInRangeFunc) == 212);
@@ -1590,6 +2021,24 @@ unsafe impl c::expression::OrdinaryField<Field_free_decode_buffer>
 // SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
 const _: Projection<crate::__pgrx_c_bindings::XLogReaderState, <<c::expression::CRecord<crate::__pgrx_c_bindings::XLogReaderState> as c::expression::OrdinaryField<Field_free_decode_buffer>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).free_decode_buffer) };
 #[doc(hidden)]
+pub struct Field_decode_queue_head;
+const _: () = assert!(
+    ::core::mem::offset_of!(crate::__pgrx_c_bindings::XLogReaderState, decode_queue_head) == 152
+);
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_decode_queue_head>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::XLogReaderState>
+{
+    type Member = c::expression::CPointer<
+        c::expression::CRecord<crate::__pgrx_c_bindings::DecodedXLogRecord>,
+        c::expression::ReadWrite,
+    >;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 152;
+}
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::XLogReaderState, <<c::expression::CRecord<crate::__pgrx_c_bindings::XLogReaderState> as c::expression::OrdinaryField<Field_decode_queue_head>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).decode_queue_head) };
+#[doc(hidden)]
 pub struct Field_readLen;
 const _: () =
     assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::XLogReaderState, readLen) == 176);
@@ -2567,137 +3016,22 @@ const _: Projection<
 > = |base| unsafe { ::core::ptr::addr_of_mut!((*base)._fileno) };
 #[doc(hidden)]
 pub struct Field__flags2;
-const _: () = {
-    assert!(
-        ::core::mem::offset_of!(crate::__pgrx_c_bindings::_IO_FILE, _bitfield_1) * 8 + 0 == 928
-    );
-};
-unsafe extern "C" {
-    fn __pgrx_bitfield__get__05f494f5f46494c45__05f666c61677332(
-        p: *const crate::__pgrx_c_bindings::_IO_FILE,
-    ) -> i32;
-    fn __pgrx_bitfield__set__05f494f5f46494c45__05f666c61677332(
-        p: *mut crate::__pgrx_c_bindings::_IO_FILE,
-        value: i32,
-    ) -> i32;
-    fn __pgrx_bitfield__get_volatile__05f494f5f46494c45__05f666c61677332(
-        p: *const crate::__pgrx_c_bindings::_IO_FILE,
-    ) -> i32;
-    fn __pgrx_bitfield__set_volatile__05f494f5f46494c45__05f666c61677332(
-        p: *mut crate::__pgrx_c_bindings::_IO_FILE,
-        value: i32,
-    ) -> i32;
-    fn __pgrx_bitfield__get_unaligned__05f494f5f46494c45__05f666c61677332(
-        p: *const crate::__pgrx_c_bindings::_IO_FILE,
-    ) -> i32;
-    fn __pgrx_bitfield__set_unaligned__05f494f5f46494c45__05f666c61677332(
-        p: *mut crate::__pgrx_c_bindings::_IO_FILE,
-        value: i32,
-    ) -> i32;
-    fn __pgrx_bitfield__get_unaligned_volatile__05f494f5f46494c45__05f666c61677332(
-        p: *const crate::__pgrx_c_bindings::_IO_FILE,
-    ) -> i32;
-    fn __pgrx_bitfield__set_unaligned_volatile__05f494f5f46494c45__05f666c61677332(
-        p: *mut crate::__pgrx_c_bindings::_IO_FILE,
-        value: i32,
-    ) -> i32;
-}
-#[doc(hidden)]
-pub struct Bitfield_05f494f5f46494c45__05f666c61677332<Q: c::expression::Qualifier> {
-    address: Q::Raw<crate::__pgrx_c_bindings::_IO_FILE>,
-    access: c::expression::Access,
-}
-impl<Q: c::expression::Qualifier> Copy for Bitfield_05f494f5f46494c45__05f666c61677332<Q> {}
-impl<Q: c::expression::Qualifier> Clone for Bitfield_05f494f5f46494c45__05f666c61677332<Q> {
-    fn clone(&self) -> Self {
-        *self
-    }
-}
-// SAFETY: Clang and bindgen layout witnesses agree. This projects the record address without a reference or record read.
-unsafe impl<Q: c::expression::Qualifier> c::expression::Field<Field__flags2, Q>
+const _: () = assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::_IO_FILE, _flags2) == 116);
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field__flags2>
     for c::expression::CRecord<crate::__pgrx_c_bindings::_IO_FILE>
 {
-    type Output = Bitfield_05f494f5f46494c45__05f666c61677332<Q>;
-    unsafe fn project(base: c::expression::Place<Self, Q>) -> Self::Output {
-        Bitfield_05f494f5f46494c45__05f666c61677332::<Q> {
-            address: <Q as c::expression::Qualifier>::from_mut(base.pointer().as_mut_address()),
-            access: c::expression::Access {
-                volatile: base.access().volatile || false,
-                unaligned: base.access().unaligned,
-            },
-        }
-    }
+    type Member = c::CInt;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 116;
 }
-impl<Q: c::expression::Qualifier> c::expression::VolatilePlace
-    for Bitfield_05f494f5f46494c45__05f666c61677332<Q>
-{
-    type Qualified = Self;
-    fn qualify_volatile(mut self) -> Self::Qualified {
-        self.access.volatile = true;
-        self
-    }
-}
-// SAFETY: The same-profile C compiler owns bitfield storage reads, including partially initialized neighbor/padding bits. The marker retains declared size and compiler-proved arithmetic promotion.
-unsafe impl<Q: c::expression::Qualifier> c::expression::ReadPlace
-    for Bitfield_05f494f5f46494c45__05f666c61677332<Q>
-{
-    type Object = c::CInt;
-    type Type = c::expression::CBitfield<c::CInt, c::CInt>;
-    unsafe fn load(self) -> <Self::Type as c::expression::CType>::Value {
-        let pointer = Q::into_mut(self.address).cast_const(); // SAFETY: The caller establishes the original C field load contract; helpers perform only that field access.
-        let storage = unsafe {
-            if self.access.unaligned {
-                if self.access.volatile {
-                    __pgrx_bitfield__get_unaligned_volatile__05f494f5f46494c45__05f666c61677332(
-                        pointer,
-                    )
-                } else {
-                    __pgrx_bitfield__get_unaligned__05f494f5f46494c45__05f666c61677332(pointer)
-                }
-            } else if self.access.volatile {
-                __pgrx_bitfield__get_volatile__05f494f5f46494c45__05f666c61677332(pointer)
-            } else {
-                __pgrx_bitfield__get__05f494f5f46494c45__05f666c61677332(pointer)
-            }
-        };
-        <Self::Type as c::expression::CType>::from_storage(storage)
-    }
-}
-// SAFETY: Write capability retains ReadWrite qualification. Original C performs declared-base conversion and width narrowing without Rust byte reads.
-unsafe impl c::expression::WritePlace
-    for Bitfield_05f494f5f46494c45__05f666c61677332<c::expression::ReadWrite>
-{
-    type Assignment = c::CInt;
-    unsafe fn store(
-        self,
-        value: <Self::Assignment as c::expression::CType>::Value,
-    ) -> <Self::Type as c::expression::CType>::Value {
-        let value = <Self::Assignment as c::expression::CType>::into_storage(value); // SAFETY: The caller establishes writable field storage; this helper evaluates one original-C assignment and returns its narrowed result.
-        let stored = unsafe {
-            if self.access.unaligned {
-                if self.access.volatile {
-                    __pgrx_bitfield__set_unaligned_volatile__05f494f5f46494c45__05f666c61677332(
-                        self.address,
-                        value,
-                    )
-                } else {
-                    __pgrx_bitfield__set_unaligned__05f494f5f46494c45__05f666c61677332(
-                        self.address,
-                        value,
-                    )
-                }
-            } else if self.access.volatile {
-                __pgrx_bitfield__set_volatile__05f494f5f46494c45__05f666c61677332(
-                    self.address,
-                    value,
-                )
-            } else {
-                __pgrx_bitfield__set__05f494f5f46494c45__05f666c61677332(self.address, value)
-            }
-        };
-        <Self::Type as c::expression::CType>::from_storage(stored)
-    }
-}
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<
+    crate::__pgrx_c_bindings::_IO_FILE,
+    <<c::expression::CRecord<crate::__pgrx_c_bindings::_IO_FILE> as c::expression::OrdinaryField<
+        Field__flags2,
+    >>::Member as c::expression::CType>::Storage,
+> = |base| unsafe { ::core::ptr::addr_of_mut!((*base)._flags2) };
 #[doc(hidden)]
 pub struct Field__old_offset;
 const _: () =
@@ -2774,6 +3108,24 @@ const _: Projection<
     >>::Member as c::expression::CType>::Storage,
 > = |base| unsafe { ::core::ptr::addr_of_mut!((*base)._offset) };
 #[doc(hidden)]
+pub struct Field___pad5;
+const _: () = assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::_IO_FILE, __pad5) == 184);
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field___pad5>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::_IO_FILE>
+{
+    type Member = c::expression::CIntegerStorage<c::CUnsignedLong, usize>;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 184;
+}
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<
+    crate::__pgrx_c_bindings::_IO_FILE,
+    <<c::expression::CRecord<crate::__pgrx_c_bindings::_IO_FILE> as c::expression::OrdinaryField<
+        Field___pad5,
+    >>::Member as c::expression::CType>::Storage,
+> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).__pad5) };
+#[doc(hidden)]
 pub struct Field__mode;
 const _: () = assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::_IO_FILE, _mode) == 192);
 // SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
@@ -2791,43 +3143,6 @@ const _: Projection<
         Field__mode,
     >>::Member as c::expression::CType>::Storage,
 > = |base| unsafe { ::core::ptr::addr_of_mut!((*base)._mode) };
-#[doc(hidden)]
-pub struct Field__unused3;
-const _: () = assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::_IO_FILE, _unused3) == 196);
-// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
-unsafe impl c::expression::OrdinaryField<Field__unused3>
-    for c::expression::CRecord<crate::__pgrx_c_bindings::_IO_FILE>
-{
-    type Member = c::CInt;
-    type Declared = FieldReadWrite;
-    const OFFSET: usize = 196;
-}
-// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
-const _: Projection<
-    crate::__pgrx_c_bindings::_IO_FILE,
-    <<c::expression::CRecord<crate::__pgrx_c_bindings::_IO_FILE> as c::expression::OrdinaryField<
-        Field__unused3,
-    >>::Member as c::expression::CType>::Storage,
-> = |base| unsafe { ::core::ptr::addr_of_mut!((*base)._unused3) };
-#[doc(hidden)]
-pub struct Field__total_written;
-const _: () =
-    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::_IO_FILE, _total_written) == 200);
-// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
-unsafe impl c::expression::OrdinaryField<Field__total_written>
-    for c::expression::CRecord<crate::__pgrx_c_bindings::_IO_FILE>
-{
-    type Member = c::CUnsignedLong;
-    type Declared = FieldReadWrite;
-    const OFFSET: usize = 200;
-}
-// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
-const _: Projection<
-    crate::__pgrx_c_bindings::_IO_FILE,
-    <<c::expression::CRecord<crate::__pgrx_c_bindings::_IO_FILE> as c::expression::OrdinaryField<
-        Field__total_written,
-    >>::Member as c::expression::CType>::Storage,
-> = |base| unsafe { ::core::ptr::addr_of_mut!((*base)._total_written) };
 const _: () = {
     assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::_SPI_plan>() == 64);
     assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::_SPI_plan>() == 8);
@@ -4210,272 +4525,3 @@ unsafe impl c::expression::OrdinaryField<Field_exclusive>
     type Declared = FieldReadWrite;
     const OFFSET: usize = 36;
 }
-// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
-const _: Projection<crate::__pgrx_c_bindings::dshash_seq_status, <<c::expression::CRecord<crate::__pgrx_c_bindings::dshash_seq_status> as c::expression::OrdinaryField<Field_exclusive>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).exclusive) };
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::ginxlogCreatePostingTree>() == 4);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::ginxlogCreatePostingTree>() == 4);
-};
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::ginxlogCreatePostingTree {}
-const _: () =
-    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::ginxlogCreatePostingTree, size) == 0);
-// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
-unsafe impl c::expression::OrdinaryField<Field_size>
-    for c::expression::CRecord<crate::__pgrx_c_bindings::ginxlogCreatePostingTree>
-{
-    type Member = c::CUnsignedInt;
-    type Declared = FieldReadWrite;
-    const OFFSET: usize = 0;
-}
-// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
-const _: Projection<crate::__pgrx_c_bindings::ginxlogCreatePostingTree, <<c::expression::CRecord<crate::__pgrx_c_bindings::ginxlogCreatePostingTree> as c::expression::OrdinaryField<Field_size>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).size) };
-#[doc(hidden)]
-pub struct Field_ndeleted;
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::ginxlogDeleteListPages>() == 64);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::ginxlogDeleteListPages>() == 8);
-};
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::ginxlogDeleteListPages {}
-const _: () = assert!(
-    ::core::mem::offset_of!(crate::__pgrx_c_bindings::ginxlogDeleteListPages, ndeleted) == 56
-);
-// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
-unsafe impl c::expression::OrdinaryField<Field_ndeleted>
-    for c::expression::CRecord<crate::__pgrx_c_bindings::ginxlogDeleteListPages>
-{
-    type Member = c::CInt;
-    type Declared = FieldReadWrite;
-    const OFFSET: usize = 56;
-}
-// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
-const _: Projection<crate::__pgrx_c_bindings::ginxlogDeleteListPages, <<c::expression::CRecord<crate::__pgrx_c_bindings::ginxlogDeleteListPages> as c::expression::OrdinaryField<Field_ndeleted>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).ndeleted) };
-#[doc(hidden)]
-pub struct Field_parentOffset;
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::ginxlogDeletePage>() == 12);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::ginxlogDeletePage>() == 4);
-};
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::ginxlogDeletePage {}
-const _: () = assert!(
-    ::core::mem::offset_of!(crate::__pgrx_c_bindings::ginxlogDeletePage, parentOffset) == 0
-);
-// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
-unsafe impl c::expression::OrdinaryField<Field_parentOffset>
-    for c::expression::CRecord<crate::__pgrx_c_bindings::ginxlogDeletePage>
-{
-    type Member = c::CUnsignedShort;
-    type Declared = FieldReadWrite;
-    const OFFSET: usize = 0;
-}
-// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
-const _: Projection<crate::__pgrx_c_bindings::ginxlogDeletePage, <<c::expression::CRecord<crate::__pgrx_c_bindings::ginxlogDeletePage> as c::expression::OrdinaryField<Field_parentOffset>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).parentOffset) };
-#[doc(hidden)]
-pub struct Field_rightLink;
-const _: () =
-    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::ginxlogDeletePage, rightLink) == 4);
-// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
-unsafe impl c::expression::OrdinaryField<Field_rightLink>
-    for c::expression::CRecord<crate::__pgrx_c_bindings::ginxlogDeletePage>
-{
-    type Member = c::CUnsignedInt;
-    type Declared = FieldReadWrite;
-    const OFFSET: usize = 4;
-}
-// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
-const _: Projection<crate::__pgrx_c_bindings::ginxlogDeletePage, <<c::expression::CRecord<crate::__pgrx_c_bindings::ginxlogDeletePage> as c::expression::OrdinaryField<Field_rightLink>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).rightLink) };
-#[doc(hidden)]
-pub struct Field_deleteXid;
-const _: () =
-    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::ginxlogDeletePage, deleteXid) == 8);
-// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
-unsafe impl c::expression::OrdinaryField<Field_deleteXid>
-    for c::expression::CRecord<crate::__pgrx_c_bindings::ginxlogDeletePage>
-{
-    type Member =
-        c::expression::CIntegerStorage<c::CUnsignedInt, crate::__pgrx_c_bindings::TransactionId>;
-    type Declared = FieldReadWrite;
-    const OFFSET: usize = 8;
-}
-// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
-const _: Projection<crate::__pgrx_c_bindings::ginxlogDeletePage, <<c::expression::CRecord<crate::__pgrx_c_bindings::ginxlogDeletePage> as c::expression::OrdinaryField<Field_deleteXid>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).deleteXid) };
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::ginxlogInsertListPage>() == 8);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::ginxlogInsertListPage>() == 4);
-};
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::ginxlogInsertListPage {}
-const _: () = assert!(
-    ::core::mem::offset_of!(crate::__pgrx_c_bindings::ginxlogInsertListPage, rightlink) == 0
-);
-// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
-unsafe impl c::expression::OrdinaryField<Field_rightlink>
-    for c::expression::CRecord<crate::__pgrx_c_bindings::ginxlogInsertListPage>
-{
-    type Member = c::CUnsignedInt;
-    type Declared = FieldReadWrite;
-    const OFFSET: usize = 0;
-}
-// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
-const _: Projection<crate::__pgrx_c_bindings::ginxlogInsertListPage, <<c::expression::CRecord<crate::__pgrx_c_bindings::ginxlogInsertListPage> as c::expression::OrdinaryField<Field_rightlink>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).rightlink) };
-const _: () =
-    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::ginxlogInsertListPage, ntuples) == 4);
-// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
-unsafe impl c::expression::OrdinaryField<Field_ntuples>
-    for c::expression::CRecord<crate::__pgrx_c_bindings::ginxlogInsertListPage>
-{
-    type Member = c::CInt;
-    type Declared = FieldReadWrite;
-    const OFFSET: usize = 4;
-}
-// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
-const _: Projection<crate::__pgrx_c_bindings::ginxlogInsertListPage, <<c::expression::CRecord<crate::__pgrx_c_bindings::ginxlogInsertListPage> as c::expression::OrdinaryField<Field_ntuples>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).ntuples) };
-#[doc(hidden)]
-pub struct Field_rrlink;
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::ginxlogSplit>() == 28);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::ginxlogSplit>() == 4);
-};
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::ginxlogSplit {}
-const _: () =
-    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::ginxlogSplit, rrlink) == 12);
-// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
-unsafe impl c::expression::OrdinaryField<Field_rrlink>
-    for c::expression::CRecord<crate::__pgrx_c_bindings::ginxlogSplit>
-{
-    type Member = c::CUnsignedInt;
-    type Declared = FieldReadWrite;
-    const OFFSET: usize = 12;
-}
-// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
-const _: Projection<crate::__pgrx_c_bindings::ginxlogSplit, <<c::expression::CRecord<crate::__pgrx_c_bindings::ginxlogSplit> as c::expression::OrdinaryField<Field_rrlink>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).rrlink) };
-#[doc(hidden)]
-pub struct Field_leftChildBlkno;
-const _: () =
-    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::ginxlogSplit, leftChildBlkno) == 16);
-// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
-unsafe impl c::expression::OrdinaryField<Field_leftChildBlkno>
-    for c::expression::CRecord<crate::__pgrx_c_bindings::ginxlogSplit>
-{
-    type Member = c::CUnsignedInt;
-    type Declared = FieldReadWrite;
-    const OFFSET: usize = 16;
-}
-// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
-const _: Projection<crate::__pgrx_c_bindings::ginxlogSplit, <<c::expression::CRecord<crate::__pgrx_c_bindings::ginxlogSplit> as c::expression::OrdinaryField<Field_leftChildBlkno>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).leftChildBlkno) };
-#[doc(hidden)]
-pub struct Field_rightChildBlkno;
-const _: () =
-    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::ginxlogSplit, rightChildBlkno) == 20);
-// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
-unsafe impl c::expression::OrdinaryField<Field_rightChildBlkno>
-    for c::expression::CRecord<crate::__pgrx_c_bindings::ginxlogSplit>
-{
-    type Member = c::CUnsignedInt;
-    type Declared = FieldReadWrite;
-    const OFFSET: usize = 20;
-}
-// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
-const _: Projection<crate::__pgrx_c_bindings::ginxlogSplit, <<c::expression::CRecord<crate::__pgrx_c_bindings::ginxlogSplit> as c::expression::OrdinaryField<Field_rightChildBlkno>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).rightChildBlkno) };
-const _: () = assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::ginxlogSplit, flags) == 24);
-// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
-unsafe impl c::expression::OrdinaryField<Field_flags>
-    for c::expression::CRecord<crate::__pgrx_c_bindings::ginxlogSplit>
-{
-    type Member = c::CUnsignedShort;
-    type Declared = FieldReadWrite;
-    const OFFSET: usize = 24;
-}
-// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
-const _: Projection<crate::__pgrx_c_bindings::ginxlogSplit, <<c::expression::CRecord<crate::__pgrx_c_bindings::ginxlogSplit> as c::expression::OrdinaryField<Field_flags>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).flags) };
-#[doc(hidden)]
-pub struct Field_prevTail;
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::ginxlogUpdateMeta>() == 88);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::ginxlogUpdateMeta>() == 8);
-};
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::ginxlogUpdateMeta {}
-const _: () =
-    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::ginxlogUpdateMeta, prevTail) == 72);
-// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
-unsafe impl c::expression::OrdinaryField<Field_prevTail>
-    for c::expression::CRecord<crate::__pgrx_c_bindings::ginxlogUpdateMeta>
-{
-    type Member = c::CUnsignedInt;
-    type Declared = FieldReadWrite;
-    const OFFSET: usize = 72;
-}
-// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
-const _: Projection<crate::__pgrx_c_bindings::ginxlogUpdateMeta, <<c::expression::CRecord<crate::__pgrx_c_bindings::ginxlogUpdateMeta> as c::expression::OrdinaryField<Field_prevTail>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).prevTail) };
-#[doc(hidden)]
-pub struct Field_newRightlink;
-const _: () = assert!(
-    ::core::mem::offset_of!(crate::__pgrx_c_bindings::ginxlogUpdateMeta, newRightlink) == 76
-);
-// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
-unsafe impl c::expression::OrdinaryField<Field_newRightlink>
-    for c::expression::CRecord<crate::__pgrx_c_bindings::ginxlogUpdateMeta>
-{
-    type Member = c::CUnsignedInt;
-    type Declared = FieldReadWrite;
-    const OFFSET: usize = 76;
-}
-// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
-const _: Projection<crate::__pgrx_c_bindings::ginxlogUpdateMeta, <<c::expression::CRecord<crate::__pgrx_c_bindings::ginxlogUpdateMeta> as c::expression::OrdinaryField<Field_newRightlink>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).newRightlink) };
-const _: () =
-    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::ginxlogUpdateMeta, ntuples) == 80);
-// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
-unsafe impl c::expression::OrdinaryField<Field_ntuples>
-    for c::expression::CRecord<crate::__pgrx_c_bindings::ginxlogUpdateMeta>
-{
-    type Member = c::CInt;
-    type Declared = FieldReadWrite;
-    const OFFSET: usize = 80;
-}
-// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
-const _: Projection<crate::__pgrx_c_bindings::ginxlogUpdateMeta, <<c::expression::CRecord<crate::__pgrx_c_bindings::ginxlogUpdateMeta> as c::expression::OrdinaryField<Field_ntuples>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).ntuples) };
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::ginxlogVacuumDataLeafPage>() == 2);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::ginxlogVacuumDataLeafPage>() == 2);
-};
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::ginxlogVacuumDataLeafPage {}
-const _: () = assert!(
-    ::core::mem::offset_of!(crate::__pgrx_c_bindings::ginxlogVacuumDataLeafPage, data) == 0
-);
-// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
-unsafe impl c::expression::OrdinaryField<Field_data>
-    for c::expression::CRecord<crate::__pgrx_c_bindings::ginxlogVacuumDataLeafPage>
-{
-    type Member = c::expression::CRecord<crate::__pgrx_c_bindings::ginxlogRecompressDataLeaf>;
-    type Declared = FieldReadWrite;
-    const OFFSET: usize = 0;
-}
-// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
-const _: Projection<crate::__pgrx_c_bindings::ginxlogVacuumDataLeafPage, <<c::expression::CRecord<crate::__pgrx_c_bindings::ginxlogVacuumDataLeafPage> as c::expression::OrdinaryField<Field_data>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).data) };
-#[cfg(feature = "pg15")]
-#[doc(hidden)]
-pub struct Field_latestRemovedXid;
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::gistxlogDelete>() == 8);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::gistxlogDelete>() == 4);
-};
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::gistxlogDelete {}
-#[cfg(feature = "pg15")]
-const _: () = assert!(
-    ::core::mem::offset_of!(crate::__pgrx_c_bindings::gistxlogDelete, latestRemovedXid) == 0
-);
-#[cfg(feature = "pg15")]
-// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
-unsafe impl c::expression::OrdinaryField<Field_latestRemovedXid>
-    for c::expression::CRecord<crate::__pgrx_c_bindings::gistxlogDelete>
-{
-    type Member =
-        c::expression::CIntegerStorage<c::CUnsignedInt, crate::__pgrx_c_bindings::TransactionId>;
-    type Declared = FieldReadWrite;
-    const OFFSET: usize = 0;
-}
-#[cfg(feature = "pg15")]
-// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
-const _: Projection<crate::__pgrx_c_bindings::gistxlogDelete, <<c::expression::CRecord<crate::__pgrx_c_bindings::gistxlogDelete> as c::expression::OrdinaryField<Field_latestRemovedXid>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).latestRemovedXid) };
-#[doc(hidden)]
-pub struct Field_ntodelete;
-const _: () =
-    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::gistxlogDelete, ntodelete) == 4);

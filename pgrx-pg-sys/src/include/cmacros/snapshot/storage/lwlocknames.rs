@@ -26,19 +26,25 @@ macro_rules! AddinShmemInitLock {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -80,19 +86,25 @@ macro_rules! AioWorkerControlLock {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -134,19 +146,25 @@ macro_rules! AioWorkerSubmissionQueueLock {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -187,19 +205,25 @@ macro_rules! AutoFileLock {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -240,19 +264,25 @@ macro_rules! AutovacuumLock {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -293,19 +323,25 @@ macro_rules! AutovacuumScheduleLock {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -346,19 +382,25 @@ macro_rules! BackgroundWorkerLock {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -399,19 +441,25 @@ macro_rules! BtreeVacuumLock {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -452,19 +500,25 @@ macro_rules! CheckpointerCommLock {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -505,19 +559,25 @@ macro_rules! CommitTsLock {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -559,19 +619,25 @@ macro_rules! CommitTsSLRULock {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -612,19 +678,25 @@ macro_rules! ControlFileLock {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -666,19 +738,25 @@ macro_rules! DSMRegistryLock {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -719,19 +797,25 @@ macro_rules! DynamicSharedMemoryControlLock {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -773,19 +857,25 @@ macro_rules! InjectionPointLock {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -827,19 +917,25 @@ macro_rules! LogicalDecodingControlLock {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -880,19 +976,25 @@ macro_rules! LogicalRepWorkerLock {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -933,19 +1035,25 @@ macro_rules! MultiXactGenLock {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -987,19 +1095,25 @@ macro_rules! MultiXactMemberSLRULock {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -1041,19 +1155,25 @@ macro_rules! MultiXactOffsetSLRULock {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -1094,19 +1214,25 @@ macro_rules! MultiXactTruncationLock {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -1147,19 +1273,25 @@ macro_rules! NotifyQueueLock {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -1200,19 +1332,25 @@ macro_rules! NotifyQueueTailLock {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -1254,19 +1392,25 @@ macro_rules! NotifySLRULock {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -1307,19 +1451,25 @@ macro_rules! OidGenLock {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -1361,19 +1511,25 @@ macro_rules! OldSnapshotTimeMapLock {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -1414,19 +1570,25 @@ macro_rules! ProcArrayLock {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -1467,19 +1629,25 @@ macro_rules! RelCacheInitLock {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -1520,19 +1688,25 @@ macro_rules! RelationMappingLock {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -1573,19 +1747,25 @@ macro_rules! ReplicationOriginLock {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -1626,19 +1806,25 @@ macro_rules! ReplicationSlotAllocationLock {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -1679,19 +1865,25 @@ macro_rules! ReplicationSlotControlLock {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -1732,19 +1924,25 @@ macro_rules! SInvalReadLock {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -1785,19 +1983,25 @@ macro_rules! SInvalWriteLock {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -1839,19 +2043,25 @@ macro_rules! SerialControlLock {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -1893,19 +2103,25 @@ macro_rules! SerialSLRULock {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -1946,19 +2162,25 @@ macro_rules! SerializableFinishedListLock {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -1999,19 +2221,25 @@ macro_rules! SerializablePredicateListLock {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -2052,19 +2280,25 @@ macro_rules! SerializableXactHashLock {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -2106,19 +2340,25 @@ macro_rules! ShmemIndexLock {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -2160,19 +2400,25 @@ macro_rules! SubtransSLRULock {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -2213,19 +2459,25 @@ macro_rules! SyncRepLock {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -2266,19 +2518,25 @@ macro_rules! SyncScanLock {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -2319,19 +2577,25 @@ macro_rules! TablespaceCreateLock {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -2372,19 +2636,25 @@ macro_rules! TwoPhaseStateLock {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -2425,19 +2695,25 @@ macro_rules! WALBufMappingLock {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -2479,19 +2755,25 @@ macro_rules! WALSummarizerLock {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -2532,19 +2814,25 @@ macro_rules! WALWriteLock {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -2586,19 +2874,25 @@ macro_rules! WaitEventCustomLock {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -2640,19 +2934,25 @@ macro_rules! WaitLSNLock {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -2693,19 +2993,25 @@ macro_rules! WrapLimitsVacuumLock {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -2747,19 +3053,25 @@ macro_rules! XactSLRULock {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -2800,19 +3112,25 @@ macro_rules! XactTruncationLock {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -2853,19 +3171,25 @@ macro_rules! XidGenLock {
                             >(
                                 $crate::__pgrx_c_macros::expression::index(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::load(
-                                            $crate::__pgrx_c_macros::expression::place::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::LWLockPadded
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>(
-                                                ::core::ptr::addr_of_mut!(
-                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                        {
+                                            $crate::submodules::thread_check::check_active_thread();
+                                            /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */
+                                            #[allow(unused_unsafe)] unsafe {
+                                                $crate::__pgrx_c_macros::expression::load_global(
+                                                    $crate::__pgrx_c_macros::expression::place::<
+                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                $crate::__pgrx_c_bindings::LWLockPadded
+                                                            >,
+                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                        >>(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                                        )
+                                                    )
                                                 )
-                                            )
-                                        )
+                                            }
+                                        }
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<

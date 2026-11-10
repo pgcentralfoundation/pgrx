@@ -173,6 +173,39 @@ macro_rules! IS_OUTER_JOIN {
         )
     };
 }
+/// C macro IsA from nodes.h:596 (PostgreSQL 15), nodes.h:179 (PostgreSQL 16), nodes.h:158 (PostgreSQL 17), nodes.h:164 (PostgreSQL 18), nodes.h:162 (PostgreSQL 19)
+///
+/// ```text
+/// #define IsA( nodeptr , _type_ ) ( nodeTag ( nodeptr ) == T_ ## _type_ )
+/// ```
+///
+///
+/// `_type_` is a structure type, named by any Rust path to its binding. C pastes `T_` onto the type's C name to name an enumerator of `enum NodeTag`, so a type whose name has no such enumerator fails to compile.
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! IsA {
+    ($nodeptr:expr, $_type_:ty $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$nodeptr;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
+    };
+}
 /// C macro NodeSetTag from nodes.h:594 (PostgreSQL 15), nodes.h:177 (PostgreSQL 16), nodes.h:156 (PostgreSQL 17), nodes.h:162 (PostgreSQL 18), nodes.h:160 (PostgreSQL 19)
 ///
 /// ```text
@@ -230,19 +263,47 @@ macro_rules! NodeSetTag {
         )
     };
 }
-/// Typed call adapter for C inline function castNodeImpl from nodes.h:606 (PostgreSQL 15), nodes.h:189 (PostgreSQL 16), nodes.h:168 (PostgreSQL 17), nodes.h:174 (PostgreSQL 18), nodes.h:172 (PostgreSQL 19)
+/// C macro castNode from nodes.h:612 (PostgreSQL 15), nodes.h:195 (PostgreSQL 16), nodes.h:174 (PostgreSQL 17), nodes.h:180 (PostgreSQL 18), nodes.h:178 (PostgreSQL 19)
 ///
-/// ```c
-/// static inline Node *
-/// castNodeImpl(NodeTag type, void *ptr)
-/// {
-/// 	Assert(ptr == NULL || nodeTag(ptr) == type);
-/// 	return (Node *) ptr;
-/// }
+/// ```text
+/// #define castNode( _type_ , nodeptr ) ( ( _type_ * ) castNodeImpl ( T_ ## _type_ , nodeptr ) )
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+/// `_type_` is a structure type, named by any Rust path to its binding. C pastes `T_` onto the type's C name to name an enumerator of `enum NodeTag`, so a type whose name has no such enumerator fails to compile.
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! castNode {
+    ($_type_:ty, $nodeptr:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$nodeptr;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<<$_type_ as $crate::__pgrx_c_macros::expression::NativeType
+                        >::Marker,
+                        $crate::__pgrx_c_macros::expression::ReadWrite>>()
+                    )
+                )
+            }
+        )
+    };
+}
+#[cfg(feature = "pg19")]
+/// C macro copyObject from nodes.h:230 (PostgreSQL 19)
+///
+/// ```text
+/// #define copyObject( obj ) copyObjectImpl ( obj )
+/// ```
+///
 ///
 /// # Safety
 ///
@@ -252,18 +313,15 @@ macro_rules! NodeSetTag {
 ///
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
-macro_rules! castNodeImpl {
-    ($type:expr, $ptr:expr $(,)?) => {
+macro_rules! copyObject {
+    ($obj:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
-                let _ = &$type;
-                let _ = &$ptr;
+                let _ = &$obj;
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::type_witness::<
                         $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CRecord<
-                                $crate::__pgrx_c_bindings::Node
-                            >,
+                            $crate::__pgrx_c_macros::expression::CVoid,
                             $crate::__pgrx_c_macros::expression::ReadWrite
                         >>()
                 )
@@ -271,8 +329,143 @@ macro_rules! castNodeImpl {
         )
     };
 }
+#[cfg(any(feature = "pg15", feature = "pg16"))]
+/// C macro makeNode from nodes.h:593 (PostgreSQL 15), nodes.h:176 (PostgreSQL 16)
+///
+/// ```text
+/// #define makeNode( _type_ ) ( ( _type_ * ) newNode ( sizeof ( _type_ ) , T_ ## _type_ ) )
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
+///
+/// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+///
+#[doc = crate::__pgrx_c_doc_assertions!()]
+///
+/// Caller argument tokens must not mention the macro's C local names, even inside groups: those invocations are rejected because C substitution can capture locals that Rust hygiene would resolve differently. The scope check also inspects forwarded expression fragments and is bounded to 4096 stringified bytes. Matches in fields, paths or strings are conservatively rejected.
+///
+/// `_type_` is a structure type, named by any Rust path to its binding. C pastes `T_` onto the type's C name to name an enumerator of `enum NodeTag`, so a type whose name has no such enumerator fails to compile.
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! makeNode {
+    ($_type_:ty $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<<$_type_ as $crate::__pgrx_c_macros::expression::NativeType
+                        >::Marker,
+                        $crate::__pgrx_c_macros::expression::ReadWrite>>()
+                    )
+                )
+            }
+        )
+    };
+}
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function newNode from nodes.h:143 (PostgreSQL 17), nodes.h:149 (PostgreSQL 18), nodes.h:147 (PostgreSQL 19)
+/// C macro makeNode from nodes.h:155 (PostgreSQL 17), nodes.h:161 (PostgreSQL 18), nodes.h:159 (PostgreSQL 19)
+///
+/// ```text
+/// #define makeNode( _type_ ) ( ( _type_ * ) newNode ( sizeof ( _type_ ) , T_ ## _type_ ) )
+/// ```
+///
+///
+/// `_type_` is a structure type, named by any Rust path to its binding. C pastes `T_` onto the type's C name to name an enumerator of `enum NodeTag`, so a type whose name has no such enumerator fails to compile.
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! makeNode {
+    ($_type_:ty $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<<$_type_ as $crate::__pgrx_c_macros::expression::NativeType
+                        >::Marker,
+                        $crate::__pgrx_c_macros::expression::ReadWrite>>()
+                    )
+                )
+            }
+        )
+    };
+}
+#[cfg(any(feature = "pg15", feature = "pg16"))]
+/// C macro newNode from nodes.h:566 (PostgreSQL 15), nodes.h:149 (PostgreSQL 16)
+///
+/// ```text
+/// #define newNode( size , tag ) ( { Node * _result ; AssertMacro ( ( size ) >= sizeof ( Node ) ) ; /* need the tag, at least */ _result = ( Node * ) palloc0fast ( size ) ; _result -> type = ( tag ) ; _result ; } )
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
+///
+/// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+///
+#[doc = crate::__pgrx_c_doc_assertions!()]
+///
+/// Caller argument tokens must not mention the macro's C local names, even inside groups: those invocations are rejected because C substitution can capture locals that Rust hygiene would resolve differently. The scope check also inspects forwarded expression fragments and is bounded to 4096 stringified bytes. Matches in fields, paths or strings are conservatively rejected.
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! newNode {
+    ($size:expr, $tag:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$size;
+                let _ = &$tag;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    {
+                        let mut __pgrx_c_local0 = ::core::mem::MaybeUninit::<
+                            *mut $crate::__pgrx_c_bindings::Node
+                        >::uninit();
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            /* SAFETY: analysis proves this local initialized before each evaluated read; its aligned storage is owned here and addressed without creating references. */
+                            #[allow(unused_unsafe)] unsafe {
+                                $crate::__pgrx_c_macros::expression::load(
+                                    $crate::__pgrx_c_macros::expression::place::<
+                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                $crate::__pgrx_c_bindings::Node
+                                            >,
+                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                        >>(
+                                        ::core::ptr::addr_of_mut!(__pgrx_c_local0).cast::<
+                                            *mut $crate::__pgrx_c_bindings::Node
+                                        >()
+                                    )
+                                )
+                            }
+                        )
+                    }
+                )
+            }
+        )
+    };
+}
+#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
+/// C inline function newNode from nodes.h:143 (PostgreSQL 17), nodes.h:149 (PostgreSQL 18), nodes.h:147 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline Node *
@@ -289,7 +482,11 @@ macro_rules! castNodeImpl {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+///
+#[doc = crate::__pgrx_c_doc_assertions!()]
 ///
 /// # Safety
 ///
@@ -297,7 +494,7 @@ macro_rules! castNodeImpl {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! newNode {
     ($size:expr, $tag:expr $(,)?) => {
@@ -305,15 +502,13 @@ macro_rules! newNode {
             @value {
                 let _ = &$size;
                 let _ = &$tag;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CRecord<
-                                $crate::__pgrx_c_bindings::Node
-                            >,
-                            $crate::__pgrx_c_macros::expression::ReadWrite
-                        >>()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_macros::expression::CPointer<
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::Node
+                        >,
+                        $crate::__pgrx_c_macros::expression::ReadWrite
+                    >>()
             }
         )
     };
@@ -375,8 +570,11 @@ pub use DO_AGGSPLIT_DESERIALIZE;
 pub use DO_AGGSPLIT_SERIALIZE;
 pub use DO_AGGSPLIT_SKIPFINAL;
 pub use IS_OUTER_JOIN;
+pub use IsA;
 pub use NodeSetTag;
-pub use castNodeImpl;
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
+pub use castNode;
+#[cfg(feature = "pg19")]
+pub use copyObject;
+pub use makeNode;
 pub use newNode;
 pub use nodeTag;

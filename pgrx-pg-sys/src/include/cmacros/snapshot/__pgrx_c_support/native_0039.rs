@@ -1,6 +1,2035 @@
 // Shared generated C macro support.
 
 #[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_firings>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::TriggerInstrumentation>
+{
+    type Member = c::CLong;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 360;
+}
+#[cfg(feature = "pg19")]
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::TriggerInstrumentation, <<c::expression::CRecord<crate::__pgrx_c_bindings::TriggerInstrumentation> as c::expression::OrdinaryField<Field_firings>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).firings) };
+#[cfg(feature = "pg19")]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::TupleDescData>() == 32);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::TupleDescData>() == 8);
+};
+#[cfg(feature = "pg19")]
+#[doc(hidden)]
+pub struct Field_firstNonCachedOffsetAttr;
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::offset_of!(crate::__pgrx_c_bindings::TupleDescData, firstNonCachedOffsetAttr)
+        == 16
+);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_firstNonCachedOffsetAttr>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::TupleDescData>
+{
+    type Member = c::CInt;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 16;
+}
+#[cfg(feature = "pg19")]
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::TupleDescData, <<c::expression::CRecord<crate::__pgrx_c_bindings::TupleDescData> as c::expression::OrdinaryField<Field_firstNonCachedOffsetAttr>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).firstNonCachedOffsetAttr) };
+#[cfg(feature = "pg19")]
+#[doc(hidden)]
+pub struct Field_firstNonGuaranteedAttr;
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::offset_of!(crate::__pgrx_c_bindings::TupleDescData, firstNonGuaranteedAttr) == 20
+);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_firstNonGuaranteedAttr>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::TupleDescData>
+{
+    type Member = c::CInt;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 20;
+}
+#[cfg(feature = "pg19")]
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::TupleDescData, <<c::expression::CRecord<crate::__pgrx_c_bindings::TupleDescData> as c::expression::OrdinaryField<Field_firstNonGuaranteedAttr>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).firstNonGuaranteedAttr) };
+#[cfg(feature = "pg19")]
+const _: () =
+    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::TupleDescData, compact_attrs) == 32);
+#[cfg(feature = "pg19")]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::TupleTableSlot>() == 72);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::TupleTableSlot>() == 8);
+};
+#[cfg(feature = "pg19")]
+#[doc(hidden)]
+pub struct Field_tts_first_nonguaranteed;
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::offset_of!(crate::__pgrx_c_bindings::TupleTableSlot, tts_first_nonguaranteed)
+        == 40
+);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_tts_first_nonguaranteed>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::TupleTableSlot>
+{
+    type Member = c::CInt;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 40;
+}
+#[cfg(feature = "pg19")]
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::TupleTableSlot, <<c::expression::CRecord<crate::__pgrx_c_bindings::TupleTableSlot> as c::expression::OrdinaryField<Field_tts_first_nonguaranteed>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).tts_first_nonguaranteed) };
+#[cfg(feature = "pg19")]
+const _: () =
+    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::TupleTableSlot, tts_tid) == 56);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_tts_tid>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::TupleTableSlot>
+{
+    type Member = c::expression::CRecord<crate::__pgrx_c_bindings::ItemPointerData>;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 56;
+}
+#[cfg(feature = "pg19")]
+const _: () =
+    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::TupleTableSlot, tts_tableOid) == 64);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_tts_tableOid>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::TupleTableSlot>
+{
+    type Member = c::expression::CIntegerStorage<c::CUnsignedInt, crate::__pgrx_c_bindings::Oid>;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 64;
+}
+#[cfg(feature = "pg19")]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::UniquePath>() == 96);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::UniquePath>() == 8);
+};
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::UniquePath, numkeys) == 88);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_numkeys>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::UniquePath>
+{
+    type Member = c::CInt;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 88;
+}
+#[cfg(feature = "pg19")]
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::UniquePath, <<c::expression::CRecord<crate::__pgrx_c_bindings::UniquePath> as c::expression::OrdinaryField<Field_numkeys>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).numkeys) };
+#[cfg(feature = "pg19")]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::VirtualTupleTableSlot>() == 80);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::VirtualTupleTableSlot>() == 8);
+};
+#[cfg(feature = "pg19")]
+const _: () =
+    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::VirtualTupleTableSlot, data) == 72);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_data>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::VirtualTupleTableSlot>
+{
+    type Member = c::expression::CPointer<
+        c::expression::CIntegerStorage<c::CChar, ::core::ffi::c_char>,
+        c::expression::ReadWrite,
+    >;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 72;
+}
+#[cfg(feature = "pg19")]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::WaitLSNProcInfo>() == 48);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::WaitLSNProcInfo>() == 8);
+};
+#[cfg(feature = "pg19")]
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::WaitLSNProcInfo {}
+#[cfg(feature = "pg19")]
+const _: () =
+    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::WaitLSNProcInfo, waitLSN) == 0);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_waitLSN>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::WaitLSNProcInfo>
+{
+    type Member = c::CUnsignedLong;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 0;
+}
+#[cfg(feature = "pg19")]
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::WaitLSNProcInfo, <<c::expression::CRecord<crate::__pgrx_c_bindings::WaitLSNProcInfo> as c::expression::OrdinaryField<Field_waitLSN>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).waitLSN) };
+#[cfg(feature = "pg19")]
+#[doc(hidden)]
+pub struct Field_lsnType;
+#[cfg(feature = "pg19")]
+const _: () =
+    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::WaitLSNProcInfo, lsnType) == 8);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_lsnType>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::WaitLSNProcInfo>
+{
+    type Member = c::expression::CEnumObject<
+        crate::__pgrx_c_generated::EnumIdentity_enum__WaitLSNType,
+        c::CUnsignedInt,
+        u32,
+    >;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 8;
+}
+#[cfg(feature = "pg19")]
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::WaitLSNProcInfo, <<c::expression::CRecord<crate::__pgrx_c_bindings::WaitLSNProcInfo> as c::expression::OrdinaryField<Field_lsnType>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).lsnType) };
+#[cfg(feature = "pg19")]
+const _: () =
+    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::WaitLSNProcInfo, procno) == 12);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_procno>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::WaitLSNProcInfo>
+{
+    type Member = c::CInt;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 12;
+}
+#[cfg(feature = "pg19")]
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::WaitLSNProcInfo, <<c::expression::CRecord<crate::__pgrx_c_bindings::WaitLSNProcInfo> as c::expression::OrdinaryField<Field_procno>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).procno) };
+#[cfg(feature = "pg19")]
+#[doc(hidden)]
+pub struct Field_inHeap;
+#[cfg(feature = "pg19")]
+const _: () =
+    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::WaitLSNProcInfo, inHeap) == 16);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_inHeap>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::WaitLSNProcInfo>
+{
+    type Member = c::CBool;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 16;
+}
+#[cfg(feature = "pg19")]
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::WaitLSNProcInfo, <<c::expression::CRecord<crate::__pgrx_c_bindings::WaitLSNProcInfo> as c::expression::OrdinaryField<Field_inHeap>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).inHeap) };
+#[cfg(feature = "pg19")]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::WaitStmt>() == 32);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::WaitStmt>() == 8);
+};
+#[cfg(feature = "pg19")]
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::WaitStmt {}
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::WaitStmt, type_) == 0);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_type>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::WaitStmt>
+{
+    type Member = c::expression::CEnumObject<
+        crate::__pgrx_c_generated::EnumIdentity_enum__NodeTag,
+        c::CUnsignedInt,
+        crate::__pgrx_c_bindings::NodeTag,
+    >;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 0;
+}
+#[cfg(feature = "pg19")]
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<
+    crate::__pgrx_c_bindings::WaitStmt,
+    <<c::expression::CRecord<crate::__pgrx_c_bindings::WaitStmt> as c::expression::OrdinaryField<
+        Field_type,
+    >>::Member as c::expression::CType>::Storage,
+> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).type_) };
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::WaitStmt, options) == 16);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_options>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::WaitStmt>
+{
+    type Member = c::expression::CPointer<
+        c::expression::CRecord<crate::__pgrx_c_bindings::List>,
+        c::expression::ReadWrite,
+    >;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 16;
+}
+#[cfg(feature = "pg19")]
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<
+    crate::__pgrx_c_bindings::WaitStmt,
+    <<c::expression::CRecord<crate::__pgrx_c_bindings::WaitStmt> as c::expression::OrdinaryField<
+        Field_options,
+    >>::Member as c::expression::CType>::Storage,
+> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).options) };
+#[cfg(feature = "pg19")]
+#[doc(hidden)]
+pub struct Field_lsn_location;
+#[cfg(feature = "pg19")]
+const _: () =
+    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::WaitStmt, lsn_location) == 24);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_lsn_location>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::WaitStmt>
+{
+    type Member = c::CInt;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 24;
+}
+#[cfg(feature = "pg19")]
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<
+    crate::__pgrx_c_bindings::WaitStmt,
+    <<c::expression::CRecord<crate::__pgrx_c_bindings::WaitStmt> as c::expression::OrdinaryField<
+        Field_lsn_location,
+    >>::Member as c::expression::CType>::Storage,
+> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).lsn_location) };
+#[cfg(feature = "pg19")]
+const _: () = {
+    assert!(
+        ::core::mem::size_of::<
+            ::core::option::Option<
+                unsafe extern "C-unwind" fn(
+                    *mut crate::__pgrx_c_bindings::WalReceiverConn,
+                    *mut u32,
+                    *mut u64,
+                ) -> *mut ::core::ffi::c_char,
+            >,
+        >() == 8
+    );
+    assert!(
+        ::core::mem::align_of::<
+            ::core::option::Option<
+                unsafe extern "C-unwind" fn(
+                    *mut crate::__pgrx_c_bindings::WalReceiverConn,
+                    *mut u32,
+                    *mut u64,
+                ) -> *mut ::core::ffi::c_char,
+            >,
+        >() == 8
+    );
+};
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_walrcv_identify_system>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::WalReceiverFunctionsType>
+{
+    type Member = c::expression::CFunction<crate::__pgrx_c_generated::Signature_char__0p__0l__struct__WalReceiverConn__0p__0c__unsigned__int__0p__0c__unsigned__long__0p__0r>;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 32;
+}
+#[cfg(feature = "pg19")]
+const _: () =
+    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::WindowFunc, ignore_nulls) == 56);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_ignore_nulls>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::WindowFunc>
+{
+    type Member = c::CInt;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 56;
+}
+#[cfg(feature = "pg19")]
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::WindowFunc, <<c::expression::CRecord<crate::__pgrx_c_bindings::WindowFunc> as c::expression::OrdinaryField<Field_ignore_nulls>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).ignore_nulls) };
+#[cfg(feature = "pg19")]
+const _: () =
+    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::WindowFunc, location) == 60);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_location>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::WindowFunc>
+{
+    type Member = c::CInt;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 60;
+}
+#[cfg(feature = "pg19")]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::WorkerNodeInstrumentation>() == 8);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::WorkerNodeInstrumentation>() == 8);
+};
+#[cfg(feature = "pg19")]
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::WorkerNodeInstrumentation {}
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::offset_of!(crate::__pgrx_c_bindings::WorkerNodeInstrumentation, num_workers) == 0
+);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_num_workers>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::WorkerNodeInstrumentation>
+{
+    type Member = c::CInt;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 0;
+}
+#[cfg(feature = "pg19")]
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::WorkerNodeInstrumentation, <<c::expression::CRecord<crate::__pgrx_c_bindings::WorkerNodeInstrumentation> as c::expression::OrdinaryField<Field_num_workers>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).num_workers) };
+#[cfg(feature = "pg19")]
+#[doc(hidden)]
+pub struct Field_SharedHotStandbyActive;
+#[cfg(feature = "pg19")]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::XLogRecoveryCtlData>() == 104);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::XLogRecoveryCtlData>() == 8);
+};
+#[cfg(feature = "pg19")]
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::XLogRecoveryCtlData {}
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::offset_of!(crate::__pgrx_c_bindings::XLogRecoveryCtlData, SharedHotStandbyActive)
+        == 0
+);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_SharedHotStandbyActive>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::XLogRecoveryCtlData>
+{
+    type Member = c::CBool;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 0;
+}
+#[cfg(feature = "pg19")]
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::XLogRecoveryCtlData, <<c::expression::CRecord<crate::__pgrx_c_bindings::XLogRecoveryCtlData> as c::expression::OrdinaryField<Field_SharedHotStandbyActive>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).SharedHotStandbyActive) };
+#[cfg(feature = "pg19")]
+#[doc(hidden)]
+pub struct Field_SharedPromoteIsTriggered;
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::offset_of!(
+        crate::__pgrx_c_bindings::XLogRecoveryCtlData,
+        SharedPromoteIsTriggered
+    ) == 1
+);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_SharedPromoteIsTriggered>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::XLogRecoveryCtlData>
+{
+    type Member = c::CBool;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 1;
+}
+#[cfg(feature = "pg19")]
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::XLogRecoveryCtlData, <<c::expression::CRecord<crate::__pgrx_c_bindings::XLogRecoveryCtlData> as c::expression::OrdinaryField<Field_SharedPromoteIsTriggered>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).SharedPromoteIsTriggered) };
+#[cfg(feature = "pg19")]
+#[doc(hidden)]
+pub struct Field_SharedRecoverySubtransInitialized;
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::offset_of!(
+        crate::__pgrx_c_bindings::XLogRecoveryCtlData,
+        SharedRecoverySubtransInitialized
+    ) == 2
+);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_SharedRecoverySubtransInitialized>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::XLogRecoveryCtlData>
+{
+    type Member = c::CBool;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 2;
+}
+#[cfg(feature = "pg19")]
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::XLogRecoveryCtlData, <<c::expression::CRecord<crate::__pgrx_c_bindings::XLogRecoveryCtlData> as c::expression::OrdinaryField<Field_SharedRecoverySubtransInitialized>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).SharedRecoverySubtransInitialized) };
+#[cfg(feature = "pg19")]
+#[doc(hidden)]
+pub struct Field_lastReplayedReadRecPtr;
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::offset_of!(crate::__pgrx_c_bindings::XLogRecoveryCtlData, lastReplayedReadRecPtr)
+        == 24
+);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_lastReplayedReadRecPtr>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::XLogRecoveryCtlData>
+{
+    type Member = c::CUnsignedLong;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 24;
+}
+#[cfg(feature = "pg19")]
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::XLogRecoveryCtlData, <<c::expression::CRecord<crate::__pgrx_c_bindings::XLogRecoveryCtlData> as c::expression::OrdinaryField<Field_lastReplayedReadRecPtr>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).lastReplayedReadRecPtr) };
+#[cfg(feature = "pg19")]
+#[doc(hidden)]
+pub struct Field_lastReplayedEndRecPtr;
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::offset_of!(crate::__pgrx_c_bindings::XLogRecoveryCtlData, lastReplayedEndRecPtr)
+        == 32
+);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_lastReplayedEndRecPtr>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::XLogRecoveryCtlData>
+{
+    type Member = c::CUnsignedLong;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 32;
+}
+#[cfg(feature = "pg19")]
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::XLogRecoveryCtlData, <<c::expression::CRecord<crate::__pgrx_c_bindings::XLogRecoveryCtlData> as c::expression::OrdinaryField<Field_lastReplayedEndRecPtr>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).lastReplayedEndRecPtr) };
+#[cfg(feature = "pg19")]
+#[doc(hidden)]
+pub struct Field_lastReplayedTLI;
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::offset_of!(crate::__pgrx_c_bindings::XLogRecoveryCtlData, lastReplayedTLI) == 40
+);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_lastReplayedTLI>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::XLogRecoveryCtlData>
+{
+    type Member = c::CUnsignedInt;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 40;
+}
+#[cfg(feature = "pg19")]
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::XLogRecoveryCtlData, <<c::expression::CRecord<crate::__pgrx_c_bindings::XLogRecoveryCtlData> as c::expression::OrdinaryField<Field_lastReplayedTLI>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).lastReplayedTLI) };
+#[cfg(feature = "pg19")]
+#[doc(hidden)]
+pub struct Field_replayEndRecPtr;
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::offset_of!(crate::__pgrx_c_bindings::XLogRecoveryCtlData, replayEndRecPtr) == 48
+);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_replayEndRecPtr>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::XLogRecoveryCtlData>
+{
+    type Member = c::CUnsignedLong;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 48;
+}
+#[cfg(feature = "pg19")]
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::XLogRecoveryCtlData, <<c::expression::CRecord<crate::__pgrx_c_bindings::XLogRecoveryCtlData> as c::expression::OrdinaryField<Field_replayEndRecPtr>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).replayEndRecPtr) };
+#[cfg(feature = "pg19")]
+#[doc(hidden)]
+pub struct Field_replayEndTLI;
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::offset_of!(crate::__pgrx_c_bindings::XLogRecoveryCtlData, replayEndTLI) == 56
+);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_replayEndTLI>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::XLogRecoveryCtlData>
+{
+    type Member = c::CUnsignedInt;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 56;
+}
+#[cfg(feature = "pg19")]
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::XLogRecoveryCtlData, <<c::expression::CRecord<crate::__pgrx_c_bindings::XLogRecoveryCtlData> as c::expression::OrdinaryField<Field_replayEndTLI>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).replayEndTLI) };
+#[cfg(feature = "pg19")]
+#[doc(hidden)]
+pub struct Field_recoveryLastXTime;
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::offset_of!(crate::__pgrx_c_bindings::XLogRecoveryCtlData, recoveryLastXTime) == 64
+);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_recoveryLastXTime>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::XLogRecoveryCtlData>
+{
+    type Member = c::CLong;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 64;
+}
+#[cfg(feature = "pg19")]
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::XLogRecoveryCtlData, <<c::expression::CRecord<crate::__pgrx_c_bindings::XLogRecoveryCtlData> as c::expression::OrdinaryField<Field_recoveryLastXTime>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).recoveryLastXTime) };
+#[cfg(feature = "pg19")]
+#[doc(hidden)]
+pub struct Field_currentChunkStartTime;
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::offset_of!(crate::__pgrx_c_bindings::XLogRecoveryCtlData, currentChunkStartTime)
+        == 72
+);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_currentChunkStartTime>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::XLogRecoveryCtlData>
+{
+    type Member = c::CLong;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 72;
+}
+#[cfg(feature = "pg19")]
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::XLogRecoveryCtlData, <<c::expression::CRecord<crate::__pgrx_c_bindings::XLogRecoveryCtlData> as c::expression::OrdinaryField<Field_currentChunkStartTime>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).currentChunkStartTime) };
+#[cfg(feature = "pg19")]
+#[doc(hidden)]
+pub struct Field_recoveryPauseState;
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::offset_of!(crate::__pgrx_c_bindings::XLogRecoveryCtlData, recoveryPauseState)
+        == 80
+);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_recoveryPauseState>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::XLogRecoveryCtlData>
+{
+    type Member = c::expression::CEnumObject<
+        crate::__pgrx_c_generated::EnumIdentity_enum__RecoveryPauseState,
+        c::CUnsignedInt,
+        u32,
+    >;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 80;
+}
+#[cfg(feature = "pg19")]
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::XLogRecoveryCtlData, <<c::expression::CRecord<crate::__pgrx_c_bindings::XLogRecoveryCtlData> as c::expression::OrdinaryField<Field_recoveryPauseState>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).recoveryPauseState) };
+#[cfg(feature = "pg19")]
+#[doc(hidden)]
+pub struct Field_info_lck;
+#[cfg(feature = "pg19")]
+const _: () =
+    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::XLogRecoveryCtlData, info_lck) == 96);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_info_lck>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::XLogRecoveryCtlData>
+{
+    type Member = c::CUnsignedChar;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 96;
+}
+#[cfg(feature = "pg19")]
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::XLogRecoveryCtlData, <<c::expression::CRecord<crate::__pgrx_c_bindings::XLogRecoveryCtlData> as c::expression::OrdinaryField<Field_info_lck>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).info_lck) };
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::catclist, cl_magic) == 16);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_cl_magic>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::catclist>
+{
+    type Member = c::CInt;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 16;
+}
+#[cfg(feature = "pg19")]
+const _: () =
+    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::catclist, hash_value) == 20);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_hash_value>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::catclist>
+{
+    type Member = c::CUnsignedInt;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 20;
+}
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::catctup, ct_magic) == 16);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_ct_magic>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::catctup>
+{
+    type Member = c::CInt;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 16;
+}
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::catctup, hash_value) == 20);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_hash_value>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::catctup>
+{
+    type Member = c::CUnsignedInt;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 20;
+}
+#[cfg(feature = "pg19")]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::config_bool>() == 48);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::config_bool>() == 8);
+};
+#[cfg(feature = "pg19")]
+const _: () =
+    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::config_bool, boot_val) == 8);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_boot_val>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::config_bool>
+{
+    type Member = c::CBool;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 8;
+}
+#[cfg(feature = "pg19")]
+const _: () =
+    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::config_bool, reset_val) == 40);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_reset_val>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::config_bool>
+{
+    type Member = c::CBool;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 40;
+}
+#[cfg(feature = "pg19")]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::config_int>() == 56);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::config_int>() == 8);
+};
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::config_int, boot_val) == 8);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_boot_val>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::config_int>
+{
+    type Member = c::CInt;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 8;
+}
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::config_int, min) == 12);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_min>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::config_int>
+{
+    type Member = c::CInt;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 12;
+}
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::config_int, max) == 16);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_max>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::config_int>
+{
+    type Member = c::CInt;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 16;
+}
+#[cfg(feature = "pg19")]
+const _: () =
+    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::config_int, reset_val) == 48);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_reset_val>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::config_int>
+{
+    type Member = c::CInt;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 48;
+}
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::offset_of!(crate::__pgrx_c_bindings::core_yy_extra_type, saw_non_ascii) == 80
+);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_saw_non_ascii>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::core_yy_extra_type>
+{
+    type Member = c::CBool;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 80;
+}
+#[cfg(feature = "pg19")]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::pg_locale_struct>() == 48);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::pg_locale_struct>() == 8);
+};
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::offset_of!(crate::__pgrx_c_bindings::pg_locale_struct, deterministic) == 0
+);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_deterministic>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::pg_locale_struct>
+{
+    type Member = c::CBool;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 0;
+}
+#[cfg(feature = "pg19")]
+const _: () =
+    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::pg_locale_struct, collate_is_c) == 1);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_collate_is_c>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::pg_locale_struct>
+{
+    type Member = c::CBool;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 1;
+}
+#[cfg(feature = "pg19")]
+const _: () =
+    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::pg_locale_struct, ctype_is_c) == 2);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_ctype_is_c>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::pg_locale_struct>
+{
+    type Member = c::CBool;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 2;
+}
+#[cfg(feature = "pg19")]
+const _: () =
+    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::pg_locale_struct, is_default) == 3);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_is_default>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::pg_locale_struct>
+{
+    type Member = c::CBool;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 3;
+}
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::offset_of!(crate::__pgrx_c_bindings::relopt_value, __bindgen_anon_1) == 16
+);
+#[cfg(feature = "pg19")]
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<
+    crate::__pgrx_c_bindings::relopt_value,
+    crate::__pgrx_c_bindings::relopt_value__bindgen_ty_1,
+> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).__bindgen_anon_1) };
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_bool_val>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::relopt_value>
+{
+    type Member = c::CBool;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 16;
+}
+#[cfg(feature = "pg19")]
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::relopt_value, <<c::expression::CRecord<crate::__pgrx_c_bindings::relopt_value> as c::expression::OrdinaryField<Field_bool_val>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).__bindgen_anon_1.bool_val) };
+#[cfg(feature = "pg19")]
+#[doc(hidden)]
+pub struct Field_ternary_val;
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::offset_of!(crate::__pgrx_c_bindings::relopt_value__bindgen_ty_1, ternary_val) == 0
+);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_ternary_val>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::relopt_value>
+{
+    type Member = c::expression::CEnumObject<
+        crate::__pgrx_c_generated::EnumIdentity_enum__pg_ternary,
+        c::CInt,
+        i32,
+    >;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 16;
+}
+#[cfg(feature = "pg19")]
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::relopt_value, <<c::expression::CRecord<crate::__pgrx_c_bindings::relopt_value> as c::expression::OrdinaryField<Field_ternary_val>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).__bindgen_anon_1.ternary_val) };
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_int_val>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::relopt_value>
+{
+    type Member = c::CInt;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 16;
+}
+#[cfg(feature = "pg19")]
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::relopt_value, <<c::expression::CRecord<crate::__pgrx_c_bindings::relopt_value> as c::expression::OrdinaryField<Field_int_val>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).__bindgen_anon_1.int_val) };
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_enum_val>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::relopt_value>
+{
+    type Member = c::CInt;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 16;
+}
+#[cfg(feature = "pg19")]
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::relopt_value, <<c::expression::CRecord<crate::__pgrx_c_bindings::relopt_value> as c::expression::OrdinaryField<Field_enum_val>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).__bindgen_anon_1.enum_val) };
+#[cfg(feature = "pg19")]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::sequence_magic>() == 4);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::sequence_magic>() == 4);
+};
+#[cfg(feature = "pg19")]
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::sequence_magic {}
+#[cfg(feature = "pg19")]
+const _: () =
+    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::sequence_magic, magic) == 0);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_magic>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::sequence_magic>
+{
+    type Member = c::CUnsignedInt;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 0;
+}
+#[cfg(feature = "pg19")]
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::sequence_magic, <<c::expression::CRecord<crate::__pgrx_c_bindings::sequence_magic> as c::expression::OrdinaryField<Field_magic>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).magic) };
+#[cfg(feature = "pg19")]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::xl_checkpoint_redo>() == 4);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::xl_checkpoint_redo>() == 4);
+};
+#[cfg(feature = "pg19")]
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::xl_checkpoint_redo {}
+#[cfg(feature = "pg19")]
+const _: () =
+    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::xl_checkpoint_redo, wal_level) == 0);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_wal_level>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::xl_checkpoint_redo>
+{
+    type Member = c::CInt;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 0;
+}
+#[cfg(feature = "pg19")]
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::xl_checkpoint_redo, <<c::expression::CRecord<crate::__pgrx_c_bindings::xl_checkpoint_redo> as c::expression::OrdinaryField<Field_wal_level>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).wal_level) };
+#[cfg(feature = "pg19")]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::xl_heap_prune>() == 2);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::xl_heap_prune>() == 2);
+};
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::xl_heap_prune, flags) == 0);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_flags>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::xl_heap_prune>
+{
+    type Member = c::CUnsignedShort;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 0;
+}
+#[cfg(feature = "pg19")]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::xl_multixact_create>() == 24);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::xl_multixact_create>() == 8);
+};
+#[cfg(feature = "pg19")]
+const _: () =
+    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::xl_multixact_create, moff) == 8);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_moff>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::xl_multixact_create>
+{
+    type Member = c::CUnsignedLong;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 8;
+}
+#[cfg(feature = "pg19")]
+const _: () =
+    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::xl_multixact_create, nmembers) == 16);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_nmembers>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::xl_multixact_create>
+{
+    type Member = c::CInt;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 16;
+}
+#[cfg(feature = "pg19")]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::xl_multixact_truncate>() == 16);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::xl_multixact_truncate>() == 8);
+};
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::offset_of!(crate::__pgrx_c_bindings::xl_multixact_truncate, oldestMulti) == 4
+);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_oldestMulti>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::xl_multixact_truncate>
+{
+    type Member =
+        c::expression::CIntegerStorage<c::CUnsignedInt, crate::__pgrx_c_bindings::MultiXactId>;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 4;
+}
+#[cfg(feature = "pg19")]
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::xl_multixact_truncate, <<c::expression::CRecord<crate::__pgrx_c_bindings::xl_multixact_truncate> as c::expression::OrdinaryField<Field_oldestMulti>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).oldestMulti) };
+#[cfg(feature = "pg19")]
+#[doc(hidden)]
+pub struct Field_oldestOffset;
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::offset_of!(crate::__pgrx_c_bindings::xl_multixact_truncate, oldestOffset) == 8
+);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_oldestOffset>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::xl_multixact_truncate>
+{
+    type Member = c::CUnsignedLong;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 8;
+}
+#[cfg(feature = "pg19")]
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::xl_multixact_truncate, <<c::expression::CRecord<crate::__pgrx_c_bindings::xl_multixact_truncate> as c::expression::OrdinaryField<Field_oldestOffset>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).oldestOffset) };
+#[cfg(feature = "pg19")]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::BufferDescPadded>() == 64);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::BufferDescPadded>() == 8);
+};
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_ternary_val>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::relopt_value__bindgen_ty_1>
+{
+    type Member = c::expression::CEnumObject<
+        crate::__pgrx_c_generated::EnumIdentity_enum__pg_ternary,
+        c::CInt,
+        i32,
+    >;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 0;
+}
+#[cfg(feature = "pg19")]
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::relopt_value__bindgen_ty_1, <<c::expression::CRecord<crate::__pgrx_c_bindings::relopt_value__bindgen_ty_1> as c::expression::OrdinaryField<Field_ternary_val>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).ternary_val) };
+#[cfg(feature = "pg19")]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::Chromosome>() == 24);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::Chromosome>() == 8);
+};
+#[cfg(feature = "pg19")]
+const _: () = {
+    assert!(
+        ::core::mem::size_of::<crate::__pgrx_c_bindings::pg_locale_struct__bindgen_ty_1>() == 24
+    );
+    assert!(
+        ::core::mem::align_of::<crate::__pgrx_c_bindings::pg_locale_struct__bindgen_ty_1>() == 8
+    );
+};
+#[cfg(feature = "pg19")]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::config_generic__bindgen_ty_1>() == 64);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::config_generic__bindgen_ty_1>() == 8);
+};
+#[cfg(feature = "pg19")]
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::config_generic__bindgen_ty_1 {}
+#[cfg(feature = "pg19")]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::relopt_ternary>() == 32);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::relopt_ternary>() == 8);
+};
+#[cfg(feature = "pg19")]
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::relopt_ternary {}
+#[cfg(feature = "pg19")]
+const _: () = {
+    assert!(
+        ::core::mem::size_of::<
+            crate::__pgrx_c_bindings::pg_locale_struct__bindgen_ty_1__bindgen_ty_2,
+        >() == 24
+    );
+    assert!(
+        ::core::mem::align_of::<
+            crate::__pgrx_c_bindings::pg_locale_struct__bindgen_ty_1__bindgen_ty_2,
+        >() == 8
+    );
+};
+#[cfg(feature = "pg19")]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::ctype_methods>() == 136);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::ctype_methods>() == 8);
+};
+#[cfg(feature = "pg19")]
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::ctype_methods {}
+#[cfg(feature = "pg19")]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::config_string>() == 48);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::config_string>() == 8);
+};
+#[cfg(feature = "pg19")]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::config_real>() == 64);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::config_real>() == 8);
+};
+#[cfg(feature = "pg19")]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::WaitLSNState>() == 128);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::WaitLSNState>() == 8);
+};
+#[cfg(feature = "pg19")]
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::WaitLSNState {}
+#[cfg(feature = "pg19")]
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::UCaseMap {}
+#[cfg(feature = "pg19")]
+impl c::expression::NativeType for crate::__pgrx_c_bindings::UCaseMap {
+    type Marker = c::expression::COpaque<Self>;
+}
+#[cfg(feature = "pg19")]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::TidRangeScanInstrumentation>() == 56);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::TidRangeScanInstrumentation>() == 8);
+};
+#[cfg(feature = "pg19")]
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::TidRangeScanInstrumentation {}
+#[cfg(feature = "pg19")]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::TableScanInstrumentation>() == 56);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::TableScanInstrumentation>() == 8);
+};
+#[cfg(feature = "pg19")]
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::TableScanInstrumentation {}
+#[cfg(feature = "pg19")]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::SeqScanInstrumentation>() == 56);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::SeqScanInstrumentation>() == 8);
+};
+#[cfg(feature = "pg19")]
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::SeqScanInstrumentation {}
+#[cfg(feature = "pg19")]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::ReplicationSlotCtlData>() == 296);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::ReplicationSlotCtlData>() == 8);
+};
+#[cfg(feature = "pg19")]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::PgStat_PendingLock>() == 288);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::PgStat_PendingLock>() == 8);
+};
+#[cfg(feature = "pg19")]
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::PgStat_PendingLock {}
+#[cfg(feature = "pg19")]
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::ParallelBitmapHeapState {}
+#[cfg(feature = "pg19")]
+impl c::expression::NativeType for crate::__pgrx_c_bindings::ParallelBitmapHeapState {
+    type Marker = c::expression::COpaque<Self>;
+}
+#[cfg(feature = "pg19")]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::PVWorkerUsage>() == 16);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::PVWorkerUsage>() == 4);
+};
+#[cfg(feature = "pg19")]
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::PVWorkerUsage {}
+#[cfg(feature = "pg19")]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::MergeAppendPath>() == 104);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::MergeAppendPath>() == 8);
+};
+#[cfg(feature = "pg19")]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::BitmapHeapScanDescData>() == 752);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::BitmapHeapScanDescData>() == 8);
+};
+#[cfg(feature = "pg19")]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::BatchMVCCState>() == 7280);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::BatchMVCCState>() == 8);
+};
+#[cfg(feature = "pg19")]
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::BatchMVCCState {}
+#[cfg(feature = "pg19")]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::AppendPathInput>() == 24);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::AppendPathInput>() == 8);
+};
+#[cfg(feature = "pg19")]
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::AppendPathInput {}
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::Datum>() == 8);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::Datum>() == 8);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::Datum>() == 8);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::Datum>() == 8);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::Datum>() == 8);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::Datum>() == 8);
+#[cfg(feature = "pg19")]
+unsafe extern "C-unwind" {
+    #[link_name = "__pgrx_inline__fn__GetSysCacheHashValue"]
+    fn raw_inline_GetSysCacheHashValue(
+        arg0: i32,
+        arg1: crate::__pgrx_c_bindings::Datum,
+        arg2: crate::__pgrx_c_bindings::Datum,
+        arg3: crate::__pgrx_c_bindings::Datum,
+        arg4: crate::__pgrx_c_bindings::Datum,
+    ) -> u32;
+}
+#[cfg(feature = "pg19")]
+#[doc = "Call the original C function `GetSysCacheHashValue`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
+#[inline]
+pub unsafe fn Inline_GetSysCacheHashValue(
+    arg0: i32,
+    arg1: crate::__pgrx_c_bindings::Datum,
+    arg2: crate::__pgrx_c_bindings::Datum,
+    arg3: crate::__pgrx_c_bindings::Datum,
+    arg4: crate::__pgrx_c_bindings::Datum,
+) -> u32 {
+    const _: () = assert!(!::core::mem::needs_drop::<i32>());
+    const _: () = assert!(!::core::mem::needs_drop::<crate::__pgrx_c_bindings::Datum>());
+    const _: () = assert!(!::core::mem::needs_drop::<crate::__pgrx_c_bindings::Datum>());
+    const _: () = assert!(!::core::mem::needs_drop::<crate::__pgrx_c_bindings::Datum>());
+    const _: () = assert!(!::core::mem::needs_drop::<crate::__pgrx_c_bindings::Datum>());
+    // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
+    unsafe {
+        crate::ffi::pg_guard_ffi_boundary(move || {
+            raw_inline_GetSysCacheHashValue(arg0, arg1, arg2, arg3, arg4)
+        })
+    }
+}
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::size_of::<i16>() == 2);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::align_of::<i16>() == 2);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::Datum>() == 8);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::Datum>() == 8);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::Datum>() == 8);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::Datum>() == 8);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::Datum>() == 8);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::Datum>() == 8);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::Datum>() == 8);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::Datum>() == 8);
+#[cfg(feature = "pg19")]
+unsafe extern "C-unwind" {
+    #[link_name = "__pgrx_inline__fn__GetSysCacheOid"]
+    fn raw_inline_GetSysCacheOid(
+        arg0: i32,
+        arg1: i16,
+        arg2: crate::__pgrx_c_bindings::Datum,
+        arg3: crate::__pgrx_c_bindings::Datum,
+        arg4: crate::__pgrx_c_bindings::Datum,
+        arg5: crate::__pgrx_c_bindings::Datum,
+    ) -> crate::__pgrx_c_bindings::Oid;
+}
+#[cfg(feature = "pg19")]
+#[doc = "Call the original C function `GetSysCacheOid`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
+#[inline]
+pub unsafe fn Inline_GetSysCacheOid(
+    arg0: i32,
+    arg1: i16,
+    arg2: crate::__pgrx_c_bindings::Datum,
+    arg3: crate::__pgrx_c_bindings::Datum,
+    arg4: crate::__pgrx_c_bindings::Datum,
+    arg5: crate::__pgrx_c_bindings::Datum,
+) -> crate::__pgrx_c_bindings::Oid {
+    const _: () = assert!(!::core::mem::needs_drop::<i32>());
+    const _: () = assert!(!::core::mem::needs_drop::<i16>());
+    const _: () = assert!(!::core::mem::needs_drop::<crate::__pgrx_c_bindings::Datum>());
+    const _: () = assert!(!::core::mem::needs_drop::<crate::__pgrx_c_bindings::Datum>());
+    const _: () = assert!(!::core::mem::needs_drop::<crate::__pgrx_c_bindings::Datum>());
+    const _: () = assert!(!::core::mem::needs_drop::<crate::__pgrx_c_bindings::Datum>());
+    // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
+    unsafe {
+        crate::ffi::pg_guard_ffi_boundary(move || {
+            raw_inline_GetSysCacheOid(arg0, arg1, arg2, arg3, arg4, arg5)
+        })
+    }
+}
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::Datum>() == 8);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::Datum>() == 8);
+#[cfg(feature = "pg19")]
+unsafe extern "C-unwind" {
+    #[link_name = "__pgrx_inline__fn__LockBufferInternal"]
+    fn raw_inline_LockBufferInternal(arg0: i32, arg1: u32) -> ();
+}
+#[cfg(feature = "pg19")]
+#[doc = "Call the original C function `LockBufferInternal`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
+#[inline]
+pub unsafe fn Inline_LockBufferInternal(arg0: i32, arg1: u32) -> () {
+    const _: () = assert!(!::core::mem::needs_drop::<i32>());
+    const _: () = assert!(!::core::mem::needs_drop::<u32>());
+    // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
+    unsafe { crate::ffi::pg_guard_ffi_boundary(move || raw_inline_LockBufferInternal(arg0, arg1)) }
+}
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::size_of::<u32>() == 4);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::align_of::<u32>() == 4);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::Datum>() == 8);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::Datum>() == 8);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::Datum>() == 8);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::Datum>() == 8);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::Datum>() == 8);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::Datum>() == 8);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::Datum>() == 8);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::Datum>() == 8);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::size_of::<*mut crate::__pgrx_c_bindings::HeapTupleData>() == 8);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::align_of::<*mut crate::__pgrx_c_bindings::HeapTupleData>() == 8);
+#[cfg(feature = "pg19")]
+unsafe extern "C-unwind" {
+    #[link_name = "__pgrx_inline__fn__SearchSysCacheCopy"]
+    fn raw_inline_SearchSysCacheCopy(
+        arg0: i32,
+        arg1: crate::__pgrx_c_bindings::Datum,
+        arg2: crate::__pgrx_c_bindings::Datum,
+        arg3: crate::__pgrx_c_bindings::Datum,
+        arg4: crate::__pgrx_c_bindings::Datum,
+    ) -> *mut crate::__pgrx_c_bindings::HeapTupleData;
+}
+#[cfg(feature = "pg19")]
+#[doc = "Call the original C function `SearchSysCacheCopy`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
+#[inline]
+pub unsafe fn Inline_SearchSysCacheCopy(
+    arg0: i32,
+    arg1: crate::__pgrx_c_bindings::Datum,
+    arg2: crate::__pgrx_c_bindings::Datum,
+    arg3: crate::__pgrx_c_bindings::Datum,
+    arg4: crate::__pgrx_c_bindings::Datum,
+) -> *mut crate::__pgrx_c_bindings::HeapTupleData {
+    const _: () = assert!(!::core::mem::needs_drop::<i32>());
+    const _: () = assert!(!::core::mem::needs_drop::<crate::__pgrx_c_bindings::Datum>());
+    const _: () = assert!(!::core::mem::needs_drop::<crate::__pgrx_c_bindings::Datum>());
+    const _: () = assert!(!::core::mem::needs_drop::<crate::__pgrx_c_bindings::Datum>());
+    const _: () = assert!(!::core::mem::needs_drop::<crate::__pgrx_c_bindings::Datum>());
+    // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
+    unsafe {
+        crate::ffi::pg_guard_ffi_boundary(move || {
+            raw_inline_SearchSysCacheCopy(arg0, arg1, arg2, arg3, arg4)
+        })
+    }
+}
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::Datum>() == 8);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::Datum>() == 8);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::Datum>() == 8);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::Datum>() == 8);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::Datum>() == 8);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::Datum>() == 8);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::Datum>() == 8);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::Datum>() == 8);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::size_of::<bool>() == 1);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::align_of::<bool>() == 1);
+#[cfg(feature = "pg19")]
+unsafe extern "C-unwind" {
+    #[link_name = "__pgrx_inline__fn__SearchSysCacheExists"]
+    fn raw_inline_SearchSysCacheExists(
+        arg0: i32,
+        arg1: crate::__pgrx_c_bindings::Datum,
+        arg2: crate::__pgrx_c_bindings::Datum,
+        arg3: crate::__pgrx_c_bindings::Datum,
+        arg4: crate::__pgrx_c_bindings::Datum,
+    ) -> bool;
+}
+#[cfg(feature = "pg19")]
+#[doc = "Call the original C function `SearchSysCacheExists`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
+#[inline]
+pub unsafe fn Inline_SearchSysCacheExists(
+    arg0: i32,
+    arg1: crate::__pgrx_c_bindings::Datum,
+    arg2: crate::__pgrx_c_bindings::Datum,
+    arg3: crate::__pgrx_c_bindings::Datum,
+    arg4: crate::__pgrx_c_bindings::Datum,
+) -> bool {
+    const _: () = assert!(!::core::mem::needs_drop::<i32>());
+    const _: () = assert!(!::core::mem::needs_drop::<crate::__pgrx_c_bindings::Datum>());
+    const _: () = assert!(!::core::mem::needs_drop::<crate::__pgrx_c_bindings::Datum>());
+    const _: () = assert!(!::core::mem::needs_drop::<crate::__pgrx_c_bindings::Datum>());
+    const _: () = assert!(!::core::mem::needs_drop::<crate::__pgrx_c_bindings::Datum>());
+    // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
+    unsafe {
+        crate::ffi::pg_guard_ffi_boundary(move || {
+            raw_inline_SearchSysCacheExists(arg0, arg1, arg2, arg3, arg4)
+        })
+    }
+}
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::Datum>() == 8);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::Datum>() == 8);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::Datum>() == 8);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::Datum>() == 8);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::Datum>() == 8);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::Datum>() == 8);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::size_of::<*mut crate::__pgrx_c_bindings::catclist>() == 8);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::align_of::<*mut crate::__pgrx_c_bindings::catclist>() == 8);
+#[cfg(feature = "pg19")]
+unsafe extern "C-unwind" {
+    #[link_name = "__pgrx_inline__fn__SearchSysCacheList"]
+    fn raw_inline_SearchSysCacheList(
+        arg0: i32,
+        arg1: i32,
+        arg2: crate::__pgrx_c_bindings::Datum,
+        arg3: crate::__pgrx_c_bindings::Datum,
+        arg4: crate::__pgrx_c_bindings::Datum,
+    ) -> *mut crate::__pgrx_c_bindings::catclist;
+}
+#[cfg(feature = "pg19")]
+#[doc = "Call the original C function `SearchSysCacheList`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
+#[inline]
+pub unsafe fn Inline_SearchSysCacheList(
+    arg0: i32,
+    arg1: i32,
+    arg2: crate::__pgrx_c_bindings::Datum,
+    arg3: crate::__pgrx_c_bindings::Datum,
+    arg4: crate::__pgrx_c_bindings::Datum,
+) -> *mut crate::__pgrx_c_bindings::catclist {
+    const _: () = assert!(!::core::mem::needs_drop::<i32>());
+    const _: () = assert!(!::core::mem::needs_drop::<i32>());
+    const _: () = assert!(!::core::mem::needs_drop::<crate::__pgrx_c_bindings::Datum>());
+    const _: () = assert!(!::core::mem::needs_drop::<crate::__pgrx_c_bindings::Datum>());
+    const _: () = assert!(!::core::mem::needs_drop::<crate::__pgrx_c_bindings::Datum>());
+    // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
+    unsafe {
+        crate::ffi::pg_guard_ffi_boundary(move || {
+            raw_inline_SearchSysCacheList(arg0, arg1, arg2, arg3, arg4)
+        })
+    }
+}
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::size_of::<*mut crate::__pgrx_c_bindings::SlruDesc>() == 8);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::align_of::<*mut crate::__pgrx_c_bindings::SlruDesc>() == 8);
+#[cfg(feature = "pg19")]
+unsafe extern "C-unwind" {
+    #[link_name = "__pgrx_inline__fn__SlruPagePrecedesUnitTests"]
+    fn raw_inline_SlruPagePrecedesUnitTests(
+        arg0: *mut crate::__pgrx_c_bindings::SlruDesc,
+        arg1: i32,
+    ) -> ();
+}
+#[cfg(feature = "pg19")]
+#[doc = "Call the original C function `SlruPagePrecedesUnitTests`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
+#[inline]
+pub unsafe fn Inline_SlruPagePrecedesUnitTests(
+    arg0: *mut crate::__pgrx_c_bindings::SlruDesc,
+    arg1: i32,
+) -> () {
+    const _: () = assert!(!::core::mem::needs_drop::<*mut crate::__pgrx_c_bindings::SlruDesc>());
+    const _: () = assert!(!::core::mem::needs_drop::<i32>());
+    // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
+    unsafe {
+        crate::ffi::pg_guard_ffi_boundary(move || raw_inline_SlruPagePrecedesUnitTests(arg0, arg1))
+    }
+}
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::size_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::varatt_external>>()
+        == 16
+);
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::align_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::varatt_external>>()
+        == 4
+);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::size_of::<u32>() == 4);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::align_of::<u32>() == 4);
+#[cfg(feature = "pg19")]
+unsafe extern "C-unwind" {
+    #[link_name = "__pgrx_inline__fn__VARATT_EXTERNAL_GET_COMPRESS_METHOD"]
+    fn raw_inline_VARATT_EXTERNAL_GET_COMPRESS_METHOD(
+        arg0: ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::varatt_external>,
+    ) -> u32;
+}
+#[cfg(feature = "pg19")]
+#[doc = "Call the original C function `VARATT_EXTERNAL_GET_COMPRESS_METHOD`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
+#[inline]
+pub unsafe fn Inline_VARATT_EXTERNAL_GET_COMPRESS_METHOD(
+    arg0: ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::varatt_external>,
+) -> u32 {
+    const _: () = assert!(!::core::mem::needs_drop::<
+        ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::varatt_external>,
+    >());
+    // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
+    unsafe {
+        crate::ffi::pg_guard_ffi_boundary(move || {
+            raw_inline_VARATT_EXTERNAL_GET_COMPRESS_METHOD(arg0)
+        })
+    }
+}
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::size_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::varatt_external>>()
+        == 16
+);
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::align_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::varatt_external>>()
+        == 4
+);
+#[cfg(feature = "pg19")]
+unsafe extern "C-unwind" {
+    #[link_name = "__pgrx_inline__fn__VARATT_EXTERNAL_GET_EXTSIZE"]
+    fn raw_inline_VARATT_EXTERNAL_GET_EXTSIZE(
+        arg0: ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::varatt_external>,
+    ) -> usize;
+}
+#[cfg(feature = "pg19")]
+#[doc = "Call the original C function `VARATT_EXTERNAL_GET_EXTSIZE`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
+#[inline]
+pub unsafe fn Inline_VARATT_EXTERNAL_GET_EXTSIZE(
+    arg0: ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::varatt_external>,
+) -> usize {
+    const _: () = assert!(!::core::mem::needs_drop::<
+        ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::varatt_external>,
+    >());
+    // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
+    unsafe {
+        crate::ffi::pg_guard_ffi_boundary(move || raw_inline_VARATT_EXTERNAL_GET_EXTSIZE(arg0))
+    }
+}
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::size_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::varatt_external>>()
+        == 16
+);
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::align_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::varatt_external>>()
+        == 4
+);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::size_of::<bool>() == 1);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::align_of::<bool>() == 1);
+#[cfg(feature = "pg19")]
+unsafe extern "C-unwind" {
+    #[link_name = "__pgrx_inline__fn__VARATT_EXTERNAL_IS_COMPRESSED"]
+    fn raw_inline_VARATT_EXTERNAL_IS_COMPRESSED(
+        arg0: ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::varatt_external>,
+    ) -> bool;
+}
+#[cfg(feature = "pg19")]
+#[doc = "Call the original C function `VARATT_EXTERNAL_IS_COMPRESSED`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
+#[inline]
+pub unsafe fn Inline_VARATT_EXTERNAL_IS_COMPRESSED(
+    arg0: ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::varatt_external>,
+) -> bool {
+    const _: () = assert!(!::core::mem::needs_drop::<
+        ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::varatt_external>,
+    >());
+    // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
+    unsafe {
+        crate::ffi::pg_guard_ffi_boundary(move || raw_inline_VARATT_EXTERNAL_IS_COMPRESSED(arg0))
+    }
+}
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::size_of::<u32>() == 4);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::align_of::<u32>() == 4);
+#[cfg(feature = "pg19")]
+unsafe extern "C-unwind" {
+    #[link_name = "__pgrx_inline__fn__VARTAG_EXTERNAL"]
+    fn raw_inline_VARTAG_EXTERNAL(arg0: *const ::core::ffi::c_void) -> u32;
+}
+#[cfg(feature = "pg19")]
+#[doc = "Call the original C function `VARTAG_EXTERNAL`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
+#[inline]
+pub unsafe fn Inline_VARTAG_EXTERNAL(arg0: *const ::core::ffi::c_void) -> u32 {
+    const _: () = assert!(!::core::mem::needs_drop::<*const ::core::ffi::c_void>());
+    // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
+    unsafe { crate::ffi::pg_guard_ffi_boundary(move || raw_inline_VARTAG_EXTERNAL(arg0)) }
+}
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::size_of::<u32>() == 4);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::align_of::<u32>() == 4);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::size_of::<bool>() == 1);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::align_of::<bool>() == 1);
+#[cfg(feature = "pg19")]
+unsafe extern "C-unwind" {
+    #[link_name = "__pgrx_inline__fn__VARTAG_IS_EXPANDED"]
+    fn raw_inline_VARTAG_IS_EXPANDED(arg0: u32) -> bool;
+}
+#[cfg(feature = "pg19")]
+#[doc = "Call the original C function `VARTAG_IS_EXPANDED`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
+#[inline]
+pub unsafe fn Inline_VARTAG_IS_EXPANDED(arg0: u32) -> bool {
+    const _: () = assert!(!::core::mem::needs_drop::<u32>());
+    // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
+    unsafe { crate::ffi::pg_guard_ffi_boundary(move || raw_inline_VARTAG_IS_EXPANDED(arg0)) }
+}
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::size_of::<u32>() == 4);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::align_of::<u32>() == 4);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::size_of::<usize>() == 8);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::align_of::<usize>() == 8);
+#[cfg(feature = "pg19")]
+unsafe extern "C-unwind" {
+    #[link_name = "__pgrx_inline__fn__VARTAG_SIZE"]
+    fn raw_inline_VARTAG_SIZE(arg0: u32) -> usize;
+}
+#[cfg(feature = "pg19")]
+#[doc = "Call the original C function `VARTAG_SIZE`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
+#[inline]
+pub unsafe fn Inline_VARTAG_SIZE(arg0: u32) -> usize {
+    const _: () = assert!(!::core::mem::needs_drop::<u32>());
+    // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
+    unsafe { crate::ffi::pg_guard_ffi_boundary(move || raw_inline_VARTAG_SIZE(arg0)) }
+}
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::size_of::<u32>() == 4);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::align_of::<u32>() == 4);
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::size_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::Fitness>>() == 16
+);
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::align_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::Fitness>>() == 8
+);
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::size_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::Fitness>>() == 16
+);
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::align_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::Fitness>>() == 8
+);
+#[cfg(feature = "pg19")]
+unsafe extern "C-unwind" {
+    #[link_name = "__pgrx_inline__fn__fitness_compare"]
+    fn raw_inline_fitness_compare(
+        arg0: ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::Fitness>,
+        arg1: ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::Fitness>,
+    ) -> i32;
+}
+#[cfg(feature = "pg19")]
+#[doc = "Call the original C function `fitness_compare`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
+#[inline]
+pub unsafe fn Inline_fitness_compare(
+    arg0: ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::Fitness>,
+    arg1: ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::Fitness>,
+) -> i32 {
+    const _: () = assert!(!::core::mem::needs_drop::<
+        ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::Fitness>,
+    >());
+    const _: () = assert!(!::core::mem::needs_drop::<
+        ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::Fitness>,
+    >());
+    // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
+    unsafe { crate::ffi::pg_guard_ffi_boundary(move || raw_inline_fitness_compare(arg0, arg1)) }
+}
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::size_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::Fitness>>() == 16
+);
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::align_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::Fitness>>() == 8
+);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::size_of::<bool>() == 1);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::align_of::<bool>() == 1);
+#[cfg(feature = "pg19")]
+unsafe extern "C-unwind" {
+    #[link_name = "__pgrx_inline__fn__fitness_is_valid"]
+    fn raw_inline_fitness_is_valid(
+        arg0: ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::Fitness>,
+    ) -> bool;
+}
+#[cfg(feature = "pg19")]
+#[doc = "Call the original C function `fitness_is_valid`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
+#[inline]
+pub unsafe fn Inline_fitness_is_valid(
+    arg0: ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::Fitness>,
+) -> bool {
+    const _: () = assert!(!::core::mem::needs_drop::<
+        ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::Fitness>,
+    >());
+    // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
+    unsafe { crate::ffi::pg_guard_ffi_boundary(move || raw_inline_fitness_is_valid(arg0)) }
+}
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::Oid>() == 4);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::Oid>() == 4);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::size_of::<u32>() == 4);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::align_of::<u32>() == 4);
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::size_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>>() == 8
+);
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::align_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>>() == 8
+);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::size_of::<*mut crate::__pgrx_c_bindings::List>() == 8);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::align_of::<*mut crate::__pgrx_c_bindings::List>() == 8);
+#[cfg(feature = "pg19")]
+unsafe extern "C-unwind" {
+    #[link_name = "__pgrx_inline__fn__list_make1_impl"]
+    fn raw_inline_list_make1_impl(
+        arg0: u32,
+        arg1: ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>,
+    ) -> *mut crate::__pgrx_c_bindings::List;
+}
+#[cfg(feature = "pg19")]
+#[doc = "Call the original C function `list_make1_impl`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
+#[inline]
+pub unsafe fn Inline_list_make1_impl(
+    arg0: u32,
+    arg1: ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>,
+) -> *mut crate::__pgrx_c_bindings::List {
+    const _: () = assert!(!::core::mem::needs_drop::<u32>());
+    const _: () = assert!(!::core::mem::needs_drop::<
+        ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>,
+    >());
+    // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
+    unsafe { crate::ffi::pg_guard_ffi_boundary(move || raw_inline_list_make1_impl(arg0, arg1)) }
+}
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::size_of::<u32>() == 4);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::align_of::<u32>() == 4);
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::size_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>>() == 8
+);
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::align_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>>() == 8
+);
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::size_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>>() == 8
+);
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::align_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>>() == 8
+);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::size_of::<*mut crate::__pgrx_c_bindings::List>() == 8);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::align_of::<*mut crate::__pgrx_c_bindings::List>() == 8);
+#[cfg(feature = "pg19")]
+unsafe extern "C-unwind" {
+    #[link_name = "__pgrx_inline__fn__list_make2_impl"]
+    fn raw_inline_list_make2_impl(
+        arg0: u32,
+        arg1: ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>,
+        arg2: ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>,
+    ) -> *mut crate::__pgrx_c_bindings::List;
+}
+#[cfg(feature = "pg19")]
+#[doc = "Call the original C function `list_make2_impl`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
+#[inline]
+pub unsafe fn Inline_list_make2_impl(
+    arg0: u32,
+    arg1: ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>,
+    arg2: ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>,
+) -> *mut crate::__pgrx_c_bindings::List {
+    const _: () = assert!(!::core::mem::needs_drop::<u32>());
+    const _: () = assert!(!::core::mem::needs_drop::<
+        ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>,
+    >());
+    const _: () = assert!(!::core::mem::needs_drop::<
+        ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>,
+    >());
+    // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
+    unsafe {
+        crate::ffi::pg_guard_ffi_boundary(move || raw_inline_list_make2_impl(arg0, arg1, arg2))
+    }
+}
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::size_of::<u32>() == 4);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::align_of::<u32>() == 4);
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::size_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>>() == 8
+);
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::align_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>>() == 8
+);
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::size_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>>() == 8
+);
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::align_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>>() == 8
+);
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::size_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>>() == 8
+);
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::align_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>>() == 8
+);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::size_of::<*mut crate::__pgrx_c_bindings::List>() == 8);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::align_of::<*mut crate::__pgrx_c_bindings::List>() == 8);
+#[cfg(feature = "pg19")]
+unsafe extern "C-unwind" {
+    #[link_name = "__pgrx_inline__fn__list_make3_impl"]
+    fn raw_inline_list_make3_impl(
+        arg0: u32,
+        arg1: ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>,
+        arg2: ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>,
+        arg3: ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>,
+    ) -> *mut crate::__pgrx_c_bindings::List;
+}
+#[cfg(feature = "pg19")]
+#[doc = "Call the original C function `list_make3_impl`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
+#[inline]
+pub unsafe fn Inline_list_make3_impl(
+    arg0: u32,
+    arg1: ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>,
+    arg2: ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>,
+    arg3: ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>,
+) -> *mut crate::__pgrx_c_bindings::List {
+    const _: () = assert!(!::core::mem::needs_drop::<u32>());
+    const _: () = assert!(!::core::mem::needs_drop::<
+        ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>,
+    >());
+    const _: () = assert!(!::core::mem::needs_drop::<
+        ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>,
+    >());
+    const _: () = assert!(!::core::mem::needs_drop::<
+        ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>,
+    >());
+    // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
+    unsafe {
+        crate::ffi::pg_guard_ffi_boundary(move || {
+            raw_inline_list_make3_impl(arg0, arg1, arg2, arg3)
+        })
+    }
+}
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::size_of::<u32>() == 4);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::align_of::<u32>() == 4);
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::size_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>>() == 8
+);
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::align_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>>() == 8
+);
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::size_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>>() == 8
+);
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::align_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>>() == 8
+);
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::size_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>>() == 8
+);
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::align_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>>() == 8
+);
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::size_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>>() == 8
+);
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::align_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>>() == 8
+);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::size_of::<*mut crate::__pgrx_c_bindings::List>() == 8);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::align_of::<*mut crate::__pgrx_c_bindings::List>() == 8);
+#[cfg(feature = "pg19")]
+unsafe extern "C-unwind" {
+    #[link_name = "__pgrx_inline__fn__list_make4_impl"]
+    fn raw_inline_list_make4_impl(
+        arg0: u32,
+        arg1: ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>,
+        arg2: ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>,
+        arg3: ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>,
+        arg4: ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>,
+    ) -> *mut crate::__pgrx_c_bindings::List;
+}
+#[cfg(feature = "pg19")]
+#[doc = "Call the original C function `list_make4_impl`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
+#[inline]
+pub unsafe fn Inline_list_make4_impl(
+    arg0: u32,
+    arg1: ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>,
+    arg2: ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>,
+    arg3: ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>,
+    arg4: ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>,
+) -> *mut crate::__pgrx_c_bindings::List {
+    const _: () = assert!(!::core::mem::needs_drop::<u32>());
+    const _: () = assert!(!::core::mem::needs_drop::<
+        ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>,
+    >());
+    const _: () = assert!(!::core::mem::needs_drop::<
+        ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>,
+    >());
+    const _: () = assert!(!::core::mem::needs_drop::<
+        ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>,
+    >());
+    const _: () = assert!(!::core::mem::needs_drop::<
+        ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>,
+    >());
+    // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
+    unsafe {
+        crate::ffi::pg_guard_ffi_boundary(move || {
+            raw_inline_list_make4_impl(arg0, arg1, arg2, arg3, arg4)
+        })
+    }
+}
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::size_of::<u32>() == 4);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::align_of::<u32>() == 4);
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::size_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>>() == 8
+);
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::align_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>>() == 8
+);
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::size_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>>() == 8
+);
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::align_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>>() == 8
+);
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::size_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>>() == 8
+);
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::align_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>>() == 8
+);
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::size_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>>() == 8
+);
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::align_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>>() == 8
+);
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::size_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>>() == 8
+);
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::align_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>>() == 8
+);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::size_of::<*mut crate::__pgrx_c_bindings::List>() == 8);
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::align_of::<*mut crate::__pgrx_c_bindings::List>() == 8);
+#[cfg(feature = "pg19")]
+unsafe extern "C-unwind" {
+    #[link_name = "__pgrx_inline__fn__list_make5_impl"]
+    fn raw_inline_list_make5_impl(
+        arg0: u32,
+        arg1: ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>,
+        arg2: ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>,
+        arg3: ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>,
+        arg4: ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>,
+        arg5: ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ListCell>,
+    ) -> *mut crate::__pgrx_c_bindings::List;
+}
+#[cfg(feature = "pg19")]
 #[doc = "Call the original C function `list_make5_impl`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
 #[inline]
 pub unsafe fn Inline_list_make5_impl(
@@ -240,33 +2269,9 @@ const _: () = assert!(::core::mem::size_of::<i32>() == 4);
 #[cfg(feature = "pg19")]
 const _: () = assert!(::core::mem::align_of::<i32>() == 4);
 #[cfg(feature = "pg19")]
-const _: () = assert!(::core::mem::size_of::<*mut crate::__pgrx_c_bindings::TupleTableSlot>() == 8);
-#[cfg(feature = "pg19")]
-const _: () =
-    assert!(::core::mem::align_of::<*mut crate::__pgrx_c_bindings::TupleTableSlot>() == 8);
-#[cfg(feature = "pg19")]
-const _: () = assert!(::core::mem::size_of::<bool>() == 1);
-#[cfg(feature = "pg19")]
-const _: () = assert!(::core::mem::align_of::<bool>() == 1);
-#[cfg(feature = "pg19")]
-const _: () =
-    assert!(::core::mem::size_of::<*mut crate::__pgrx_c_bindings::TableScanDescData>() == 8);
-#[cfg(feature = "pg19")]
-const _: () =
-    assert!(::core::mem::align_of::<*mut crate::__pgrx_c_bindings::TableScanDescData>() == 8);
-#[cfg(feature = "pg19")]
 const _: () = assert!(::core::mem::size_of::<i32>() == 4);
 #[cfg(feature = "pg19")]
 const _: () = assert!(::core::mem::align_of::<i32>() == 4);
-#[cfg(feature = "pg19")]
-const _: () = assert!(::core::mem::size_of::<*mut crate::__pgrx_c_bindings::TupleTableSlot>() == 8);
-#[cfg(feature = "pg19")]
-const _: () =
-    assert!(::core::mem::align_of::<*mut crate::__pgrx_c_bindings::TupleTableSlot>() == 8);
-#[cfg(feature = "pg19")]
-const _: () = assert!(::core::mem::size_of::<bool>() == 1);
-#[cfg(feature = "pg19")]
-const _: () = assert!(::core::mem::align_of::<bool>() == 1);
 #[cfg(feature = "pg19")]
 const _: () = assert!(::core::mem::size_of::<i8>() == 1);
 #[cfg(feature = "pg19")]
@@ -965,4 +2970,85 @@ impl c::expression::EnumIdentity for EnumIdentity_enum__vartag_external {}
 #[cfg(feature = "pg19")]
 impl c::expression::enumeration::NumericEnum for EnumIdentity_enum__vartag_external {
     type Compatible = c::CUnsignedInt;
+}
+#[cfg(feature = "pg19")]
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AggClauseInfo {}
+#[cfg(feature = "pg19")]
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AggClauseInfo {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AggClauseInfo as i32);
+}
+#[cfg(feature = "pg19")]
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::ElidedNode {}
+#[cfg(feature = "pg19")]
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::ElidedNode {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_ElidedNode as i32);
+}
+#[cfg(feature = "pg19")]
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::GroupingExprInfo {}
+#[cfg(feature = "pg19")]
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::GroupingExprInfo {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_GroupingExprInfo as i32);
+}
+#[cfg(feature = "pg19")]
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::OnConflictActionState {}
+#[cfg(feature = "pg19")]
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::OnConflictActionState {
+    const VALUE: c::CValue<c::CInt> = c::CValue::<c::CInt>::new(
+        crate::__pgrx_c_bindings::NodeTag::T_OnConflictActionState as i32,
+    );
+}
+#[cfg(feature = "pg19")]
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::PublicationAllObjSpec {}
+#[cfg(feature = "pg19")]
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::PublicationAllObjSpec {
+    const VALUE: c::CValue<c::CInt> = c::CValue::<c::CInt>::new(
+        crate::__pgrx_c_bindings::NodeTag::T_PublicationAllObjSpec as i32,
+    );
+}
+#[cfg(feature = "pg19")]
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::RelAggInfo {}
+#[cfg(feature = "pg19")]
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::RelAggInfo {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_RelAggInfo as i32);
+}
+#[cfg(feature = "pg19")]
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::RepackStmt {}
+#[cfg(feature = "pg19")]
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::RepackStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_RepackStmt as i32);
+}
+#[cfg(feature = "pg19")]
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::SubPlanRTInfo {}
+#[cfg(feature = "pg19")]
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::SubPlanRTInfo {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_SubPlanRTInfo as i32);
+}
+#[cfg(feature = "pg19")]
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::SupportRequestInlineInFrom {}
+#[cfg(feature = "pg19")]
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::SupportRequestInlineInFrom {
+    const VALUE: c::CValue<c::CInt> = c::CValue::<c::CInt>::new(
+        crate::__pgrx_c_bindings::NodeTag::T_SupportRequestInlineInFrom as i32,
+    );
+}
+#[cfg(feature = "pg19")]
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::SupportRequestSimplifyAggref {}
+#[cfg(feature = "pg19")]
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::SupportRequestSimplifyAggref {
+    const VALUE: c::CValue<c::CInt> = c::CValue::<c::CInt>::new(
+        crate::__pgrx_c_bindings::NodeTag::T_SupportRequestSimplifyAggref as i32,
+    );
+}
+#[cfg(feature = "pg19")]
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::WaitStmt {}
+#[cfg(feature = "pg19")]
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::WaitStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_WaitStmt as i32);
 }

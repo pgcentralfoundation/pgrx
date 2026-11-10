@@ -101,6 +101,10 @@ pub use rangetypes::*;
 mod rel;
 #[allow(unused_imports)]
 pub use rel::*;
+#[path = "relcache.rs"]
+mod relcache;
+#[allow(unused_imports)]
+pub use relcache::*;
 #[path = "selfuncs.rs"]
 mod selfuncs;
 #[allow(unused_imports)]

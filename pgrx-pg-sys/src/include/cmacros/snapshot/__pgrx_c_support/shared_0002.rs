@@ -1,5 +1,13 @@
 // Shared generated C macro support.
 
+/// Whether the PostgreSQL these macros were generated for enables assertions.
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_assert_checking {
+    () => {
+        true
+    };
+}
 /// Original compiler type-operator alignments; these may exceed record storage alignment.
 #[doc(hidden)]
 #[allow(non_upper_case_globals)]

@@ -1,5 +1,352 @@
 // Shared generated C macro support.
 
+impl c::expression::NativeType for crate::__pgrx_c_bindings::pg_tz {
+    type Marker = c::expression::COpaque<Self>;
+}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::pg_cryptohash_ctx {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::pg_cryptohash_ctx {
+    type Marker = c::expression::COpaque<Self>;
+}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::memoize_hash {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::memoize_hash {
+    type Marker = c::expression::COpaque<Self>;
+}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::dsm_segment {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::dsm_segment {
+    type Marker = c::expression::COpaque<Self>;
+}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::dshash_table_item {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::dshash_table_item {
+    type Marker = c::expression::COpaque<Self>;
+}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::dshash_table {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::dshash_table {
+    type Marker = c::expression::COpaque<Self>;
+}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::dsa_area {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::dsa_area {
+    type Marker = c::expression::COpaque<Self>;
+}
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::dlist_mutable_iter>() == 24);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::dlist_mutable_iter>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::dlist_mutable_iter {}
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::dlist_iter>() == 16);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::dlist_iter>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::dlist_iter {}
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::config_var_value>() == 16);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::config_var_value>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::config_var_value {}
+#[cfg(feature = "pg15")]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::config_string>() == 168);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::config_string>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::config_string {}
+#[cfg(feature = "pg15")]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::config_real>() == 184);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::config_real>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::config_real {}
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::bkend {}
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
+impl c::expression::NativeType for crate::__pgrx_c_bindings::bkend {
+    type Marker = c::expression::COpaque<Self>;
+}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::binaryheap {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::binaryheap {
+    type Marker = c::expression::COpaque<Self>;
+}
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::__locale_struct>() == 232);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::__locale_struct>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::__locale_struct {}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::__locale_data {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::__locale_data {
+    type Marker = c::expression::COpaque<Self>;
+}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::__dirstream {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::__dirstream {
+    type Marker = c::expression::COpaque<Self>;
+}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::_MdfdVec {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::_MdfdVec {
+    type Marker = c::expression::COpaque<Self>;
+}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::_IO_wide_data {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::_IO_wide_data {
+    type Marker = c::expression::COpaque<Self>;
+}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::_IO_marker {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::_IO_marker {
+    type Marker = c::expression::COpaque<Self>;
+}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::_IO_codecvt {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::_IO_codecvt {
+    type Marker = c::expression::COpaque<Self>;
+}
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::XLogReaderRoutine>() == 24);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::XLogReaderRoutine>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::XLogReaderRoutine {}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::XLogPrefetcher {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::XLogPrefetcher {
+    type Marker = c::expression::COpaque<Self>;
+}
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::WorkTableScanState>() == 232);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::WorkTableScanState>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::WorkTableScanState {}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::WindowStatePerFuncData {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::WindowStatePerFuncData {
+    type Marker = c::expression::COpaque<Self>;
+}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::WindowStatePerAggData {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::WindowStatePerAggData {
+    type Marker = c::expression::COpaque<Self>;
+}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::WindowObjectData {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::WindowObjectData {
+    type Marker = c::expression::COpaque<Self>;
+}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::WaitEventSet {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::WaitEventSet {
+    type Marker = c::expression::COpaque<Self>;
+}
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::ValuesScan>() == 120);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::ValuesScan>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::ValuesScan {}
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::UniqueState>() == 208);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::UniqueState>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::UniqueState {}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::TypeCacheEnumData {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::TypeCacheEnumData {
+    type Marker = c::expression::COpaque<Self>;
+}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::Tuplestorestate {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::Tuplestorestate {
+    type Marker = c::expression::COpaque<Self>;
+}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::Tuplesortstate {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::Tuplesortstate {
+    type Marker = c::expression::COpaque<Self>;
+}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::TupleQueueReader {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::TupleQueueReader {
+    type Marker = c::expression::COpaque<Self>;
+}
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::TupleConversionMap>() == 56);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::TupleConversionMap>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::TupleConversionMap {}
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::TupOutputState>() == 16);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::TupOutputState>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::TupOutputState {}
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::TidScan>() == 120);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::TidScan>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::TidScan {}
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::TidRangeScan>() == 120);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::TidRangeScan>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::TidRangeScan {}
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::TidRangePath>() == 80);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::TidRangePath>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::TidRangePath {}
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::TidPath>() == 80);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::TidPath>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::TidPath {}
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::TableFuncScan>() == 120);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::TableFuncScan>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::TableFuncScan {}
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::TableFuncRoutine>() == 64);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::TableFuncRoutine>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::TableFuncRoutine {}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::TSVectorParseStateData {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::TSVectorParseStateData {
+    type Marker = c::expression::COpaque<Self>;
+}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::TSQueryParserStateData {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::TSQueryParserStateData {
+    type Marker = c::expression::COpaque<Self>;
+}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::TIDBitmap {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::TIDBitmap {
+    type Marker = c::expression::COpaque<Self>;
+}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::TBMSharedIterator {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::TBMSharedIterator {
+    type Marker = c::expression::COpaque<Self>;
+}
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::TBMIterator {}
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
+impl c::expression::NativeType for crate::__pgrx_c_bindings::TBMIterator {
+    type Marker = c::expression::COpaque<Self>;
+}
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::SysScanDescData>() == 48);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::SysScanDescData>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::SysScanDescData {}
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::SubscriptExecSteps>() == 32);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::SubscriptExecSteps>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::SubscriptExecSteps {}
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::SubqueryScanState>() == 232);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::SubqueryScanState>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::SubqueryScanState {}
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::SubqueryScanPath>() == 80);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::SubqueryScanPath>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::SubqueryScanPath {}
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::SpGistLUPCache>() == 64);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::SpGistLUPCache>() == 4);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::SpGistLUPCache {}
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::SortPath>() == 80);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::SortPath>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::SortPath {}
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::SnapBuild {}
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
+impl c::expression::NativeType for crate::__pgrx_c_bindings::SnapBuild {
+    type Marker = c::expression::COpaque<Self>;
+}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::Sharedsort {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::Sharedsort {
+    type Marker = c::expression::COpaque<Self>;
+}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::SharedTuplestoreAccessor {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::SharedTuplestoreAccessor {
+    type Marker = c::expression::COpaque<Self>;
+}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::SharedTuplestore {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::SharedTuplestore {
+    type Marker = c::expression::COpaque<Self>;
+}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::SharedRecordTypmodRegistry {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::SharedRecordTypmodRegistry {
+    type Marker = c::expression::COpaque<Self>;
+}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::SharedHashJoinBatch {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::SharedHashJoinBatch {
+    type Marker = c::expression::COpaque<Self>;
+}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::SharedExecutorInstrumentation {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::SharedExecutorInstrumentation {
+    type Marker = c::expression::COpaque<Self>;
+}
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::SetOpStatePerGroupData {}
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
+impl c::expression::NativeType for crate::__pgrx_c_bindings::SetOpStatePerGroupData {
+    type Marker = c::expression::COpaque<Self>;
+}
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::Session>() == 40);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::Session>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::Session {}
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::SeqScan>() == 112);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::SeqScan>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::SeqScan {}
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::SemiAntiJoinFactors>() == 16);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::SemiAntiJoinFactors>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::SemiAntiJoinFactors {}
+#[cfg(feature = "pg15")]
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::SelectLimit {}
+#[cfg(feature = "pg15")]
+impl c::expression::NativeType for crate::__pgrx_c_bindings::SelectLimit {
+    type Marker = c::expression::COpaque<Self>;
+}
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::ScanState>() == 224);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::ScanState>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::ScanState {}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::ScalarArrayOpExprHashTable {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::ScalarArrayOpExprHashTable {
+    type Marker = c::expression::COpaque<Self>;
+}
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::SampleScan>() == 120);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::SampleScan>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::SampleScan {}
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::SERIALIZABLEXID>() == 16);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::SERIALIZABLEXID>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::SERIALIZABLEXID {}
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::RowSecurityDesc>() == 16);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::RowSecurityDesc>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::RowSecurityDesc {}
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::RmgrData>() == 64);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::RmgrData>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::RmgrData {}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::RewriteStateData {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::RewriteStateData {
+    type Marker = c::expression::COpaque<Self>;
+}
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::RevmapContents>() == 6);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::RevmapContents>() == 2);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::RevmapContents {}
+#[cfg(feature = "pg15")]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::ResultRelInfoExtra>() == 16);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::ResultRelInfoExtra>() == 8);
+};
+#[cfg(feature = "pg15")]
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::ResultRelInfoExtra {}
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
 const _: () = {
     assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::Result>() == 112);
@@ -763,6 +1110,35 @@ const _: () = {
     assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::BOX>() == 8);
 };
 impl c::expression::NativeRecord for crate::__pgrx_c_bindings::BOX {}
+unsafe extern "C-unwind" {
+    #[link_name = "__pgrx_inline__fn__AssertPendingSyncs_RelationCache"]
+    fn raw_inline_AssertPendingSyncs_RelationCache() -> ();
+}
+#[doc = "Call the original C function `AssertPendingSyncs_RelationCache`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
+#[inline]
+pub unsafe fn Inline_AssertPendingSyncs_RelationCache() -> () {
+    // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
+    unsafe {
+        crate::ffi::pg_guard_ffi_boundary(move || raw_inline_AssertPendingSyncs_RelationCache())
+    }
+}
+const _: () = assert!(::core::mem::size_of::<crate::TransactionId>() == 4);
+const _: () = assert!(::core::mem::align_of::<crate::TransactionId>() == 4);
+unsafe extern "C-unwind" {
+    #[link_name = "__pgrx_inline__fn__AssertTransactionIdInAllowableRange"]
+    fn raw_inline_AssertTransactionIdInAllowableRange(arg0: crate::TransactionId) -> ();
+}
+#[doc = "Call the original C function `AssertTransactionIdInAllowableRange`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
+#[inline]
+pub unsafe fn Inline_AssertTransactionIdInAllowableRange(arg0: crate::TransactionId) -> () {
+    const _: () = assert!(!::core::mem::needs_drop::<crate::TransactionId>());
+    // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
+    unsafe {
+        crate::ffi::pg_guard_ffi_boundary(move || {
+            raw_inline_AssertTransactionIdInAllowableRange(arg0)
+        })
+    }
+}
 const _: () = assert!(::core::mem::size_of::<*mut ::core::ffi::c_char>() == 8);
 const _: () = assert!(::core::mem::align_of::<*mut ::core::ffi::c_char>() == 8);
 const _: () = assert!(
@@ -832,44 +1208,6 @@ pub unsafe fn Inline_CreateCommandTag(arg0: *mut crate::__pgrx_c_bindings::Node)
     const _: () = assert!(!::core::mem::needs_drop::<*mut crate::__pgrx_c_bindings::Node>());
     // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
     unsafe { crate::ffi::pg_guard_ffi_boundary(move || raw_inline_CreateCommandTag(arg0)) }
-}
-const _: () = assert!(::core::mem::size_of::<*const i8>() == 8);
-const _: () = assert!(::core::mem::align_of::<*const i8>() == 8);
-const _: () = assert!(::core::mem::size_of::<*const i8>() == 8);
-const _: () = assert!(::core::mem::align_of::<*const i8>() == 8);
-const _: () = assert!(::core::mem::size_of::<*const i8>() == 8);
-const _: () = assert!(::core::mem::align_of::<*const i8>() == 8);
-const _: () = assert!(::core::mem::size_of::<i32>() == 4);
-const _: () = assert!(::core::mem::align_of::<i32>() == 4);
-#[cfg(feature = "pg15")]
-unsafe extern "C-unwind" {
-    #[link_name = "__pgrx_inline__fn__ExceptionalCondition"]
-    fn raw_inline_ExceptionalCondition(
-        arg0: *const i8,
-        arg1: *const i8,
-        arg2: *const i8,
-        arg3: i32,
-    ) -> ();
-}
-#[cfg(feature = "pg15")]
-#[doc = "Call the original C function `ExceptionalCondition`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
-#[inline]
-pub unsafe fn Inline_ExceptionalCondition(
-    arg0: *const i8,
-    arg1: *const i8,
-    arg2: *const i8,
-    arg3: i32,
-) -> () {
-    const _: () = assert!(!::core::mem::needs_drop::<*const i8>());
-    const _: () = assert!(!::core::mem::needs_drop::<*const i8>());
-    const _: () = assert!(!::core::mem::needs_drop::<*const i8>());
-    const _: () = assert!(!::core::mem::needs_drop::<i32>());
-    // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
-    unsafe {
-        crate::ffi::pg_guard_ffi_boundary(move || {
-            raw_inline_ExceptionalCondition(arg0, arg1, arg2, arg3)
-        })
-    }
 }
 const _: () = assert!(::core::mem::size_of::<u32>() == 4);
 const _: () = assert!(::core::mem::align_of::<u32>() == 4);
@@ -1115,6 +1453,45 @@ pub unsafe fn Inline_GistPageSetDeleted(
     // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
     unsafe { crate::ffi::pg_guard_ffi_boundary(move || raw_inline_GistPageSetDeleted(arg0, arg1)) }
 }
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
+const _: () = assert!(::core::mem::size_of::<*mut crate::__pgrx_c_bindings::RelationData>() == 8);
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
+const _: () = assert!(::core::mem::align_of::<*mut crate::__pgrx_c_bindings::RelationData>() == 8);
+const _: () = assert!(
+    ::core::mem::size_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::FullTransactionId>>()
+        == 8
+);
+const _: () = assert!(
+    ::core::mem::align_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::FullTransactionId>>(
+    ) == 8
+);
+const _: () = assert!(::core::mem::size_of::<bool>() == 1);
+const _: () = assert!(::core::mem::align_of::<bool>() == 1);
+unsafe extern "C-unwind" {
+    #[link_name = "__pgrx_inline__fn__GlobalVisCheckRemovableFullXid"]
+    fn raw_inline_GlobalVisCheckRemovableFullXid(
+        arg0: *mut crate::__pgrx_c_bindings::RelationData,
+        arg1: ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::FullTransactionId>,
+    ) -> bool;
+}
+#[doc = "Call the original C function `GlobalVisCheckRemovableFullXid`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
+#[inline]
+pub unsafe fn Inline_GlobalVisCheckRemovableFullXid(
+    arg0: *mut crate::__pgrx_c_bindings::RelationData,
+    arg1: ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::FullTransactionId>,
+) -> bool {
+    const _: () =
+        assert!(!::core::mem::needs_drop::<*mut crate::__pgrx_c_bindings::RelationData>());
+    const _: () = assert!(!::core::mem::needs_drop::<
+        ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::FullTransactionId>,
+    >());
+    // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
+    unsafe {
+        crate::ffi::pg_guard_ffi_boundary(move || {
+            raw_inline_GlobalVisCheckRemovableFullXid(arg0, arg1)
+        })
+    }
+}
 const _: () = assert!(
     ::core::mem::size_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::FullTransactionId>>()
         == 8
@@ -1166,6 +1543,34 @@ pub unsafe fn Inline_RelationGetNumberOfBlocksInFork(
         })
     }
 }
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
+const _: () = assert!(::core::mem::size_of::<*mut crate::__pgrx_c_bindings::SlruCtlData>() == 8);
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
+const _: () = assert!(::core::mem::align_of::<*mut crate::__pgrx_c_bindings::SlruCtlData>() == 8);
+const _: () = assert!(::core::mem::size_of::<i32>() == 4);
+const _: () = assert!(::core::mem::align_of::<i32>() == 4);
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
+unsafe extern "C-unwind" {
+    #[link_name = "__pgrx_inline__fn__SlruPagePrecedesUnitTests"]
+    fn raw_inline_SlruPagePrecedesUnitTests(
+        arg0: *mut crate::__pgrx_c_bindings::SlruCtlData,
+        arg1: i32,
+    ) -> ();
+}
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
+#[doc = "Call the original C function `SlruPagePrecedesUnitTests`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
+#[inline]
+pub unsafe fn Inline_SlruPagePrecedesUnitTests(
+    arg0: *mut crate::__pgrx_c_bindings::SlruCtlData,
+    arg1: i32,
+) -> () {
+    const _: () = assert!(!::core::mem::needs_drop::<*mut crate::__pgrx_c_bindings::SlruCtlData>());
+    const _: () = assert!(!::core::mem::needs_drop::<i32>());
+    // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
+    unsafe {
+        crate::ffi::pg_guard_ffi_boundary(move || raw_inline_SlruPagePrecedesUnitTests(arg0, arg1))
+    }
+}
 const _: () = assert!(::core::mem::size_of::<*mut *const u16>() == 8);
 const _: () = assert!(::core::mem::align_of::<*mut *const u16>() == 8);
 unsafe extern "C-unwind" {
@@ -1177,16 +1582,6 @@ unsafe extern "C-unwind" {
 pub unsafe fn Inline___ctype_b_loc() -> *mut *const u16 {
     // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
     unsafe { crate::ffi::pg_guard_ffi_boundary(move || raw_inline___ctype_b_loc()) }
-}
-unsafe extern "C-unwind" {
-    #[link_name = "__pgrx_inline__fn__abort"]
-    fn raw_inline_abort() -> ();
-}
-#[doc = "Call the original C function `abort`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
-#[inline]
-pub unsafe fn Inline_abort() -> () {
-    // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
-    unsafe { crate::ffi::pg_guard_ffi_boundary(move || raw_inline_abort()) }
 }
 const _: () = assert!(::core::mem::size_of::<*mut crate::__pgrx_c_bindings::StringInfoData>() == 8);
 const _: () =
@@ -1511,6 +1906,42 @@ pub unsafe fn Inline_rint(arg0: f64) -> f64 {
     // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
     unsafe { crate::ffi::pg_guard_ffi_boundary(move || raw_inline_rint(arg0)) }
 }
+#[cfg(feature = "pg15")]
+const _: () = assert!(
+    ::core::mem::size_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::RelFileNode>>() == 12
+);
+#[cfg(feature = "pg15")]
+const _: () = assert!(
+    ::core::mem::align_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::RelFileNode>>() == 4
+);
+const _: () = assert!(::core::mem::size_of::<i32>() == 4);
+const _: () = assert!(::core::mem::align_of::<i32>() == 4);
+const _: () =
+    assert!(::core::mem::size_of::<*mut crate::__pgrx_c_bindings::SMgrRelationData>() == 8);
+const _: () =
+    assert!(::core::mem::align_of::<*mut crate::__pgrx_c_bindings::SMgrRelationData>() == 8);
+#[cfg(feature = "pg15")]
+unsafe extern "C-unwind" {
+    #[link_name = "__pgrx_inline__fn__smgropen"]
+    fn raw_inline_smgropen(
+        arg0: ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::RelFileNode>,
+        arg1: i32,
+    ) -> *mut crate::__pgrx_c_bindings::SMgrRelationData;
+}
+#[cfg(feature = "pg15")]
+#[doc = "Call the original C function `smgropen`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
+#[inline]
+pub unsafe fn Inline_smgropen(
+    arg0: ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::RelFileNode>,
+    arg1: i32,
+) -> *mut crate::__pgrx_c_bindings::SMgrRelationData {
+    const _: () = assert!(!::core::mem::needs_drop::<
+        ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::RelFileNode>,
+    >());
+    const _: () = assert!(!::core::mem::needs_drop::<i32>());
+    // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
+    unsafe { crate::ffi::pg_guard_ffi_boundary(move || raw_inline_smgropen(arg0, arg1)) }
+}
 const _: () = assert!(::core::mem::size_of::<*const i8>() == 8);
 const _: () = assert!(::core::mem::align_of::<*const i8>() == 8);
 const _: () = assert!(::core::mem::size_of::<*const i8>() == 8);
@@ -1546,9 +1977,7 @@ pub unsafe fn Inline_strlen(arg0: *const i8) -> u64 {
 }
 const _: () = assert!(::core::mem::size_of::<*const i8>() == 8);
 const _: () = assert!(::core::mem::align_of::<*const i8>() == 8);
-#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
 const _: () = assert!(::core::mem::size_of::<*const i8>() == 8);
-#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
 const _: () = assert!(::core::mem::align_of::<*const i8>() == 8);
 const _: () = assert!(::core::mem::size_of::<u64>() == 8);
 const _: () = assert!(::core::mem::align_of::<u64>() == 8);
@@ -1564,9 +1993,7 @@ pub unsafe fn Inline_strspn(arg0: *const i8, arg1: *const i8) -> u64 {
     // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
     unsafe { crate::ffi::pg_guard_ffi_boundary(move || raw_inline_strspn(arg0, arg1)) }
 }
-#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
 const _: () = assert!(::core::mem::size_of::<*const i8>() == 8);
-#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
 const _: () = assert!(::core::mem::align_of::<*const i8>() == 8);
 const _: () = assert!(::core::mem::size_of::<*mut *mut i8>() == 8);
 const _: () = assert!(::core::mem::align_of::<*mut *mut i8>() == 8);
@@ -1587,9 +2014,7 @@ pub unsafe fn Inline_strtol(arg0: *const i8, arg1: *mut *mut i8, arg2: i32) -> i
     // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
     unsafe { crate::ffi::pg_guard_ffi_boundary(move || raw_inline_strtol(arg0, arg1, arg2)) }
 }
-#[cfg(feature = "pg15")]
 const _: () = assert!(::core::mem::size_of::<*const i8>() == 8);
-#[cfg(feature = "pg15")]
 const _: () = assert!(::core::mem::align_of::<*const i8>() == 8);
 const _: () = assert!(::core::mem::size_of::<*mut *mut i8>() == 8);
 const _: () = assert!(::core::mem::align_of::<*mut *mut i8>() == 8);
@@ -1614,13 +2039,16 @@ const _: () =
     assert!(::core::mem::size_of::<*mut crate::__pgrx_c_bindings::TableScanDescData>() == 8);
 const _: () =
     assert!(::core::mem::align_of::<*mut crate::__pgrx_c_bindings::TableScanDescData>() == 8);
+#[cfg(any(feature = "pg15", feature = "pg17", feature = "pg18", feature = "pg19"))]
 const _: () = assert!(::core::mem::size_of::<i32>() == 4);
+#[cfg(any(feature = "pg15", feature = "pg17", feature = "pg18", feature = "pg19"))]
 const _: () = assert!(::core::mem::align_of::<i32>() == 4);
 const _: () = assert!(::core::mem::size_of::<*mut crate::__pgrx_c_bindings::TupleTableSlot>() == 8);
 const _: () =
     assert!(::core::mem::align_of::<*mut crate::__pgrx_c_bindings::TupleTableSlot>() == 8);
 const _: () = assert!(::core::mem::size_of::<bool>() == 1);
 const _: () = assert!(::core::mem::align_of::<bool>() == 1);
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
 unsafe extern "C-unwind" {
     #[link_name = "__pgrx_inline__fn__table_scan_getnextslot"]
     fn raw_inline_table_scan_getnextslot(
@@ -1629,6 +2057,7 @@ unsafe extern "C-unwind" {
         arg2: *mut crate::__pgrx_c_bindings::TupleTableSlot,
     ) -> bool;
 }
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
 #[doc = "Call the original C function `table_scan_getnextslot`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
 #[inline]
 pub unsafe fn Inline_table_scan_getnextslot(
@@ -1645,44 +2074,6 @@ pub unsafe fn Inline_table_scan_getnextslot(
     unsafe {
         crate::ffi::pg_guard_ffi_boundary(move || {
             raw_inline_table_scan_getnextslot(arg0, arg1, arg2)
-        })
-    }
-}
-const _: () =
-    assert!(::core::mem::size_of::<*mut crate::__pgrx_c_bindings::TableScanDescData>() == 8);
-const _: () =
-    assert!(::core::mem::align_of::<*mut crate::__pgrx_c_bindings::TableScanDescData>() == 8);
-const _: () = assert!(::core::mem::size_of::<i32>() == 4);
-const _: () = assert!(::core::mem::align_of::<i32>() == 4);
-const _: () = assert!(::core::mem::size_of::<*mut crate::__pgrx_c_bindings::TupleTableSlot>() == 8);
-const _: () =
-    assert!(::core::mem::align_of::<*mut crate::__pgrx_c_bindings::TupleTableSlot>() == 8);
-const _: () = assert!(::core::mem::size_of::<bool>() == 1);
-const _: () = assert!(::core::mem::align_of::<bool>() == 1);
-unsafe extern "C-unwind" {
-    #[link_name = "__pgrx_inline__fn__table_scan_getnextslot_tidrange"]
-    fn raw_inline_table_scan_getnextslot_tidrange(
-        arg0: *mut crate::__pgrx_c_bindings::TableScanDescData,
-        arg1: i32,
-        arg2: *mut crate::__pgrx_c_bindings::TupleTableSlot,
-    ) -> bool;
-}
-#[doc = "Call the original C function `table_scan_getnextslot_tidrange`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
-#[inline]
-pub unsafe fn Inline_table_scan_getnextslot_tidrange(
-    arg0: *mut crate::__pgrx_c_bindings::TableScanDescData,
-    arg1: i32,
-    arg2: *mut crate::__pgrx_c_bindings::TupleTableSlot,
-) -> bool {
-    const _: () =
-        assert!(!::core::mem::needs_drop::<*mut crate::__pgrx_c_bindings::TableScanDescData>());
-    const _: () = assert!(!::core::mem::needs_drop::<i32>());
-    const _: () =
-        assert!(!::core::mem::needs_drop::<*mut crate::__pgrx_c_bindings::TupleTableSlot>());
-    // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
-    unsafe {
-        crate::ffi::pg_guard_ffi_boundary(move || {
-            raw_inline_table_scan_getnextslot_tidrange(arg0, arg1, arg2)
         })
     }
 }
@@ -3165,1897 +3556,1040 @@ impl c::expression::EnumIdentity for EnumIdentity_subxids_array_status {}
 impl c::expression::enumeration::NumericEnum for EnumIdentity_subxids_array_status {
     type Compatible = c::CUnsignedInt;
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                crate::__pgrx_c_bindings::Datum,
-            ) -> *mut crate::__pgrx_c_bindings::BOX,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                crate::__pgrx_c_bindings::Datum,
-            ) -> *mut crate::__pgrx_c_bindings::BOX,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_BOX__0p__0l__unsigned__long__0r;
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::sealed::Sealed for Signature_BOX__0p__0l__unsigned__long__0r {}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::expression::NativeFunctionSignature for Signature_BOX__0p__0l__unsigned__long__0r {
-    type Physical = PhysicalFunction_C_unwind_1<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                crate::__pgrx_c_bindings::Datum,
-            ) -> *mut crate::__pgrx_c_bindings::BOX,
-        >,
-    >;
+/// Seals the type enumerator lookups: only this support names these traits.
+mod type_enumerator_seals {
+    pub trait Seal_T_ {}
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                crate::__pgrx_c_bindings::Datum,
-            ) -> *mut crate::__pgrx_c_bindings::CIRCLE,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                crate::__pgrx_c_bindings::Datum,
-            ) -> *mut crate::__pgrx_c_bindings::CIRCLE,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_CIRCLE__0p__0l__unsigned__long__0r;
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::sealed::Sealed for Signature_CIRCLE__0p__0l__unsigned__long__0r {}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::expression::NativeFunctionSignature for Signature_CIRCLE__0p__0l__unsigned__long__0r {
-    type Physical = PhysicalFunction_C_unwind_1<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                crate::__pgrx_c_bindings::Datum,
-            ) -> *mut crate::__pgrx_c_bindings::CIRCLE,
-        >,
-    >;
+/// The enumerator of `enum NodeTag` that C names by pasting `T_` onto a structure type's name.
+#[diagnostic::on_unimplemented(
+    message = "no enumerator of `enum NodeTag` is `T_` followed by the C name of `{Self}`",
+    label = "`T_` pasted onto this type's C name must name an enumerator",
+    note = "a Rust type that several C type names share, each with its own enumerator, selects none: DistinctExpr, NullIfExpr, OpExpr"
+)]
+pub trait TypeEnumerator_T_: type_enumerator_seals::Seal_T_ {
+    /// The enumerator, with its C type.
+    const VALUE: c::CValue<c::CInt>;
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                crate::__pgrx_c_bindings::Datum,
-            ) -> *mut crate::__pgrx_c_bindings::Interval,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                crate::__pgrx_c_bindings::Datum,
-            ) -> *mut crate::__pgrx_c_bindings::Interval,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_Interval__0p__0l__unsigned__long__0r;
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::sealed::Sealed for Signature_Interval__0p__0l__unsigned__long__0r {}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::expression::NativeFunctionSignature for Signature_Interval__0p__0l__unsigned__long__0r {
-    type Physical = PhysicalFunction_C_unwind_1<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                crate::__pgrx_c_bindings::Datum,
-            ) -> *mut crate::__pgrx_c_bindings::Interval,
-        >,
-    >;
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::A_ArrayExpr {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::A_ArrayExpr {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_A_ArrayExpr as i32);
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                crate::__pgrx_c_bindings::Datum,
-            ) -> *mut crate::__pgrx_c_bindings::Jsonb,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                crate::__pgrx_c_bindings::Datum,
-            ) -> *mut crate::__pgrx_c_bindings::Jsonb,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_Jsonb__0p__0l__unsigned__long__0r;
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::sealed::Sealed for Signature_Jsonb__0p__0l__unsigned__long__0r {}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::expression::NativeFunctionSignature for Signature_Jsonb__0p__0l__unsigned__long__0r {
-    type Physical = PhysicalFunction_C_unwind_1<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                crate::__pgrx_c_bindings::Datum,
-            ) -> *mut crate::__pgrx_c_bindings::Jsonb,
-        >,
-    >;
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::A_Const {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::A_Const {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_A_Const as i32);
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                crate::__pgrx_c_bindings::Datum,
-            ) -> *mut crate::__pgrx_c_bindings::LINE,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                crate::__pgrx_c_bindings::Datum,
-            ) -> *mut crate::__pgrx_c_bindings::LINE,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_LINE__0p__0l__unsigned__long__0r;
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::sealed::Sealed for Signature_LINE__0p__0l__unsigned__long__0r {}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::expression::NativeFunctionSignature for Signature_LINE__0p__0l__unsigned__long__0r {
-    type Physical = PhysicalFunction_C_unwind_1<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                crate::__pgrx_c_bindings::Datum,
-            ) -> *mut crate::__pgrx_c_bindings::LINE,
-        >,
-    >;
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::A_Expr {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::A_Expr {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_A_Expr as i32);
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                crate::__pgrx_c_bindings::Datum,
-            ) -> *mut crate::__pgrx_c_bindings::LSEG,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                crate::__pgrx_c_bindings::Datum,
-            ) -> *mut crate::__pgrx_c_bindings::LSEG,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_LSEG__0p__0l__unsigned__long__0r;
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::sealed::Sealed for Signature_LSEG__0p__0l__unsigned__long__0r {}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::expression::NativeFunctionSignature for Signature_LSEG__0p__0l__unsigned__long__0r {
-    type Physical = PhysicalFunction_C_unwind_1<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                crate::__pgrx_c_bindings::Datum,
-            ) -> *mut crate::__pgrx_c_bindings::LSEG,
-        >,
-    >;
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::A_Indices {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::A_Indices {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_A_Indices as i32);
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                crate::__pgrx_c_bindings::Datum,
-            ) -> *mut crate::__pgrx_c_bindings::PATH,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                crate::__pgrx_c_bindings::Datum,
-            ) -> *mut crate::__pgrx_c_bindings::PATH,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_PATH__0p__0l__unsigned__long__0r;
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::sealed::Sealed for Signature_PATH__0p__0l__unsigned__long__0r {}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::expression::NativeFunctionSignature for Signature_PATH__0p__0l__unsigned__long__0r {
-    type Physical = PhysicalFunction_C_unwind_1<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                crate::__pgrx_c_bindings::Datum,
-            ) -> *mut crate::__pgrx_c_bindings::PATH,
-        >,
-    >;
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::A_Indirection {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::A_Indirection {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_A_Indirection as i32);
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                crate::__pgrx_c_bindings::Datum,
-            ) -> *mut crate::__pgrx_c_bindings::POLYGON,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                crate::__pgrx_c_bindings::Datum,
-            ) -> *mut crate::__pgrx_c_bindings::POLYGON,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_POLYGON__0p__0l__unsigned__long__0r;
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::sealed::Sealed for Signature_POLYGON__0p__0l__unsigned__long__0r {}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::expression::NativeFunctionSignature for Signature_POLYGON__0p__0l__unsigned__long__0r {
-    type Physical = PhysicalFunction_C_unwind_1<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                crate::__pgrx_c_bindings::Datum,
-            ) -> *mut crate::__pgrx_c_bindings::POLYGON,
-        >,
-    >;
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::A_Star {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::A_Star {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_A_Star as i32);
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                crate::__pgrx_c_bindings::Datum,
-            ) -> *mut crate::__pgrx_c_bindings::Point,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                crate::__pgrx_c_bindings::Datum,
-            ) -> *mut crate::__pgrx_c_bindings::Point,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_Point__0p__0l__unsigned__long__0r;
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::sealed::Sealed for Signature_Point__0p__0l__unsigned__long__0r {}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::expression::NativeFunctionSignature for Signature_Point__0p__0l__unsigned__long__0r {
-    type Physical = PhysicalFunction_C_unwind_1<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                crate::__pgrx_c_bindings::Datum,
-            ) -> *mut crate::__pgrx_c_bindings::Point,
-        >,
-    >;
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AccessPriv {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AccessPriv {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AccessPriv as i32);
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                crate::__pgrx_c_bindings::Datum,
-            ) -> *mut crate::__pgrx_c_bindings::RangeType,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                crate::__pgrx_c_bindings::Datum,
-            ) -> *mut crate::__pgrx_c_bindings::RangeType,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_RangeType__0p__0l__unsigned__long__0r;
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::sealed::Sealed for Signature_RangeType__0p__0l__unsigned__long__0r {}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::expression::NativeFunctionSignature for Signature_RangeType__0p__0l__unsigned__long__0r {
-    type Physical = PhysicalFunction_C_unwind_1<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                crate::__pgrx_c_bindings::Datum,
-            ) -> *mut crate::__pgrx_c_bindings::RangeType,
-        >,
-    >;
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::Agg {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::Agg {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_Agg as i32);
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                crate::__pgrx_c_bindings::Datum,
-            ) -> *mut crate::__pgrx_c_bindings::TSQueryData,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                crate::__pgrx_c_bindings::Datum,
-            ) -> *mut crate::__pgrx_c_bindings::TSQueryData,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_TSQueryData__0p__0l__unsigned__long__0r;
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::sealed::Sealed for Signature_TSQueryData__0p__0l__unsigned__long__0r {}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::expression::NativeFunctionSignature for Signature_TSQueryData__0p__0l__unsigned__long__0r {
-    type Physical = PhysicalFunction_C_unwind_1<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                crate::__pgrx_c_bindings::Datum,
-            ) -> *mut crate::__pgrx_c_bindings::TSQueryData,
-        >,
-    >;
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AggPath {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AggPath {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AggPath as i32);
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                crate::__pgrx_c_bindings::Datum,
-            ) -> *mut crate::__pgrx_c_bindings::TSVectorData,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                crate::__pgrx_c_bindings::Datum,
-            ) -> *mut crate::__pgrx_c_bindings::TSVectorData,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_TSVectorData__0p__0l__unsigned__long__0r;
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::sealed::Sealed for Signature_TSVectorData__0p__0l__unsigned__long__0r {}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::expression::NativeFunctionSignature for Signature_TSVectorData__0p__0l__unsigned__long__0r {
-    type Physical = PhysicalFunction_C_unwind_1<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                crate::__pgrx_c_bindings::Datum,
-            ) -> *mut crate::__pgrx_c_bindings::TSVectorData,
-        >,
-    >;
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AggState {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AggState {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AggState as i32);
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                crate::__pgrx_c_bindings::Datum,
-            ) -> *mut crate::__pgrx_c_bindings::TimeTzADT,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                crate::__pgrx_c_bindings::Datum,
-            ) -> *mut crate::__pgrx_c_bindings::TimeTzADT,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_TimeTzADT__0p__0l__unsigned__long__0r;
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::sealed::Sealed for Signature_TimeTzADT__0p__0l__unsigned__long__0r {}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::expression::NativeFunctionSignature for Signature_TimeTzADT__0p__0l__unsigned__long__0r {
-    type Physical = PhysicalFunction_C_unwind_1<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                crate::__pgrx_c_bindings::Datum,
-            ) -> *mut crate::__pgrx_c_bindings::TimeTzADT,
-        >,
-    >;
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::Aggref {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::Aggref {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_Aggref as i32);
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *mut crate::__pgrx_c_bindings::List,
-                *mut crate::__pgrx_c_bindings::List,
-                bool,
-            ) -> bool,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *mut crate::__pgrx_c_bindings::List,
-                *mut crate::__pgrx_c_bindings::List,
-                bool,
-            ) -> bool,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_0x5f426f6f6c__0l__struct__List__0p__0c__struct__List__0p__0c__0x5f426f6f6c__0r;
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::sealed::Sealed
-    for Signature_0x5f426f6f6c__0l__struct__List__0p__0c__struct__List__0p__0c__0x5f426f6f6c__0r
-{
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::Alias {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::Alias {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_Alias as i32);
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::expression::NativeFunctionSignature
-    for Signature_0x5f426f6f6c__0l__struct__List__0p__0c__struct__List__0p__0c__0x5f426f6f6c__0r
-{
-    type Physical = PhysicalFunction_C_unwind_3<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *mut crate::__pgrx_c_bindings::List,
-                *mut crate::__pgrx_c_bindings::List,
-                bool,
-            ) -> bool,
-        >,
-    >;
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterCollationStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterCollationStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AlterCollationStmt as i32);
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *mut crate::__pgrx_c_bindings::Node,
-                *mut ::core::ffi::c_void,
-            ) -> bool,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *mut crate::__pgrx_c_bindings::Node,
-                *mut ::core::ffi::c_void,
-            ) -> bool,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_0x5f426f6f6c__0l__struct__Node__0p__0c__void__0p__0r;
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::sealed::Sealed for Signature_0x5f426f6f6c__0l__struct__Node__0p__0c__void__0p__0r {}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::expression::NativeFunctionSignature
-    for Signature_0x5f426f6f6c__0l__struct__Node__0p__0c__void__0p__0r
-{
-    type Physical = PhysicalFunction_C_unwind_2<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *mut crate::__pgrx_c_bindings::Node,
-                *mut ::core::ffi::c_void,
-            ) -> bool,
-        >,
-    >;
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterDatabaseRefreshCollStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterDatabaseRefreshCollStmt {
+    const VALUE: c::CValue<c::CInt> = c::CValue::<c::CInt>::new(
+        crate::__pgrx_c_bindings::NodeTag::T_AlterDatabaseRefreshCollStmt as i32,
+    );
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *mut crate::__pgrx_c_bindings::PlanState,
-                *mut ::core::ffi::c_void,
-            ) -> bool,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *mut crate::__pgrx_c_bindings::PlanState,
-                *mut ::core::ffi::c_void,
-            ) -> bool,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_0x5f426f6f6c__0l__struct__PlanState__0p__0c__void__0p__0r;
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::sealed::Sealed for Signature_0x5f426f6f6c__0l__struct__PlanState__0p__0c__void__0p__0r {}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::expression::NativeFunctionSignature
-    for Signature_0x5f426f6f6c__0l__struct__PlanState__0p__0c__void__0p__0r
-{
-    type Physical = PhysicalFunction_C_unwind_2<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *mut crate::__pgrx_c_bindings::PlanState,
-                *mut ::core::ffi::c_void,
-            ) -> bool,
-        >,
-    >;
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterDatabaseSetStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterDatabaseSetStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AlterDatabaseSetStmt as i32);
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *mut ::core::ffi::c_char,
-                *mut crate::__pgrx_c_bindings::RelationData,
-            ) -> bool,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *mut ::core::ffi::c_char,
-                *mut crate::__pgrx_c_bindings::RelationData,
-            ) -> bool,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_0x5f426f6f6c__0l__char__0p__0c__struct__RelationData__0p__0r;
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::sealed::Sealed for Signature_0x5f426f6f6c__0l__char__0p__0c__struct__RelationData__0p__0r {}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::expression::NativeFunctionSignature
-    for Signature_0x5f426f6f6c__0l__char__0p__0c__struct__RelationData__0p__0r
-{
-    type Physical = PhysicalFunction_C_unwind_2<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *mut ::core::ffi::c_char,
-                *mut crate::__pgrx_c_bindings::RelationData,
-            ) -> bool,
-        >,
-    >;
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterDatabaseStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterDatabaseStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AlterDatabaseStmt as i32);
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(*const crate::__pgrx_c_bindings::ItemPointerData) -> bool,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(*const crate::__pgrx_c_bindings::ItemPointerData) -> bool,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_0x5f426f6f6c__0l__const__struct__ItemPointerData__0p__0r;
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::sealed::Sealed for Signature_0x5f426f6f6c__0l__const__struct__ItemPointerData__0p__0r {}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::expression::NativeFunctionSignature
-    for Signature_0x5f426f6f6c__0l__const__struct__ItemPointerData__0p__0r
-{
-    type Physical = PhysicalFunction_C_unwind_1<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(*const crate::__pgrx_c_bindings::ItemPointerData) -> bool,
-        >,
-    >;
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterDefaultPrivilegesStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterDefaultPrivilegesStmt {
+    const VALUE: c::CValue<c::CInt> = c::CValue::<c::CInt>::new(
+        crate::__pgrx_c_bindings::NodeTag::T_AlterDefaultPrivilegesStmt as i32,
+    );
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(*const crate::__pgrx_c_bindings::dclist_head) -> bool,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(*const crate::__pgrx_c_bindings::dclist_head) -> bool,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_0x5f426f6f6c__0l__const__struct__dclist_head__0p__0r;
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::sealed::Sealed for Signature_0x5f426f6f6c__0l__const__struct__dclist_head__0p__0r {}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::expression::NativeFunctionSignature
-    for Signature_0x5f426f6f6c__0l__const__struct__dclist_head__0p__0r
-{
-    type Physical = PhysicalFunction_C_unwind_1<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(*const crate::__pgrx_c_bindings::dclist_head) -> bool,
-        >,
-    >;
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterDomainStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterDomainStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AlterDomainStmt as i32);
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *const crate::__pgrx_c_bindings::dclist_head,
-                *const crate::__pgrx_c_bindings::dlist_node,
-            ) -> bool,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *const crate::__pgrx_c_bindings::dclist_head,
-                *const crate::__pgrx_c_bindings::dlist_node,
-            ) -> bool,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_0x5f426f6f6c__0l__const__struct__dclist_head__0p__0c__const__struct__dlist_node__0p__0r;
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::sealed::Sealed for Signature_0x5f426f6f6c__0l__const__struct__dclist_head__0p__0c__const__struct__dlist_node__0p__0r {}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::expression::NativeFunctionSignature for Signature_0x5f426f6f6c__0l__const__struct__dclist_head__0p__0c__const__struct__dlist_node__0p__0r {
- type Physical = PhysicalFunction_C_unwind_2<::core::option::Option<unsafe extern "C-unwind" fn(*const crate::__pgrx_c_bindings::dclist_head, *const crate::__pgrx_c_bindings::dlist_node) -> bool>>;
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterEnumStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterEnumStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AlterEnumStmt as i32);
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(*const crate::__pgrx_c_bindings::dlist_head) -> bool,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(*const crate::__pgrx_c_bindings::dlist_head) -> bool,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_0x5f426f6f6c__0l__const__struct__dlist_head__0p__0r;
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::sealed::Sealed for Signature_0x5f426f6f6c__0l__const__struct__dlist_head__0p__0r {}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::expression::NativeFunctionSignature
-    for Signature_0x5f426f6f6c__0l__const__struct__dlist_head__0p__0r
-{
-    type Physical = PhysicalFunction_C_unwind_1<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(*const crate::__pgrx_c_bindings::dlist_head) -> bool,
-        >,
-    >;
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterEventTrigStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterEventTrigStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AlterEventTrigStmt as i32);
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(*const crate::__pgrx_c_bindings::dlist_node) -> bool,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(*const crate::__pgrx_c_bindings::dlist_node) -> bool,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_0x5f426f6f6c__0l__const__struct__dlist_node__0p__0r;
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::sealed::Sealed for Signature_0x5f426f6f6c__0l__const__struct__dlist_node__0p__0r {}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::expression::NativeFunctionSignature
-    for Signature_0x5f426f6f6c__0l__const__struct__dlist_node__0p__0r
-{
-    type Physical = PhysicalFunction_C_unwind_1<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(*const crate::__pgrx_c_bindings::dlist_node) -> bool,
-        >,
-    >;
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterExtensionContentsStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterExtensionContentsStmt {
+    const VALUE: c::CValue<c::CInt> = c::CValue::<c::CInt>::new(
+        crate::__pgrx_c_bindings::NodeTag::T_AlterExtensionContentsStmt as i32,
+    );
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *const crate::__pgrx_c_bindings::proclist_head,
-                i32,
-                usize,
-            ) -> bool,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *const crate::__pgrx_c_bindings::proclist_head,
-                i32,
-                usize,
-            ) -> bool,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_0x5f426f6f6c__0l__const__struct__proclist_head__0p__0c__int__0c__unsigned__long__0r;
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::sealed::Sealed for Signature_0x5f426f6f6c__0l__const__struct__proclist_head__0p__0c__int__0c__unsigned__long__0r {}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::expression::NativeFunctionSignature for Signature_0x5f426f6f6c__0l__const__struct__proclist_head__0p__0c__int__0c__unsigned__long__0r {
- type Physical = PhysicalFunction_C_unwind_3<::core::option::Option<unsafe extern "C-unwind" fn(*const crate::__pgrx_c_bindings::proclist_head, i32, usize) -> bool>>;
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterExtensionStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterExtensionStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AlterExtensionStmt as i32);
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(*const crate::__pgrx_c_bindings::slist_head) -> bool,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(*const crate::__pgrx_c_bindings::slist_head) -> bool,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_0x5f426f6f6c__0l__const__struct__slist_head__0p__0r;
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::sealed::Sealed for Signature_0x5f426f6f6c__0l__const__struct__slist_head__0p__0r {}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::expression::NativeFunctionSignature
-    for Signature_0x5f426f6f6c__0l__const__struct__slist_head__0p__0r
-{
-    type Physical = PhysicalFunction_C_unwind_1<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(*const crate::__pgrx_c_bindings::slist_head) -> bool,
-        >,
-    >;
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterFdwStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterFdwStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AlterFdwStmt as i32);
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *const crate::__pgrx_c_bindings::slist_head,
-                *const crate::__pgrx_c_bindings::slist_node,
-            ) -> bool,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *const crate::__pgrx_c_bindings::slist_head,
-                *const crate::__pgrx_c_bindings::slist_node,
-            ) -> bool,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_0x5f426f6f6c__0l__const__struct__slist_head__0p__0c__const__struct__slist_node__0p__0r;
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::sealed::Sealed for Signature_0x5f426f6f6c__0l__const__struct__slist_head__0p__0c__const__struct__slist_node__0p__0r {}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::expression::NativeFunctionSignature for Signature_0x5f426f6f6c__0l__const__struct__slist_head__0p__0c__const__struct__slist_node__0p__0r {
- type Physical = PhysicalFunction_C_unwind_2<::core::option::Option<unsafe extern "C-unwind" fn(*const crate::__pgrx_c_bindings::slist_head, *const crate::__pgrx_c_bindings::slist_node) -> bool>>;
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterForeignServerStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterForeignServerStmt {
+    const VALUE: c::CValue<c::CInt> = c::CValue::<c::CInt>::new(
+        crate::__pgrx_c_bindings::NodeTag::T_AlterForeignServerStmt as i32,
+    );
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *mut crate::__pgrx_c_bindings::HeapTupleData,
-                *mut crate::__pgrx_c_bindings::TupleDescData,
-                i32,
-                *mut crate::__pgrx_c_bindings::ScanKeyData,
-            ) -> bool,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *mut crate::__pgrx_c_bindings::HeapTupleData,
-                *mut crate::__pgrx_c_bindings::TupleDescData,
-                i32,
-                *mut crate::__pgrx_c_bindings::ScanKeyData,
-            ) -> bool,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_0x5f426f6f6c__0l__struct__HeapTupleData__0p__0c__struct__TupleDescData__0p__0c__int__0c__struct__ScanKeyData__0p__0r;
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::sealed::Sealed for Signature_0x5f426f6f6c__0l__struct__HeapTupleData__0p__0c__struct__TupleDescData__0p__0c__int__0c__struct__ScanKeyData__0p__0r {}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::expression::NativeFunctionSignature for Signature_0x5f426f6f6c__0l__struct__HeapTupleData__0p__0c__struct__TupleDescData__0p__0c__int__0c__struct__ScanKeyData__0p__0r {
- type Physical = PhysicalFunction_C_unwind_4<::core::option::Option<unsafe extern "C-unwind" fn(*mut crate::__pgrx_c_bindings::HeapTupleData, *mut crate::__pgrx_c_bindings::TupleDescData, i32, *mut crate::__pgrx_c_bindings::ScanKeyData) -> bool>>;
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterFunctionStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterFunctionStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AlterFunctionStmt as i32);
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *mut crate::__pgrx_c_bindings::List,
-                ::core::option::Option<
-                    unsafe extern "C-unwind" fn(
-                        *mut crate::__pgrx_c_bindings::Node,
-                        *mut ::core::ffi::c_void,
-                    ) -> bool,
-                >,
-                *mut ::core::ffi::c_void,
-                i32,
-            ) -> bool,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *mut crate::__pgrx_c_bindings::List,
-                ::core::option::Option<
-                    unsafe extern "C-unwind" fn(
-                        *mut crate::__pgrx_c_bindings::Node,
-                        *mut ::core::ffi::c_void,
-                    ) -> bool,
-                >,
-                *mut ::core::ffi::c_void,
-                i32,
-            ) -> bool,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_0x5f426f6f6c__0l__struct__List__0p__0c__0x5f426f6f6c__0l__0p__0r__0l__struct__Node__0p__0c__void__0p__0r__0c__void__0p__0c__int__0r;
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::sealed::Sealed for Signature_0x5f426f6f6c__0l__struct__List__0p__0c__0x5f426f6f6c__0l__0p__0r__0l__struct__Node__0p__0c__void__0p__0r__0c__void__0p__0c__int__0r {}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::expression::NativeFunctionSignature for Signature_0x5f426f6f6c__0l__struct__List__0p__0c__0x5f426f6f6c__0l__0p__0r__0l__struct__Node__0p__0c__void__0p__0r__0c__void__0p__0c__int__0r {
- type Physical = PhysicalFunction_C_unwind_4<::core::option::Option<unsafe extern "C-unwind" fn(*mut crate::__pgrx_c_bindings::List, ::core::option::Option<unsafe extern "C-unwind" fn(*mut crate::__pgrx_c_bindings::Node, *mut ::core::ffi::c_void) -> bool>, *mut ::core::ffi::c_void, i32) -> bool>>;
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterObjectDependsStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterObjectDependsStmt {
+    const VALUE: c::CValue<c::CInt> = c::CValue::<c::CInt>::new(
+        crate::__pgrx_c_bindings::NodeTag::T_AlterObjectDependsStmt as i32,
+    );
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *mut crate::__pgrx_c_bindings::Node,
-                ::core::option::Option<
-                    unsafe extern "C-unwind" fn(
-                        *mut crate::__pgrx_c_bindings::Node,
-                        *mut ::core::ffi::c_void,
-                    ) -> bool,
-                >,
-                *mut ::core::ffi::c_void,
-            ) -> bool,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *mut crate::__pgrx_c_bindings::Node,
-                ::core::option::Option<
-                    unsafe extern "C-unwind" fn(
-                        *mut crate::__pgrx_c_bindings::Node,
-                        *mut ::core::ffi::c_void,
-                    ) -> bool,
-                >,
-                *mut ::core::ffi::c_void,
-            ) -> bool,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_0x5f426f6f6c__0l__struct__Node__0p__0c__0x5f426f6f6c__0l__0p__0r__0l__struct__Node__0p__0c__void__0p__0r__0c__void__0p__0r;
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::sealed::Sealed for Signature_0x5f426f6f6c__0l__struct__Node__0p__0c__0x5f426f6f6c__0l__0p__0r__0l__struct__Node__0p__0c__void__0p__0r__0c__void__0p__0r {}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::expression::NativeFunctionSignature for Signature_0x5f426f6f6c__0l__struct__Node__0p__0c__0x5f426f6f6c__0l__0p__0r__0l__struct__Node__0p__0c__void__0p__0r__0c__void__0p__0r {
- type Physical = PhysicalFunction_C_unwind_3<::core::option::Option<unsafe extern "C-unwind" fn(*mut crate::__pgrx_c_bindings::Node, ::core::option::Option<unsafe extern "C-unwind" fn(*mut crate::__pgrx_c_bindings::Node, *mut ::core::ffi::c_void) -> bool>, *mut ::core::ffi::c_void) -> bool>>;
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterObjectSchemaStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterObjectSchemaStmt {
+    const VALUE: c::CValue<c::CInt> = c::CValue::<c::CInt>::new(
+        crate::__pgrx_c_bindings::NodeTag::T_AlterObjectSchemaStmt as i32,
+    );
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *mut crate::__pgrx_c_bindings::Node,
-                ::core::option::Option<
-                    unsafe extern "C-unwind" fn(
-                        *mut crate::__pgrx_c_bindings::Node,
-                        *mut ::core::ffi::c_void,
-                    ) -> bool,
-                >,
-                *mut ::core::ffi::c_void,
-                i32,
-            ) -> bool,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *mut crate::__pgrx_c_bindings::Node,
-                ::core::option::Option<
-                    unsafe extern "C-unwind" fn(
-                        *mut crate::__pgrx_c_bindings::Node,
-                        *mut ::core::ffi::c_void,
-                    ) -> bool,
-                >,
-                *mut ::core::ffi::c_void,
-                i32,
-            ) -> bool,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_0x5f426f6f6c__0l__struct__Node__0p__0c__0x5f426f6f6c__0l__0p__0r__0l__struct__Node__0p__0c__void__0p__0r__0c__void__0p__0c__int__0r;
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::sealed::Sealed for Signature_0x5f426f6f6c__0l__struct__Node__0p__0c__0x5f426f6f6c__0l__0p__0r__0l__struct__Node__0p__0c__void__0p__0r__0c__void__0p__0c__int__0r {}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::expression::NativeFunctionSignature for Signature_0x5f426f6f6c__0l__struct__Node__0p__0c__0x5f426f6f6c__0l__0p__0r__0l__struct__Node__0p__0c__void__0p__0r__0c__void__0p__0c__int__0r {
- type Physical = PhysicalFunction_C_unwind_4<::core::option::Option<unsafe extern "C-unwind" fn(*mut crate::__pgrx_c_bindings::Node, ::core::option::Option<unsafe extern "C-unwind" fn(*mut crate::__pgrx_c_bindings::Node, *mut ::core::ffi::c_void) -> bool>, *mut ::core::ffi::c_void, i32) -> bool>>;
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterOpFamilyStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterOpFamilyStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AlterOpFamilyStmt as i32);
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *mut crate::__pgrx_c_bindings::PlanState,
-                ::core::option::Option<
-                    unsafe extern "C-unwind" fn(
-                        *mut crate::__pgrx_c_bindings::PlanState,
-                        *mut ::core::ffi::c_void,
-                    ) -> bool,
-                >,
-                *mut ::core::ffi::c_void,
-            ) -> bool,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *mut crate::__pgrx_c_bindings::PlanState,
-                ::core::option::Option<
-                    unsafe extern "C-unwind" fn(
-                        *mut crate::__pgrx_c_bindings::PlanState,
-                        *mut ::core::ffi::c_void,
-                    ) -> bool,
-                >,
-                *mut ::core::ffi::c_void,
-            ) -> bool,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_0x5f426f6f6c__0l__struct__PlanState__0p__0c__0x5f426f6f6c__0l__0p__0r__0l__struct__PlanState__0p__0c__void__0p__0r__0c__void__0p__0r;
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::sealed::Sealed for Signature_0x5f426f6f6c__0l__struct__PlanState__0p__0c__0x5f426f6f6c__0l__0p__0r__0l__struct__PlanState__0p__0c__void__0p__0r__0c__void__0p__0r {}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::expression::NativeFunctionSignature for Signature_0x5f426f6f6c__0l__struct__PlanState__0p__0c__0x5f426f6f6c__0l__0p__0r__0l__struct__PlanState__0p__0c__void__0p__0r__0c__void__0p__0r {
- type Physical = PhysicalFunction_C_unwind_3<::core::option::Option<unsafe extern "C-unwind" fn(*mut crate::__pgrx_c_bindings::PlanState, ::core::option::Option<unsafe extern "C-unwind" fn(*mut crate::__pgrx_c_bindings::PlanState, *mut ::core::ffi::c_void) -> bool>, *mut ::core::ffi::c_void) -> bool>>;
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterOperatorStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterOperatorStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AlterOperatorStmt as i32);
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *mut crate::__pgrx_c_bindings::Query,
-                ::core::option::Option<
-                    unsafe extern "C-unwind" fn(
-                        *mut crate::__pgrx_c_bindings::Node,
-                        *mut ::core::ffi::c_void,
-                    ) -> bool,
-                >,
-                *mut ::core::ffi::c_void,
-                i32,
-            ) -> bool,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *mut crate::__pgrx_c_bindings::Query,
-                ::core::option::Option<
-                    unsafe extern "C-unwind" fn(
-                        *mut crate::__pgrx_c_bindings::Node,
-                        *mut ::core::ffi::c_void,
-                    ) -> bool,
-                >,
-                *mut ::core::ffi::c_void,
-                i32,
-            ) -> bool,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_0x5f426f6f6c__0l__struct__Query__0p__0c__0x5f426f6f6c__0l__0p__0r__0l__struct__Node__0p__0c__void__0p__0r__0c__void__0p__0c__int__0r;
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::sealed::Sealed for Signature_0x5f426f6f6c__0l__struct__Query__0p__0c__0x5f426f6f6c__0l__0p__0r__0l__struct__Node__0p__0c__void__0p__0r__0c__void__0p__0c__int__0r {}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::expression::NativeFunctionSignature for Signature_0x5f426f6f6c__0l__struct__Query__0p__0c__0x5f426f6f6c__0l__0p__0r__0l__struct__Node__0p__0c__void__0p__0r__0c__void__0p__0c__int__0r {
- type Physical = PhysicalFunction_C_unwind_4<::core::option::Option<unsafe extern "C-unwind" fn(*mut crate::__pgrx_c_bindings::Query, ::core::option::Option<unsafe extern "C-unwind" fn(*mut crate::__pgrx_c_bindings::Node, *mut ::core::ffi::c_void) -> bool>, *mut ::core::ffi::c_void, i32) -> bool>>;
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterOwnerStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterOwnerStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AlterOwnerStmt as i32);
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *mut crate::__pgrx_c_bindings::RangeTblEntry,
-                ::core::option::Option<
-                    unsafe extern "C-unwind" fn(
-                        *mut crate::__pgrx_c_bindings::Node,
-                        *mut ::core::ffi::c_void,
-                    ) -> bool,
-                >,
-                *mut ::core::ffi::c_void,
-                i32,
-            ) -> bool,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *mut crate::__pgrx_c_bindings::RangeTblEntry,
-                ::core::option::Option<
-                    unsafe extern "C-unwind" fn(
-                        *mut crate::__pgrx_c_bindings::Node,
-                        *mut ::core::ffi::c_void,
-                    ) -> bool,
-                >,
-                *mut ::core::ffi::c_void,
-                i32,
-            ) -> bool,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_0x5f426f6f6c__0l__struct__RangeTblEntry__0p__0c__0x5f426f6f6c__0l__0p__0r__0l__struct__Node__0p__0c__void__0p__0r__0c__void__0p__0c__int__0r;
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::sealed::Sealed for Signature_0x5f426f6f6c__0l__struct__RangeTblEntry__0p__0c__0x5f426f6f6c__0l__0p__0r__0l__struct__Node__0p__0c__void__0p__0r__0c__void__0p__0c__int__0r {}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::expression::NativeFunctionSignature for Signature_0x5f426f6f6c__0l__struct__RangeTblEntry__0p__0c__0x5f426f6f6c__0l__0p__0r__0l__struct__Node__0p__0c__void__0p__0r__0c__void__0p__0c__int__0r {
- type Physical = PhysicalFunction_C_unwind_4<::core::option::Option<unsafe extern "C-unwind" fn(*mut crate::__pgrx_c_bindings::RangeTblEntry, ::core::option::Option<unsafe extern "C-unwind" fn(*mut crate::__pgrx_c_bindings::Node, *mut ::core::ffi::c_void) -> bool>, *mut ::core::ffi::c_void, i32) -> bool>>;
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterPolicyStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterPolicyStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AlterPolicyStmt as i32);
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(crate::__pgrx_c_bindings::Datum) -> bool,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(crate::__pgrx_c_bindings::Datum) -> bool,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_0x5f426f6f6c__0l__unsigned__long__0r;
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::sealed::Sealed for Signature_0x5f426f6f6c__0l__unsigned__long__0r {}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::expression::NativeFunctionSignature for Signature_0x5f426f6f6c__0l__unsigned__long__0r {
-    type Physical = PhysicalFunction_C_unwind_1<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(crate::__pgrx_c_bindings::Datum) -> bool,
-        >,
-    >;
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterPublicationStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterPublicationStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AlterPublicationStmt as i32);
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<unsafe extern "C-unwind" fn(crate::__pgrx_c_bindings::Datum) -> i8>,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<unsafe extern "C-unwind" fn(crate::__pgrx_c_bindings::Datum) -> i8>,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_char__0l__unsigned__long__0r;
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::sealed::Sealed for Signature_char__0l__unsigned__long__0r {}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::expression::NativeFunctionSignature for Signature_char__0l__unsigned__long__0r {
-    type Physical = PhysicalFunction_C_unwind_1<
-        ::core::option::Option<unsafe extern "C-unwind" fn(crate::__pgrx_c_bindings::Datum) -> i8>,
-    >;
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterRoleSetStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterRoleSetStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AlterRoleSetStmt as i32);
 }
-#[cfg(any(feature = "pg16", feature = "pg17"))]
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *mut ::core::ffi::c_char,
-                *mut crate::__pgrx_c_bindings::ItemIdData,
-            ) -> *mut ::core::ffi::c_char,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17"))]
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *mut ::core::ffi::c_char,
-                *mut crate::__pgrx_c_bindings::ItemIdData,
-            ) -> *mut ::core::ffi::c_char,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17"))]
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_char__0p__0l__char__0p__0c__struct__ItemIdData__0p__0r;
-#[cfg(any(feature = "pg16", feature = "pg17"))]
-impl c::sealed::Sealed for Signature_char__0p__0l__char__0p__0c__struct__ItemIdData__0p__0r {}
-#[cfg(any(feature = "pg16", feature = "pg17"))]
-impl c::expression::NativeFunctionSignature
-    for Signature_char__0p__0l__char__0p__0c__struct__ItemIdData__0p__0r
-{
-    type Physical = PhysicalFunction_C_unwind_2<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *mut ::core::ffi::c_char,
-                *mut crate::__pgrx_c_bindings::ItemIdData,
-            ) -> *mut ::core::ffi::c_char,
-        >,
-    >;
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterRoleStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterRoleStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AlterRoleStmt as i32);
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                crate::__pgrx_c_bindings::Datum,
-            ) -> *mut ::core::ffi::c_char,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                crate::__pgrx_c_bindings::Datum,
-            ) -> *mut ::core::ffi::c_char,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_char__0p__0l__unsigned__long__0r;
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::sealed::Sealed for Signature_char__0p__0l__unsigned__long__0r {}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::expression::NativeFunctionSignature for Signature_char__0p__0l__unsigned__long__0r {
-    type Physical = PhysicalFunction_C_unwind_1<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                crate::__pgrx_c_bindings::Datum,
-            ) -> *mut ::core::ffi::c_char,
-        >,
-    >;
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterSeqStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterSeqStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AlterSeqStmt as i32);
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *mut crate::__pgrx_c_bindings::RelationData,
-                *mut crate::__pgrx_c_bindings::ItemPointerData,
-                *mut crate::__pgrx_c_bindings::TupleTableSlot,
-                u32,
-                *mut crate::__pgrx_c_bindings::SnapshotData,
-                *mut crate::__pgrx_c_bindings::SnapshotData,
-                bool,
-                *mut crate::__pgrx_c_bindings::TM_FailureData,
-                *mut u32,
-                *mut u32,
-            ) -> u32,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *mut crate::__pgrx_c_bindings::RelationData,
-                *mut crate::__pgrx_c_bindings::ItemPointerData,
-                *mut crate::__pgrx_c_bindings::TupleTableSlot,
-                u32,
-                *mut crate::__pgrx_c_bindings::SnapshotData,
-                *mut crate::__pgrx_c_bindings::SnapshotData,
-                bool,
-                *mut crate::__pgrx_c_bindings::TM_FailureData,
-                *mut u32,
-                *mut u32,
-            ) -> u32,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_enum__TM_Result__0l__struct__RelationData__0p__0c__struct__ItemPointerData__0p__0c__struct__TupleTableSlot__0p__0c__unsigned__int__0c__struct__SnapshotData__0p__0c__struct__SnapshotData__0p__0c__0x5f426f6f6c__0c__struct__TM_FailureData__0p__0c__enum__LockTupleMode__0p__0c__enum__TU_UpdateIndexes__0p__0r;
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-impl c::sealed::Sealed for Signature_enum__TM_Result__0l__struct__RelationData__0p__0c__struct__ItemPointerData__0p__0c__struct__TupleTableSlot__0p__0c__unsigned__int__0c__struct__SnapshotData__0p__0c__struct__SnapshotData__0p__0c__0x5f426f6f6c__0c__struct__TM_FailureData__0p__0c__enum__LockTupleMode__0p__0c__enum__TU_UpdateIndexes__0p__0r {}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-impl c::expression::NativeFunctionSignature for Signature_enum__TM_Result__0l__struct__RelationData__0p__0c__struct__ItemPointerData__0p__0c__struct__TupleTableSlot__0p__0c__unsigned__int__0c__struct__SnapshotData__0p__0c__struct__SnapshotData__0p__0c__0x5f426f6f6c__0c__struct__TM_FailureData__0p__0c__enum__LockTupleMode__0p__0c__enum__TU_UpdateIndexes__0p__0r {
- type Physical = PhysicalFunction_C_unwind_10<::core::option::Option<unsafe extern "C-unwind" fn(*mut crate::__pgrx_c_bindings::RelationData, *mut crate::__pgrx_c_bindings::ItemPointerData, *mut crate::__pgrx_c_bindings::TupleTableSlot, u32, *mut crate::__pgrx_c_bindings::SnapshotData, *mut crate::__pgrx_c_bindings::SnapshotData, bool, *mut crate::__pgrx_c_bindings::TM_FailureData, *mut u32, *mut u32) -> u32>>;
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterStatsStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterStatsStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AlterStatsStmt as i32);
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-// SAFETY: This adapter validates null and converts arguments before the native guard, captures only destructor-free ABI storage, and decodes results after the native call.
-unsafe impl<A0: c::expression::ImplicitTo<c::expression::CPointer<c::expression::CRecord<crate::__pgrx_c_bindings::RelationData>, c::expression::ReadWrite>>, A1: c::expression::ImplicitTo<c::expression::CPointer<c::expression::CRecord<crate::__pgrx_c_bindings::ItemPointerData>, c::expression::ReadWrite>>, A2: c::expression::ImplicitTo<c::expression::CPointer<c::expression::CRecord<crate::__pgrx_c_bindings::TupleTableSlot>, c::expression::ReadWrite>>, A3: c::expression::ImplicitTo<c::CUnsignedInt>, A4: c::expression::ImplicitTo<c::expression::CPointer<c::expression::CRecord<crate::__pgrx_c_bindings::SnapshotData>, c::expression::ReadWrite>>, A5: c::expression::ImplicitTo<c::expression::CPointer<c::expression::CRecord<crate::__pgrx_c_bindings::SnapshotData>, c::expression::ReadWrite>>, A6: c::expression::ImplicitTo<c::CBool>, A7: c::expression::ImplicitTo<c::expression::CPointer<c::expression::CRecord<crate::__pgrx_c_bindings::TM_FailureData>, c::expression::ReadWrite>>, A8: c::expression::ImplicitTo<c::expression::CPointer<c::expression::CEnumObject<crate::__pgrx_c_generated::EnumIdentity_enum__LockTupleMode, c::CUnsignedInt, u32>, c::expression::ReadWrite>>, A9: c::expression::ImplicitTo<c::expression::CPointer<c::expression::CEnumObject<crate::__pgrx_c_generated::EnumIdentity_enum__TU_UpdateIndexes, c::CUnsignedInt, u32>, c::expression::ReadWrite>>> c::expression::Call<(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9,)> for Signature_enum__TM_Result__0l__struct__RelationData__0p__0c__struct__ItemPointerData__0p__0c__struct__TupleTableSlot__0p__0c__unsigned__int__0c__struct__SnapshotData__0p__0c__struct__SnapshotData__0p__0c__0x5f426f6f6c__0c__struct__TM_FailureData__0p__0c__enum__LockTupleMode__0p__0c__enum__TU_UpdateIndexes__0p__0r {
- type Output = <c::expression::CEnumObject<crate::__pgrx_c_generated::EnumIdentity_enum__TM_Result, c::CUnsignedInt, u32> as c::expression::CType>::Value;
- unsafe fn call(pointer: Self::Pointer, args: (A0,A1,A2,A3,A4,A5,A6,A7,A8,A9,)) -> Self::Output {
-let function = pointer.expect("C indirect call requires a non-null function pointer");
-const { assert!(!::core::mem::needs_drop::<A0>()); }
-const _: () = assert!(!::core::mem::needs_drop::<*mut crate::__pgrx_c_bindings::RelationData>());
-let native0 = <c::expression::CPointer<c::expression::CRecord<crate::__pgrx_c_bindings::RelationData>, c::expression::ReadWrite> as c::expression::CType>::into_storage(c::expression::implicit::<c::expression::CPointer<c::expression::CRecord<crate::__pgrx_c_bindings::RelationData>, c::expression::ReadWrite>, _>(args.0));
-const { assert!(!::core::mem::needs_drop::<A1>()); }
-const _: () = assert!(!::core::mem::needs_drop::<*mut crate::__pgrx_c_bindings::ItemPointerData>());
-let native1 = <c::expression::CPointer<c::expression::CRecord<crate::__pgrx_c_bindings::ItemPointerData>, c::expression::ReadWrite> as c::expression::CType>::into_storage(c::expression::implicit::<c::expression::CPointer<c::expression::CRecord<crate::__pgrx_c_bindings::ItemPointerData>, c::expression::ReadWrite>, _>(args.1));
-const { assert!(!::core::mem::needs_drop::<A2>()); }
-const _: () = assert!(!::core::mem::needs_drop::<*mut crate::__pgrx_c_bindings::TupleTableSlot>());
-let native2 = <c::expression::CPointer<c::expression::CRecord<crate::__pgrx_c_bindings::TupleTableSlot>, c::expression::ReadWrite> as c::expression::CType>::into_storage(c::expression::implicit::<c::expression::CPointer<c::expression::CRecord<crate::__pgrx_c_bindings::TupleTableSlot>, c::expression::ReadWrite>, _>(args.2));
-const { assert!(!::core::mem::needs_drop::<A3>()); }
-const _: () = assert!(!::core::mem::needs_drop::<u32>());
-let native3 = <c::CUnsignedInt as c::expression::CType>::into_storage(c::expression::implicit::<c::CUnsignedInt, _>(args.3));
-const { assert!(!::core::mem::needs_drop::<A4>()); }
-const _: () = assert!(!::core::mem::needs_drop::<*mut crate::__pgrx_c_bindings::SnapshotData>());
-let native4 = <c::expression::CPointer<c::expression::CRecord<crate::__pgrx_c_bindings::SnapshotData>, c::expression::ReadWrite> as c::expression::CType>::into_storage(c::expression::implicit::<c::expression::CPointer<c::expression::CRecord<crate::__pgrx_c_bindings::SnapshotData>, c::expression::ReadWrite>, _>(args.4));
-const { assert!(!::core::mem::needs_drop::<A5>()); }
-const _: () = assert!(!::core::mem::needs_drop::<*mut crate::__pgrx_c_bindings::SnapshotData>());
-let native5 = <c::expression::CPointer<c::expression::CRecord<crate::__pgrx_c_bindings::SnapshotData>, c::expression::ReadWrite> as c::expression::CType>::into_storage(c::expression::implicit::<c::expression::CPointer<c::expression::CRecord<crate::__pgrx_c_bindings::SnapshotData>, c::expression::ReadWrite>, _>(args.5));
-const { assert!(!::core::mem::needs_drop::<A6>()); }
-const _: () = assert!(!::core::mem::needs_drop::<bool>());
-let native6 = <c::CBool as c::expression::CType>::into_storage(c::expression::implicit::<c::CBool, _>(args.6));
-const { assert!(!::core::mem::needs_drop::<A7>()); }
-const _: () = assert!(!::core::mem::needs_drop::<*mut crate::__pgrx_c_bindings::TM_FailureData>());
-let native7 = <c::expression::CPointer<c::expression::CRecord<crate::__pgrx_c_bindings::TM_FailureData>, c::expression::ReadWrite> as c::expression::CType>::into_storage(c::expression::implicit::<c::expression::CPointer<c::expression::CRecord<crate::__pgrx_c_bindings::TM_FailureData>, c::expression::ReadWrite>, _>(args.7));
-const { assert!(!::core::mem::needs_drop::<A8>()); }
-const _: () = assert!(!::core::mem::needs_drop::<*mut u32>());
-let native8 = <c::expression::CPointer<c::expression::CEnumObject<crate::__pgrx_c_generated::EnumIdentity_enum__LockTupleMode, c::CUnsignedInt, u32>, c::expression::ReadWrite> as c::expression::CType>::into_storage(c::expression::implicit::<c::expression::CPointer<c::expression::CEnumObject<crate::__pgrx_c_generated::EnumIdentity_enum__LockTupleMode, c::CUnsignedInt, u32>, c::expression::ReadWrite>, _>(args.8));
-const { assert!(!::core::mem::needs_drop::<A9>()); }
-const _: () = assert!(!::core::mem::needs_drop::<*mut u32>());
-let native9 = <c::expression::CPointer<c::expression::CEnumObject<crate::__pgrx_c_generated::EnumIdentity_enum__TU_UpdateIndexes, c::CUnsignedInt, u32>, c::expression::ReadWrite> as c::expression::CType>::into_storage(c::expression::implicit::<c::expression::CPointer<c::expression::CEnumObject<crate::__pgrx_c_generated::EnumIdentity_enum__TU_UpdateIndexes, c::CUnsignedInt, u32>, c::expression::ReadWrite>, _>(args.9));
-// SAFETY: The caller establishes the exact native target contract, backend thread, and guarded callbacks. Conversions and the null check are complete; captured native storage and the function pointer have no destructors. The closure performs only the native call.
-let result = unsafe { crate::ffi::pg_guard_ffi_boundary(move || function(native0, native1, native2, native3, native4, native5, native6, native7, native8, native9)) };
-<c::expression::CEnumObject<crate::__pgrx_c_generated::EnumIdentity_enum__TM_Result, c::CUnsignedInt, u32> as c::expression::CType>::from_storage(result)
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterSubscriptionStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterSubscriptionStmt {
+    const VALUE: c::CValue<c::CInt> = c::CValue::<c::CInt>::new(
+        crate::__pgrx_c_bindings::NodeTag::T_AlterSubscriptionStmt as i32,
+    );
 }
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterSystemStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterSystemStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AlterSystemStmt as i32);
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *const crate::__pgrx_c_bindings::SortTuple,
-                *const crate::__pgrx_c_bindings::SortTuple,
-                *mut crate::__pgrx_c_bindings::Tuplesortstate,
-            ) -> i32,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *const crate::__pgrx_c_bindings::SortTuple,
-                *const crate::__pgrx_c_bindings::SortTuple,
-                *mut crate::__pgrx_c_bindings::Tuplesortstate,
-            ) -> i32,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_int__0l__const__SortTuple__0p__0c__const__SortTuple__0p__0c__struct__Tuplesortstate__0p__0r;
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::sealed::Sealed for Signature_int__0l__const__SortTuple__0p__0c__const__SortTuple__0p__0c__struct__Tuplesortstate__0p__0r {}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::expression::NativeFunctionSignature for Signature_int__0l__const__SortTuple__0p__0c__const__SortTuple__0p__0c__struct__Tuplesortstate__0p__0r {
- type Physical = PhysicalFunction_C_unwind_3<::core::option::Option<unsafe extern "C-unwind" fn(*const crate::__pgrx_c_bindings::SortTuple, *const crate::__pgrx_c_bindings::SortTuple, *mut crate::__pgrx_c_bindings::Tuplesortstate) -> i32>>;
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterTSConfigurationStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterTSConfigurationStmt {
+    const VALUE: c::CValue<c::CInt> = c::CValue::<c::CInt>::new(
+        crate::__pgrx_c_bindings::NodeTag::T_AlterTSConfigurationStmt as i32,
+    );
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(*const crate::__pgrx_c_bindings::List) -> i32,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(*const crate::__pgrx_c_bindings::List) -> i32,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_int__0l__const__struct__List__0p__0r;
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::sealed::Sealed for Signature_int__0l__const__struct__List__0p__0r {}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::expression::NativeFunctionSignature for Signature_int__0l__const__struct__List__0p__0r {
-    type Physical = PhysicalFunction_C_unwind_1<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(*const crate::__pgrx_c_bindings::List) -> i32,
-        >,
-    >;
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterTSDictionaryStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterTSDictionaryStmt {
+    const VALUE: c::CValue<c::CInt> = c::CValue::<c::CInt>::new(
+        crate::__pgrx_c_bindings::NodeTag::T_AlterTSDictionaryStmt as i32,
+    );
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::size_of::<::core::option::Option<unsafe extern "C-unwind" fn(i64) -> i64>>() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::align_of::<::core::option::Option<unsafe extern "C-unwind" fn(i64) -> i64>>() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_long__0l__long__0r;
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::sealed::Sealed for Signature_long__0l__long__0r {}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::expression::NativeFunctionSignature for Signature_long__0l__long__0r {
-    type Physical = PhysicalFunction_C_unwind_1<
-        ::core::option::Option<unsafe extern "C-unwind" fn(i64) -> i64>,
-    >;
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterTableCmd {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterTableCmd {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AlterTableCmd as i32);
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<unsafe extern "C-unwind" fn(crate::__pgrx_c_bindings::Datum) -> i64>,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<unsafe extern "C-unwind" fn(crate::__pgrx_c_bindings::Datum) -> i64>,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_long__0l__unsigned__long__0r;
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-impl c::sealed::Sealed for Signature_long__0l__unsigned__long__0r {}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-impl c::expression::NativeFunctionSignature for Signature_long__0l__unsigned__long__0r {
-    type Physical = PhysicalFunction_C_unwind_1<
-        ::core::option::Option<unsafe extern "C-unwind" fn(crate::__pgrx_c_bindings::Datum) -> i64>,
-    >;
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterTableMoveAllStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterTableMoveAllStmt {
+    const VALUE: c::CValue<c::CInt> = c::CValue::<c::CInt>::new(
+        crate::__pgrx_c_bindings::NodeTag::T_AlterTableMoveAllStmt as i32,
+    );
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<unsafe extern "C-unwind" fn(crate::__pgrx_c_bindings::Datum) -> i16>,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<unsafe extern "C-unwind" fn(crate::__pgrx_c_bindings::Datum) -> i16>,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_short__0l__unsigned__long__0r;
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::sealed::Sealed for Signature_short__0l__unsigned__long__0r {}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::expression::NativeFunctionSignature for Signature_short__0l__unsigned__long__0r {
-    type Physical = PhysicalFunction_C_unwind_1<
-        ::core::option::Option<unsafe extern "C-unwind" fn(crate::__pgrx_c_bindings::Datum) -> i16>,
-    >;
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterTableSpaceOptionsStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterTableSpaceOptionsStmt {
+    const VALUE: c::CValue<c::CInt> = c::CValue::<c::CInt>::new(
+        crate::__pgrx_c_bindings::NodeTag::T_AlterTableSpaceOptionsStmt as i32,
+    );
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                crate::__pgrx_c_bindings::Datum,
-            )
-                -> *mut crate::__pgrx_c_bindings::ItemPointerData,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                crate::__pgrx_c_bindings::Datum,
-            )
-                -> *mut crate::__pgrx_c_bindings::ItemPointerData,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_struct__ItemPointerData__0p__0l__unsigned__long__0r;
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::sealed::Sealed for Signature_struct__ItemPointerData__0p__0l__unsigned__long__0r {}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::expression::NativeFunctionSignature
-    for Signature_struct__ItemPointerData__0p__0l__unsigned__long__0r
-{
-    type Physical = PhysicalFunction_C_unwind_1<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                crate::__pgrx_c_bindings::Datum,
-            )
-                -> *mut crate::__pgrx_c_bindings::ItemPointerData,
-        >,
-    >;
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterTableStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterTableStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AlterTableStmt as i32);
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(u32) -> *mut crate::__pgrx_c_bindings::LWLock,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(u32) -> *mut crate::__pgrx_c_bindings::LWLock,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_struct__LWLock__0p__0l__unsigned__int__0r;
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::sealed::Sealed for Signature_struct__LWLock__0p__0l__unsigned__int__0r {}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::expression::NativeFunctionSignature
-    for Signature_struct__LWLock__0p__0l__unsigned__int__0r
-{
-    type Physical = PhysicalFunction_C_unwind_1<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(u32) -> *mut crate::__pgrx_c_bindings::LWLock,
-        >,
-    >;
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterTypeStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterTypeStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AlterTypeStmt as i32);
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *mut crate::__pgrx_c_bindings::List,
-                ::core::option::Option<
-                    unsafe extern "C-unwind" fn(
-                        *mut crate::__pgrx_c_bindings::Node,
-                        *mut ::core::ffi::c_void,
-                    )
-                        -> *mut crate::__pgrx_c_bindings::Node,
-                >,
-                *mut ::core::ffi::c_void,
-                i32,
-            ) -> *mut crate::__pgrx_c_bindings::List,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *mut crate::__pgrx_c_bindings::List,
-                ::core::option::Option<
-                    unsafe extern "C-unwind" fn(
-                        *mut crate::__pgrx_c_bindings::Node,
-                        *mut ::core::ffi::c_void,
-                    )
-                        -> *mut crate::__pgrx_c_bindings::Node,
-                >,
-                *mut ::core::ffi::c_void,
-                i32,
-            ) -> *mut crate::__pgrx_c_bindings::List,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_struct__List__0p__0l__struct__List__0p__0c__struct__Node__0p__0l__0p__0r__0l__struct__Node__0p__0c__void__0p__0r__0c__void__0p__0c__int__0r;
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::sealed::Sealed for Signature_struct__List__0p__0l__struct__List__0p__0c__struct__Node__0p__0l__0p__0r__0l__struct__Node__0p__0c__void__0p__0r__0c__void__0p__0c__int__0r {}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::expression::NativeFunctionSignature for Signature_struct__List__0p__0l__struct__List__0p__0c__struct__Node__0p__0l__0p__0r__0l__struct__Node__0p__0c__void__0p__0r__0c__void__0p__0c__int__0r {
- type Physical = PhysicalFunction_C_unwind_4<::core::option::Option<unsafe extern "C-unwind" fn(*mut crate::__pgrx_c_bindings::List, ::core::option::Option<unsafe extern "C-unwind" fn(*mut crate::__pgrx_c_bindings::Node, *mut ::core::ffi::c_void) -> *mut crate::__pgrx_c_bindings::Node>, *mut ::core::ffi::c_void, i32) -> *mut crate::__pgrx_c_bindings::List>>;
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterUserMappingStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterUserMappingStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AlterUserMappingStmt as i32);
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *mut crate::__pgrx_c_bindings::Node,
-                *mut ::core::ffi::c_void,
-            ) -> *mut crate::__pgrx_c_bindings::Node,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *mut crate::__pgrx_c_bindings::Node,
-                *mut ::core::ffi::c_void,
-            ) -> *mut crate::__pgrx_c_bindings::Node,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_struct__Node__0p__0l__struct__Node__0p__0c__void__0p__0r;
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::sealed::Sealed for Signature_struct__Node__0p__0l__struct__Node__0p__0c__void__0p__0r {}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::expression::NativeFunctionSignature
-    for Signature_struct__Node__0p__0l__struct__Node__0p__0c__void__0p__0r
-{
-    type Physical = PhysicalFunction_C_unwind_2<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *mut crate::__pgrx_c_bindings::Node,
-                *mut ::core::ffi::c_void,
-            ) -> *mut crate::__pgrx_c_bindings::Node,
-        >,
-    >;
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlternativeSubPlan {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlternativeSubPlan {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AlternativeSubPlan as i32);
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *mut crate::__pgrx_c_bindings::Node,
-                ::core::option::Option<
-                    unsafe extern "C-unwind" fn(
-                        *mut crate::__pgrx_c_bindings::Node,
-                        *mut ::core::ffi::c_void,
-                    )
-                        -> *mut crate::__pgrx_c_bindings::Node,
-                >,
-                *mut ::core::ffi::c_void,
-            ) -> *mut crate::__pgrx_c_bindings::Node,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *mut crate::__pgrx_c_bindings::Node,
-                ::core::option::Option<
-                    unsafe extern "C-unwind" fn(
-                        *mut crate::__pgrx_c_bindings::Node,
-                        *mut ::core::ffi::c_void,
-                    )
-                        -> *mut crate::__pgrx_c_bindings::Node,
-                >,
-                *mut ::core::ffi::c_void,
-            ) -> *mut crate::__pgrx_c_bindings::Node,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_struct__Node__0p__0l__struct__Node__0p__0c__struct__Node__0p__0l__0p__0r__0l__struct__Node__0p__0c__void__0p__0r__0c__void__0p__0r;
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::sealed::Sealed for Signature_struct__Node__0p__0l__struct__Node__0p__0c__struct__Node__0p__0l__0p__0r__0l__struct__Node__0p__0c__void__0p__0r__0c__void__0p__0r {}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::expression::NativeFunctionSignature for Signature_struct__Node__0p__0l__struct__Node__0p__0c__struct__Node__0p__0l__0p__0r__0l__struct__Node__0p__0c__void__0p__0r__0c__void__0p__0r {
- type Physical = PhysicalFunction_C_unwind_3<::core::option::Option<unsafe extern "C-unwind" fn(*mut crate::__pgrx_c_bindings::Node, ::core::option::Option<unsafe extern "C-unwind" fn(*mut crate::__pgrx_c_bindings::Node, *mut ::core::ffi::c_void) -> *mut crate::__pgrx_c_bindings::Node>, *mut ::core::ffi::c_void) -> *mut crate::__pgrx_c_bindings::Node>>;
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::Append {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::Append {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_Append as i32);
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *mut crate::__pgrx_c_bindings::Node,
-                ::core::option::Option<
-                    unsafe extern "C-unwind" fn(
-                        *mut crate::__pgrx_c_bindings::Node,
-                        *mut ::core::ffi::c_void,
-                    )
-                        -> *mut crate::__pgrx_c_bindings::Node,
-                >,
-                *mut ::core::ffi::c_void,
-                i32,
-            ) -> *mut crate::__pgrx_c_bindings::Node,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *mut crate::__pgrx_c_bindings::Node,
-                ::core::option::Option<
-                    unsafe extern "C-unwind" fn(
-                        *mut crate::__pgrx_c_bindings::Node,
-                        *mut ::core::ffi::c_void,
-                    )
-                        -> *mut crate::__pgrx_c_bindings::Node,
-                >,
-                *mut ::core::ffi::c_void,
-                i32,
-            ) -> *mut crate::__pgrx_c_bindings::Node,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_struct__Node__0p__0l__struct__Node__0p__0c__struct__Node__0p__0l__0p__0r__0l__struct__Node__0p__0c__void__0p__0r__0c__void__0p__0c__int__0r;
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::sealed::Sealed for Signature_struct__Node__0p__0l__struct__Node__0p__0c__struct__Node__0p__0l__0p__0r__0l__struct__Node__0p__0c__void__0p__0r__0c__void__0p__0c__int__0r {}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::expression::NativeFunctionSignature for Signature_struct__Node__0p__0l__struct__Node__0p__0c__struct__Node__0p__0l__0p__0r__0l__struct__Node__0p__0c__void__0p__0r__0c__void__0p__0c__int__0r {
- type Physical = PhysicalFunction_C_unwind_4<::core::option::Option<unsafe extern "C-unwind" fn(*mut crate::__pgrx_c_bindings::Node, ::core::option::Option<unsafe extern "C-unwind" fn(*mut crate::__pgrx_c_bindings::Node, *mut ::core::ffi::c_void) -> *mut crate::__pgrx_c_bindings::Node>, *mut ::core::ffi::c_void, i32) -> *mut crate::__pgrx_c_bindings::Node>>;
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AppendPath {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AppendPath {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AppendPath as i32);
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                crate::__pgrx_c_bindings::Datum,
-            ) -> *mut crate::__pgrx_c_bindings::NumericData,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                crate::__pgrx_c_bindings::Datum,
-            ) -> *mut crate::__pgrx_c_bindings::NumericData,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_struct__NumericData__0p__0l__unsigned__long__0r;
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::sealed::Sealed for Signature_struct__NumericData__0p__0l__unsigned__long__0r {}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::expression::NativeFunctionSignature
-    for Signature_struct__NumericData__0p__0l__unsigned__long__0r
-{
-    type Physical = PhysicalFunction_C_unwind_1<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                crate::__pgrx_c_bindings::Datum,
-            ) -> *mut crate::__pgrx_c_bindings::NumericData,
-        >,
-    >;
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AppendRelInfo {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AppendRelInfo {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AppendRelInfo as i32);
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *mut crate::__pgrx_c_bindings::Query,
-                ::core::option::Option<
-                    unsafe extern "C-unwind" fn(
-                        *mut crate::__pgrx_c_bindings::Node,
-                        *mut ::core::ffi::c_void,
-                    )
-                        -> *mut crate::__pgrx_c_bindings::Node,
-                >,
-                *mut ::core::ffi::c_void,
-                i32,
-            ) -> *mut crate::__pgrx_c_bindings::Query,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *mut crate::__pgrx_c_bindings::Query,
-                ::core::option::Option<
-                    unsafe extern "C-unwind" fn(
-                        *mut crate::__pgrx_c_bindings::Node,
-                        *mut ::core::ffi::c_void,
-                    )
-                        -> *mut crate::__pgrx_c_bindings::Node,
-                >,
-                *mut ::core::ffi::c_void,
-                i32,
-            ) -> *mut crate::__pgrx_c_bindings::Query,
-        >,
-    >() == 8
-);
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_struct__Query__0p__0l__struct__Query__0p__0c__struct__Node__0p__0l__0p__0r__0l__struct__Node__0p__0c__void__0p__0r__0c__void__0p__0c__int__0r;
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::sealed::Sealed for Signature_struct__Query__0p__0l__struct__Query__0p__0c__struct__Node__0p__0l__0p__0r__0l__struct__Node__0p__0c__void__0p__0r__0c__void__0p__0c__int__0r {}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AppendState {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AppendState {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AppendState as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::ArrayCoerceExpr {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::ArrayCoerceExpr {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_ArrayCoerceExpr as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::ArrayExpr {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::ArrayExpr {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_ArrayExpr as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::BaseBackupCmd {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::BaseBackupCmd {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_BaseBackupCmd as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::BitString {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::BitString {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_BitString as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::BitmapAnd {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::BitmapAnd {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_BitmapAnd as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::BitmapAndPath {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::BitmapAndPath {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_BitmapAndPath as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::BitmapAndState {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::BitmapAndState {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_BitmapAndState as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::BitmapHeapPath {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::BitmapHeapPath {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_BitmapHeapPath as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::BitmapHeapScan {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::BitmapHeapScan {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_BitmapHeapScan as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::BitmapHeapScanState {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::BitmapHeapScanState {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_BitmapHeapScanState as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::BitmapIndexScan {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::BitmapIndexScan {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_BitmapIndexScan as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::BitmapIndexScanState {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::BitmapIndexScanState {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_BitmapIndexScanState as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::BitmapOr {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::BitmapOr {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_BitmapOr as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::BitmapOrPath {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::BitmapOrPath {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_BitmapOrPath as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::BitmapOrState {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::BitmapOrState {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_BitmapOrState as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::BoolExpr {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::BoolExpr {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_BoolExpr as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::Boolean {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::Boolean {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_Boolean as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::BooleanTest {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::BooleanTest {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_BooleanTest as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CTECycleClause {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CTECycleClause {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CTECycleClause as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CTESearchClause {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CTESearchClause {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CTESearchClause as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CallContext {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CallContext {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CallContext as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CallStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CallStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CallStmt as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CaseExpr {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CaseExpr {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CaseExpr as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CaseTestExpr {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CaseTestExpr {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CaseTestExpr as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CaseWhen {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CaseWhen {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CaseWhen as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CheckPointStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CheckPointStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CheckPointStmt as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::ClosePortalStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::ClosePortalStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_ClosePortalStmt as i32);
+}
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::ClusterStmt {}
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::ClusterStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_ClusterStmt as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CoalesceExpr {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CoalesceExpr {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CoalesceExpr as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CoerceToDomain {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CoerceToDomain {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CoerceToDomain as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CoerceToDomainValue {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CoerceToDomainValue {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CoerceToDomainValue as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CoerceViaIO {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CoerceViaIO {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CoerceViaIO as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CollateClause {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CollateClause {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CollateClause as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CollateExpr {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CollateExpr {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CollateExpr as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::ColumnDef {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::ColumnDef {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_ColumnDef as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::ColumnRef {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::ColumnRef {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_ColumnRef as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CommentStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CommentStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CommentStmt as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CommonTableExpr {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CommonTableExpr {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CommonTableExpr as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CompositeTypeStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CompositeTypeStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CompositeTypeStmt as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::Const {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::Const {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_Const as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::Constraint {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::Constraint {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_Constraint as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::ConstraintsSetStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::ConstraintsSetStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_ConstraintsSetStmt as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::ConvertRowtypeExpr {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::ConvertRowtypeExpr {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_ConvertRowtypeExpr as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CopyStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CopyStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CopyStmt as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreateAmStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreateAmStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CreateAmStmt as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreateCastStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreateCastStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CreateCastStmt as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreateConversionStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreateConversionStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CreateConversionStmt as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreateDomainStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreateDomainStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CreateDomainStmt as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreateEnumStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreateEnumStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CreateEnumStmt as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreateEventTrigStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreateEventTrigStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CreateEventTrigStmt as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreateExtensionStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreateExtensionStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CreateExtensionStmt as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreateFdwStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreateFdwStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CreateFdwStmt as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreateForeignServerStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreateForeignServerStmt {
+    const VALUE: c::CValue<c::CInt> = c::CValue::<c::CInt>::new(
+        crate::__pgrx_c_bindings::NodeTag::T_CreateForeignServerStmt as i32,
+    );
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreateForeignTableStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreateForeignTableStmt {
+    const VALUE: c::CValue<c::CInt> = c::CValue::<c::CInt>::new(
+        crate::__pgrx_c_bindings::NodeTag::T_CreateForeignTableStmt as i32,
+    );
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreateFunctionStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreateFunctionStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CreateFunctionStmt as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreateOpClassItem {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreateOpClassItem {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CreateOpClassItem as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreateOpClassStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreateOpClassStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CreateOpClassStmt as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreateOpFamilyStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreateOpFamilyStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CreateOpFamilyStmt as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreatePLangStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreatePLangStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CreatePLangStmt as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreatePolicyStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreatePolicyStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CreatePolicyStmt as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreatePublicationStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreatePublicationStmt {
+    const VALUE: c::CValue<c::CInt> = c::CValue::<c::CInt>::new(
+        crate::__pgrx_c_bindings::NodeTag::T_CreatePublicationStmt as i32,
+    );
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreateRangeStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreateRangeStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CreateRangeStmt as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreateReplicationSlotCmd {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreateReplicationSlotCmd {
+    const VALUE: c::CValue<c::CInt> = c::CValue::<c::CInt>::new(
+        crate::__pgrx_c_bindings::NodeTag::T_CreateReplicationSlotCmd as i32,
+    );
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreateRoleStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreateRoleStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CreateRoleStmt as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreateSchemaStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreateSchemaStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CreateSchemaStmt as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreateSeqStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreateSeqStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CreateSeqStmt as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreateStatsStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreateStatsStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CreateStatsStmt as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreateStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreateStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CreateStmt as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreateSubscriptionStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreateSubscriptionStmt {
+    const VALUE: c::CValue<c::CInt> = c::CValue::<c::CInt>::new(
+        crate::__pgrx_c_bindings::NodeTag::T_CreateSubscriptionStmt as i32,
+    );
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreateTableAsStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreateTableAsStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CreateTableAsStmt as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreateTableSpaceStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreateTableSpaceStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CreateTableSpaceStmt as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreateTransformStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreateTransformStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CreateTransformStmt as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreateTrigStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreateTrigStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CreateTrigStmt as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreateUserMappingStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreateUserMappingStmt {
+    const VALUE: c::CValue<c::CInt> = c::CValue::<c::CInt>::new(
+        crate::__pgrx_c_bindings::NodeTag::T_CreateUserMappingStmt as i32,
+    );
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreatedbStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreatedbStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CreatedbStmt as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CteScan {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CteScan {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CteScan as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CteScanState {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CteScanState {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CteScanState as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CurrentOfExpr {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CurrentOfExpr {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CurrentOfExpr as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CustomPath {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CustomPath {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CustomPath as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CustomScan {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CustomScan {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CustomScan as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CustomScanState {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CustomScanState {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CustomScanState as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::DeallocateStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::DeallocateStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_DeallocateStmt as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::DeclareCursorStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::DeclareCursorStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_DeclareCursorStmt as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::DefElem {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::DefElem {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_DefElem as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::DefineStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::DefineStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_DefineStmt as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::DeleteStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::DeleteStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_DeleteStmt as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::DiscardStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::DiscardStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_DiscardStmt as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::DoStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::DoStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_DoStmt as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::DomainConstraintState {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::DomainConstraintState {
+    const VALUE: c::CValue<c::CInt> = c::CValue::<c::CInt>::new(
+        crate::__pgrx_c_bindings::NodeTag::T_DomainConstraintState as i32,
+    );
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::DropOwnedStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::DropOwnedStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_DropOwnedStmt as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::DropReplicationSlotCmd {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::DropReplicationSlotCmd {
+    const VALUE: c::CValue<c::CInt> = c::CValue::<c::CInt>::new(
+        crate::__pgrx_c_bindings::NodeTag::T_DropReplicationSlotCmd as i32,
+    );
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::DropRoleStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::DropRoleStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_DropRoleStmt as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::DropStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::DropStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_DropStmt as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::DropSubscriptionStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::DropSubscriptionStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_DropSubscriptionStmt as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::DropTableSpaceStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::DropTableSpaceStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_DropTableSpaceStmt as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::DropUserMappingStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::DropUserMappingStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_DropUserMappingStmt as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::DropdbStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::DropdbStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_DropdbStmt as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::EState {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::EState {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_EState as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::EquivalenceClass {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::EquivalenceClass {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_EquivalenceClass as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::EquivalenceMember {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::EquivalenceMember {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_EquivalenceMember as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::EventTriggerData {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::EventTriggerData {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_EventTriggerData as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::ExecuteStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::ExecuteStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_ExecuteStmt as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::ExplainStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::ExplainStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_ExplainStmt as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::ExprContext {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::ExprContext {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_ExprContext as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::ExprState {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::ExprState {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_ExprState as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::ExtensibleNode {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::ExtensibleNode {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_ExtensibleNode as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::FdwRoutine {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::FdwRoutine {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_FdwRoutine as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::FetchStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::FetchStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_FetchStmt as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::FieldSelect {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::FieldSelect {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_FieldSelect as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::FieldStore {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::FieldStore {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_FieldStore as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::Float {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::Float {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_Float as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::ForeignKeyCacheInfo {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::ForeignKeyCacheInfo {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_ForeignKeyCacheInfo as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::ForeignKeyOptInfo {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::ForeignKeyOptInfo {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_ForeignKeyOptInfo as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::ForeignPath {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::ForeignPath {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_ForeignPath as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::ForeignScan {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::ForeignScan {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_ForeignScan as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::ForeignScanState {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::ForeignScanState {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_ForeignScanState as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::FromExpr {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::FromExpr {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_FromExpr as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::FuncCall {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::FuncCall {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_FuncCall as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::FuncExpr {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::FuncExpr {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_FuncExpr as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::FunctionParameter {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::FunctionParameter {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_FunctionParameter as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::FunctionScan {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::FunctionScan {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_FunctionScan as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::FunctionScanState {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::FunctionScanState {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_FunctionScanState as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::Gather {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::Gather {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_Gather as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::GatherMerge {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::GatherMerge {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_GatherMerge as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::GatherMergePath {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::GatherMergePath {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_GatherMergePath as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::GatherMergeState {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::GatherMergeState {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_GatherMergeState as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::GatherPath {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::GatherPath {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_GatherPath as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::GatherState {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::GatherState {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_GatherState as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::GrantRoleStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::GrantRoleStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_GrantRoleStmt as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::GrantStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::GrantStmt {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_GrantStmt as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::Group {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::Group {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_Group as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::GroupPath {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::GroupPath {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_GroupPath as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::GroupResultPath {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::GroupResultPath {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_GroupResultPath as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::GroupState {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::GroupState {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_GroupState as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::GroupingFunc {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::GroupingFunc {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_GroupingFunc as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::GroupingSet {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::GroupingSet {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_GroupingSet as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::GroupingSetData {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::GroupingSetData {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_GroupingSetData as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::GroupingSetsPath {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::GroupingSetsPath {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_GroupingSetsPath as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::Hash {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::Hash {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_Hash as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::HashJoin {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::HashJoin {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_HashJoin as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::HashJoinState {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::HashJoinState {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_HashJoinState as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::HashPath {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::HashPath {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_HashPath as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::HashState {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::HashState {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_HashState as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::IdentifySystemCmd {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::IdentifySystemCmd {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_IdentifySystemCmd as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::ImportForeignSchemaStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::ImportForeignSchemaStmt {
+    const VALUE: c::CValue<c::CInt> = c::CValue::<c::CInt>::new(
+        crate::__pgrx_c_bindings::NodeTag::T_ImportForeignSchemaStmt as i32,
+    );
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::IncrementalSort {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::IncrementalSort {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_IncrementalSort as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::IncrementalSortPath {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::IncrementalSortPath {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_IncrementalSortPath as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::IncrementalSortState {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::IncrementalSortState {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_IncrementalSortState as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::IndexAmRoutine {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::IndexAmRoutine {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_IndexAmRoutine as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::IndexClause {}

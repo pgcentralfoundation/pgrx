@@ -482,8 +482,8 @@ macro_rules! IntervalPGetDatum {
         )
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C inline function IntervalPGetDatum from timestamp.h:57 (PostgreSQL 16–18)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
+/// C inline function IntervalPGetDatum from timestamp.h:57 (PostgreSQL 16–19)
 ///
 /// ```c
 /// static inline Datum
@@ -510,44 +510,6 @@ macro_rules! IntervalPGetDatum {
             @value {
                 let _ = &$X;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_types::Datum>()
-            }
-        )
-    };
-}
-#[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function IntervalPGetDatum from timestamp.h:57 (PostgreSQL 19)
-///
-/// ```c
-/// static inline Datum
-/// IntervalPGetDatum(const Interval *X)
-/// {
-/// 	return PointerGetDatum(X);
-/// }
-/// ```
-///
-///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! IntervalPGetDatum {
-    ($X:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$X;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLong,
-                            $crate::__pgrx_c_bindings::Datum
-                        >>()
-                )
             }
         )
     };
@@ -764,8 +726,7 @@ macro_rules! PG_GETARG_TIMESTAMPTZ {
         )
     };
 }
-#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro PG_RETURN_INTERVAL_P from timestamp.h:41 (PostgreSQL 15), timestamp.h:69 (PostgreSQL 16–18)
+/// C macro PG_RETURN_INTERVAL_P from timestamp.h:41 (PostgreSQL 15), timestamp.h:69 (PostgreSQL 16–19)
 ///
 /// ```text
 /// #define PG_RETURN_INTERVAL_P( x ) return IntervalPGetDatum ( x )
@@ -781,32 +742,6 @@ macro_rules! PG_GETARG_TIMESTAMPTZ {
 /// # Panics
 ///
 /// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! PG_RETURN_INTERVAL_P {
-    ($x:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
-    };
-    (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
-    };
-}
-#[cfg(feature = "pg19")]
-/// C macro PG_RETURN_INTERVAL_P from timestamp.h:69 (PostgreSQL 19)
-///
-/// ```text
-/// #define PG_RETURN_INTERVAL_P( x ) return IntervalPGetDatum ( x )
-/// ```
-///
-///
-#[doc = crate::__pgrx_c_doc_caller_returns!()]
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_RETURN_INTERVAL_P {
     ($x:expr $(,)?) => {

@@ -44,7 +44,7 @@ macro_rules! SimpleLruGetBankLock {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function SimpleLruGetBankLock from slru.h:206 (PostgreSQL 19)
+/// C inline function SimpleLruGetBankLock from slru.h:206 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline LWLock *
@@ -59,7 +59,45 @@ macro_rules! SimpleLruGetBankLock {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+///
+#[doc = crate::__pgrx_c_doc_assertions!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Integer division/remainder rejects zero divisors and signed MIN / -1 overflow. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! SimpleLruGetBankLock {
+    ($ctl:expr, $pageno:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$ctl;
+                let _ = &$pageno;
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_macros::expression::CPointer<
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::LWLock
+                        >,
+                        $crate::__pgrx_c_macros::expression::ReadWrite
+                    >>()
+            }
+        )
+    };
+}
+/// C macro SlruPagePrecedesUnitTests from slru.h:156 (PostgreSQL 15–16), slru.h:199 (PostgreSQL 17–18), slru.h:233 (PostgreSQL 19)
+///
+/// ```text
+/// #define SlruPagePrecedesUnitTests( ctl , per_page ) ( SlruPagePrecedesUnitTests ) ( ctl , per_page )
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_flavor_call!()]
 ///
 /// # Safety
 ///
@@ -69,24 +107,17 @@ macro_rules! SimpleLruGetBankLock {
 ///
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
-macro_rules! SimpleLruGetBankLock {
-    ($ctl:expr, $pageno:expr $(,)?) => {
+macro_rules! SlruPagePrecedesUnitTests {
+    ($ctl:expr, $per_page:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$ctl;
-                let _ = &$pageno;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CRecord<
-                                $crate::__pgrx_c_bindings::LWLock
-                            >,
-                            $crate::__pgrx_c_macros::expression::ReadWrite
-                        >>()
-                )
+                let _ = &$per_page;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
             }
         )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
 pub use SimpleLruGetBankLock;
+pub use SlruPagePrecedesUnitTests;
