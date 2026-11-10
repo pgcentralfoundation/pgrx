@@ -486,8 +486,10 @@ PostgreSQL also sets asynchronously is `volatile` in C and is read as `volatile`
 An object of one of those types loads a valid Rust value from anything C stores in
 it through that type. Enum globals load their compatible integer, never the Rust
 enum. Writes, dereferences, and reads of floating, aggregate or function pointer
-globals still need the caller's `unsafe`. Each read runs the check, including in
-release builds.
+globals still need the caller's `unsafe`. The check runs in release builds too. A
+macro that reads several such globals runs it once, before the first read it
+evaluates, and not at all when it evaluates none. A macro that does so is a block,
+so the temporaries of its operands end with it; do not keep a pointer into one.
 Native adapters convert arguments and check nullable function pointers before
 entering that guard, and decode results after leaving it.
 

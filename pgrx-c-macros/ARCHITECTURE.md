@@ -1205,6 +1205,42 @@ generator admits in error fails to compile rather than becoming an unchecked rea
 Writes, dereferences, and floating, aggregate or function pointer globals keep the
 caller's `unsafe`. Without a thread check, as in most fixtures, every global read does.
 
+**One check for each expansion.** An expansion that can read several checked globals
+shares one `ThreadCheck`, declared as the local `__pgrx_c_thread`. Each read calls its
+`check` method, which runs the active-thread check unless it has already passed. So the
+first read the expansion evaluates checks the thread, the reads after it do not, and an
+expansion that evaluates no read, because `&&`, `?:` or `sizeof` skips them, checks
+nothing and claims no active thread. A passed check holds for the rest of the expansion,
+as the FFI guard's check holds for the call it guards. The check is a closure written in
+the expansion, so a failure still reports the macro invocation's location.
+
+`emit::thread_checks` counts the places that can check: names of checked globals and
+calls that expand a translation which shares a check. The renderer, the arms and the
+callers of a translation all decide from that count, so a body never names a local
+that its arm does not declare; a disagreement would fail to compile.
+
+- A translated inline function shares a check when it has one such place. Its body is
+  already a block, so the declaration is its first statement and changes nothing else.
+  It has an extra value arm, `@__pgrx_emit_value_on; [thread] operands`, which takes
+  the caller's check; the plain value arm passes it a new one. A caller that shares a
+  check passes its own, so a chain of translated calls checks once.
+- A statement body shares a check when it has two such places, as its first statement.
+- An expression macro shares a check when it has two such places and its value arm
+  names the local, in that arm only. Declaring the local makes the arm a block, and
+  Rust drops the temporaries of the caller's operands when the block ends, before the
+  macro's value is used. A value that pointed into such a temporary would dangle, as
+  it already does when the operand sits in a `?:` or `&&` branch. The place,
+  read-place, size and discard arms keep one check for each read, because a place
+  often does address its operand.
+
+Passing a check to another macro works through Rust hygiene alone: the tokens a caller
+renders name the caller's local wherever a callee expands them. A generated
+`pg_sys::NAME` function runs its check first, as before, and passes it to the
+translation through `@__pgrx_c_value_on [thread]; arguments`, the entry that normalizes
+arguments for the extra value arm. A documentation shell declares nothing, so a witness
+keeps a check at each read. Macro-to-macro delegation and macros that the caller writes
+as operands do not share a check.
+
 ### Assertions and build flavors
 
 A program that compiles against an assert-enabled PostgreSQL must compile against a

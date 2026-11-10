@@ -4,7 +4,8 @@
 //! When the catalog names a thread check, a macro reads an integer, enum or data pointer
 //! global after that check, so the read needs no `unsafe` from its caller, and neither does
 //! an assertion whose condition reads one. Writes, dereferences and function pointer reads
-//! still need the caller's `unsafe`.
+//! still need the caller's `unsafe`. A macro that reads several such globals checks once,
+//! before the first read it runs.
 
 #![cfg(all(
     target_pointer_width = "64",
@@ -41,6 +42,12 @@ fn is_builtin_oid(name: &str) -> bool {
 /// Macros that read a global and need no `unsafe` once the catalog names a thread check.
 const CHECKED: &[&str] =
     &["GLOBAL_COUNT", "GLOBAL_PENDING", "GLOBAL_FLAG", "GLOBAL_POINTER", "GLOBAL_BUSY"];
+/// Macros in which several reads share one thread check.
+const SHARED: &[&str] = &["GLOBAL_TOTAL", "GLOBAL_ANY"];
+/// A statement body whose reads share one check. It writes its operand, which needs `unsafe`.
+const COPY: &str = "GLOBAL_COPY";
+/// A macro that reads one global after an operand it evaluates only for its effects.
+const AFTER: &str = "GLOBAL_AFTER";
 /// Macros that need the caller's `unsafe` either way.
 const UNSAFE: &[&str] = &["GLOBAL_POINTEE", "GLOBAL_HOOKED", "GLOBAL_SET"];
 /// The check whose condition reads a global.
@@ -85,7 +92,13 @@ fn checked_global_reads_need_no_unsafe() {
     // The check runs only against headers that enable assertions.
     arguments.extend(["-std=c17".into(), "-DUSE_ASSERT_CHECKING=1".into()]);
     let frontend = inspect(&scanner, &header(), &arguments, None).expect("inspect definitions");
-    let names = CHECKED.iter().chain(UNSAFE).chain([&CHECK]).copied().collect::<Vec<_>>();
+    let names = CHECKED
+        .iter()
+        .chain(SHARED)
+        .chain(UNSAFE)
+        .chain([&COPY, &AFTER, &CHECK])
+        .copied()
+        .collect::<Vec<_>>();
     let session = AnalysisSession::prepare(&scanner, &frontend, &names).expect("prepare roots");
     let bindings = bind(&frontend);
     let mut catalog = binding_symbols::collect_bindings(
@@ -105,10 +118,16 @@ fn checked_global_reads_need_no_unsafe() {
 
     catalog.thread_check = Some(vec!["thread_check".into()]);
     let generated = generate_with_bindings(&session, &names, &catalog).unwrap();
-    for name in CHECKED {
+    for name in CHECKED.iter().chain(SHARED).chain([&AFTER]) {
         let (rust, caller_unsafe) = emitted(&generated, name);
         assert!(!caller_unsafe && rust.contains("load_global"), "{name}: {rust}");
+        // A macro with one read checks there. One with several declares the check they
+        // share once, in the arm that yields its value.
+        let shared = usize::from(SHARED.contains(name));
+        assert_eq!(rust.matches("ThreadCheck::new").count(), shared, "{name}: {rust}");
     }
+    let (rust, caller_unsafe) = emitted(&generated, COPY);
+    assert!(caller_unsafe && rust.matches("ThreadCheck::new").count() == 1, "{rust}");
     for name in UNSAFE {
         assert!(emitted(&generated, name).1, "{name} still needs unsafe");
     }
@@ -139,11 +158,15 @@ fn checked_global_reads_need_no_unsafe() {
         ),
         &arguments,
     );
-    // Each checked read checks the thread once, including the pointer read inside the
-    // dereference. The function pointer read and the write do not.
+    // The last column counts thread checks so far. A macro with one checked read checks
+    // once, including the pointer read inside the dereference. The function pointer read
+    // and the write do not. The three reads of `GLOBAL_TOTAL` check once. `GLOBAL_ANY`
+    // checks only when it runs a read, and `GLOBAL_COPY` once for its two statements. The
+    // discard arm of `GLOBAL_TOTAL` checks for each of its three reads, before the read
+    // of `GLOBAL_AFTER` itself.
     assert_eq!(
         output,
-        "count\t5\t1\npending\t1\t2\nflag\ttrue\t3\npointer\t4\nbusy\t1\t5\nin range\t1\t6\npointee\t9\nhooked\t0\ncount\t3\t8\n"
+        "count\t5\t1\npending\t1\t2\nflag\ttrue\t3\npointer\t4\nbusy\t1\t5\nin range\t1\t6\npointee\t9\nhooked\t0\ncount\t3\t8\ntotal\t5\t9\nany\t0\t9\nany\t1\t10\ncopy\t4\t11\nafter\t3\t15\n"
     );
     session.verify_inputs().expect("original profile stayed unchanged");
 }

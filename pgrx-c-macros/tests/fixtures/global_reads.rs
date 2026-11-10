@@ -32,4 +32,17 @@ fn main() {
         GLOBAL_SET!(3);
     }
     println!("count\t{}\t{}", GLOBAL_COUNT!().get(), checks());
+    // Three reads in one expansion check once.
+    println!("total\t{}\t{}", GLOBAL_TOTAL!().get(), checks());
+    // No read runs, so nothing checks; then two reads run and check once.
+    println!("any\t{}\t{}", GLOBAL_ANY!(1).get(), checks());
+    println!("any\t{}\t{}", GLOBAL_ANY!(0).get(), checks());
+    let mut copy = 0_i32;
+    // SAFETY: the macro writes only this local.
+    unsafe {
+        GLOBAL_COPY!(copy);
+    }
+    println!("copy\t{copy}\t{}", checks());
+    // The discarded operand's three reads each check, and then the macro's own read does.
+    println!("after\t{}\t{}", GLOBAL_AFTER!(GLOBAL_TOTAL!()).get(), checks());
 }

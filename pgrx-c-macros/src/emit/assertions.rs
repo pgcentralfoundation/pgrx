@@ -90,6 +90,9 @@ pub(super) struct Translation {
     pub(super) panics: BTreeSet<&'static str>,
     /// Whether expanding the translation needs the caller's `unsafe`.
     pub(super) caller_unsafe: bool,
+    /// Whether the translation shares one thread check among its global reads, and so has
+    /// the value arm that takes its caller's; see [`thread_checks`](super::thread_checks).
+    pub(super) shares_thread: bool,
 }
 
 /// A call that stops the process instead of returning.

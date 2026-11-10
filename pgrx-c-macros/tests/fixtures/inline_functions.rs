@@ -13,7 +13,7 @@ mod ffi {
 }
 
 /// Times a generated function or global read checked its thread. Only functions that touch
-/// a global check, and each read of the global checks.
+/// a global check, and the reads of the global in one call share that check.
 static CHECKS: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
 
 /// Count thread checks instead of comparing threads.
@@ -43,5 +43,9 @@ fn main() {
         println!("bump\t{}", wrapped::WrapBump(2));
         println!("bump twice\t{}", wrapped::WrapBumpTwice(1));
     }
+    println!("checks\t{}", CHECKS.load(std::sync::atomic::Ordering::Relaxed));
+    // SAFETY: as above. The macro itself does not check before it writes the global.
+    let twice = unsafe { WrapBumpTwice!(1) };
+    println!("macro\t{}", twice.get());
     println!("checks\t{}", CHECKS.load(std::sync::atomic::Ordering::Relaxed));
 }

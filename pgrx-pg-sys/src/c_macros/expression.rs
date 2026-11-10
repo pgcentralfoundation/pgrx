@@ -21,6 +21,7 @@
 //! initialization, aliasing permissions, or PostgreSQL backend-thread eligibility.
 
 use super::{CInteger, CValue, IntoCValue, OverflowPolicy, PromotedInteger, sealed};
+use core::cell::Cell;
 use core::marker::PhantomData;
 
 /// Stop the process for failed C assertions and reached unreachable code without a native call.
@@ -2090,6 +2091,40 @@ unsafe impl<I: EnumIdentity, K: CInteger, R: EnumStorage<I, K>> GlobalObject
 {
 }
 
+/// pgrx's active-thread check, run at most once for one expansion of a generated macro.
+///
+/// An expansion that reads several globals shares one of these. The first read it
+/// evaluates runs the check, the reads after it do not repeat it, and an expansion that
+/// evaluates no read never runs it. A check that passed holds for the rest of the
+/// expansion, as the check of pgrx's FFI guard holds for the call it guards. The value is
+/// neither `Send` nor `Sync`, so a check that passed on one thread never stands for
+/// another.
+pub struct ThreadCheck<F> {
+    /// The check. The expansion writes it as a closure, so a failure reports the
+    /// location of the macro invocation.
+    check: F,
+    /// Whether the check has passed on this thread.
+    passed: Cell<bool>,
+    /// A raw pointer is neither `Send` nor `Sync`.
+    thread: PhantomData<*mut ()>,
+}
+
+impl<F: Fn()> ThreadCheck<F> {
+    /// Hold `check` without running it.
+    pub const fn new(check: F) -> Self {
+        Self { check, passed: Cell::new(false), thread: PhantomData }
+    }
+
+    /// Run the check unless it has already passed. A check that panics has not passed.
+    #[inline]
+    pub fn check(&self) {
+        if !self.passed.get() {
+            (self.check)();
+            self.passed.set(true);
+        }
+    }
+}
+
 /// Read a PostgreSQL global variable. Generated macros do so after pgrx's active-thread
 /// check, so their callers need no `unsafe` for the read.
 ///
@@ -3547,6 +3582,24 @@ mod tests {
     use std::mem::MaybeUninit;
     use std::path::PathBuf;
     use std::sync::atomic::{AtomicU64, Ordering};
+
+    /// A thread check runs when first asked and not again once it has passed. A check that
+    /// panics has not passed, so the next request runs it again.
+    #[test]
+    fn thread_check_runs_until_it_passes_once() {
+        let runs = Cell::new(0);
+        let thread = ThreadCheck::new(|| {
+            runs.set(runs.get() + 1);
+            assert!(runs.get() > 1, "the first check fails");
+        });
+        assert_eq!(runs.get(), 0);
+        let failed = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| thread.check()));
+        assert!(failed.is_err());
+        assert_eq!(runs.get(), 1);
+        thread.check();
+        thread.check();
+        assert_eq!(runs.get(), 2);
+    }
 
     /// Retain literal bytes while reading each high byte through inspected plain-char storage.
     #[test]
