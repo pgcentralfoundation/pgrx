@@ -82,6 +82,9 @@ const SELECT_LINT: &[&str] = &["deny.toml"];
 enum Subjects {
     /// The job runs these packages' tests.
     Packages(&'static [&'static str]),
+    /// The job runs `packages`' tests under conditions that cannot change how `ignoring` behave,
+    /// so a change that reaches `packages` only through `ignoring` doesn't need it.
+    PackagesIgnoring { packages: &'static [&'static str], ignoring: &'static [&'static str] },
     /// The job builds these packages' artifacts into something else and tests that.
     Artifacts(&'static [&'static str]),
     /// The job packages the published packages, with their readmes, using [`PACKAGING_TOOLS`].
@@ -95,8 +98,17 @@ const JOBS: &[(&str, Subjects)] = &[
     // Miri checks pointer provenance in pgrx-pg-sys's Datum and pgrx's fcinfo and varlena.
     ("miri", Subjects::Packages(&["pgrx-pg-sys", "pgrx"])),
     // Every supported Clang runs the generator's tests, generates pgrx-pg-sys's macros
-    // through pgrx-bindgen's build script and runs pgrx-pg-sys's tests of them.
-    ("clang", Subjects::Packages(&["pgrx-c-macros", "pgrx-bindgen", "pgrx-pg-sys"])),
+    // through pgrx-bindgen's build script and runs pgrx-pg-sys's tests of them. pgrx-pg-sys
+    // also builds with pgrx-macros and pgrx-sql-entity-graph, which neither run libclang nor
+    // feed the generator, so the Clang versions cannot disagree over a change to them. The pg
+    // jobs still test pgrx-pg-sys for such a change.
+    (
+        "clang",
+        Subjects::PackagesIgnoring {
+            packages: &["pgrx-c-macros", "pgrx-bindgen", "pgrx-pg-sys"],
+            ignoring: &["pgrx-macros", "pgrx-sql-entity-graph"],
+        },
+    ),
     ("bindgen_harness", Subjects::Packages(&["pgrx-bindgen"])),
     ("ui", Subjects::Packages(&["pgrx-unit-tests"])),
     ("bench", Subjects::Packages(&["benching", "pgrx-bench"])),
@@ -446,6 +458,19 @@ impl Plan {
     fn job(&self, graph: &Graph, subjects: &Subjects) -> bool {
         match subjects {
             Subjects::Packages(names) => names.iter().any(|name| self.affected.contains(*name)),
+            Subjects::PackagesIgnoring { packages, ignoring } => {
+                let changed = self
+                    .changed
+                    .iter()
+                    .filter(|name| !ignoring.contains(&name.as_str()))
+                    .cloned()
+                    .collect();
+                let tested = graph.tested(&graph.artifacts(&changed));
+                self.everything
+                    || packages
+                        .iter()
+                        .any(|name| tested.contains(*name) || self.tests_changed.contains(*name))
+            }
             Subjects::Artifacts(names) => names.iter().any(|name| self.artifacts.contains(*name)),
             Subjects::Packaging => {
                 self.readme
@@ -575,12 +600,17 @@ mod tests {
             node("pgrx-pg-config", "pgrx-pg-config", false, &[]),
             node("pgrx-c-macros", "pgrx-c-macros", false, &[("pgrx-pg-config", false)]),
             node("pgrx-bindgen", "pgrx-bindgen", false, &[("pgrx-c-macros", false)]),
-            node("pgrx-macros", "pgrx-macros", false, &[]),
+            node("pgrx-sql-entity-graph", "pgrx-sql-entity-graph", false, &[]),
+            node("pgrx-macros", "pgrx-macros", false, &[("pgrx-sql-entity-graph", false)]),
             node(
                 "pgrx-pg-sys",
                 "pgrx-pg-sys",
                 true,
-                &[("pgrx-bindgen", false), ("pgrx-macros", false)],
+                &[
+                    ("pgrx-bindgen", false),
+                    ("pgrx-macros", false),
+                    ("pgrx-sql-entity-graph", false),
+                ],
             ),
             node("pgrx", "pgrx", true, &[("pgrx-pg-sys", false), ("pgrx-macros", false)]),
             node("pgrx-tests", "pgrx-tests", true, &[("pgrx", false), ("pgrx-pg-config", false)]),
@@ -711,8 +741,8 @@ mod tests {
         for path in [
             "pgrx-pg-config/src/lib.rs",
             "pgrx-bindgen/src/build.rs",
+            "pgrx-pg-sys/src/lib.rs",
             "pgrx-pg-sys/tests/oracle.rs",
-            "pgrx-macros/src/lib.rs",
         ] {
             let plan = Plan::new(&graph, Some(&files(&[path])));
             assert_eq!(output(&plan, &graph, "clang"), "true", "{path}");
@@ -721,6 +751,24 @@ mod tests {
             let plan = Plan::new(&graph, Some(&files(&[path])));
             assert_eq!(output(&plan, &graph, "clang"), "false", "{path}");
         }
+    }
+
+    #[test]
+    fn the_clang_jobs_ignore_what_no_clang_version_changes() {
+        let graph = graph();
+        // pgrx-pg-sys builds with both, and pgrx-bindgen's tests build with pgrx-macros, so
+        // every other job that tests those packages still runs.
+        for path in ["pgrx-macros/src/lib.rs", "pgrx-sql-entity-graph/src/lib.rs"] {
+            let plan = Plan::new(&graph, Some(&files(&[path])));
+            assert!(plan.affected.contains("pgrx-pg-sys"), "{path}");
+            assert_eq!(output(&plan, &graph, "clang"), "false", "{path}");
+            assert_eq!(output(&plan, &graph, "miri"), "true", "{path}");
+            assert_eq!(output(&plan, &graph, "bindgen_harness"), "true", "{path}");
+        }
+        // A change that also touches the bindings needs the jobs.
+        let plan =
+            Plan::new(&graph, Some(&files(&["pgrx-macros/src/lib.rs", "pgrx-pg-sys/build.rs"])));
+        assert_eq!(output(&plan, &graph, "clang"), "true");
     }
 
     #[test]
@@ -749,6 +797,7 @@ mod tests {
             let plan = Plan::new(&graph, Some(&files(&[path])));
             assert!(plan.everything, "{path}");
             assert_eq!(plan.affected, graph.all(), "{path}");
+            assert_eq!(output(&plan, &graph, "clang"), "true", "{path}");
         }
         // A nested package's own directory still wins over tools/.
         let plan = Plan::new(&graph, Some(&files(&["tools/version-updater/src/main.rs"])));
