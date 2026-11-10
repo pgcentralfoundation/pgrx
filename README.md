@@ -93,6 +93,7 @@ A cross build has further requirements; see [Cross-compiling](#cross-compiling).
    - Debian-likes: `apt install clang llvm libclang-dev`
    - RHEL-likes: `yum install clang llvm`
    - Windows: download installers from https://github.com/llvm/llvm-project/releases
+   - On Linux, pgrx's CI generates the C macros with every Clang major from 14 through 23, on x86_64 and aarch64, and requires those versions to generate the same macros. Other Clang versions are not tested on Linux.
    - `pgrx-pg-sys` uses the driver to find the target's system headers, to check the C macro profile against the PostgreSQL headers and to compile its native support archive, including the `cshim` feature. Its major version must match `libclang`. pgrx uses `CLANG_PATH` when it is set; otherwise it uses the first match among the `CLANG` recorded in a `pg_config` program's `--configure` output, the `clang` installed with `libclang`, and `clang-<major>` or `clang` on `PATH`.
    - The archiver is `llvm-ar` from the driver's LLVM release, or `llvm-lib` for Windows targets. pgrx looks for `llvm-ar-<major>` beside a `clang-<major>` driver, then `llvm-ar` beside the driver or beside its resolved path, such as Debian's `/usr/lib/llvm-<major>/bin/llvm-ar`. Without one, builds for Unix targets use the system `ar`, which works for native builds but may not index objects built for another target.
    - A failure to generate the C macros stops the build with an error that names the cause.
