@@ -120,6 +120,9 @@ pub(super) struct Renderer<'a> {
     mode: RenderMode,
     /// Whether this rendering needs the caller's `unsafe`.
     caller_unsafe: bool,
+    /// Whether the rendered arm declares [`super::THREAD`], the one thread check its
+    /// global reads and translated calls share.
+    shares_thread: bool,
 }
 
 /// Lower each expression occurrence under its own C context with shared trusted object facts.
@@ -211,6 +214,12 @@ impl<'a> Renderer<'a> {
         let expectations = super::expectation::plan(frontend, analysis);
         let caller_unsafe =
             super::assertions::caller_unsafe(frontend, bindings, analysis, generated.translations);
+        let shares_thread = super::thread_checks(
+            frontend.declarations(),
+            bindings,
+            analysis,
+            generated.translations,
+        ) >= if inline_body { 1 } else { 2 };
         Self {
             frontend,
             analysis,
@@ -228,12 +237,54 @@ impl<'a> Renderer<'a> {
             expectations,
             mode: RenderMode::Macro,
             caller_unsafe,
+            shares_thread,
         }
     }
 
     /// Whether this rendering needs the caller's `unsafe`.
     pub(super) fn caller_unsafe(&self) -> bool {
         self.caller_unsafe
+    }
+
+    /// Whether what this renders names [`super::THREAD`], which the arm holding it must
+    /// then declare. A documentation shell declares nothing, so a witness never does.
+    pub(super) fn shares_thread(&self) -> bool {
+        self.shares_thread && self.mode == RenderMode::Macro
+    }
+
+    /// Render arms that declare no shared thread check, so each global read runs its own.
+    pub(super) fn with_own_thread_checks(self) -> Self {
+        Self { shares_thread: false, ..self }
+    }
+
+    /// A new thread check for an arm that shares one. It runs the catalog's check when a
+    /// global read first needs it.
+    pub(super) fn own_thread_check(&self) -> Result<String, SkipReason> {
+        let check = self
+            .bindings
+            .thread_check
+            .as_ref()
+            .expect("only a catalog with a thread check has checked globals");
+        rust_path(check)
+            .map(|check| super::own_thread_check(&check))
+            .map_err(|message| skip(self.analysis, SkipReasonCode::UnsupportedType, message, None))
+    }
+
+    /// Declare the shared thread check at the start of the block that holds what this
+    /// renders, if it shares one: the caller's, given as `source`, or a new one.
+    pub(super) fn declare_thread(
+        &self,
+        source: Option<&str>,
+        rust: &mut String,
+    ) -> Result<(), SkipReason> {
+        if self.shares_thread() {
+            let source = match source {
+                Some(source) => source.to_owned(),
+                None => self.own_thread_check()?,
+            };
+            write!(rust, "let {} = {source}; ", super::THREAD).expect("String output");
+        }
+        Ok(())
     }
 
     /// Parameters whose operands this rendering never names as values.
@@ -748,7 +799,8 @@ impl<'a> Renderer<'a> {
                                     .map_err(failure)?;
                                 let path = rust_path(&binding.path).map_err(failure)?;
                                 // A global that `checked_global` admits is read after a thread
-                                // check, so the read needs no `unsafe` from the caller.
+                                // check, so the read needs no `unsafe` from the caller. An
+                                // arm that shares one check runs it here unless it has passed.
                                 let check = match &self.bindings.thread_check {
                                     Some(check)
                                         if matches!(context, Context::Value)
@@ -758,7 +810,11 @@ impl<'a> Renderer<'a> {
                                                 name,
                                             ) =>
                                     {
-                                        Some(rust_path(check).map_err(failure)?)
+                                        Some(if self.shares_thread() {
+                                            format!("{}.check", super::THREAD)
+                                        } else {
+                                            rust_path(check).map_err(failure)?
+                                        })
                                     }
                                     _ => None,
                                 };
@@ -1444,7 +1500,7 @@ impl<'a> Renderer<'a> {
                                         .map_err(failure)?,
                                 )
                             };
-                            if self.translations.contains_key(name.as_str())
+                            if let Some(translation) = self.translations.get(name.as_str())
                                 && let Some(callee) = super::macro_identifier(name)
                             {
                                 // The real call below converts the translation's value with
@@ -1473,8 +1529,19 @@ impl<'a> Renderer<'a> {
                                         .expect("String output");
                                     tasks.push(text(")"));
                                 }
-                                write!(rust, "$crate::{callee}!(@__pgrx_emit_value; ")
-                                    .expect("String output");
+                                // A translation that shares a thread check takes this
+                                // arm's, when it declares one, instead of making its own.
+                                if self.shares_thread() && translation.shares_thread {
+                                    write!(
+                                        rust,
+                                        "$crate::{callee}!(@{}; [{}] ",
+                                        super::SHARED_VALUE,
+                                        super::THREAD
+                                    )
+                                } else {
+                                    write!(rust, "$crate::{callee}!(@__pgrx_emit_value; ")
+                                }
+                                .expect("String output");
                                 tasks.push(text(")"));
                                 for argument in arguments.iter().rev() {
                                     tasks.push(Task::Text(format!(

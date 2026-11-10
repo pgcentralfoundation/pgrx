@@ -74,6 +74,15 @@ pub(super) fn return_marker(analysis: &MacroAnalysis) -> String {
     marker
 }
 
+/// The arm that takes a caller's thread check binds its tokens beside the C arguments.
+pub(super) fn thread_marker(analysis: &MacroAnalysis) -> String {
+    let mut marker = String::from("__pgrx_c_shared_thread");
+    while analysis.parameters.iter().any(|parameter| parameter.name == marker) {
+        marker.push('_');
+    }
+    marker
+}
+
 /// Matcher for the internal context arms, after syntactic normalization.
 pub(super) fn matcher(analysis: &MacroAnalysis) -> String {
     let mut matcher = String::new();

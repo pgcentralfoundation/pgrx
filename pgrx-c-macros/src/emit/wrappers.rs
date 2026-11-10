@@ -12,8 +12,10 @@
 //! So a PostgreSQL error raised under the translation stops at the guard of the native call
 //! that raised it, and that guard checks the thread. The function itself checks the thread
 //! only when the translation reads or writes a C global variable, the one kind of backend
-//! state it touches without a native call. Other translations stay callable from any thread,
-//! as their macros are, and do not claim pgrx's active thread on a worker thread.
+//! state it touches without a native call. A translation that shares one thread check among
+//! its global reads takes the function's, so a call checks once. Other translations stay
+//! callable from any thread, as their macros are, and do not claim pgrx's active thread on a
+//! worker thread.
 //!
 //! The functions are definitions inside one exported macro. The defining crate cannot expand
 //! its own `include!`-generated exported macros through `$crate` paths
@@ -21,8 +23,8 @@
 //! the bindings. Each function there shadows the binding of the same name.
 
 use super::{
-    BindingCatalog, EmissionStatus, GeneratedAdapters, MacroEmission, SUPPORT, direct_calls,
-    rust_identifier, translated_inline,
+    BindingCatalog, EmissionStatus, GeneratedAdapters, MacroEmission, SHARED_ENTRY, SUPPORT,
+    THREAD, direct_calls, own_thread_check, rust_identifier, translated_inline,
     types::{self, rust_path},
 };
 use crate::{AnalysisSession, ExpressionKind, MacroAnalysis, RustBindingType, TypeCategory};
@@ -54,19 +56,30 @@ pub(super) fn render(
         adapters.types(),
         &session.frontend().profile().target,
     );
-    let translations = macros
-        .iter()
-        .filter(|emission| {
-            matches!(emission.status, EmissionStatus::Emitted { .. })
-                && translated_inline(session, &emission.analysis)
-        })
-        .map(|emission| (emission.analysis.name.as_str(), &emission.analysis))
-        .collect::<BTreeMap<_, _>>();
+    let mut translations = BTreeMap::new();
+    let mut shared = BTreeSet::new();
+    for emission in macros {
+        if let EmissionStatus::Emitted { rust, .. } = &emission.status
+            && translated_inline(session, &emission.analysis)
+        {
+            let name = emission.analysis.name.as_str();
+            translations.insert(name, &emission.analysis);
+            // The macro says whether it takes a caller's thread check: it defines the arm.
+            if rust.contains(&format!("(@{SHARED_ENTRY} ")) {
+                shared.insert(name);
+            }
+        }
+    }
     let mut known = BTreeMap::new();
     let mut functions = String::new();
     for name in translations.keys() {
-        let check = touches_globals(session, name, &translations, &mut known)
-            .then_some(thread_check.as_str());
+        let check = if shared.contains(name) {
+            Check::Shared(&thread_check)
+        } else if touches_globals(session, name, &translations, &mut known) {
+            Check::Own(&thread_check)
+        } else {
+            Check::None
+        };
         if let Ok(function) = function(session, name, bindings, &lowering, check) {
             functions.push_str(&function);
         }
@@ -74,6 +87,18 @@ pub(super) fn render(
     crate::format_rust_macros(&format!(
         "#[doc(hidden)]\n#[macro_export]\nmacro_rules! __pgrx_c_inline_functions {{\n() => {{\n{functions}}};\n}}\n"
     ))
+}
+
+/// The thread check a function runs before its translation.
+#[derive(Clone, Copy)]
+enum Check<'a> {
+    /// None: the translation touches no C global variable itself.
+    None,
+    /// This path's check. The translation checks again for each global it reads.
+    Own(&'a str),
+    /// This path's check, run once and passed to the translation, which shares it among
+    /// its global reads instead of checking again.
+    Shared(&'a str),
 }
 
 /// Whether the translation of `name` reads or writes a C global variable, directly or through
@@ -113,7 +138,7 @@ fn function(
     name: &str,
     bindings: &BindingCatalog,
     lowering: &types::Lowering<'_>,
-    thread_check: Option<&str>,
+    thread_check: Check<'_>,
 ) -> Result<String, String> {
     let binding = bindings.functions.get(name).ok_or("no binding to replace")?;
     // Only bindgen's static wrappers are bindings of an inline function; an ordinary
@@ -167,7 +192,14 @@ fn function(
         .expect("String output");
         arguments.push(local);
     }
-    let call = format!("$crate::{function_name}!({})", arguments.join(", "));
+    let arguments = arguments.join(", ");
+    // The public arm finishes the value arm's result, so the shared entry is finished too.
+    let call = match thread_check {
+        Check::Shared(_) => format!(
+            "{SUPPORT}::expression_result::finish($crate::{function_name}!(@{SHARED_ENTRY} [{THREAD}]; {arguments}))"
+        ),
+        Check::None | Check::Own(_) => format!("$crate::{function_name}!({arguments})"),
+    };
     let (output, evaluation) = if signature.result.category == TypeCategory::Void {
         if binding.result != RustBindingType::Unit {
             return Err("binding returns a value from a void C function".into());
@@ -183,14 +215,17 @@ fn function(
             ),
         )
     };
+    const CHECKED: &str = " The body reads or writes PostgreSQL globals, so the function first \
+                           checks that it runs on the backend thread.";
+    const ESTABLISHED: &str = ", and the check above established the backend thread";
     let (check, checked, established) = match thread_check {
-        Some(check) => (
-            format!("{check}();\n"),
-            " The body reads or writes PostgreSQL globals, so the function first checks that it \
-             runs on the backend thread.",
-            ", and the check above established the backend thread",
+        Check::Shared(check) => (
+            format!("let {THREAD} = {};\n{THREAD}.check();\n", own_thread_check(check)),
+            CHECKED,
+            ESTABLISHED,
         ),
-        None => (String::new(), "", ". The body touches no PostgreSQL global itself"),
+        Check::Own(check) => (format!("{check}();\n"), CHECKED, ESTABLISHED),
+        Check::None => (String::new(), "", ". The body touches no PostgreSQL global itself"),
     };
     let documentation = format!(
         "Run the Rust translation of the C inline function `{name}`.\n\n\

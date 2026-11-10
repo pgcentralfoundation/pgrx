@@ -43,6 +43,7 @@ pub(super) fn render(
     let expression = analysis.expression.as_ref().expect("candidate statement expression");
     let body = expression.syntax.statement_body.as_ref().expect("statement body");
     let mut rust = String::from("{ ");
+    renderer.declare_thread(None, &mut rust)?;
     write_constant_fallbacks(session, analysis, &mut rust);
     // Root-only expression matching cannot establish equivalence of local
     // declarations or ordered side effects. Preserve only complete simple-return
@@ -132,6 +133,9 @@ pub(super) fn render_inline(
         write!(rust, "'{INLINE_LABEL}: ").expect("String output");
     }
     rust.push_str("{ ");
+    // A caller that shares a thread check passes it to this arm; see `SHARED_VALUE`.
+    let thread = format!("$(${})*", super::arguments::thread_marker(analysis));
+    renderer.declare_thread(Some(&thread), &mut rust)?;
     write_constant_fallbacks(session, analysis, &mut rust);
     write_dependency_fallbacks(analysis, &mut rust);
     for (index, parameter) in parameters.iter().enumerate() {

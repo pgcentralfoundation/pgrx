@@ -30,6 +30,18 @@ extern GlobalHook GlobalHookValue;
 #else
 #define GLOBAL_IN_RANGE(value) (1)
 #endif
+/* Several reads in one expansion share one thread check, which the first read to run makes.
+ * An expansion that runs no read, as when `&&` skips them, makes none. */
+#define GLOBAL_TOTAL() (GlobalCount + GlobalPending + GlobalFlag)
+#define GLOBAL_ANY(skip) (!(skip) && GlobalCount > 0 && GlobalFlag)
+/* A statement body shares one check too. */
+#define GLOBAL_COPY(target) \
+	do { \
+		(target) = GlobalCount; \
+		(target) += GlobalPending; \
+	} while (0)
+/* An operand evaluated for its effects expands the discard arm, which shares none. */
+#define GLOBAL_AFTER(first) ((first), GlobalCount)
 /* A dereference, a function pointer read and a write still need the caller's unsafe. */
 #define GLOBAL_POINTEE() (*GlobalPointer)
 #define GLOBAL_HOOKED() (GlobalHookValue != 0)

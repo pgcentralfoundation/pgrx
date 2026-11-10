@@ -183,8 +183,10 @@ fn translated_inline_functions_replace_their_bindings() {
     for name in ["WrapAdd", "WrapNext", "WrapStore", "WrapKeyword", "WrapBump", "WrapBumpTwice"] {
         assert!(generated.functions.contains(&format!("pub unsafe fn {name}(")), "{name}");
     }
-    // Only the two translations that write the global check the thread.
+    // Only the two translations that write the global check the thread. Each passes its
+    // check to its translation, which reads the global.
     assert_eq!(generated.functions.matches("thread_check()").count(), 2);
+    assert_eq!(generated.functions.matches("!(@__pgrx_c_value_on [__pgrx_c_thread];").count(), 2);
     assert!(generated.functions.contains("r#type: u32"), "keyword parameter");
     for name in ["WrapShadeRank", "WrapNative"] {
         assert!(!generated.functions.contains(&format!("fn {name}(")), "{name}");
@@ -217,11 +219,12 @@ fn translated_inline_functions_replace_their_bindings() {
         &format!("{}\nint WrapCounter = 5;\n", generated.support.c_source),
         &arguments,
     );
-    // Each function that writes the global checks once, and each read of the global in a
-    // translation checks again: once in `WrapBump`, and twice in `WrapBumpTwice`.
+    // Each function that writes the global checks once. Its translation shares that check,
+    // so the reads of the global check nothing more: one in `WrapBump`, and two through
+    // the calls in `WrapBumpTwice`. The macro makes one check for its two reads.
     assert_eq!(
         output,
-        "add\t5\nnext\t1\nstore\t7\nkeyword\t42\nbump\t7\nbump twice\t9\nchecks\t5\n"
+        "add\t5\nnext\t1\nstore\t7\nkeyword\t42\nbump\t7\nbump twice\t9\nchecks\t2\nmacro\t11\nchecks\t3\n"
     );
     session.verify_inputs().expect("original profile stayed unchanged");
     // libclang allows one runtime per process, so the LLP64 case shares this test's scanner.

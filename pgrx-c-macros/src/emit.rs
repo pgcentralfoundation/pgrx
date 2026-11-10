@@ -683,9 +683,10 @@ fn translated_callees(
 
 /// Whether reading the C global `name` needs no caller `unsafe`.
 ///
-/// The rendering runs pgrx's active-thread check before such a read. pgrx relies on that
-/// check for every call into PostgreSQL, which reads and writes its globals on the thread
-/// that passes it. A global PostgreSQL also sets asynchronously is `volatile` in C and is
+/// The rendering runs pgrx's active-thread check before such a read, once for the reads
+/// that share a check; see [`thread_checks`]. pgrx relies on that check for every call
+/// into PostgreSQL, which reads and writes its globals on the thread that passes it. A
+/// global PostgreSQL also sets asynchronously is `volatile` in C and is
 /// read as `volatile` here. Integer, `_Bool`, enum and data pointer objects load a valid
 /// Rust value from anything C stores in them; aggregates, floating values and function
 /// pointers are left to the caller. Writes always are.
@@ -704,6 +705,52 @@ fn checked_global(
             ),
             _ => false,
         })
+}
+
+/// The local that holds an expansion's shared thread check, a reference to the runtime's
+/// `ThreadCheck`. Rust hygiene keeps caller tokens and other expansions from naming it.
+const THREAD: &str = "__pgrx_c_thread";
+/// The internal value arm of a translated inline function that takes its caller's thread
+/// check, in brackets, before its operands.
+const SHARED_VALUE: &str = "__pgrx_emit_value_on";
+/// The entry arm that normalizes arguments for [`SHARED_VALUE`], as `@__pgrx_c_value`
+/// does for the value arm.
+const SHARED_ENTRY: &str = "__pgrx_c_value_on";
+
+/// A new thread check that runs `check`, pgrx's active-thread check, when first needed.
+///
+/// The closure is expanded at the macro invocation, so a failed check reports that location.
+fn own_thread_check(check: &str) -> String {
+    format!("&{SUPPORT}::expression::ThreadCheck::new(|| {check}())")
+}
+
+/// An upper bound on the places in `analysis` whose rendering checks the thread: its
+/// names of checked globals, and its calls that expand a translation which shares a
+/// check.
+///
+/// A translated inline function shares one check among them when it has any, and takes
+/// its caller's when given one. Its body is already a block, so declaring the check
+/// changes nothing else. Any other macro shares one check among two or more. The bound
+/// may count a place that renders no check, such as a global that is only written, and
+/// a shared check that fewer places use is harmless. The renderer and every caller of a
+/// translation decide from this one count, so they agree on which arms exist.
+fn thread_checks(
+    declarations: &crate::DeclarationCatalog,
+    bindings: &BindingCatalog,
+    analysis: &MacroAnalysis,
+    translations: &BTreeMap<String, assertions::Translation>,
+) -> usize {
+    let nodes = analysis.expression.as_ref().map_or(&[][..], |expression| &expression.syntax.nodes);
+    nodes
+        .iter()
+        .filter(|node| match &node.kind {
+            ExpressionKind::Identifier { name } => checked_global(declarations, bindings, name),
+            ExpressionKind::Call { callee, .. } => direct_callee(nodes, *callee)
+                .and_then(|name| translations.get(name))
+                .is_some_and(|translation| translation.shares_thread),
+            _ => false,
+        })
+        .count()
 }
 
 /// The panic conditions and caller safety of each translation in `translated`, which lists
@@ -729,6 +776,12 @@ fn translation_facts(
                 analysis,
                 &facts,
             ),
+            shares_thread: thread_checks(
+                session.frontend().declarations(),
+                bindings,
+                analysis,
+                &facts,
+            ) != 0,
         };
         facts.insert(name.clone(), translation);
     }
@@ -1340,7 +1393,33 @@ fn render(
     } else if empty {
         String::new()
     } else {
-        render_body(session, analysis, bindings, &renderer, typed::Context::Value)?
+        let body = render_body(session, analysis, bindings, &renderer, typed::Context::Value)?;
+        // A body that delegates to another macro may name no check of its own.
+        if renderer.shares_thread() && body.contains(THREAD) {
+            let mut value = String::from("{ ");
+            renderer.declare_thread(None, &mut value)?;
+            value.push_str(&body);
+            value.push_str(" }");
+            value
+        } else {
+            body
+        }
+    };
+    // A translated function that shares a thread check takes its caller's through a value
+    // arm of its own, to which the plain value arm passes a new one.
+    let shared_value = if inline_body.is_some() && renderer.shares_thread() {
+        Some((arguments::thread_marker(analysis), renderer.own_thread_check()?))
+    } else {
+        None
+    };
+    // Only the value arm of an expression macro shares a thread check. Declaring one takes
+    // a block, which ends the temporaries of the caller's operands with the macro's value,
+    // and a place that outlived them would dangle. The other arms keep a check for each
+    // read.
+    let renderer = if inline_body.is_none() && statement_body.is_none() {
+        renderer.with_own_thread_checks()
+    } else {
+        renderer
     };
     let mut rust = String::from(assertions);
     if let Some(arguments) = &arguments {
@@ -1599,10 +1678,28 @@ fn render(
             let body = if empty {
                 "::core::compile_error!(\"an empty C macro has no expression operand\")".into()
             } else if mode == "value" {
-                value.clone()
+                match &shared_value {
+                    Some((thread, own)) => {
+                        writeln!(
+                            &mut rust,
+                            "(@{SHARED_VALUE}; [$(${thread}:tt)*] {matcher}) => {{ {value} }};"
+                        )
+                        .expect("String output");
+                        let call = invoke(SHARED_VALUE, &format!("[$(${thread})*] "));
+                        writeln!(
+                            &mut rust,
+                            "(@{SHARED_ENTRY} [$(${thread}:tt)*]; $($raw:tt)*) => {{ {call} }};"
+                        )
+                        .expect("String output");
+                        format!("$crate::{identifier}!(@{SHARED_VALUE}; [{own}] {operands})")
+                    }
+                    None => value.clone(),
+                }
             } else if let Some(result) = &inline_body {
                 match (context, result) {
-                    (typed::Context::Discard, _) => format!("{{ let _ = {value}; }}"),
+                    (typed::Context::Discard, _) => format!(
+                        "{{ let _ = $crate::{identifier}!(@__pgrx_emit_value; {operands}); }}"
+                    ),
                     (typed::Context::Size, InlineResult::Void) => {
                         "compile_error!(\"a void C function call has no size\")".into()
                     }

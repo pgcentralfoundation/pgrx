@@ -426,6 +426,12 @@ an argument repeatedly; unused arguments do not evaluate; logical and conditiona
 branches remain lazy. Do not assume function-style evaluate-once behavior merely
 because the invocation looks like a function call.
 
+A macro's value can also outlive the temporaries its arguments create. An argument
+inside a conditional branch drops them when the branch ends, and a macro that reads
+several backend globals is a block, which drops them when it ends. Unless the name
+is an inline function, as described above, bind a value such as a `CString` to a
+local before passing a pointer into it.
+
 ## Pass a node type as a Rust type
 
 `IsA`, `castNode`, `makeNode` and the list macros such as `lfirst_node` take the
