@@ -297,6 +297,29 @@ mod tests {
         }
     }
 
+    /// Checks the translation of `ExecQual`, a static inline function that reads its local
+    /// `isnull` after only a callee has written it, through the local's address.
+    #[pg_test]
+    fn generated_exec_qual_reads_the_null_flag_its_callee_wrote() {
+        // SAFETY: a `#[pg_test]` runs on the backend thread with a current memory context,
+        // in which each constant, its one-element qual list, the compiled qual and the
+        // expression context are allocated. `ExecInitQual` compiles the qual that
+        // `ExecQual` requires, and the expression context is freed once.
+        unsafe {
+            let econtext = pg::CreateStandaloneExprContext();
+            for expected in [true, false] {
+                let constant = pg::makeBoolConst(expected, false);
+                let qual = pg::lappend(core::ptr::null_mut(), constant.cast());
+                let state = pg::ExecInitQual(qual, core::ptr::null_mut());
+                assert_eq!(pg::ExecQual!(state, econtext).get(), expected);
+            }
+            // An empty qual has no state and is true.
+            let empty = core::ptr::null_mut::<pg::ExprState>();
+            assert!(pg::ExecQual!(empty, econtext).get());
+            pg::FreeExprContext(econtext, true);
+        }
+    }
+
     pg::__pgrx_c_classify! { @if_available INTERRUPTS_PENDING_CONDITION {
     /// Checks that the interrupt predicate reads `InterruptPending` from safe code on the
     /// backend thread, and panics before reading it on any other thread.

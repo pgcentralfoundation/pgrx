@@ -81,6 +81,9 @@ struct Local {
     ty: TypeInfo,
     /// Cached marker/storage result, retaining unsupported local representations as errors.
     lowered: Result<super::types::LoweredType, String>,
+    /// Whether the local is declared holding zero: analysis counts it as initialized because
+    /// the body takes its address and declares it without an initializer.
+    zeroed: bool,
 }
 
 /// Per-macro expression facts borrowing the pass's immutable storage reconciliation.
@@ -138,6 +141,7 @@ impl<'a> Renderer<'a> {
         inline_body: bool,
     ) -> Self {
         let expression = analysis.expression.as_ref().expect("candidate expression");
+        let indeterminate = crate::analysis::indeterminate_locals(&expression.syntax);
         let locals = expression
             .syntax
             .statements()
@@ -156,7 +160,9 @@ impl<'a> Renderer<'a> {
             .enumerate()
             .map(|(index, (name, ty))| {
                 let lowered = lowering.resolve(&ty);
-                (name, Local { index, ty, lowered })
+                let zeroed =
+                    indeterminate.contains(name.as_str()) && crate::analysis::zero_is_a_value(&ty);
+                (name, Local { index, ty, lowered, zeroed })
             })
             .collect::<BTreeMap<_, _>>();
         // Native Rust operands and public macro results are evaluated value
@@ -552,11 +558,21 @@ impl<'a> Renderer<'a> {
         let lowered = local.lowered.as_ref().map_err(|message| {
             skip(self.analysis, SkipReasonCode::UnsupportedType, message.clone(), None)
         })?;
-        write!(
-            rust,
-            "let mut __pgrx_c_local{} = ::core::mem::MaybeUninit::<{}>::uninit(); ",
-            local.index, lowered.storage
-        )
+        // Analysis counts a zeroed local as initialized from its declaration, which has no
+        // initializer, so its storage must hold a value before anything reads it.
+        if local.zeroed && initializer.is_none() {
+            write!(
+                rust,
+                "/* C leaves this local indeterminate until it is written through its address; zero is a value of its type. */ let mut __pgrx_c_local{} = ::core::mem::MaybeUninit::<{}>::zeroed(); ",
+                local.index, lowered.storage
+            )
+        } else {
+            write!(
+                rust,
+                "let mut __pgrx_c_local{} = ::core::mem::MaybeUninit::<{}>::uninit(); ",
+                local.index, lowered.storage
+            )
+        }
         .expect("String output");
         if let Some(initializer) = initializer {
             rust.push_str("let __pgrx_c_initializer = ");

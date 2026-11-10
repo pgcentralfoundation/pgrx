@@ -1595,9 +1595,63 @@ fn analyze_types(
     Ok((types, constants, helpers))
 }
 
+/// The locals an expression declares without an initializer and whose address it takes
+/// with `&`, wherever the operator appears.
+///
+/// C makes reading an uninitialized automatic object undefined only when the object
+/// "could have been declared with the `register` storage class", that is, when its
+/// address is never taken (C11 6.3.2.1p2). An object whose address is taken instead holds
+/// an indeterminate value until it is written. A function that received `&local` may have
+/// written it, and a read that follows is then the read C defines.
+///
+/// Local names are unique in an analyzed body, so a name stands for one declaration.
+pub(crate) fn indeterminate_locals(expression: &Expression) -> HashSet<&str> {
+    let declared = expression
+        .statements()
+        .filter_map(|statement| match statement {
+            Statement::Declaration { name, initializer: None, .. } => Some(name.as_str()),
+            _ => None,
+        })
+        .collect::<HashSet<_>>();
+    if declared.is_empty() {
+        return declared;
+    }
+    expression
+        .nodes
+        .iter()
+        .filter_map(|node| {
+            let ExpressionKind::AddressOf { mut operand } = node.kind else { return None };
+            while let ExpressionKind::Group { operand: inner } = expression.nodes[operand].kind {
+                operand = inner;
+            }
+            match &expression.nodes[operand].kind {
+                ExpressionKind::Identifier { name } => declared.get(name.as_str()).copied(),
+                _ => None,
+            }
+        })
+        .collect()
+}
+
+/// Whether all-zero bytes are a value of a local of type `ty` in C and in its Rust storage:
+/// an integer, `_Bool`, floating or pointer object.
+///
+/// One of the [`indeterminate_locals`] with such a type is declared holding zero. C leaves
+/// it indeterminate, so zero is one of the values C allows, and whatever is later written
+/// through its address replaces it. An enum's Rust storage may have no zero variant, and a
+/// record's fields may not accept zero, so a read of such a local still needs a proved
+/// assignment.
+pub(crate) fn zero_is_a_value(ty: &TypeInfo) -> bool {
+    !ty.is_volatile
+        && matches!(
+            ty.category,
+            TypeCategory::Integer(_) | TypeCategory::Floating | TypeCategory::Pointer
+        )
+}
+
 /// Initialization is proved at complete statement and condition boundaries.
 /// Every path that can continue must initialize a local before its later read.
-/// Taking an address or passing it to a function does not prove that C wrote it.
+/// Taking an address or passing it to a function does not prove that C wrote it, so the
+/// [`indeterminate_locals`] start at zero where [`zero_is_a_value`] of their type.
 fn validate_local_initialization<'a>(
     expression: &'a Expression,
     locals: &HashMap<&'a str, TypeInfo>,
@@ -1605,7 +1659,10 @@ fn validate_local_initialization<'a>(
     if locals.is_empty() {
         return Ok(());
     }
-    let mut initialized = HashSet::new();
+    let mut initialized = indeterminate_locals(expression)
+        .into_iter()
+        .filter(|name| locals.get(name).is_some_and(zero_is_a_value))
+        .collect::<HashSet<_>>();
     match &expression.statement_body {
         Some(body) => check_statements(expression, &body.statements, locals, &mut initialized)
             .map(|_returns| ()),
@@ -2741,9 +2798,10 @@ mod tests {
             vec!["{", "int", "local", ";", "return", "local", ";", "}"],
             vec!["{", "int", "local", ";", "local", "+=", "1", ";", "return", "local", ";", "}"],
             vec!["{", "int", "local", "=", "local", ";", "return", "local", ";", "}"],
+            // An initializer reads its own local before the local holds anything.
             vec![
-                "{", "int", "local", ";", "(", "void", ")", "&", "local", ";", "return", "local",
-                ";", "}",
+                "{", "int", "local", "=", "local", ";", "(", "void", ")", "&", "local", ";",
+                "return", "local", ";", "}",
             ],
         ] {
             let AnalysisStatus::Skipped { reason } = analyze(&frontend(&body), "F").status else {
@@ -2759,6 +2817,15 @@ mod tests {
                 "}",
             ],
             vec!["{", "int", "local", ";", "return", "sizeof", "local", ";", "}"],
+            // C leaves a local whose address is taken indeterminate, not undefined to read.
+            vec![
+                "{", "int", "local", ";", "(", "void", ")", "&", "local", ";", "return", "local",
+                ";", "}",
+            ],
+            vec![
+                "{", "int", "local", ";", "(", "void", ")", "&", "(", "local", ")", ";", "local",
+                "+=", "1", ";", "return", "local", ";", "}",
+            ],
         ] {
             assert!(
                 matches!(analyze(&frontend(&body), "F").status, AnalysisStatus::Candidate),

@@ -861,7 +861,14 @@ earlier identifier's binding, or escape their source scope. Definite-initializat
 analysis rejects local reads that are not established as initialized on the
 required paths. Reads are checked before granting initialization from an
 initializer or a full-expression direct assignment. Taking or passing an address
-proves no initialization; compound assignment reads the previous value. At joins,
+proves no write. C makes an uninitialized read undefined only for an object whose
+address is never taken (C11 6.3.2.1p2); one whose address is taken holds an
+indeterminate value until it is written. An integer, `_Bool`, floating or pointer
+local that is declared without an initializer and whose address the body takes is
+therefore declared holding zero and counts as initialized from its declaration, so
+a read after a callee wrote it through `&local` gives the callee's value. Zero need
+not be a value of an enum's or a record's Rust storage, so those locals still need
+a proved assignment. Compound assignment reads the previous value. At joins,
 intersect continuing paths and exclude returning paths. The parser must consume
 the entire replacement; a supported
 prefix followed by unknown tokens never becomes an accepted macro.

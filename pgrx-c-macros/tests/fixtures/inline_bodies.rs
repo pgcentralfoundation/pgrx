@@ -64,6 +64,14 @@ fn main() {
         BODY_EARLY!(&raw mut value, 11_i32).get();
         BODY_EARLY!(&raw mut value, -1_i32).get();
         println!("early\t{value}");
+        println!(
+            "out\t{}\t{}\t{}",
+            BODY_OUT!(5_i32).get(),
+            BODY_OUT_NATIVE!(6_i32).get(),
+            BODY_OUT_POINTER!(&raw const value).get()
+        );
+        // The callee writes nothing, so the local still holds the zero it was declared with.
+        println!("unwritten\t{}", BODY_OUT!(-1_i32).get());
         println!("color\t{}\t{}", BODY_COLOR!(0_i32).get(), BODY_COLOR!(5_i32).get());
         // The native call returns the record the C function initialized.
         println!("pair\t{}", BODY_PAIR!(4_i32).get().assume_init().right);
