@@ -80,6 +80,9 @@ pub struct PgrxSql<'a> {
     pub extension_name: String,
     pub versioned_so: bool,
     pub qualify_default_schema: bool,
+    /// When true, the test harness creates `tests` outside the extension; generated SQL
+    /// must neither create that schema nor attach it to the extension.
+    pub shared_test_schema: bool,
 }
 
 impl<'a> PgrxSql<'a> {
@@ -252,6 +255,7 @@ impl<'a> PgrxSql<'a> {
             extension_name,
             versioned_so,
             qualify_default_schema: false,
+            shared_test_schema: false,
         };
         Ok(this)
     }
@@ -894,7 +898,9 @@ impl<'a> PgrxSql<'a> {
                 )))
             }
             SqlGraphEntity::Schema(s) => {
-                if matches!(s.name, "public" | "pg_catalog") {
+                if matches!(s.name, "public" | "pg_catalog")
+                    || (self.shared_test_schema && s.name == "tests")
+                {
                     return Ok(None);
                 }
                 Ok(Some(format!("ALTER EXTENSION \"{ext}\" ADD SCHEMA {name};", name = s.name)))
@@ -2370,6 +2376,40 @@ mod tests {
 
     fn schema_entity(module_path: &'static str, name: &'static str) -> SchemaEntity<'static> {
         SchemaEntity { module_path, name, file: "test.rs", line: 1 }
+    }
+
+    #[test]
+    fn shared_test_schema_keeps_function_qualification_without_schema_membership() {
+        let mut function = function_entity("test_function", vec![], PgExternReturnEntity::None);
+        function.module_path = "extension::tests";
+        let mut sql = PgrxSql::build(
+            vec![
+                SqlGraphEntity::ExtensionRoot(control_file()),
+                SqlGraphEntity::Schema(schema_entity("extension::tests", "tests")),
+                SqlGraphEntity::Schema(schema_entity("extension::other_tests", "other_tests")),
+                SqlGraphEntity::Function(function),
+            ]
+            .into_iter(),
+            "extension".into(),
+            false,
+        )
+        .unwrap();
+
+        for shared in [false, true] {
+            sql.shared_test_schema = shared;
+            let full = sql.to_sql().unwrap();
+            assert_eq!(full.contains("CREATE SCHEMA IF NOT EXISTS tests;"), !shared);
+            assert!(full.contains("CREATE SCHEMA IF NOT EXISTS other_tests;"));
+            assert!(full.contains("FUNCTION tests.\"test_function\"("));
+
+            let selected = sql
+                .to_sql_for_items(&["test_function".into()], "extension", Some("extension"))
+                .unwrap();
+            assert_eq!(selected.contains("CREATE SCHEMA IF NOT EXISTS tests;"), !shared);
+            assert_eq!(selected.contains("ADD SCHEMA tests;"), !shared);
+            assert!(selected.contains("FUNCTION tests.\"test_function\"("));
+            assert!(selected.contains("ADD FUNCTION tests.\"test_function\"();"));
+        }
     }
 
     fn type_entity(

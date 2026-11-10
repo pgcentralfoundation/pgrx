@@ -52,7 +52,10 @@ impl SqlGraphIdentifier for SchemaEntity<'_> {
 }
 
 impl ToSql for SchemaEntity<'_> {
-    fn to_sql(&self, _context: &PgrxSql) -> eyre::Result<String> {
+    fn to_sql(&self, context: &PgrxSql) -> eyre::Result<String> {
+        if context.shared_test_schema && self.name == "tests" {
+            return Ok(String::new());
+        }
         let SchemaEntity { name, file, line, module_path } = self;
         let sql = format!(
             "\n\

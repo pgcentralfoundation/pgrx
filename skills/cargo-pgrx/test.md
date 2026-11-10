@@ -64,6 +64,13 @@ unresolved `pgrx_tests::client` in the extension build means the feature or the
 
 ## Harness installation
 
+The harness creates a shared `tests` schema before loading the extension and its dependencies.
+Test-mode SQL generation omits that schema's creation, so dependencies can also use
+`#[pg_schema] mod tests`. Regenerate older installed dependency test artifacts before testing.
+Same-named objects in `tests` normally fail to create; SQL that permits replacement can instead
+replace an existing object, subject to PostgreSQL's ownership checks. Use distinct names across
+extensions. Manual loading of `--test` artifacts requires creating the `tests` schema first.
+
 The harness invokes cargo-pgrx separately to install the test extension. It uses
 `CARGO_PGRX` when set, otherwise prefers the source checkout's CLI when available,
 then falls back to PATH. Keep that executable compatible with the tested code.

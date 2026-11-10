@@ -319,3 +319,138 @@ fn install_from_virtual_workspace_auto_detects_manifest_and_preserves_rustflags(
         );
     }
 }
+
+#[test]
+fn dependent_extensions_share_the_tests_schema() {
+    let Some((pg_feature, _)) = preferred_pg_config() else {
+        return;
+    };
+    let fixture = tempfile::tempdir().expect("shared test schema fixture");
+    // Cargo runs test binaries from their package directory, including the harness's
+    // nested install command. Preserve the workspace's platform linker flags there.
+    fs::create_dir(fixture.path().join(".cargo")).unwrap();
+    fs::copy(
+        workspace_root().join(".cargo/config.toml"),
+        fixture.path().join(".cargo/config.toml"),
+    )
+    .unwrap();
+    let pgrx_path = cargo_toml_path(&workspace_root().join("pgrx"));
+    let pgrx_tests_path = cargo_toml_path(&workspace_root().join("pgrx-tests"));
+    let dep = "pgrx_shared_schema_dep";
+    let top = "pgrx_shared_schema_top";
+    let target_dir = Path::new(cargo_pgrx_bin())
+        .parent()
+        .and_then(Path::parent)
+        .expect("cargo-pgrx binary lives under target/profile");
+
+    for name in [dep, top] {
+        let extension_dir = fixture.path().join(name);
+        fs::create_dir_all(extension_dir.join("src")).unwrap();
+        fs::write(
+            extension_dir.join("Cargo.toml"),
+            format!(
+                r#"
+[package]
+name = "{name}"
+version = "0.0.0"
+edition = "2024"
+
+[workspace]
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[features]
+{pg_feature} = ["pgrx/{pg_feature}", "pgrx-tests/{pg_feature}"]
+pg_test = []
+cshim = ["pgrx/cshim", "pgrx-tests/cshim"]
+
+[dependencies]
+pgrx = {{ path = "{pgrx_path}" }}
+
+[dev-dependencies]
+pgrx-tests = {{ path = "{pgrx_tests_path}" }}
+"#
+            ),
+        )
+        .unwrap();
+        let requires = if name == top { format!("requires = '{dep}'\n") } else { String::new() };
+        fs::write(
+            extension_dir.join(format!("{name}.control")),
+            format!(
+                "comment = 'shared tests schema regression'\ndefault_version = '@CARGO_VERSION@'\nrelocatable = false\nsuperuser = true\n{requires}"
+            ),
+        )
+        .unwrap();
+        let check_dependency = if name == top {
+            format!(r#"Spi::run("SELECT tests.{dep}_works()").unwrap();"#)
+        } else {
+            String::new()
+        };
+        fs::write(
+            extension_dir.join("src/lib.rs"),
+            format!(
+                r#"
+use pgrx::prelude::*;
+pgrx::pg_module_magic!(name, version);
+
+#[cfg(any(test, feature = "pg_test"))]
+#[pg_schema]
+mod tests {{
+    use pgrx::prelude::*;
+
+    #[pg_test]
+    fn {name}_works() {{
+        assert_eq!(Spi::get_one::<bool>(
+            "SELECT NOT EXISTS (SELECT FROM pg_depend
+             WHERE classid = 'pg_namespace'::regclass
+               AND objid = 'tests'::regnamespace AND deptype = 'e')"
+        ).unwrap(), Some(true));
+        assert_eq!(Spi::get_one::<String>(
+            "SELECT e.extname::text FROM pg_depend d
+             JOIN pg_extension e ON e.oid = d.refobjid
+             WHERE d.classid = 'pg_proc'::regclass
+               AND d.objid = 'tests.{name}_works()'::regprocedure AND d.deptype = 'e'"
+        ).unwrap().as_deref(), Some("{name}"));
+        {check_dependency}
+    }}
+}}
+
+#[cfg(test)]
+pub mod pg_test {{
+    pub fn setup(_options: Vec<&str>) {{}}
+    pub fn postgresql_conf_options() -> Vec<&'static str> {{ vec![] }}
+}}
+"#
+            ),
+        )
+        .unwrap();
+
+        // Leave the dependency's test-enabled installation in place for the second harness.
+        let mut command = Command::new(cargo_pgrx_bin());
+        command
+            .current_dir(workspace_root())
+            .env("CARGO_PGRX", cargo_pgrx_bin())
+            .env("CARGO_TARGET_DIR", target_dir)
+            .env_remove("PGRX_TEST_SKIP")
+            .args(["pgrx", "test", &pg_feature, "--no-default-features", "--manifest-path"])
+            .arg(extension_dir.join("Cargo.toml"));
+        if !cfg!(all(
+            any(target_os = "linux", target_os = "macos"),
+            any(target_arch = "x86_64", target_arch = "aarch64")
+        )) {
+            command.args(["--features", "cshim"]);
+        }
+        let output = command.output().expect("cargo-pgrx test should launch");
+        assert!(
+            output.status.success(),
+            "{name} test harness failed\nstdout:\n{}\nstderr:\n{}",
+            String::from_utf8_lossy(&output.stdout),
+            String::from_utf8_lossy(&output.stderr),
+        );
+        assert!(
+            String::from_utf8_lossy(&output.stdout).contains("1 passed"),
+            "{name} did not run its backend test",
+        );
+    }
+}

@@ -4,6 +4,17 @@ Test harness for [`pgrx`](https://crates.io/crates/pgrx/) extension tests.
 
 Use this as a `[dev-dependencies]` crate when your extension uses `#[pg_test]`.
 
+## The shared `tests` schema
+
+The harness creates `tests` before loading extensions. Test-mode SQL generation omits that
+schema's creation, allowing an extension and its dependencies to use `#[pg_schema] mod tests`.
+Each extension owns its objects, but the schema belongs to no extension. Regenerate installed
+dependency test artifacts with the matching cargo-pgrx version before testing.
+
+Use distinct object names across extensions. Same-named objects in `tests` normally fail to
+create; SQL that permits replacement can instead replace an existing object, subject to
+PostgreSQL's ownership checks. Functions with different argument signatures can be overloaded.
+
 ## The `client` feature
 
 A `#[pg_test]` function runs in one backend. A test that needs more sessions,

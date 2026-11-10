@@ -208,6 +208,7 @@ pub(crate) fn generate_schema_for_cli(
     generate_schema_implicit(
         package_manifest_path,
         profile,
+        is_test,
         target,
         target_dir,
         path,
@@ -223,6 +224,7 @@ pub(crate) use generate_schema_for_cli as generate_schema;
 pub(crate) fn generate_schema_implicit(
     package_manifest_path: &Path,
     profile: &CargoProfile,
+    is_test: bool,
     target: Option<&str>,
     target_dir: &Path,
     path: Option<&Path>,
@@ -260,8 +262,9 @@ pub(crate) fn generate_schema_implicit(
     )?));
     entities.extend(section_entities);
 
-    let pgrx_sql = PgrxSql::build(entities.into_iter(), lib_name.to_string(), versioned_so)
+    let mut pgrx_sql = PgrxSql::build(entities.into_iter(), lib_name.to_string(), versioned_so)
         .wrap_err("SQL generation error")?;
+    pgrx_sql.shared_test_schema = is_test;
 
     if let Some(items) = items {
         let extension_name = attach.then_some(extname.as_str());

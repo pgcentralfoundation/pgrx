@@ -914,6 +914,11 @@ fn create_extension() -> eyre::Result<()> {
     let mut client = connect()?;
     let extension_name = get_extension_name()?;
 
+    // Keep the shared test schema outside extension membership. Dependencies loaded
+    // by CASCADE can then install their own test objects into the same schema.
+    query_wrapper(&mut client, "CREATE SCHEMA IF NOT EXISTS tests;")
+        .wrap_err("There was an issue creating the shared 'tests' schema in Postgres")?;
+
     query_wrapper(&mut client, &format!("CREATE EXTENSION {extension_name} CASCADE;")).wrap_err(
         format!("There was an issue creating the extension '{extension_name}' in Postgres: "),
     )?;
