@@ -129,8 +129,11 @@ fn generated_field_access_preserves_raw_c_storage() {
         // targets. Convert the expected bits to that exact inferred storage type.
         assert_eq!(pg::NodeSetTag!(node, u32::MAX).get(), u32::MAX as _);
         assert_eq!(pg::nodeTag!(node).get(), u32::MAX as _);
+        // `NodeTag` converts from either integer type, and refuses a value that is no tag.
+        assert!(pg::NodeTag::try_from(pg::nodeTag!(node).get()).is_err());
         assert_eq!(pg::NodeSetTag!(node, pg::NodeTag::T_Invalid).get(), 0);
         assert_eq!(pg::nodeTag!(node).get(), 0);
+        assert_eq!(pg::NodeTag::try_from(pg::nodeTag!(node).get()), Ok(pg::NodeTag::T_Invalid));
         core::ptr::addr_of_mut!((*cell).int_value).write(-17);
         assert_eq!(pg::lfirst_int!(cell).get(), -17);
     }
