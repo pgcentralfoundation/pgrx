@@ -14,6 +14,7 @@
     unused_unsafe,
     reason = "docs.rs builds replace generated C macros with shells, some of which need no unsafe"
 )]
+mod item;
 mod lexeme;
 
 use crate::callconv::{Arg, ArgAbi};
@@ -33,6 +34,7 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer, de};
 use std::ffi::{CStr, CString};
 use std::panic::UnwindSafe;
 
+pub use item::{Item, Items, Operand, Operator, WeightSet};
 pub use lexeme::{InvalidWeight, Lexeme, Lexemes, Position, Weight};
 
 /// Size of the varlena header and the `size` field that precede the entries of both types.

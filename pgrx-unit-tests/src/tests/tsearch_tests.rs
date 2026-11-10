@@ -432,6 +432,49 @@ mod tests {
     }
 
     #[pg_test]
+    fn tsquery_items() {
+        use pgrx::datum::tsearch::{Item, Operator};
+
+        let q: TsQueryBuf = "a:AB & !b:* | (c <2> d) & e <-> f".parse().unwrap();
+        let mut shape = Vec::new();
+        for item in q.items() {
+            shape.push(match item {
+                Item::Operator(Operator::Not) => "!".to_owned(),
+                Item::Operator(Operator::And) => "&".to_owned(),
+                Item::Operator(Operator::Or) => "|".to_owned(),
+                Item::Operator(Operator::Phrase { distance }) => format!("<{distance}>"),
+                Item::Operand(op) => {
+                    let mut weights: Vec<_> = op.weights().iter().map(char::from).collect();
+                    weights.reverse();
+                    let weights: String = weights.into_iter().collect();
+                    let prefix = if op.is_prefix() { "*" } else { "" };
+                    format!("{}:{weights}{prefix}", op.to_str().unwrap())
+                }
+            });
+        }
+        assert_eq!(
+            shape,
+            ["|", "&", "<1>", "f:", "e:", "<2>", "d:", "c:", "&", "!", "b:*", "a:AB"]
+        );
+        assert_eq!(q.items().len(), 12);
+        assert_eq!(q.operands().count(), 6);
+        assert_eq!(q.to_string(), "'a':AB & !'b':* | 'c' <2> 'd' & 'e' <-> 'f'");
+    }
+
+    #[pg_test]
+    fn tsquery_items_of_empty() {
+        let q = TsQueryBuf::default();
+        assert_eq!(q.items().count(), 0);
+    }
+
+    #[pg_test]
+    fn tsquery_items_unicode() {
+        let q: TsQueryBuf = "h\u{e9}llo | \u{65e5}\u{672c}".parse().unwrap();
+        let words: Vec<_> = q.operands().map(|o| o.to_str().unwrap().to_owned()).collect();
+        assert_eq!(words, ["\u{65e5}\u{672c}", "h\u{e9}llo"]);
+    }
+
+    #[pg_test]
     fn operators_match_methods() {
         let a: TsVectorBuf = "a:1 b:2".parse().unwrap();
         let b: TsVectorBuf = "b:1 c:2".parse().unwrap();
