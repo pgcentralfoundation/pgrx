@@ -194,7 +194,6 @@ void c_bodies(void)
 {
 	int elements[] = {10, 20, 30};
 	printf("element\t%d\n", *CheckedElement(elements, 1));
-	printf("verified\t%d\n", VERIFIED_ELEMENT(elements, 2));
 	printf("flavored\t%d\n", FlavoredValue(1));
 	printf("macro\t%d\n", ConditionalMacro(1));
 	printf("braces\t%d\t%d\n", ConditionalBraces(1), ConditionalBraces(-1));
@@ -265,7 +264,6 @@ fn main() {
     // through the pointer, and `c_bodies` reads its own array.
     unsafe {
         println!("element\t{}", *CheckedElement!(elements.as_ptr(), counted(1)).get());
-        println!("verified\t{}", VERIFIED_ELEMENT!(elements.as_ptr(), 2_i32).get());
         println!("flavored\t{}", FlavoredValue!(1_i32).get());
         println!("macro\t{}", ConditionalMacro!(1_i32).get());
         println!("braces\t{}\t{}", ConditionalBraces!(1_i32).get(), ConditionalBraces!(-1_i32).get());
@@ -302,6 +300,7 @@ fn both_build_flavors_generate_the_same_macros() {
             "Assert",
             "AssertCouldGetRelation",
             "AssertMacro",
+            "AssertOrClear",
             "AssertPositive",
             "AssertTransactionIdInAllowableRange",
             "CHECKED",
@@ -331,6 +330,7 @@ fn both_build_flavors_generate_the_same_macros() {
         "ASSERT_ONLY_MACRO",
         "AssertOnlyFunction",
         "AssertOnlyVariable",
+        "AssertOrClear",
         "CheckedImpl",
         "AssertTransactionIdInAllowableRange",
         "SlruPagePrecedesUnitTests",
@@ -435,8 +435,19 @@ fn both_build_flavors_generate_the_same_macros() {
         assert!(flavored.contains(translated) && !caller_unsafe, "{flavored}");
         assert!(flavored.contains(&format!("if {checking} {{")), "{flavored}");
         assert!(flavored.contains("} else {"), "{flavored}");
-        // A macro whose assert-enabled definition makes such a call is generated too.
-        assert!(flavor.emitted("VERIFIED_ELEMENT").0.contains("Inline_VerifyElement"));
+        // A macro whose assert-enabled definition makes such a call is not shared: its
+        // release definition is other text, which could do work the call leaves out.
+        let EmissionStatus::Skipped { reason } = &flavor.emission("VERIFIED_ELEMENT").status else {
+            panic!("VERIFIED_ELEMENT was emitted");
+        };
+        assert_eq!(reason.code, SkipReasonCode::BuildFlavor, "{reason:?}");
+        assert!(reason.message.contains("VerifyElement"), "{reason:?}");
+        // Nor does a call stand for a release macro that does work.
+        let EmissionStatus::Skipped { reason } = &flavor.emission("AssertOrClear").status else {
+            panic!("AssertOrClear was emitted");
+        };
+        assert_eq!(reason.code, SkipReasonCode::BuildFlavor, "{reason:?}");
+        assert!(reason.message.contains("does work"), "{reason:?}");
     }
     assert!(!released.c_support.contains("VerifyElement"), "{}", released.c_support);
     // Any other difference leaves a call to the function, in both flavors: a statement
@@ -464,7 +475,7 @@ fn both_build_flavors_generate_the_same_macros() {
     assert!(!status.success(), "{stdout}\n{stderr}");
     // Each inline function whose definition differs does what this flavor's C does, first
     // as generated and then as compiled. The checks that only this flavor has are made.
-    let bodies = "called element\t20\nelement\t20\ncalled element\t30\nverified\t30\nflavored\t101\nmacro\t3\nbraces\t2\t1\noperand\t11\ncalled value\t1\nbranch\t6\t4\nlocal\t2\n";
+    let bodies = "called element\t20\nelement\t20\nflavored\t101\nmacro\t3\nbraces\t2\t1\noperand\t11\ncalled value\t1\nbranch\t6\t4\nlocal\t2\n";
     assert_eq!(
         stdout,
         format!(
@@ -482,7 +493,7 @@ fn both_build_flavors_generate_the_same_macros() {
     // does, and an operand of a check that is not made is still evaluated once.
     let (status, stdout, stderr) = released.run(MAIN);
     assert!(status.success(), "{stdout}\n{stderr}");
-    let bodies = "element\t20\nverified\t30\nflavored\t201\nmacro\t2\nbraces\t4\t-1\noperand\t1\nbranch\t6\t-1\nlocal\t3\n";
+    let bodies = "element\t20\nflavored\t201\nmacro\t2\nbraces\t4\t-1\noperand\t1\nbranch\t6\t-1\nlocal\t3\n";
     assert_eq!(
         stdout,
         format!(

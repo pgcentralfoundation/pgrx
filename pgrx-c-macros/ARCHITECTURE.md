@@ -1301,7 +1301,11 @@ flavors apply it to the same pair. Nothing is written to disk.
   declares as a function becomes, in both, the macro `NAME(formals) (NAME)(formals)`,
   which calls the function. The function must be external, return nothing, take as
   many arguments as the macro has formals, and use only parameter types the release
-  flavor declares; otherwise the name is a conflict. A release inspection adds the
+  flavor declares, and the release macro must do nothing: its replacement list may
+  hold only grouping, a cast to `void`, integer constants, an empty `do`/`while`, and
+  object-like macros that are nothing but those. A release build's call to the
+  function does nothing, so it cannot stand for a macro that does work. Otherwise the
+  name is a conflict, and no flavor binds the function. A release inspection adds the
   assert-enabled prototype to its catalog, so both check a call's operands alike.
   The names are also flavor-specific for the binding generator of an assert-enabled
   build, which would otherwise bind a function a release build lacks.
@@ -1310,9 +1314,12 @@ flavors apply it to the same pair. Nothing is written to disk.
 - Any other function that only the assert-enabled flavor declares is an assertion
   function too when it is external, returns nothing and uses only parameter types
   the release flavor declares. It gets no macro, since no release name stands for
-  it. A definition that becomes Rust may call it: a release inspection adds its
-  prototype to the catalog, and the call renders as described under **Calls to
-  assertion functions**. A helper may not, because a release build compiles a
+  it. A merged inline body may call it, from the statements that only the
+  assert-enabled flavor has: a release inspection adds its prototype to the catalog,
+  and the call renders as described under **Calls to assertion functions**. A
+  function-like macro whose assert-enabled definition calls it stays a conflict,
+  because the macro's release definition is other text that could do work the call
+  leaves out. A helper may not call it either, because a release build compiles a
   helper's C text, where the function is not declared.
 - A conflict is skipped in both flavors with `SkipReasonCode::BuildFlavor`. So is
   every root whose dependency closure contains one, at expansion, and an inline

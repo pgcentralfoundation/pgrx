@@ -44,6 +44,16 @@ extern void SlruPagePrecedesUnitTests(const int *ctl, int per_page);
 #define SlruPagePrecedesUnitTests(ctl, per_page) do {} while (0)
 #endif
 
+/*
+ * A function with assertions whose name a release build gives to a macro that does work.
+ * A release build's call to the function does nothing, so no call can stand for the macro.
+ */
+#ifdef USE_ASSERT_CHECKING
+extern void AssertOrClear(int *value);
+#else
+#define AssertOrClear(value) (*(value) = 0)
+#endif
+
 /* A function with assertions, and a static inline function that does nothing without them. */
 #ifdef USE_ASSERT_CHECKING
 extern void AssertCouldGetRelation(void);
@@ -91,8 +101,8 @@ ValidateObject(const int *object)
 }
 
 /*
- * Checks that only an assert-enabled build declares, as it alone declares
- * verify_compact_attribute, and a macro that makes one only there.
+ * Checks that only an assert-enabled build declares, and a macro that makes one only
+ * there. Nothing compares the macro's two definitions, so it is not shared.
  */
 #ifdef USE_ASSERT_CHECKING
 extern void VerifyElement(const int *elements, int index);

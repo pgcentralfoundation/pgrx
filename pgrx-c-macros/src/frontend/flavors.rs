@@ -23,9 +23,11 @@
 //!   build compiles that definition itself, where its assertions do nothing.
 //! - A function that an assert-enabled build declares where a release build defines a macro
 //!   that does nothing, or the reverse of a static inline function, becomes a macro that
-//!   calls the function in both.
+//!   calls the function in both. A release macro that does anything is a conflict.
 //! - An external function that only an assert-enabled build declares, and that returns
-//!   nothing, is called by translated code in both. A release build's call does nothing.
+//!   nothing, is called in both by a merged inline body, from the statements that only an
+//!   assert-enabled build has. A release build's call does nothing. A macro is never shared
+//!   on that ground: its release definition may do work that the call would leave out.
 //! - A static inline function whose definition differs between the flavors is translated
 //!   from one body merged from both definitions, in which the installation's flavor selects
 //!   the statements that only one of them has. When the definitions do not merge, both
@@ -268,7 +270,15 @@ pub(super) fn reconcile(
         }
         let Some(function) = assert.function(name) else { continue };
         let formals = formals(definition);
-        match assertion_function(function, Some(&formals), release.declarations) {
+        // A release build's call to the function does nothing, so it can stand only for a
+        // release macro that does nothing.
+        let callable = if does_nothing(release, definition) {
+            assertion_function(function, Some(&formals), release.declarations)
+        } else {
+            Err("the macro does work that a call a release build does not make would leave out"
+                .into())
+        };
+        match callable {
             Ok(()) => {
                 calls.insert(name.clone(), call(name, &formals, definition.provenance.clone()));
                 flavors.assert_functions.insert(name.clone());
@@ -280,6 +290,8 @@ pub(super) fn reconcile(
                         "an assert-enabled build declares {name} as a function and a release build defines it as a macro, and {reason}"
                     ),
                 );
+                // A release build has no function of this name to bind.
+                flavors.flavor_specific.insert(name.clone());
             }
         }
     }
@@ -417,6 +429,13 @@ pub(super) fn reconcile(
         }
         flavors.helpers.extend(added);
     }
+    // A macro's release definition is its own text, which nothing here compares with the
+    // assert-enabled one. A release build's call to an assertion function does nothing, so
+    // sharing an assert-enabled definition that makes one could leave out work the release
+    // definition does. Such a macro stays a conflict.
+    let unshared_macro = |name: &str| unshared_given(name, &flavors.helpers, false);
+    // A merged inline body holds each flavor's own statements, so a call there is one that
+    // only an assert-enabled build compiles.
     let unshared = |name: &str| unshared_given(name, &flavors.helpers, true);
     // Function-like macros the flavors define differently take the assert-enabled
     // definition when a release build can expand it.
@@ -440,7 +459,7 @@ pub(super) fn reconcile(
             }
             continue;
         }
-        match reaches(assert, name, &unshared) {
+        match reaches(assert, name, &unshared_macro) {
             Some((reached, reason)) => {
                 flavors.conflicts.insert(
                     name.clone(),
@@ -659,6 +678,42 @@ fn differing_members(
 fn identifiers(text: &str) -> impl Iterator<Item = &str> {
     text.split(|character: char| !(character.is_ascii_alphanumeric() || character == '_'))
         .filter(|word| word.bytes().next().is_some_and(|byte| !byte.is_ascii_digit()))
+}
+
+/// Whether a macro of `view` does nothing wherever it is used: its replacement list names
+/// no parameter, function or variable and writes nothing.
+///
+/// PostgreSQL defines such a macro as `((void)true)`, `((void)0)` or `do {} while (0)` where
+/// a release build has no assertion to make. Only grouping, an empty `do`/`while` body, a
+/// cast to `void`, integer constants, and object-like macros that are themselves nothing
+/// but those are accepted, so a macro that evaluates an operand does something.
+fn does_nothing(view: View<'_>, definition: &MacroDefinition) -> bool {
+    let mut pending = vec![definition];
+    let mut visited = BTreeSet::new();
+    while let Some(definition) = pending.pop() {
+        let (_, body) = parameters_and_body(definition);
+        for token in body {
+            let constant = token.bytes().next().is_some_and(|byte| byte.is_ascii_digit())
+                && token.bytes().all(|byte| byte.is_ascii_alphanumeric());
+            if constant
+                || matches!(
+                    token,
+                    "(" | ")" | "{" | "}" | ";" | "void" | "do" | "while" | "true" | "false"
+                )
+            {
+                continue;
+            }
+            match view.macros.get(token) {
+                Some(named) if named.kind == MacroKind::ObjectLike => {
+                    if visited.insert(token) {
+                        pending.push(named);
+                    }
+                }
+                _ => return false,
+            }
+        }
+    }
+    true
 }
 
 /// A function's result and parameter types, by canonical spelling.
@@ -1089,4 +1144,70 @@ fn define(definition: &MacroDefinition) -> Option<String> {
         return None;
     }
     Some(format!("{name}{} {}", rest[..=close].concat(), rest[close + 1..].join(" ")))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{View, does_nothing};
+    use crate::{DeclarationCatalog, MacroDefinition, MacroKind, Token, TokenKind};
+    use std::collections::BTreeMap;
+
+    /// A definition from its tokens' spellings, the macro's name first.
+    fn definition(kind: MacroKind, spellings: &[&str]) -> MacroDefinition {
+        MacroDefinition {
+            name: spellings[0].into(),
+            kind,
+            location: None,
+            provenance: None,
+            tokens: spellings
+                .iter()
+                .map(|spelling| Token { kind: TokenKind::Identifier, spelling: (*spelling).into() })
+                .collect(),
+            builtin: false,
+            main_file: false,
+        }
+    }
+
+    /// A release macro does nothing only when it names no operand, function or variable
+    /// and writes nothing, also through the object-like macros it names.
+    #[test]
+    fn a_release_macro_does_nothing_only_without_operands_calls_and_writes() {
+        let macros = [
+            definition(MacroKind::ObjectLike, &["true", "1"]),
+            definition(MacroKind::ObjectLike, &["NOTHING", "(", "(", "void", ")", "true", ")"]),
+            definition(MacroKind::ObjectLike, &["COUNTED", "counter", "++"]),
+            definition(MacroKind::ObjectLike, &["LOOP", "LOOP"]),
+            definition(MacroKind::FunctionLike, &["CALLED", "(", ")", "0"]),
+        ]
+        .into_iter()
+        .map(|definition| (definition.name.clone(), definition))
+        .collect::<BTreeMap<_, _>>();
+        let declarations = DeclarationCatalog::default();
+        let view = View { macros: &macros, declarations: &declarations };
+        for nothing in [
+            vec!["F", "(", "x", ")"],
+            vec!["F", "(", "x", ")", "(", "(", "void", ")", "true", ")"],
+            vec!["F", "(", "x", ")", "(", "(", "void", ")", "0", ")"],
+            vec!["F", "(", "a", ",", "b", ")", "do", "{", "}", "while", "(", "0", ")"],
+            vec!["F", "(", ")", "NOTHING"],
+            vec!["F", "(", ")", "LOOP"],
+        ] {
+            assert!(
+                does_nothing(view, &definition(MacroKind::FunctionLike, &nothing)),
+                "{nothing:?}"
+            );
+        }
+        for work in [
+            // It evaluates its operand, which may have an effect.
+            vec!["F", "(", "x", ")", "(", "(", "void", ")", "(", "x", ")", ")"],
+            vec!["F", "(", "x", ")", "(", "*", "(", "x", ")", "=", "0", ")"],
+            vec!["F", "(", ")", "counter", "++"],
+            vec!["F", "(", ")", "function", "(", ")"],
+            vec!["F", "(", ")", "COUNTED"],
+            vec!["F", "(", ")", "CALLED", "(", ")"],
+            vec!["F", "(", ")", "(", "(", "void", ")", "\"text\"", ")"],
+        ] {
+            assert!(!does_nothing(view, &definition(MacroKind::FunctionLike, &work)), "{work:?}");
+        }
+    }
 }
