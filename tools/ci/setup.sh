@@ -87,6 +87,20 @@ fi
 
 pg_config=""
 
+# Run apt-get so that a mirror which stops answering fails the attempt instead of holding the
+# job until its time limit. apt-get gives up on a connection that is silent for 30 seconds
+# and tries each download three more times; a failed run is tried three times in all.
+apt_get() {
+    local attempt=1
+    until sudo apt-get -o Acquire::Retries=3 -o Acquire::http::Timeout=30 \
+        -o Acquire::https::Timeout=30 -o DPkg::Lock::Timeout=120 "$@"; do
+        (( attempt < 3 )) || return 1
+        echo "retrying apt-get $1 after attempt $attempt failed" >&2
+        sleep $((attempt * 10))
+        attempt=$((attempt + 1))
+    done
+}
+
 setup_linux() {
     local codename packages=()
     codename="$(. /etc/os-release && echo "$VERSION_CODENAME")"
@@ -124,8 +138,8 @@ setup_linux() {
     fi
 
     if (( ${#packages[@]} )); then
-        sudo apt-get update -qq
-        sudo apt-get install -y -qq --no-install-recommends "${packages[@]}" > /dev/null
+        apt_get update -qq
+        apt_get install -y -qq --no-install-recommends "${packages[@]}" > /dev/null
     fi
 
     if [[ -n "${PG_VER:-}" ]]; then
