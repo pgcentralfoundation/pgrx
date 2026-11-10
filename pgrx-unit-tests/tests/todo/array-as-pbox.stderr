@@ -8,13 +8,13 @@ error[E0277]: `PBox<'_, FlatArray<'_, i32>>` cannot be passed into a Postgres fu
   |
   = help: the following other types implement trait `ArgAbi<'fcx>`:
             &'fcx T
+            &'fcx TsQuery
+            &'fcx TsVector
             &'fcx [u8]
             &'fcx str
             &MemCx<'fcx>
             *mut FunctionCallInfoBaseData
             AnyArray
-            AnyElement
-            AnyNumeric
           and $N others
 note: required by a bound in `pgrx::callconv::Args::<'a, 'fcx>::next_arg_unchecked`
  --> $WORKSPACE/pgrx/src/callconv.rs
