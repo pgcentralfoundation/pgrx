@@ -101,7 +101,7 @@ A cross build has further requirements; see [Cross-compiling](#cross-compiling).
    - Linux and macOS: a host C compiler, which builds the generator's SHA-256 backend
    - Windows: MSVC, which Rust's MSVC targets need for linking
 - [PostgreSQL's build dependencies](https://wiki.postgresql.org/wiki/Compile_and_Install_from_source_code) ‡
-   - Debian-likes: `sudo apt-get install build-essential libreadline-dev zlib1g-dev flex bison libxml2-dev libxslt-dev libssl-dev libxml2-utils xsltproc ccache pkg-config`
+   - Debian-likes: `sudo apt-get install build-essential libreadline-dev zlib1g-dev flex bison libxml2-dev libxslt-dev libssl-dev libxml2-utils xsltproc ccache pkg-config libicu-dev`
    - RHEL-likes: `sudo yum install -y bison-devel readline-devel zlib-devel openssl-devel wget ccache && sudo yum groupinstall -y 'Development Tools'`
 
  † PGRX has no MSRV policy, thus may require the latest stable version of Rust, available via Rustup
