@@ -486,7 +486,8 @@ fn prove_snapshot_facts(
     scanner: &MacroScanner,
     frontend: &mut FrontendOutput,
 ) -> Result<(), FrontendError> {
-    for (name, definition) in definitions::prove(scanner, frontend)? {
+    let definitions::Proved { definitions, offsets } = definitions::prove(scanner, frontend)?;
+    for (name, definition) in definitions {
         let info = frontend
             .declarations
             .function_signatures
@@ -497,7 +498,7 @@ fn prove_snapshot_facts(
     }
     // The proof above compares inline bodies with the headers' own final macros. The passes
     // below, and every later one, see the macros both build flavors generate.
-    flavors::reconcile(scanner, frontend)?;
+    flavors::reconcile(scanner, frontend, &offsets)?;
     frontend.declarations.bitfields = bitfields::probe(scanner, frontend)?;
     let builtins = builtins::prove(scanner, frontend)?;
     frontend.declarations.builtins = builtins.supported;

@@ -545,8 +545,21 @@ things from them:
   the macro reaches it through a generated adapter, which does nothing in a release
   build. So does a function that one flavor defines `static inline` and the other
   only declares, such as `AssertCouldGetRelation`, which both builds bind.
+- Any other external function that only an assert-enabled build declares, and that
+  returns nothing, is reached the same way by the translated code that calls it:
+  `AssertBufferLocksPermitCatalogRead` and `MemoryContextCheck`, for example. No
+  macro has its name, because nothing in a release build does. A function that
+  returns a value has nothing a release build could return, so code that calls one
+  is not shared.
 - A static inline function whose definition differs between the flavors, such as
-  `TupleDescCompactAttr`, is called, not translated, in both.
+  `TupleDescCompactAttr`, is translated from one body that both flavors build from
+  the two definitions. The statements that only one flavor has run when
+  `__pgrx_c_assert_checking!()` says the installation is that flavor, and the other
+  flavor still compiles them. The function is called, not translated, in both when
+  the difference is anything but whole statements of a block: tokens inside an
+  expression, braces that do not pair, or the branch of an `if`. So it is when
+  those statements use a name the flavors do not share, or declare a local that
+  later statements use.
 - A name that only one flavor declares is generated and bound by neither:
   `castNodeImpl`, `MemoryContextCheck` and `USE_ASSERT_CHECKING` itself, for example.
   So is a function whose prototype differs. `FrontendOutput::flavor_specific_names`
@@ -589,7 +602,8 @@ Differences that are not names stay: a structure member or enumerator that only 
 flavor has, such as `JumbleState.total_jumble_len`, and the value of an object-like
 macro. The emission report records `caller_unsafe` for each emitted macro, and
 pgrx-pg-sys's macro report records these decisions under `build_flavors`, so that
-builds can be compared.
+builds can be compared. Its `merged` list names the inline functions whose two
+definitions became one body, and `native_only` those that both builds call.
 
 ## Calling generated macros
 

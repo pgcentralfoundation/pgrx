@@ -218,7 +218,8 @@ unsafe fn attribute_fetch_info(tupdesc: pg_sys::TupleDesc, index: usize) -> (i32
 /// `fastgetattr` reads: `TupleDescCompactAttr(tupleDesc, index)` on PG18 and PG19.
 ///
 /// That static inline function returns `&tupdesc->compact_attrs[i]`; assert-enabled builds
-/// also call `verify_compact_attribute`, which the generated form makes a native call.
+/// also call `verify_compact_attribute`, as the generated form does against one. This reads
+/// the same element without that check.
 ///
 /// # Safety
 ///

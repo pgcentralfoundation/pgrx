@@ -31,6 +31,23 @@ const MAX_DEPTH: usize = 64;
 /// statement nesting budgets, and analysis and emission recurse once into each.
 const MAX_STATEMENT_EXPRESSIONS: usize = 8;
 
+/// The spelling of the keyword token that opens a [`Statement::BuildFlavor`].
+///
+/// A C lexer gives this spelling the kind of an identifier, never of a keyword, so no token
+/// read from a header opens the statement. `frontend::flavors` writes the token into the
+/// body it merges from a static inline function's two definitions.
+pub(crate) const BUILD_FLAVOR: &str = "__pgrx_c_assert_checking";
+
+/// Whether `token` opens a [`Statement::BuildFlavor`].
+pub(crate) fn opens_build_flavor(token: &Token) -> bool {
+    token.kind == TokenKind::Keyword && token.spelling == BUILD_FLAVOR
+}
+
+/// The keyword token that opens a [`Statement::BuildFlavor`].
+pub(crate) fn build_flavor_keyword() -> Token {
+    Token { kind: TokenKind::Keyword, spelling: BUILD_FLAVOR.into() }
+}
+
 /// Half-open indices into a macro's replacement-token list, including comment tokens.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct TokenRange {
@@ -97,6 +114,10 @@ fn walk(statements: &[Statement]) -> impl Iterator<Item = &Statement> {
                         }
                         scopes.push(std::slice::from_ref(then_branch.as_ref()).iter());
                     }
+                    Statement::BuildFlavor { checked, unchecked, .. } => {
+                        scopes.push(std::slice::from_ref(unchecked.as_ref()).iter());
+                        scopes.push(std::slice::from_ref(checked.as_ref()).iter());
+                    }
                     _ => {}
                 }
                 return Some(statement);
@@ -115,7 +136,7 @@ pub(crate) fn full_expressions(statements: &[Statement]) -> impl Iterator<Item =
         }
         Statement::Declaration { initializer, .. } => *initializer,
         Statement::If { condition, .. } => Some(*condition),
-        Statement::Block { .. } => None,
+        Statement::Block { .. } | Statement::BuildFlavor { .. } => None,
     })
 }
 
@@ -185,6 +206,20 @@ pub enum Statement {
         else_branch: Option<Box<Statement>>,
         /// Original token range of this complete statement, including its scope or semicolon
         /// boundary.
+        tokens: TokenRange,
+    },
+    /// Execute the statements of the installation's build flavor, where a static inline
+    /// function's definition differs between a PostgreSQL built with assertions and one
+    /// built without.
+    ///
+    /// It is an item of a block, never the branch of a conditional, so either block can
+    /// stand for the statements it holds and an empty one for none.
+    BuildFlavor {
+        /// The block of statements that only a build with assertions has.
+        checked: Box<Statement>,
+        /// The block of statements that only a build without assertions has.
+        unchecked: Box<Statement>,
+        /// Original token range of this complete statement, including both blocks.
         tokens: TokenRange,
     },
 }
@@ -2935,6 +2970,7 @@ mod tests {
                 Statement::Expression { .. } => "expression",
                 Statement::Return { .. } => "return",
                 Statement::If { .. } => "if",
+                Statement::BuildFlavor { .. } => "build flavor",
             })
             .collect::<Vec<_>>();
         assert_eq!(order, ["outer", "block", "inner", "expression", "expression"]);
@@ -2977,6 +3013,85 @@ mod tests {
             parse_replacement(&tokens(&nested), &[], |_| false).unwrap_err().kind,
             SyntaxErrorKind::BudgetExceeded
         );
+    }
+
+    /// The statements of one build flavor are an item of a block, opened only by the keyword
+    /// token. Either block scopes its locals, and the statement returns when both blocks do.
+    #[test]
+    fn build_flavor_statements_are_block_items_opened_by_a_keyword() {
+        let flavored = |spellings: &[&str]| {
+            let mut source = tokens(spellings);
+            for token in &mut source {
+                if token.spelling == "FLAVOR" {
+                    *token = build_flavor_keyword();
+                }
+            }
+            parse_replacement(&source, &["x".into()], |name| name == "int")
+        };
+        let parsed = flavored(&[
+            "do", "{", "x", "++", ";", "FLAVOR", "{", "x", "--", ";", "}", "{", "}", "FLAVOR", "{",
+            "return", "x", ";", "}", "{", "return", "1", ";", "}", "}", "while", "(", "0", ")",
+        ])
+        .unwrap();
+        let body = parsed.statement_body.unwrap();
+        assert!(body.always_returns);
+        assert_eq!(body.return_tokens, Some(TokenRange { start: 15, end: 18 }));
+        let [_, Statement::BuildFlavor { checked, unchecked, tokens: range }, returning] =
+            body.statements.as_slice()
+        else {
+            panic!("{:?}", body.statements)
+        };
+        assert_eq!(*range, TokenRange { start: 5, end: 13 });
+        assert!(matches!(
+            (checked.as_ref(), unchecked.as_ref()),
+            (
+                Statement::Block { statements: checked, .. },
+                Statement::Block { statements: unchecked, .. },
+            ) if checked.len() == 1 && unchecked.is_empty()
+        ));
+        assert!(matches!(returning, Statement::BuildFlavor { .. }));
+        // A statement that returns in one flavor only does not end every path.
+        let partial =
+            flavored(&["{", "FLAVOR", "{", "return", "x", ";", "}", "{", "}", "x", "++", ";", "}"])
+                .unwrap();
+        assert!(!partial.statement_body.unwrap().always_returns);
+
+        for refused in [
+            // As a branch it would bind the next statement differently in each flavor.
+            vec![
+                "{", "if", "(", "x", ")", "FLAVOR", "{", "x", "++", ";", "}", "{", "}", "x", "--",
+                ";", "}",
+            ],
+            vec![
+                "{", "if", "(", "x", ")", "x", "++", ";", "else", "FLAVOR", "{", "}", "{", "}", "}",
+            ],
+            vec!["if", "(", "x", ")", "FLAVOR", "{", "}", "{", "}"],
+            // An `else` cannot follow it.
+            vec![
+                "{", "FLAVOR", "{", "if", "(", "x", ")", "x", "++", ";", "}", "{", "}", "else",
+                "x", "--", ";", "}",
+            ],
+            // Both blocks are required, and each is braced.
+            vec!["{", "FLAVOR", "{", "x", "++", ";", "}", "x", "--", ";", "}"],
+            vec!["{", "FLAVOR", "x", "++", ";", "{", "}", "}"],
+            // It is no expression.
+            vec!["{", "x", "=", "FLAVOR", "{", "}", "{", "}", ";", "}"],
+            // A local of one block is out of scope in the other and after both.
+            vec!["{", "FLAVOR", "{", "int", "y", "=", "x", ";", "}", "{", "y", "++", ";", "}", "}"],
+            vec![
+                "{", "FLAVOR", "{", "int", "y", "=", "x", ";", "}", "{", "}", "return", "y", ";",
+                "}",
+            ],
+            vec![
+                "{", "FLAVOR", "{", "int", "y", "=", "x", ";", "}", "{", "int", "y", "=", "1", ";",
+                "}", "}",
+            ],
+        ] {
+            assert!(flavored(&refused).is_err(), "{refused:?}");
+        }
+        // An identifier of the keyword's spelling, as C source could hold, opens nothing.
+        let identifier = tokens(&["{", BUILD_FLAVOR, "{", "x", "++", ";", "}", "{", "}", "}"]);
+        assert!(parse_replacement(&identifier, &["x".into()], |_| false).is_err());
     }
 
     /// Checks conditionals attach else to the nearest if and group condition tokens.

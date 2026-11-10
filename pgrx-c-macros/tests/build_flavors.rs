@@ -174,7 +174,7 @@ impl Flavor {
     fn run(&self, main: &str) -> (std::process::ExitStatus, String, String) {
         let arguments = self.arguments.iter().map(String::as_str).collect::<Vec<_>>();
         let c = format!(
-            "{}\n#include <stdio.h>\n#include <stdlib.h>\nvoid ExceptionalCondition(const char *c, const char *f, int l) {{ abort(); }}\nint *PointerVariable = 0;\n#ifdef USE_ASSERT_CHECKING\nvoid AssertTransactionIdInAllowableRange(unsigned int xid) {{ printf(\"called range\\t%u\\n\", xid); fflush(stdout); }}\nvoid SlruPagePrecedesUnitTests(const int *ctl, int per_page) {{ printf(\"called slru\\t%d\\t%d\\n\", *ctl, per_page); fflush(stdout); }}\nvoid AssertCouldGetRelation(void) {{ printf(\"called relation\\n\"); fflush(stdout); }}\nint AssertOnlyFunction(int value) {{ return 100; }}\nint AssertOnlyVariable = 0;\n#else\nint ReleaseOnlyFunction(int value) {{ return value; }}\n#endif\n",
+            "{}\n#include <stdio.h>\n#include <stdlib.h>\nvoid ExceptionalCondition(const char *c, const char *f, int l) {{ abort(); }}\nint *PointerVariable = 0;\n#ifdef USE_ASSERT_CHECKING\nvoid AssertTransactionIdInAllowableRange(unsigned int xid) {{ printf(\"called range\\t%u\\n\", xid); fflush(stdout); }}\nvoid SlruPagePrecedesUnitTests(const int *ctl, int per_page) {{ printf(\"called slru\\t%d\\t%d\\n\", *ctl, per_page); fflush(stdout); }}\nvoid AssertCouldGetRelation(void) {{ printf(\"called relation\\n\"); fflush(stdout); }}\nvoid VerifyElement(const int *elements, int index) {{ printf(\"called element\\t%d\\n\", elements[index]); fflush(stdout); }}\nvoid VerifyValue(int value) {{ printf(\"called value\\t%d\\n\", value); fflush(stdout); }}\nint AssertOnlyFunction(int value) {{ return 100; }}\nint AssertOnlyVariable = 0;\n#else\nint ReleaseOnlyFunction(int value) {{ return value; }}\n#endif\n{C_BODIES}",
             self.c_support
         );
         rust_oracle::run_rust_linked_status(
@@ -186,6 +186,24 @@ impl Flavor {
         )
     }
 }
+
+/// What this flavor's C compiler makes of each inline function whose definition differs
+/// between the flavors, in the order and form in which `MAIN` reports its translations.
+const C_BODIES: &str = r#"
+void c_bodies(void)
+{
+	int elements[] = {10, 20, 30};
+	printf("element\t%d\n", *CheckedElement(elements, 1));
+	printf("verified\t%d\n", VERIFIED_ELEMENT(elements, 2));
+	printf("flavored\t%d\n", FlavoredValue(1));
+	printf("macro\t%d\n", ConditionalMacro(1));
+	printf("braces\t%d\t%d\n", ConditionalBraces(1), ConditionalBraces(-1));
+	printf("operand\t%d\n", ConditionalOperand(1));
+	printf("branch\t%d\t%d\n", ConditionalBranch(1), ConditionalBranch(-1));
+	printf("local\t%d\n", ConditionalLocal(1));
+	fflush(stdout);
+}
+"#;
 
 /// Uses every generated macro, counting how often each operand is evaluated, and ends with
 /// an assertion that fails.
@@ -204,6 +222,11 @@ fn counted(value: i32) -> i32 {
 /// Report and reset the evaluation count.
 fn evaluations() -> usize {
     EVALUATIONS.swap(0, Ordering::Relaxed)
+}
+
+unsafe extern "C" {
+    /// Report what C makes of the inline functions whose definitions differ.
+    fn c_bodies();
 }
 
 /// `Assert` is a C statement, so it yields `()` and can end a function.
@@ -237,6 +260,21 @@ fn main() {
         println!("checked\t{}\t{}", USES_CHECKED!(counted(5)).get(), evaluations());
     }
     println!("counter\t{counter}");
+    let elements = [10_i32, 20, 30];
+    // SAFETY: `elements` holds the elements read, the fixture's functions only read
+    // through the pointer, and `c_bodies` reads its own array.
+    unsafe {
+        println!("element\t{}", *CheckedElement!(elements.as_ptr(), counted(1)).get());
+        println!("verified\t{}", VERIFIED_ELEMENT!(elements.as_ptr(), 2_i32).get());
+        println!("flavored\t{}", FlavoredValue!(1_i32).get());
+        println!("macro\t{}", ConditionalMacro!(1_i32).get());
+        println!("braces\t{}\t{}", ConditionalBraces!(1_i32).get(), ConditionalBraces!(-1_i32).get());
+        println!("operand\t{}", ConditionalOperand!(1_i32).get());
+        println!("branch\t{}\t{}", ConditionalBranch!(1_i32).get(), ConditionalBranch!(-1_i32).get());
+        println!("local\t{}", ConditionalLocal!(1_i32).get());
+        println!("bodies\t{}", evaluations());
+        c_bodies();
+    }
     println!("sizes\t{}\t{}", ASSERTED_SIZE!().get(), PLAIN_SIZE!().get());
     if std::hint::black_box(false) {
         let () = flavor_unreachable!().get();
@@ -270,13 +308,21 @@ fn both_build_flavors_generate_the_same_macros() {
             "CHECKED_HALF",
             "CHECKED_TAG",
             "COUNT_OR_ABORT",
+            "CheckedElement",
             "ConditionalBody",
+            "ConditionalBraces",
+            "ConditionalBranch",
+            "ConditionalLocal",
+            "ConditionalMacro",
+            "ConditionalOperand",
+            "FlavoredValue",
             "NEEDS_ASSERT_ONLY",
             "PLAIN_SIZE",
             "SlruPagePrecedesUnitTests",
             "TrapMacro",
             "USES_CHECKED",
             "USES_NEEDS_ASSERT_ONLY",
+            "VERIFIED_ELEMENT",
             "ValidateObject",
             "flavor_unreachable",
         ]
@@ -288,6 +334,8 @@ fn both_build_flavors_generate_the_same_macros() {
         "CheckedImpl",
         "AssertTransactionIdInAllowableRange",
         "SlruPagePrecedesUnitTests",
+        "VerifyElement",
+        "VerifyValue",
     ] {
         assert!(asserted.hidden.contains(name), "{name}: {:?}", asserted.hidden);
     }
@@ -369,19 +417,59 @@ fn both_build_flavors_generate_the_same_macros() {
     ] {
         assert!(asserted.emitted(name).1, "{name} needs unsafe");
     }
-    // A static inline function whose definition differs is called, and one whose
-    // definition is shared is translated with its checks.
-    assert!(asserted.emitted("ConditionalBody").0.contains("Inline_ConditionalBody"));
+    // A static inline function whose definition is shared is translated with its checks.
     let (validate, _) = asserted.emitted("ValidateObject");
     assert!(validate.contains("assertion_failure") && !validate.contains("Inline_ValidateObject"));
+    // So is one whose definition differs by whole statements that name what both flavors
+    // can: the constant selects the statements of the installation's flavor. A call to a
+    // function that only an assert-enabled build declares is one such statement.
+    let translated = "Translates the original function definition";
+    let checking = "$crate::__pgrx_c_assert_checking!()";
+    for flavor in [&asserted, &released] {
+        let (element, caller_unsafe) = flavor.emitted("CheckedElement");
+        assert!(element.contains(translated) && caller_unsafe, "{element}");
+        assert!(element.contains(&format!("if {checking} {{")), "{element}");
+        assert!(element.contains("Inline_VerifyElement"), "{element}");
+        assert!(!element.contains("Inline_CheckedElement"), "{element}");
+        let (flavored, caller_unsafe) = flavor.emitted("FlavoredValue");
+        assert!(flavored.contains(translated) && !caller_unsafe, "{flavored}");
+        assert!(flavored.contains(&format!("if {checking} {{")), "{flavored}");
+        assert!(flavored.contains("} else {"), "{flavored}");
+        // A macro whose assert-enabled definition makes such a call is generated too.
+        assert!(flavor.emitted("VERIFIED_ELEMENT").0.contains("Inline_VerifyElement"));
+    }
+    assert!(!released.c_support.contains("VerifyElement"), "{}", released.c_support);
+    // Any other difference leaves a call to the function, in both flavors: a statement
+    // that needs a value or a macro only one flavor has, tokens that are no statements of
+    // their own, a statement that is the branch of a conditional, and a local that later
+    // statements use.
+    for name in [
+        "ConditionalBody",
+        "ConditionalMacro",
+        "ConditionalBraces",
+        "ConditionalOperand",
+        "ConditionalBranch",
+        "ConditionalLocal",
+    ] {
+        for flavor in [&asserted, &released] {
+            let (rust, _) = flavor.emitted(name);
+            assert!(rust.contains(&format!("Inline_{name}")), "{name}: {rust}");
+            assert!(!rust.contains(translated) && !rust.contains(checking), "{name}: {rust}");
+        }
+    }
 
     // With assertions every check runs, the functions are called, and the failed assertion
     // stops the process where it is.
     let (status, stdout, stderr) = asserted.run(MAIN);
     assert!(!status.success(), "{stdout}\n{stderr}");
+    // Each inline function whose definition differs does what this flavor's C does, first
+    // as generated and then as compiled. The checks that only this flavor has are made.
+    let bodies = "called element\t20\nelement\t20\ncalled element\t30\nverified\t30\nflavored\t101\nmacro\t3\nbraces\t2\t1\noperand\t11\ncalled value\t1\nbranch\t6\t4\nlocal\t2\n";
     assert_eq!(
         stdout,
-        "assert\t2\npositive\t1\nhalf\t2\t2\ntrap\ttrue\t1\ncalled range\t7\nrange\t1\ncalled relation\ncalled slru\t3\t2\nslru\t1\nbody\t102\nchecked\t6\t1\ncounter\t1\nsizes\t1\t8\nbefore\n"
+        format!(
+            "assert\t2\npositive\t1\nhalf\t2\t2\ntrap\ttrue\t1\ncalled range\t7\nrange\t1\ncalled relation\ncalled slru\t3\t2\nslru\t1\nbody\t102\nchecked\t6\t1\ncounter\t1\n{bodies}bodies\t1\n{bodies}sizes\t1\t8\nbefore\n"
+        )
     );
     let trap = stderr
         .lines()
@@ -390,12 +478,16 @@ fn both_build_flavors_generate_the_same_macros() {
     assert!(trap.contains("\", Line: "), "{trap}");
 
     // Without assertions the same program evaluates no check and calls no assertion
-    // function, and the other stop still counts.
+    // function, and the other stop still counts. The inline functions do what release C
+    // does, and an operand of a check that is not made is still evaluated once.
     let (status, stdout, stderr) = released.run(MAIN);
     assert!(status.success(), "{stdout}\n{stderr}");
+    let bodies = "element\t20\nverified\t30\nflavored\t201\nmacro\t2\nbraces\t4\t-1\noperand\t1\nbranch\t6\t-1\nlocal\t3\n";
     assert_eq!(
         stdout,
-        "assert\t0\npositive\t0\nhalf\t2\t1\ntrap\ttrue\t0\nrange\t0\nslru\t0\nbody\t2\nchecked\t6\t1\ncounter\t1\nsizes\t1\t8\nbefore\nafter\t0\n"
+        format!(
+            "assert\t0\npositive\t0\nhalf\t2\t1\ntrap\ttrue\t0\nrange\t0\nslru\t0\nbody\t2\nchecked\t6\t1\ncounter\t1\n{bodies}bodies\t1\n{bodies}sizes\t1\t8\nbefore\nafter\t0\n"
+        )
     );
 
     // The helper's own assertion runs in the function PostgreSQL compiled with assertions,
@@ -443,6 +535,48 @@ fn headers_that_undefine_assertions_still_share_assert_enabled_definitions() {
         panic!("FLAVORED must be emitted");
     };
     assert!(rust.contains("( ( value ) + 1 )"), "{rust}");
+}
+
+/// Both flavors must prove a body that they merge. Only the inspected flavor's proof can
+/// use the driver's report of `#undef` directives, which admits a macro that a header
+/// defines again each time it is included, as Clang's `<stddef.h>` defines `NULL` under
+/// glibc. A definition that differs between the flavors and needs that report is therefore
+/// called in both, while a definition both flavors share is still translated.
+#[test]
+fn a_body_that_needs_the_undefinition_report_is_not_merged() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let directory = tempfile::tempdir().unwrap();
+    std::fs::write(directory.path().join("again.h"), "#undef AGAIN\n#define AGAIN 7\n").unwrap();
+    let scanner = MacroScanner::new().expect("libclang must be available");
+    // What each flavor decides about `differs`, and whether it retains a body for `shared`.
+    let decide = |again: &str| {
+        let header = directory.path().join("main.h");
+        std::fs::write(
+            &header,
+            format!(
+                "#include \"again.h\"\nextern void check(int value);\nstatic inline int differs(int value)\n{{\n#ifdef USE_ASSERT_CHECKING\n\tcheck(value);\n#endif\n\treturn value + AGAIN;\n}}\nstatic inline int shared(int value)\n{{\n\treturn value + AGAIN;\n}}\n{again}"
+            ),
+        )
+        .unwrap();
+        [false, true].map(|assert_enabled| {
+            let mut arguments = oracle::native_arguments();
+            if assert_enabled {
+                arguments.push("-DUSE_ASSERT_CHECKING=1".into());
+            }
+            let frontend = inspect(&scanner, &header, &arguments, None).unwrap();
+            assert_eq!(frontend.assert_enabled(), assert_enabled);
+            let flavors = serde_json::to_value(frontend.flavors()).unwrap();
+            let translated = frontend.declarations().function_signatures["shared"]
+                .definition
+                .as_ref()
+                .is_some_and(|definition| definition.body.is_some());
+            (flavors["merged"].clone(), flavors["native_only"].clone(), translated)
+        })
+    };
+    let merged = (serde_json::json!(["differs"]), serde_json::json!([]), true);
+    assert_eq!(decide(""), [merged.clone(), merged]);
+    let called = (serde_json::json!([]), serde_json::json!(["differs"]), true);
+    assert_eq!(decide("#include \"again.h\"\n"), [called.clone(), called]);
 }
 
 /// A compiler's error lines, without the source lines and locations that surround them.

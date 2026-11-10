@@ -450,6 +450,11 @@ impl<'a> Safety<'a> {
                         self.statements(std::slice::from_ref(branch.as_ref()))
                     })
             }
+            // Both blocks count, whichever the installation runs.
+            Statement::BuildFlavor { checked, unchecked, .. } => {
+                self.statements(std::slice::from_ref(checked.as_ref()))
+                    || self.statements(std::slice::from_ref(unchecked.as_ref()))
+            }
         })
     }
 

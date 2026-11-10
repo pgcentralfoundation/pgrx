@@ -82,9 +82,9 @@ impl FrontendOutput {
     ///
     /// These are the functions, variables, types, enumerators and macros that only the
     /// inspected build flavor declares, and the functions that only an assert-enabled
-    /// build defines where a release build defines a macro, such as
-    /// `AssertTransactionIdInAllowableRange`. Generated macros reach the latter through
-    /// their own adapters.
+    /// build declares, such as `AssertTransactionIdInAllowableRange`, where a release
+    /// build defines a macro or nothing. Generated macros reach the latter through their
+    /// own adapters.
     pub fn flavor_specific_names(&self) -> impl Iterator<Item = &str> {
         self.flavors
             .flavor_specific
