@@ -153,7 +153,7 @@ different names:
 | `CompilationProfile` | Original main-file path, matched compiler identity, ordered arguments, target facts, overflow policy, unsupported options, and `BuildInputs`. | Every observation has a compilation context. |
 | `DeclarationCatalog` | Named types, canonical structural shapes, records, fields, functions/prototypes, variables, enum constants, and verified builtins. | C identity and layout are independent of Rust storage. |
 | `FrontendOutput` | The profile, environment, catalog, inventory, and initial dependency graph from one inspection. | Downstream consumers cannot assemble unrelated facts casually. |
-| `ExpansionBatch` | Per-root expanded bodies or skips, original formal names, occurrences, dependencies, constant fallbacks, and consumed inputs. | Expansion observations belong to one requested batch. |
+| `ExpansionBatch` | Per-root expanded bodies or skips, original formal names, occurrences, proven pastes onto formals, dependencies, constant fallbacks, and consumed inputs. | Expansion observations belong to one requested batch. |
 | `AnalysisSession` | A borrowed frontend plus expansion results, retained integer constants, zero-constant proofs, and the augmented graph. | Emission accepts a coherent session rather than a detached AST. |
 | `Expression` | Arena nodes indexed by `NodeId`, root, token ranges, and optional structured statement body. | One syntax arena supports analysis and all emission contexts. |
 | `MacroAnalysis` | Signature, formal/capture roles, uses, invocation/evaluation contracts, symbolic result types, dependencies, and candidate/skip status. | Candidate analysis is weaker than successful emission. |
@@ -634,7 +634,8 @@ an ungrouped replacement list into one expression atom.
 
 Some `##` expressions are closed over fixed tokens and can be resolved during
 generation. Open pastes involving caller spelling still cannot be implemented
-by pretending Rust expression fragments expose their original C tokens.
+by pretending Rust expression fragments expose their original C tokens. The one
+exception, a fixed identifier pasted onto a type operand's name, follows below.
 
 The closed-paste proof combines ordinary expansion with independent diagnostic
 probes. Poison possible synthesized active identifiers so Clang exposes their
@@ -663,6 +664,37 @@ budget. Add them to the dependency graph. Reject erased operands, dynamic helper
 names, probe collisions, incomplete diagnostics, or unknown error shapes. The
 proof of an observed final paste is necessary because the ordinary lexical graph
 cannot see an identifier assembled from several tokens.
+
+### Pastes onto a type operand
+
+PostgreSQL's `IsA`, `makeNode` and `castNode` paste `T_` onto a type name to name
+that type's node tag. `macro_rules!` cannot build an identifier, but the macro needs
+only the enumerator's value for the type its caller supplies, which a trait lookup
+gives (section 12). The rule names no prefix, enum or macro: a fixed identifier is
+pasted onto the start of an operand, and the result names an enumerator.
+
+The paste proof admits such a root in three steps:
+
+1. In the braced pass, every error the probe owns must be Clang's `pasting formed
+   'IDENTIFIER{', an invalid preprocessing token`. A braced operand starts with
+   `{`, so this is a paste of `IDENTIFIER` onto the start of an operand. A paste
+   onto the end of an operand, of two operands or of a number forms other text,
+   and refuses the probe as before. The probe leaves the braced pass, which could
+   never expand it cleanly, with those identifiers.
+2. The poison pass also poisons each such identifier followed by each of the
+   probe's markers. Clang checks a pasted identifier before rescan, so it reports
+   every paste that forms one, including a result that a later expansion erases.
+   The pass must reach its completion witness and report each identifier the
+   braced pass named for at least one marker.
+3. In the authoritative expansion, every reported identifier must survive as a
+   token of its own, and no other identifier may contain a marker. A name that
+   the expansion erased, stringified or pasted again is refused: the Rust form
+   would lose that use of the operand. `ExpandedMacro::pastes` then records each
+   identifier with its fixed part and its formal.
+
+A probe that left the braced pass has no clean braced traversal. Its traversal
+rests on the poison pass's completion witness and on the authoritative pass, which
+checks every probe's boundaries.
 
 ### Source zero identity
 
@@ -739,6 +771,14 @@ evidence. Bare GNU alignment of
 `T` alone does not prove that `T` is a type; it admits `sizeof(T)` as a type
 operand but never makes `(T)` a cast. Pointer/qualified forms, established
 sizeof-type and offset forms provide stronger evidence.
+
+A compiler expansion lists, in `ExpandedMacro::pastes`, the identifiers that
+section 6 proved to be pastes of a fixed identifier onto a formal. The parser
+forms `TypeParameterPaste { prefix, parameter }` for exactly those identifiers,
+only as an expression of its own; as a member, a local's name or any other name
+one is refused. The node is type evidence for its formal too. The Rust form
+resolves the name through the operand's type, so it admits only invocations that
+pass a type there, and a bare `sizeof(T)` beside the paste measures that type.
 
 Argument lists parse assignment expressions with top-level commas as separators;
 a grouped comma is an expression. The conditional's middle operand can contain
@@ -832,6 +872,16 @@ use the catalog instead. A recognized type name never becomes a capture; it is
 refused wherever the parser leaves it in value position. Captures stay separate
 from formals even if a nested expansion introduces the same spelling as an
 unused outer formal.
+
+A pasted name gives its formal the type role and has the C type of the
+enumerators it can name. `FrontendOutput::type_enumerators` finds them for a
+prefix: each typedef name of a structure or union for which the prefix followed by
+that name is an enumerator. A name that only one build flavor declares has no
+binding, so it is left out. A name that an active macro hides would expand in C,
+so it selects no enumerator, but it still shares its structure with that
+structure's other names (section 12). The enumerators must belong to one enum and
+share one C type, so one lookup serves every type. Otherwise, or when no type has an enumerator, the macro is
+skipped with `token_paste`.
 
 Determine an invocation contract from grouping and statement shape:
 
@@ -1069,6 +1119,7 @@ still have these internal context arms.
 | `sizeof` expression | Use a type-checkable unexecuted witness; retain arrays rather than first decaying them to pointers. |
 | `sizeof`/alignment type | Resolve a verified concrete or formal type marker; return C `size_t`. |
 | `offsetof` | Use separately proved offset-path metadata; no load or place projection is required. |
+| Name pasted onto a type operand | Read the enumerator from the operand type's generated lookup trait; never a place or a null constant. |
 | Function call | Apply C prototype conversions and validated callable ABI; preserve FFI guard and result validity. |
 | Return statement | Return from the enclosing Rust caller after C assignment conversion to its established return marker. |
 
@@ -1320,7 +1371,8 @@ Unknown, conflicting, or ambiguous storage witnesses must remain failures.
 ### Demand planning
 
 `demands::plan` walks the analyzed roots and builds requests for fields, offsets,
-functions, callable bodies, original addresses, types, callbacks, and enums.
+functions, callable bodies, original addresses, types, callbacks, enums, and the
+prefixes that roots paste onto type operands.
 It uses a finite worklist to propagate possible value/type categories through
 the arena. Operators, assignment destinations, member paths, known prototypes,
 and declared results narrow the possible families. Index records and promoted
@@ -1351,6 +1403,7 @@ Generate adapters in dependency order:
  required type closure
           |
  enum + field + offset + original-address adapters
+ + type enumerator lookups
           |
  emit batch with the generated adapters + propagate required failures
           |
@@ -1368,11 +1421,12 @@ support cannot renumber the identities already referenced by emitted macros.
 Generated capabilities, their refusals and a batch's inline translations never
 enter the caller's `BindingCatalog`. Rendering reads them from the generated
 state passed beside it, so a caller cannot assert a callback signature, function
-adapter, address getter, field or offset adapter, or inline translation that
-generation did not create. Single-macro emission has none of these. It skips a
-macro that needs one of the adapters, and its calls to inline functions never
-expand a translation. It can still name a C enum's generated identity type in
-`__pgrx_c_generated`, because that path depends only on the enum declaration.
+adapter, address getter, field or offset adapter, type enumerator lookup, or
+inline translation that generation did not create. Single-macro emission has none
+of these. It skips a macro that needs one of the adapters or lookups, and its
+calls to inline functions never expand a translation. It can still name a C
+enum's generated identity type in `__pgrx_c_generated`, because that path depends
+only on the enum declaration.
 Only batch support defines the type, so an invocation of such a macro compiles
 only in a crate that already includes batch support for that enum.
 
@@ -1428,6 +1482,40 @@ exact native storage. This explicit selection adds no ABI cast and does not
 pretend ambiguous raw storage globally identifies one C prototype. Conflicting
 paths fail; rejected/unproven prototypes receive no constructor. The safe
 constructor does not call the pointer or discharge the unsafe invocation contract.
+
+### Type enumerator lookups
+
+For each requested prefix, `type_enumerators::generate` writes a trait,
+`TypeEnumerator_<prefix>`, whose one constant is an enumerator as a `CValue` of
+its C type. A macro reads it as `<$type as TypeEnumerator_<prefix>>::VALUE`,
+where C pastes the prefix onto the type's name. Each type of the prefix's family
+(section 8) implements the trait when the bindings hold both its record and its
+enumerator:
+
+- The constant is the enumerator's Rust binding, a variant of a Rust enum or a
+  module constant, converted as any named constant is. Its value is first
+  compared with Clang's. A disagreement refuses the lookup, and the macros that
+  use it are skipped with `binding_value_mismatch`.
+- A type whose record or enumerator has no binding is left out. Its use fails to
+  compile, as a pasted name that is no enumerator fails in C.
+  `#[diagnostic::on_unimplemented]` names the prefix and the enum.
+- A record that several C names share, each with its own enumerator, implements
+  nothing. PostgreSQL's `OpExpr`, `DistinctExpr` and `NullIfExpr` name one
+  structure, which Rust sees as one type. Choosing `T_OpExpr` for it would change
+  what `IsA(node, DistinctExpr)` tests without any sign at the call. A name whose
+  enumerator a macro hides or the bindings lack still counts, since Rust can
+  spell that name as the same type. The diagnostic lists these names.
+- A Rust alias or other path of a bound record names the same type and selects the
+  same enumerator. An enumerator that C names for something other than a type,
+  as `T_IntList` is, has no Rust operand: compare `nodeTag!` with it instead.
+- The trait has a supertrait in a private module of the generated support, so no
+  other crate can implement it and claim an enumerator for a type of its own.
+- No implementation at all refuses the lookup, and its macros are skipped with
+  `token_paste`.
+
+The trait and its implementations name bindings and no values. The family leaves
+out names that only one build flavor declares, and the bindings never hold them,
+so both flavors generate the same lookups.
 
 ## 13. Generated C and native safety
 
@@ -1894,6 +1982,9 @@ like every evaluated or unused operand, it is an `expr`. Every arm expands to th
   internal arms, so it never names a translated callee's value arm. The shell
   evaluates `if false { finish(witness) } else { panic }`, which has the real
   macro's `CExpression<V>` type.
+  A name pasted onto a type operand renders its lookup, so a shell requires the
+  same trait of that type as the real macro unless an enclosing collapsed node,
+  such as a cast or comparison, closes over it.
 - A translated inline function body passes `type_witness::<M>()` for its result
   marker `M`, or `()` for a void function, in a block that borrows every
   argument, which the real body evaluates once before it runs.
@@ -2402,7 +2493,7 @@ generalized; do not add a macro-name exception.
 | Documentation shells and witnesses | [`documentation.rs`](src/emit/documentation.rs), [`expression/witness.rs`](../pgrx-pg-sys/src/c_macros/expression/witness.rs), [`macro_snapshot.rs`](../pgrx-bindgen/src/build/macro_snapshot.rs). |
 | Arguments, expressions, statements | [`arguments.rs`](src/emit/arguments.rs), [`typed.rs`](src/emit/typed.rs), [`statements.rs`](src/emit/statements.rs). |
 | Assertions and build flavors | [`flavors.rs`](src/frontend/flavors.rs), [`assertions.rs`](src/emit/assertions.rs), [`expression/assertion.rs`](../pgrx-pg-sys/src/c_macros/expression/assertion.rs). |
-| Native/nominal capabilities | [`fields.rs`](src/emit/fields.rs), [`bitfields.rs`](src/emit/bitfields.rs), [`functions.rs`](src/emit/functions.rs), [`addresses.rs`](src/emit/addresses.rs), [`callbacks.rs`](src/emit/callbacks.rs), [`enumerations.rs`](src/emit/enumerations.rs). |
+| Native/nominal capabilities | [`fields.rs`](src/emit/fields.rs), [`bitfields.rs`](src/emit/bitfields.rs), [`functions.rs`](src/emit/functions.rs), [`addresses.rs`](src/emit/addresses.rs), [`callbacks.rs`](src/emit/callbacks.rs), [`enumerations.rs`](src/emit/enumerations.rs), [`type_enumerators.rs`](src/emit/type_enumerators.rs). |
 | Readable delegation and layout | [`src/delegation.rs`](src/delegation.rs), [`src/formatting.rs`](src/formatting.rs). |
 | Runtime target gate/bridges | [`src/support_generation.rs`](src/support_generation.rs). |
 | Rust semantic runtime | [`pgrx-pg-sys/src/c_macros/`](../pgrx-pg-sys/src/c_macros/). |
@@ -2456,6 +2547,7 @@ positions, or the build environment:
 | Function address getter | `Address_<function>`, native `__pgrx_address__fn__<function>` |
 | Callback signature | `Signature_<encoded C function type>` |
 | Enum identity | `EnumIdentity_<encoded C enum type>` |
+| Type enumerator lookup | `TypeEnumerator_<prefix>`, sealed by `type_enumerator_seals::Seal_<prefix>` |
 
 Native helper names put their role before the C names (`__pgrx_inline__arg0__f`),
 and multi-part names join plain C identifiers with `__`. A part that is not a

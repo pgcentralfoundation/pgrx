@@ -12,6 +12,8 @@ typedef unsigned int DocWord;
 typedef size_t DocSize;
 
 typedef enum DocState { DOC_IDLE, DOC_BUSY } DocState;
+/* Enumerators that a prefix pasted onto a structure type's name forms. */
+typedef enum DocTag { DOC_TAG_DocRecord = 7, DOC_TAG_DocInner } DocTag;
 typedef int (*DocCallback)(int);
 
 typedef struct DocInner {
@@ -88,6 +90,9 @@ extern int doc_global;
 #define DOC_SIZEOF_TYPE() (sizeof(DocRecord))
 #define DOC_SIZEOF_PARAMETER(type) (sizeof(type *))
 #define DOC_TYPED(type, pointer) ((type *) (pointer))
+#define DOC_TAG_OF(type) (DOC_TAG_##type)
+#define DOC_TAG_SIZE(type) (sizeof(type) + DOC_TAG_##type)
+#define DOC_TAGGED(record, type) ((record)->value == DOC_TAG_##type)
 #define DOC_SWAP16(value) __builtin_bswap16(value)
 #define DOC_LIKELY(value) __builtin_expect((value) != 0, 1)
 #define DOC_FILE() __FILE__

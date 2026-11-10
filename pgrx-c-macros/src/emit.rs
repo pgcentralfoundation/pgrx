@@ -74,6 +74,8 @@ mod functions;
 mod names;
 /// Lexically ordered statement lowering over the shared expression arena.
 mod statements;
+/// Lookups of the enumerator that a fixed prefix pasted onto a structure type's name forms.
+mod type_enumerators;
 /// Contextual expression rendering for values, places, size operands, and effects.
 mod typed;
 /// Shared reconciliation of compiler C identity with fresh Rust binding storage.
@@ -926,12 +928,13 @@ fn render_adapters(
 ) -> Result<MacroSupportArtifact, String> {
     let callbacks = !adapters.callbacks.typedefs.is_empty();
     let body = format!(
-        "{}\n{}\n{}\n{}\n{}",
+        "{}\n{}\n{}\n{}\n{}\n{}",
         adapters.callbacks.rust,
         adapters.fields.rust,
         adapters.functions.rust,
         adapters.addresses.rust,
-        adapters.enumerations.rust
+        adapters.enumerations.rust,
+        adapters.type_enumerators.rust
     );
     let mut rust = if body.trim().is_empty() {
         String::new()
@@ -995,6 +998,8 @@ struct GeneratedAdapters {
     addresses: addresses::AddressAdapters,
     /// Enum identities and checked storage bridges for requested types.
     enumerations: enumerations::EnumAdapters,
+    /// Lookups of the enumerators that requested prefixes paste into.
+    type_enumerators: type_enumerators::TypeEnumeratorAdapters,
 }
 
 impl GeneratedAdapters {
@@ -1111,6 +1116,12 @@ fn generated_adapters(
             generated,
             &requests.addresses,
             &frontend.profile().target,
+        )?,
+        type_enumerators: type_enumerators::generate(
+            frontend,
+            &capabilities,
+            &lowering,
+            &requests.type_enumerators,
         )?,
         functions,
         callbacks,
@@ -1448,6 +1459,23 @@ fn render(
             write!(comment, "`{}`", parameter.name).expect("String output");
         }
         comment.push_str(". Each operand must preserve its C type and place requirements.");
+    }
+    let mut pasted = BTreeSet::new();
+    for node in &expression.syntax.nodes {
+        if let ExpressionKind::TypeParameterPaste { prefix, parameter } = &node.kind
+            && pasted.insert((*parameter, prefix))
+        {
+            let enumerators = session
+                .frontend()
+                .type_enumerators(prefix)
+                .expect("analysis established the enumerators this paste names");
+            comment.push_str("\n\n");
+            comment.push_str(&documentation::type_enumerator_operand(
+                &analysis.parameters[*parameter].name,
+                prefix,
+                &names::strip_location_directories(enumerators.enumeration),
+            ));
+        }
     }
     comment.push_str("\n\n# Safety\n\n");
     comment.push_str(documentation::SAFETY);
@@ -1875,34 +1903,13 @@ fn render_expression(
                                 .expect("String output");
                         }
                         match binding_path(bindings, &constant.name) {
-                            Ok((path, representation)) => {
-                                write!(
-                                    rust,
-                                    "{SUPPORT}::CValue::<{SUPPORT}::{}>::new(",
-                                    marker(constant.ty.kind)
-                                )
-                                .expect("writing to a String cannot fail");
-                                if constant.ty.kind == IntegerKind::Bool {
-                                    rust.push('(');
-                                }
-                                write!(rust, "$crate::{path}")
-                                    .expect("writing to a String cannot fail");
-                                if matches!(representation, IntegerBindingRepresentation::Oid) {
-                                    rust.push_str(".to_u32()");
-                                }
-                                if constant.ty.kind == IntegerKind::Bool {
-                                    rust.push_str(" as u8 != 0)");
-                                } else {
-                                    write!(
-                                        rust,
-                                        " as {}{}",
-                                        if constant.ty.signed { 'i' } else { 'u' },
-                                        constant.ty.bits
-                                    )
-                                    .expect("writing to a String cannot fail");
-                                }
-                                rust.push(')');
-                            }
+                            Ok((path, representation)) => write_binding_value(
+                                rust,
+                                SUPPORT,
+                                &format!("$crate::{path}"),
+                                representation,
+                                constant.ty,
+                            ),
                             Err(reason) => {
                                 write_fallback(rust, &constant.name, reason);
                                 let value = match constant.value {
@@ -2072,6 +2079,36 @@ fn binding_path(
         })
         .collect::<Result<Vec<_>, _>>()
         .map(|parts| (parts.join("::"), binding.representation))
+}
+
+/// Tag the Rust binding of an integer constant at `path` with its C type `ty`.
+///
+/// `support` names the semantic runtime and `path` the binding as the destination
+/// resolves them: through `$crate` in an exported macro, or from the generated support
+/// module.
+fn write_binding_value(
+    rust: &mut String,
+    support: &str,
+    path: &str,
+    representation: IntegerBindingRepresentation,
+    ty: IntegerType,
+) {
+    write!(rust, "{support}::CValue::<{support}::{}>::new(", marker(ty.kind))
+        .expect("writing to a String cannot fail");
+    if ty.kind == IntegerKind::Bool {
+        rust.push('(');
+    }
+    rust.push_str(path);
+    if matches!(representation, IntegerBindingRepresentation::Oid) {
+        rust.push_str(".to_u32()");
+    }
+    if ty.kind == IntegerKind::Bool {
+        rust.push_str(" as u8 != 0)");
+    } else {
+        write!(rust, " as {}{}", if ty.signed { 'i' } else { 'u' }, ty.bits)
+            .expect("writing to a String cannot fail");
+    }
+    rust.push(')');
 }
 
 /// Record why a C name remains expanded, sanitizing header text as inert Rust commentary.

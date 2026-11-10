@@ -240,7 +240,7 @@ impl<'a> AnalysisSession<'a> {
                     name,
                     Some(&active),
                     &self.integer_constants,
-                    true,
+                    Some(&expansion.pastes),
                 );
                 for (parameter, original_name) in
                     analysis.parameters.iter_mut().zip(&expansion.parameters)

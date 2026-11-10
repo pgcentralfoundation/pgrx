@@ -97,6 +97,10 @@ const MACROS: &[(&str, Kind, &str)] = &[
     ("DOC_SIZEOF_TYPE", Kind::Value, "DOC_SIZEOF_TYPE!()"),
     ("DOC_SIZEOF_PARAMETER", Kind::Value, "DOC_SIZEOF_PARAMETER!(DocRecord)"),
     ("DOC_TYPED", Kind::Value, "DOC_TYPED!(DocRecord, pointer)"),
+    // A type operand that C pastes onto a prefix selects that type's enumerator.
+    ("DOC_TAG_OF", Kind::Value, "DOC_TAG_OF!(DocRecord)"),
+    ("DOC_TAG_SIZE", Kind::Value, "DOC_TAG_SIZE!(DocInner)"),
+    ("DOC_TAGGED", Kind::Value, "unsafe { DOC_TAGGED!(record, DocRecord) }"),
     ("DOC_SWAP16", Kind::Value, "DOC_SWAP16!(value)"),
     ("DOC_LIKELY", Kind::Value, "DOC_LIKELY!(value)"),
     ("DOC_FILE", Kind::Value, "DOC_FILE!()"),
@@ -295,7 +299,7 @@ fn documentation_shells_have_the_real_result_types() {
         .allowlist_type("Doc.*")
         .allowlist_function("doc_.*")
         .allowlist_var("doc_.*")
-        .rustified_enum("DocState")
+        .rustified_enum("DocState|DocTag")
         .layout_tests(false)
         .generate_comments(false)
         .formatter(bindgen::Formatter::None)
@@ -375,6 +379,10 @@ fn documentation_shells_have_the_real_result_types() {
         ("DOC_ADDRESS_OF", "@place; (@native [$place])"),
         ("DOC_BITS", "Field_high"),
         ("DOC_OID", "CIntegerStorage<"),
+        // A pasted name's lookup is rendered, so a shell keeps the bound on its type.
+        ("DOC_TAG_OF", "<$type as $crate::__pgrx_c_generated::TypeEnumerator_DOC_TAG_>::VALUE"),
+        ("DOC_TAG_SIZE", "<$type as $crate::__pgrx_c_generated::TypeEnumerator_DOC_TAG_>::VALUE"),
+        ("DOC_TAGGED", "{ let _ = &$record; "),
     ] {
         let DocumentedResult::Value { witness } = &results[name] else { unreachable!() };
         assert!(witness.contains(expected), "{name}: {witness}");

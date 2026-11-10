@@ -508,6 +508,7 @@ impl Safety<'_> {
                 | ExpressionKind::AlignOfType { .. }
                 | ExpressionKind::SizeOfTypeParameter { .. }
                 | ExpressionKind::AlignOfTypeParameter { .. }
+                | ExpressionKind::TypeParameterPaste { .. }
                 | ExpressionKind::OffsetOf { .. } => {}
             }
         }

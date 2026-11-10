@@ -61,8 +61,9 @@ pub struct ExpansionBatch {
 pub enum ExpansionResult {
     /// The matched compiler supplied a complete owned symbolic expansion.
     Expanded {
-        /// The owned authoritative compiler expansion admitted to symbolic analysis.
-        expansion: ExpandedMacro,
+        /// The owned authoritative compiler expansion admitted to symbolic analysis, boxed
+        /// because it is several times the size of a refusal.
+        expansion: Box<ExpandedMacro>,
     },
     /// A required proof or supported construct is missing, with an explicit refusal attached.
     Skipped {
@@ -88,6 +89,11 @@ pub struct ExpandedMacro {
     /// Every surviving compiler-expanded formal occurrence needed to preserve argument evaluation
     /// multiplicity.
     pub occurrences: Vec<ParameterOccurrence>,
+    /// Identifiers of the replacement that the compiler formed by pasting a fixed identifier
+    /// onto a formal's marker, by their spelling. The paste proof observed each paste, and
+    /// these are the root's only pastes that involve a formal.
+    #[serde(skip_serializing_if = "BTreeMap::is_empty")]
+    pub pastes: BTreeMap<String, ParameterPaste>,
     /// Conservative closure, including object-like/external context definitions.
     /// This establishes possible origins, not an exact per-token source map.
     pub dependencies: Vec<ExpansionDependency>,
@@ -112,6 +118,16 @@ pub struct ParameterOccurrence {
     pub parameter: usize,
     /// Index within the expanded replacement list, excluding the macro signature.
     pub token: usize,
+}
+
+/// An identifier that `##` formed by pasting a fixed identifier onto a formal's spelling, as
+/// PostgreSQL's `T_##_type_` forms the name of a node tag.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+pub struct ParameterPaste {
+    /// The fixed identifier pasted before the formal's spelling.
+    pub prefix: String,
+    /// Original formal index whose spelling completes the identifier.
+    pub parameter: usize,
 }
 
 /// A conservative macro origin observed during expansion, including context definitions not emitted
@@ -607,6 +623,13 @@ fn expand_prepared<'a>(
     }
     verify_original_environment(scanner, frontend, &directory.0, original, &inputs)?;
     let proof = paste::prove(frontend, &directory.0, original, prefix, &prepared, limits)?;
+    // Identifiers the proof showed a root forming by pasting a fixed identifier onto one of
+    // its markers. Later passes drop probes, so the roots are named.
+    let mut operand_pastes = proof
+        .operand_pastes
+        .into_iter()
+        .map(|(index, pastes)| (prepared[index].definition.name.clone(), pastes))
+        .collect::<HashMap<_, _>>();
     let mut rejected = proof.rejected;
     for (&index, discovered) in &proof.dependencies {
         let item = &mut prepared[index];
@@ -767,17 +790,39 @@ fn expand_prepared<'a>(
             continue;
         }
         restore_invocation_diagnostics(&mut body, prefix);
+        let pastes = operand_pastes.remove(&item.definition.name).unwrap_or_default();
         let mut occurrences = Vec::new();
+        let mut surviving = BTreeSet::new();
         for (index, token) in body.iter().enumerate() {
             if let Some(&parameter) = markers.get(token.spelling.as_str()) {
                 occurrences.push(ParameterOccurrence { parameter, token: index });
+            } else if token.kind == TokenKind::Identifier && pastes.contains_key(&token.spelling) {
+                surviving.insert(token.spelling.as_str());
             }
+        }
+        // An identifier pasted from fixed text and an operand must survive as a token of
+        // its own, where analysis can give it a meaning. One that the expansion erased,
+        // stringified or pasted again would otherwise leave no trace of the operand's use.
+        if surviving.len() != pastes.len() {
+            record_skip(
+                &mut results,
+                &item.definition.name,
+                skip(
+                    ExpansionSkipCode::TokenPaste,
+                    "token pasting depends on an invocation operand, and the pasted name does not survive in the expansion",
+                    Some(&item.definition.name),
+                    frontend,
+                ),
+                frontend,
+            );
+            continue;
         }
         if body.iter().any(|token| {
             token.spelling.contains(prefix.as_str())
                 && !markers.contains_key(token.spelling.as_str())
                 && !(token.kind == TokenKind::Literal
                     && formal_string(&token.spelling, &item.markers, prefix))
+                && !(token.kind == TokenKind::Identifier && pastes.contains_key(&token.spelling))
         }) {
             record_skip(
                 &mut results,
@@ -846,15 +891,16 @@ fn expand_prepared<'a>(
         results.insert(
             item.definition.name.clone(),
             ExpansionResult::Expanded {
-                expansion: ExpandedMacro {
+                expansion: Box::new(ExpandedMacro {
                     name: item.definition.name.clone(),
                     definition: expanded,
                     parameters: item.parameters,
                     symbolic_parameters: item.markers,
                     occurrences,
+                    pastes,
                     dependencies: item.dependencies,
                     constant_fallbacks: Vec::new(),
-                },
+                }),
             },
         );
     }

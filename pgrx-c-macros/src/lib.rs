@@ -90,7 +90,8 @@ mod expansion;
 pub use expansion::{
     ConstantFallback, ExpandedMacro, ExpansionBatch, ExpansionDependency, ExpansionLimits,
     ExpansionResult, ExpansionSkip, ExpansionSkipCode, ObjectIntegerConstants, ParameterOccurrence,
-    prepare_expansions, prepare_expansions_with_limits, probe_integer_object_constants,
+    ParameterPaste, prepare_expansions, prepare_expansions_with_limits,
+    probe_integer_object_constants,
 };
 /// Tie expansion, constant proofs, and analysis to one verified inspection snapshot.
 mod session;

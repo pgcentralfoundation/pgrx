@@ -178,8 +178,14 @@ fn analyze_root(
     formals: &[String],
     constants: &BTreeMap<String, IntegerConstant>,
 ) -> MacroAnalysis {
-    let mut analysis =
-        crate::analysis::analyze_active_with_constants(frontend, name, Some(root), constants, true);
+    // A private root reaches no token paste.
+    let mut analysis = crate::analysis::analyze_active_with_constants(
+        frontend,
+        name,
+        Some(root),
+        constants,
+        Some(&BTreeMap::new()),
+    );
     for (parameter, name) in analysis.parameters.iter_mut().zip(formals) {
         parameter.name.clone_from(name);
     }

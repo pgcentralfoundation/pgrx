@@ -845,6 +845,101 @@ fn malformed_paste_probes_cannot_swallow_a_later_operand_validation() {
     assert_eq!(expanded(&batch, "C_HEALTHY").occurrences.len(), 1);
 }
 
+/// A paste of a fixed identifier onto the start of an operand keeps its expansion when the
+/// poison pass saw the paste and the pasted name survives. A paste onto the end of an
+/// operand, of two operands or of a number, and one whose result the expansion erases or
+/// pastes again, are still refused.
+#[test]
+fn identifiers_pasted_before_an_operand_survive_as_proven_tokens() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let directory = Directory::new();
+    let header = directory.0.join("operands.h");
+    std::fs::write(
+        &header,
+        r#"
+#define CAT(a,b) a##b
+#define XCAT(a,b) CAT(a,b)
+#define DROP(x) 0
+#define PRESCAN(x) DROP(x)
+#define TWICE(x) x + x
+#define T_DIRECT(n,t) ((n) == T_##t)
+#define T_NESTED(t) (XCAT(T_, t))
+#define T_TWICE(t) (TWICE(CAT(T_, t)))
+#define T_TWO(t,u) (CAT(A_, t) + CAT(B_, u) + CAT(A_, u))
+#define T_CLOSED(t) (CAT(T_, t) + CAT(0xFF, U))
+#define T_ERASED(t) PRESCAN(CAT(T_, t))
+#define T_PARTLY_ERASED(t,u) (CAT(T_, t) + PRESCAN(CAT(T_, u)))
+#define T_REPASTED(t) (XCAT(XCAT(T_, t), _suffix))
+#define T_SUFFIX(t) (CAT(t, _suffix))
+#define T_BOTH(t,u) (CAT(t, u))
+#define T_NUMBER(t) (CAT(1, t))
+#define T_STRING(t) (XSTR(CAT(T_, t)))
+#define STR(x) #x
+#define XSTR(x) STR(x)
+"#,
+    )
+    .unwrap();
+    let scanner = MacroScanner::new().unwrap();
+    let frontend = inspect(&scanner, &header, &["-std=c17".into()], None).unwrap();
+    let names = [
+        "T_DIRECT",
+        "T_NESTED",
+        "T_TWICE",
+        "T_TWO",
+        "T_CLOSED",
+        "T_ERASED",
+        "T_PARTLY_ERASED",
+        "T_REPASTED",
+        "T_SUFFIX",
+        "T_BOTH",
+        "T_NUMBER",
+        "T_STRING",
+    ];
+    let batch = prepare_expansions(&scanner, &frontend, &names).unwrap();
+    // The expansion lists each pasted identifier with the fixed identifier and the formal
+    // it was pasted from, and the identifier is spelled from that formal's marker.
+    let pasted = |name: &str| {
+        let expansion = expanded(&batch, name);
+        for (spelling, paste) in &expansion.pastes {
+            let marker = &expansion.symbolic_parameters[paste.parameter];
+            assert_eq!(*spelling, format!("{}{marker}", paste.prefix), "{name}");
+        }
+        let start =
+            expansion.definition.tokens.iter().position(|token| token.spelling == ")").unwrap() + 1;
+        expansion.definition.tokens[start..]
+            .iter()
+            .filter_map(|token| expansion.pastes.get(&token.spelling))
+            .map(|paste| format!("{}{}", paste.prefix, expansion.parameters[paste.parameter]))
+            .collect::<Vec<_>>()
+    };
+    assert_eq!(pasted("T_DIRECT"), ["T_t"]);
+    assert_eq!(expanded(&batch, "T_DIRECT").occurrences.len(), 1);
+    assert_eq!(pasted("T_NESTED"), ["T_t"]);
+    assert_eq!(pasted("T_TWICE"), ["T_t", "T_t"]);
+    assert_eq!(pasted("T_TWO"), ["A_t", "B_u", "A_u"]);
+    assert_eq!(pasted("T_CLOSED"), ["T_t"]);
+    assert!(body(expanded(&batch, "T_CLOSED")).contains(&"0xFFU"));
+    assert_eq!(expanded(&batch, "T_TWO").pastes.len(), 3);
+    assert!(expanded(&batch, "T_DIRECT").dependencies.is_empty());
+    for name in ["T_ERASED", "T_PARTLY_ERASED"] {
+        assert_skip_reason(
+            &batch,
+            name,
+            ExpansionSkipCode::TokenPaste,
+            "token pasting depends on an invocation operand, and the pasted name does not survive in the expansion",
+        );
+    }
+    for name in ["T_REPASTED", "T_SUFFIX", "T_BOTH", "T_NUMBER"] {
+        assert_skip_reason(
+            &batch,
+            name,
+            ExpansionSkipCode::TokenPaste,
+            "Clang rejected a braced operand; token pasting depends on invocation operands or the expansion is malformed",
+        );
+    }
+    assert_skip(&batch, "T_STRING", ExpansionSkipCode::Stringification);
+}
+
 /// Checks that original main file context preserves macros and conditional declarations.
 #[test]
 fn original_main_file_context_preserves_macros_and_conditional_declarations() {

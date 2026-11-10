@@ -34,6 +34,14 @@ pub(super) const FLAVOR_CALL: &str = "PostgreSQL declares this name as a functio
 /// Caller obligations shared by every generated macro.
 pub(super) const SAFETY: &str = "Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation, including the operations of an assertion that this PostgreSQL build does not evaluate. Mutation requires writable storage. Native calls and global writes require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions; checked global reads run pgrx's active-thread check themselves and panic when it fails. Generated guards preserve error boundaries; they do not prove these obligations.";
 
+/// How a caller supplies an operand that C pastes onto `prefix` to name an enumerator of
+/// `enumeration`.
+pub(super) fn type_enumerator_operand(name: &str, prefix: &str, enumeration: &str) -> String {
+    format!(
+        "`{name}` is a structure type, named by any Rust path to its binding. C pastes `{prefix}` onto the type's C name to name an enumerator of `{enumeration}`, so a type whose name has no such enumerator fails to compile."
+    )
+}
+
 /// Documentation paragraphs that many generated macros repeat verbatim.
 ///
 /// Documentation shells refer to each one through the macro named here instead of

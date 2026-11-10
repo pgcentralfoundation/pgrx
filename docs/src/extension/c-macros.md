@@ -426,6 +426,43 @@ an argument repeatedly; unused arguments do not evaluate; logical and conditiona
 branches remain lazy. Do not assume function-style evaluate-once behavior merely
 because the invocation looks like a function call.
 
+## Pass a node type as a Rust type
+
+`IsA`, `castNode`, `makeNode` and the list macros such as `lfirst_node` take the
+name of a node type, and C pastes `T_` onto it to name that type's node tag. Pass
+the Rust type:
+
+```rust
+use pgrx::pg_sys;
+
+/// # Safety
+/// `node` must point to a valid node.
+unsafe fn as_query(node: *mut pg_sys::Node) -> Option<*mut pg_sys::Query> {
+    // SAFETY: the caller provides a valid node. `IsA!` reads its tag, and
+    // `castNode!` runs only for a `Query`.
+    unsafe {
+        pgrx::IsA!(node, pg_sys::Query)
+            .is_true()
+            .then(|| pgrx::castNode!(pg_sys::Query, node).get())
+    }
+}
+```
+
+Any Rust path or alias of the type names it. A type whose C name pastes into no
+node tag does not compile, and the error says that no enumerator of `enum NodeTag`
+is `T_` followed by that type's name.
+
+`OpExpr`, `DistinctExpr` and `NullIfExpr` are one structure in C, each with its
+own tag, and one type in Rust. None of the three names is accepted, since a Rust
+type cannot say which tag is meant. Use `PgNode::is_a_ptr` with the tag there, and
+for a tag that names no structure, such as `T_IntList`.
+
+Each of these macros needs `unsafe` against an assert-enabled and a release
+PostgreSQL alike. `IsA!` reads the node through your pointer. `castNode!` and the
+list macros check the node's tag when PostgreSQL was built with assertions and only
+cast otherwise. `makeNode!` allocates in the current memory context, and is
+generated from PostgreSQL 17 on.
+
 ## Mutate storage with an explicit safety argument
 
 Macros that load or mutate raw storage require an `unsafe` context. This also
