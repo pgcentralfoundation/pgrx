@@ -238,24 +238,37 @@ pub(super) fn caller_unsafe(
     translations: &BTreeMap<String, Translation>,
 ) -> bool {
     let Some(expression) = &analysis.expression else { return false };
-    let safety = Safety {
-        frontend,
-        bindings,
-        nodes: &expression.syntax.nodes,
-        translations,
-        locals: expression
-            .syntax
-            .statements()
-            .filter_map(|statement| match statement {
-                Statement::Declaration { name, .. } => Some(name.as_str()),
-                _ => None,
-            })
-            .collect(),
-    };
+    let safety = Safety::new(frontend, bindings, &expression.syntax, translations, false);
     match &expression.syntax.statement_body {
         Some(body) => safety.statements(&body.statements),
         None => safety.expression(expression.syntax.root, Context::Value),
     }
+}
+
+/// Whether the operand of a `sizeof`, rendered in `context`, must sit in generated `unsafe`.
+///
+/// C does not evaluate the operand, so the rendering sits in a branch that never runs and
+/// no operation in it asks anything of the caller. Rust still requires `unsafe` around an
+/// operation it calls unsafe, and the rendering holds one in two cases. The first is an
+/// operation that would need the caller's `unsafe` if it ran; every check counts, so both
+/// build flavors agree. The second, with `caller_operands`, is an operand of the caller's
+/// outside a nested `sizeof`: it may be another generated macro, or an expression compiled
+/// for one, that performs such an operation. A translated inline function's body holds no
+/// caller tokens, so its callers pass `false`.
+///
+/// An operand that meets neither case gets no `unsafe` block, which would be unused.
+pub(super) fn unevaluated_unsafe(
+    frontend: &FrontendOutput,
+    bindings: &super::BindingCatalog,
+    analysis: &MacroAnalysis,
+    translations: &BTreeMap<String, Translation>,
+    operand: NodeId,
+    context: Context,
+    caller_operands: bool,
+) -> bool {
+    let expression = analysis.expression.as_ref().expect("a rendered analysis has an expression");
+    Safety::new(frontend, bindings, &expression.syntax, translations, caller_operands)
+        .expression(operand, context)
 }
 
 /// Parameters whose operands a rendering never names as values: unused ones, and those
@@ -374,9 +387,10 @@ pub(super) fn reports(
 ///
 /// This follows the renderer's contexts. Loads, stores, member projections, dereferenced
 /// values, indirect calls and native calls need `unsafe`; caller operands are the caller's
-/// own, generated locals are owned, unevaluated operands sit in generated `unsafe`, the
-/// rendering checks pgrx's active thread before reading a global that `checked_global`
-/// admits, and it wraps a call that `safe_call` admits.
+/// own, generated locals are owned, an unevaluated operand sits in generated `unsafe`
+/// where [`unevaluated_unsafe`] finds a need, the rendering checks pgrx's active thread
+/// before reading a global that `checked_global` admits, and it wraps a call that
+/// `safe_call` admits.
 struct Safety<'a> {
     /// Declarations that distinguish globals, builtins and stopping calls.
     frontend: &'a FrontendOutput,
@@ -388,9 +402,36 @@ struct Safety<'a> {
     translations: &'a BTreeMap<String, Translation>,
     /// Statement locals, whose generated storage needs no caller `unsafe` to read.
     locals: BTreeSet<&'a str>,
+    /// Whether a caller's operand counts as needing `unsafe`, as it does where generated
+    /// `unsafe` must cover whatever the operand expands to; see [`unevaluated_unsafe`].
+    caller_operands: bool,
 }
 
-impl Safety<'_> {
+impl<'a> Safety<'a> {
+    /// Collect the locals of one analyzed expression.
+    fn new(
+        frontend: &'a FrontendOutput,
+        bindings: &'a super::BindingCatalog,
+        syntax: &'a crate::syntax::Expression,
+        translations: &'a BTreeMap<String, Translation>,
+        caller_operands: bool,
+    ) -> Self {
+        Self {
+            frontend,
+            bindings,
+            nodes: &syntax.nodes,
+            translations,
+            locals: syntax
+                .statements()
+                .filter_map(|statement| match statement {
+                    Statement::Declaration { name, .. } => Some(name.as_str()),
+                    _ => None,
+                })
+                .collect(),
+            caller_operands,
+        }
+    }
+
     /// Whether rendering `statements` needs `unsafe`.
     fn statements(&self, statements: &[Statement]) -> bool {
         statements.iter().any(|statement| match statement {
@@ -490,8 +531,12 @@ impl Safety<'_> {
                     }
                     pending.extend(arguments.iter().map(value));
                 }
+                ExpressionKind::Parameter { .. } => {
+                    if self.caller_operands {
+                        return true;
+                    }
+                }
                 ExpressionKind::Empty
-                | ExpressionKind::Parameter { .. }
                 | ExpressionKind::IntegerLiteral { .. }
                 | ExpressionKind::StringLiteral { .. }
                 | ExpressionKind::Stringification { .. }

@@ -52,6 +52,15 @@ const AFTER: &str = "GLOBAL_AFTER";
 const UNSAFE: &[&str] = &["GLOBAL_POINTEE", "GLOBAL_HOOKED", "GLOBAL_SET"];
 /// The check whose condition reads a global.
 const CHECK: &str = "GLOBAL_IN_RANGE";
+/// `sizeof` macros whose operand holds no unsafe operation.
+const SIZES: &[&str] = &["GLOBAL_SIZE", "GLOBAL_SUM_SIZE", "GLOBAL_POINTEE_SIZE"];
+/// `sizeof` macros whose operand holds one, or may: a function pointer read, and an operand
+/// of the caller's.
+const UNSAFE_SIZES: &[&str] = &["GLOBAL_HOOK_SIZE", "GLOBAL_WIDER"];
+/// A macro that passes a dereference to [`UNSAFE_SIZES`]' second.
+const DELEGATED_SIZE: &str = "GLOBAL_POINTEE_WIDER";
+/// The comment on the `unsafe` block around a `sizeof` operand.
+const UNEVALUATED: &str = "SAFETY: C does not evaluate this operand";
 
 /// The fixture header.
 fn header() -> PathBuf {
@@ -96,7 +105,9 @@ fn checked_global_reads_need_no_unsafe() {
         .iter()
         .chain(SHARED)
         .chain(UNSAFE)
-        .chain([&COPY, &AFTER, &CHECK])
+        .chain(SIZES)
+        .chain(UNSAFE_SIZES)
+        .chain([&COPY, &AFTER, &CHECK, &DELEGATED_SIZE])
         .copied()
         .collect::<Vec<_>>();
     let session = AnalysisSession::prepare(&scanner, &frontend, &names).expect("prepare roots");
@@ -133,6 +144,20 @@ fn checked_global_reads_need_no_unsafe() {
     }
     let (rust, caller_unsafe) = emitted(&generated, CHECK);
     assert!(!caller_unsafe && rust.contains("assertion_failure"), "{rust}");
+    // No `sizeof` needs the caller's `unsafe`, and its operand sits in generated `unsafe`
+    // only where an operation in it needs that.
+    for name in SIZES.iter().chain(UNSAFE_SIZES).chain([&DELEGATED_SIZE]) {
+        let (rust, caller_unsafe) = emitted(&generated, name);
+        assert!(!caller_unsafe, "{name}: {rust}");
+        assert_eq!(rust.contains(UNEVALUATED), !SIZES.contains(name), "{name}: {rust}");
+    }
+    // Without a thread check the reads in an operand are unsafe, and so wrapped. The
+    // address of a global is not.
+    for name in SIZES.iter().chain(UNSAFE_SIZES).chain([&DELEGATED_SIZE]) {
+        let (rust, caller_unsafe) = emitted(&unchecked, name);
+        assert!(!caller_unsafe, "{name}: {rust}");
+        assert_eq!(rust.contains(UNEVALUATED), *name != "GLOBAL_SIZE", "{name}: {rust}");
+    }
 
     let support = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
         .join("../pgrx-pg-sys/src/c_macros/support.rs")
@@ -163,10 +188,11 @@ fn checked_global_reads_need_no_unsafe() {
     // and the write do not. The three reads of `GLOBAL_TOTAL` check once. `GLOBAL_ANY`
     // checks only when it runs a read, and `GLOBAL_COPY` once for its two statements. The
     // discard arm of `GLOBAL_TOTAL` checks for each of its three reads, before the read
-    // of `GLOBAL_AFTER` itself.
+    // of `GLOBAL_AFTER` itself. No `sizeof` checks: each gives the size of an `int`, which
+    // is also what a sum with a `short` and a comparison yield.
     assert_eq!(
         output,
-        "count\t5\t1\npending\t1\t2\nflag\ttrue\t3\npointer\t4\nbusy\t1\t5\nin range\t1\t6\npointee\t9\nhooked\t0\ncount\t3\t8\ntotal\t5\t9\nany\t0\t9\nany\t1\t10\ncopy\t4\t11\nafter\t3\t15\n"
+        "count\t5\t1\npending\t1\t2\nflag\ttrue\t3\npointer\t4\nbusy\t1\t5\nin range\t1\t6\npointee\t9\nhooked\t0\ncount\t3\t8\ntotal\t5\t9\nany\t0\t9\nany\t1\t10\ncopy\t4\t11\nafter\t3\t15\nsizes\t4\t4\t4\t4\t15\nwider\t4\t4\t4\t15\nwider\t4\n"
     );
     session.verify_inputs().expect("original profile stayed unchanged");
 }

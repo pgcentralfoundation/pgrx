@@ -42,6 +42,15 @@ extern GlobalHook GlobalHookValue;
 	} while (0)
 /* An operand evaluated for its effects expands the discard arm, which shares none. */
 #define GLOBAL_AFTER(first) ((first), GlobalCount)
+/* `sizeof` evaluates nothing, so none of these needs the caller's unsafe or checks the thread.
+ * The operand of the first three holds no unsafe operation and gets no unsafe block. */
+#define GLOBAL_SIZE() (sizeof(GlobalCount))
+#define GLOBAL_SUM_SIZE() (sizeof(GlobalCount + GlobalPending))
+#define GLOBAL_POINTEE_SIZE() (sizeof(*GlobalPointer))
+/* A function pointer read is unsafe, and an operand of the caller's may be. */
+#define GLOBAL_HOOK_SIZE() (sizeof(GlobalHookValue != 0))
+#define GLOBAL_WIDER(value) (sizeof((value) + GlobalCount))
+#define GLOBAL_POINTEE_WIDER() GLOBAL_WIDER(*GlobalPointer)
 /* A dereference, a function pointer read and a write still need the caller's unsafe. */
 #define GLOBAL_POINTEE() (*GlobalPointer)
 #define GLOBAL_HOOKED() (GlobalHookValue != 0)

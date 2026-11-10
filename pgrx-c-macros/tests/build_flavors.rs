@@ -174,7 +174,7 @@ impl Flavor {
     fn run(&self, main: &str) -> (std::process::ExitStatus, String, String) {
         let arguments = self.arguments.iter().map(String::as_str).collect::<Vec<_>>();
         let c = format!(
-            "{}\n#include <stdio.h>\n#include <stdlib.h>\nvoid ExceptionalCondition(const char *c, const char *f, int l) {{ abort(); }}\n#ifdef USE_ASSERT_CHECKING\nvoid AssertTransactionIdInAllowableRange(unsigned int xid) {{ printf(\"called range\\t%u\\n\", xid); fflush(stdout); }}\nvoid SlruPagePrecedesUnitTests(const int *ctl, int per_page) {{ printf(\"called slru\\t%d\\t%d\\n\", *ctl, per_page); fflush(stdout); }}\nvoid AssertCouldGetRelation(void) {{ printf(\"called relation\\n\"); fflush(stdout); }}\nint AssertOnlyFunction(int value) {{ return 100; }}\nint AssertOnlyVariable = 0;\n#else\nint ReleaseOnlyFunction(int value) {{ return value; }}\n#endif\n",
+            "{}\n#include <stdio.h>\n#include <stdlib.h>\nvoid ExceptionalCondition(const char *c, const char *f, int l) {{ abort(); }}\nint *PointerVariable = 0;\n#ifdef USE_ASSERT_CHECKING\nvoid AssertTransactionIdInAllowableRange(unsigned int xid) {{ printf(\"called range\\t%u\\n\", xid); fflush(stdout); }}\nvoid SlruPagePrecedesUnitTests(const int *ctl, int per_page) {{ printf(\"called slru\\t%d\\t%d\\n\", *ctl, per_page); fflush(stdout); }}\nvoid AssertCouldGetRelation(void) {{ printf(\"called relation\\n\"); fflush(stdout); }}\nint AssertOnlyFunction(int value) {{ return 100; }}\nint AssertOnlyVariable = 0;\n#else\nint ReleaseOnlyFunction(int value) {{ return value; }}\n#endif\n",
             self.c_support
         );
         rust_oracle::run_rust_linked_status(
@@ -237,6 +237,7 @@ fn main() {
         println!("checked\t{}\t{}", USES_CHECKED!(counted(5)).get(), evaluations());
     }
     println!("counter\t{counter}");
+    println!("sizes\t{}\t{}", ASSERTED_SIZE!().get(), PLAIN_SIZE!().get());
     if std::hint::black_box(false) {
         let () = flavor_unreachable!().get();
     }
@@ -259,6 +260,7 @@ fn both_build_flavors_generate_the_same_macros() {
     assert_eq!(
         asserted.names,
         [
+            "ASSERTED_SIZE",
             "Assert",
             "AssertCouldGetRelation",
             "AssertMacro",
@@ -270,6 +272,7 @@ fn both_build_flavors_generate_the_same_macros() {
             "COUNT_OR_ABORT",
             "ConditionalBody",
             "NEEDS_ASSERT_ONLY",
+            "PLAIN_SIZE",
             "SlruPagePrecedesUnitTests",
             "TrapMacro",
             "USES_CHECKED",
@@ -344,8 +347,18 @@ fn both_build_flavors_generate_the_same_macros() {
         "flavor_unreachable",
         "AssertTransactionIdInAllowableRange",
         "AssertCouldGetRelation",
+        "ASSERTED_SIZE",
+        "PLAIN_SIZE",
     ] {
         assert!(!asserted.emitted(name).1, "{name} needs no unsafe");
+    }
+    // The operand of a `sizeof` sits in generated `unsafe` where the assert-enabled
+    // definition holds an unsafe operation, in a release build too, whose own definition of
+    // `TrapMacro` holds none. An operand with no such operation gets no `unsafe` block.
+    let unevaluated = "SAFETY: C does not evaluate this operand";
+    for flavor in [&asserted, &released] {
+        assert!(flavor.emitted("ASSERTED_SIZE").0.contains(unevaluated));
+        assert!(!flavor.emitted("PLAIN_SIZE").0.contains(unevaluated));
     }
     for name in [
         "ValidateObject",
@@ -368,7 +381,7 @@ fn both_build_flavors_generate_the_same_macros() {
     assert!(!status.success(), "{stdout}\n{stderr}");
     assert_eq!(
         stdout,
-        "assert\t2\npositive\t1\nhalf\t2\t2\ntrap\ttrue\t1\ncalled range\t7\nrange\t1\ncalled relation\ncalled slru\t3\t2\nslru\t1\nbody\t102\nchecked\t6\t1\ncounter\t1\nbefore\n"
+        "assert\t2\npositive\t1\nhalf\t2\t2\ntrap\ttrue\t1\ncalled range\t7\nrange\t1\ncalled relation\ncalled slru\t3\t2\nslru\t1\nbody\t102\nchecked\t6\t1\ncounter\t1\nsizes\t1\t8\nbefore\n"
     );
     let trap = stderr
         .lines()
@@ -382,7 +395,7 @@ fn both_build_flavors_generate_the_same_macros() {
     assert!(status.success(), "{stdout}\n{stderr}");
     assert_eq!(
         stdout,
-        "assert\t0\npositive\t0\nhalf\t2\t1\ntrap\ttrue\t0\nrange\t0\nslru\t0\nbody\t2\nchecked\t6\t1\ncounter\t1\nbefore\nafter\t0\n"
+        "assert\t0\npositive\t0\nhalf\t2\t1\ntrap\ttrue\t0\nrange\t0\nslru\t0\nbody\t2\nchecked\t6\t1\ncounter\t1\nsizes\t1\t8\nbefore\nafter\t0\n"
     );
 
     // The helper's own assertion runs in the function PostgreSQL compiled with assertions,

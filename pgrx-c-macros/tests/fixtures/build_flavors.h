@@ -100,6 +100,14 @@ ConditionalBody(int value)
 	return value + 1;
 }
 
+/*
+ * A `sizeof` whose operand reads through a pointer only where assertions are enabled, and
+ * one whose operand does not in either flavor.
+ */
+extern int *PointerVariable;
+#define ASSERTED_SIZE() (sizeof(TrapMacro(*PointerVariable)))
+#define PLAIN_SIZE() (sizeof(PointerVariable))
+
 /* A stop that is no assertion keeps its condition's effects in both flavors. */
 #define COUNT_OR_ABORT(counter) do { if (++(*(counter)) > 5) abort(); } while (0)
 
