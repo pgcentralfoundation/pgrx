@@ -695,6 +695,9 @@ impl TransactionId {{ pub fn into_inner(self) -> u32 {{ self.0 }} pub fn from_in
 pub type MultiXactId = TransactionId;
 pub struct Datum;
 pub trait PgNode {{}}
+/// The error of the `NodeTag` conversions that the bindings generate for the fixture's enum.
+#[derive(Debug)] pub struct NotNodeTag(pub i64);
+impl NotNodeTag {{ pub const fn new(value: i64) -> Self {{ Self(value) }} }}
 /// Only pure scalar C functions and Rust callbacks are used by this fixture.
 pub mod ffi {{
     /// Execute the fixture's callback without accessing a PostgreSQL backend.
