@@ -16,7 +16,7 @@
 
 use super::typed::Context;
 use crate::syntax::{
-    BinaryOperator, ExpressionKind, ExpressionNode, NodeId, Statement, StringPart,
+    BinaryOperator, ExpressionKind, ExpressionNode, NodeId, Statement, StringPart, full_expressions,
 };
 use crate::{
     BuiltinKind, DeclarationCatalog, FrontendOutput, IntegerKind, MacroAnalysis, TypeCategory,
@@ -170,12 +170,12 @@ pub(crate) fn stop(
 
 /// Write the safe support call that replaces a stopping call.
 ///
-/// `operand` names a caller operand's descriptor, whose source spelling stands in for
-/// the C spelling, as for other operand diagnostics.
+/// `spelling` gives a caller operand's source spelling, which stands in for the C
+/// spelling, as for other operand diagnostics.
 pub(super) fn render_stop(
     nodes: &[ExpressionNode],
     stop: Stop,
-    operand: impl Fn(usize) -> String,
+    spelling: impl Fn(usize) -> String,
     rust: &mut String,
 ) {
     let support = format!("{}::assertion", super::types::EXPRESSION);
@@ -183,10 +183,10 @@ pub(super) fn render_stop(
         Stop::Abort => write!(rust, "{support}::abort()"),
         Stop::Unreachable => write!(rust, "{support}::unreachable_reached()"),
         Stop::Assertion { condition, error_type } => {
-            let condition = text(nodes, condition, &operand);
+            let condition = text(nodes, condition, &spelling);
             let error_type = error_type.map_or_else(
                 || "::core::option::Option::None".to_owned(),
-                |node| format!("::core::option::Option::Some({})", text(nodes, node, &operand)),
+                |node| format!("::core::option::Option::Some({})", text(nodes, node, &spelling)),
             );
             // The report runs only against an installation that enables assertions.
             write!(
@@ -199,9 +199,7 @@ pub(super) fn render_stop(
 }
 
 /// A Rust `&'static str` expression for diagnostic C text.
-fn text(nodes: &[ExpressionNode], node: NodeId, operand: &impl Fn(usize) -> String) -> String {
-    let stringify =
-        |index: usize| format!("$crate::__pgrx_c_operand!(@stringify; {})", operand(index));
+fn text(nodes: &[ExpressionNode], node: NodeId, spelling: &impl Fn(usize) -> String) -> String {
     match &nodes[node].kind {
         ExpressionKind::StringLiteral { bytes } => {
             let bytes = bytes.strip_suffix(&[0]).unwrap_or(bytes);
@@ -214,14 +212,14 @@ fn text(nodes: &[ExpressionNode], node: NodeId, operand: &impl Fn(usize) -> Stri
                     StringPart::Text { bytes } => {
                         write!(rust, "{:?}, ", String::from_utf8_lossy(bytes))
                     }
-                    StringPart::Parameter { index } => write!(rust, "{}, ", stringify(*index)),
+                    StringPart::Parameter { index } => write!(rust, "{}, ", spelling(*index)),
                 }
                 .expect("String output");
             }
             rust.push(')');
             rust
         }
-        ExpressionKind::Parameter { index } => stringify(*index),
+        ExpressionKind::Parameter { index } => spelling(*index),
         _ => unreachable!("stop recognition admits only diagnostic text"),
     }
 }
@@ -237,22 +235,21 @@ pub(super) fn caller_unsafe(
     translations: &BTreeMap<String, Translation>,
 ) -> bool {
     let Some(expression) = &analysis.expression else { return false };
-    let body = expression.syntax.statement_body.as_ref();
     let safety = Safety {
         frontend,
         bindings,
         nodes: &expression.syntax.nodes,
         translations,
-        locals: body
-            .iter()
-            .flat_map(|body| body.walk())
+        locals: expression
+            .syntax
+            .statements()
             .filter_map(|statement| match statement {
                 Statement::Declaration { name, .. } => Some(name.as_str()),
                 _ => None,
             })
             .collect(),
     };
-    match body {
+    match &expression.syntax.statement_body {
         Some(body) => safety.statements(&body.statements),
         None => safety.expression(expression.syntax.root, Context::Value),
     }
@@ -270,26 +267,10 @@ pub(super) fn unevaluated_parameters(
     use crate::ParameterRole;
     let Some(expression) = &analysis.expression else { return Vec::new() };
     let nodes = &expression.syntax.nodes;
-    let mut pending = Vec::new();
-    match &expression.syntax.statement_body {
-        Some(body) => {
-            let mut statements = body.statements.iter().collect::<Vec<_>>();
-            while let Some(statement) = statements.pop() {
-                match statement {
-                    Statement::Expression { expression, .. }
-                    | Statement::Return { expression, .. } => pending.push(*expression),
-                    Statement::Declaration { initializer, .. } => pending.extend(*initializer),
-                    Statement::Block { statements: inner, .. } => statements.extend(inner),
-                    Statement::If { condition, then_branch, else_branch, .. } => {
-                        pending.push(*condition);
-                        statements.push(then_branch);
-                        statements.extend(else_branch.as_deref());
-                    }
-                }
-            }
-        }
-        None => pending.push(expression.syntax.root),
-    }
+    let mut pending = match &expression.syntax.statement_body {
+        Some(body) => full_expressions(&body.statements).collect(),
+        None => vec![expression.syntax.root],
+    };
     let mut evaluated = BTreeSet::new();
     while let Some(index) = pending.pop() {
         if stop(frontend.declarations(), nodes, index).is_some() {
@@ -319,6 +300,10 @@ pub(super) fn unevaluated_parameters(
             ExpressionKind::Call { callee, arguments } => {
                 pending.push(*callee);
                 pending.extend(arguments);
+            }
+            ExpressionKind::StatementExpression { statements, value } => {
+                pending.extend(full_expressions(statements));
+                pending.push(*value);
             }
             _ => {}
         }
@@ -455,6 +440,12 @@ impl Safety<'_> {
                 }
                 ExpressionKind::Comma { left, right } => {
                     pending.extend([(*left, Context::Discard), value(right)]);
+                }
+                ExpressionKind::StatementExpression { statements, value: result } => {
+                    if self.statements(statements) {
+                        return true;
+                    }
+                    pending.push(value(result));
                 }
                 ExpressionKind::Dereference { operand } => {
                     if matches!(context, Context::Value | Context::Discard) {

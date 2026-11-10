@@ -383,7 +383,8 @@ Clang can resolve closed stringification in a dependency to such a literal.
 Operand-dependent dependency stringification is narrower: it must feed a direct
 `const char *` argument of a fixed, nonvariadic, void-returning native diagnostic.
 The C text template is retained, while holes stringify the outer Rust invocation
-tokens without evaluating them. Non-ASCII token spelling, returned strings,
+tokens without evaluating them. A type operand may be stringified too, and its
+hole spells the Rust type. Non-ASCII token spelling, returned strings,
 unknown array extents, address-taking, pointer arithmetic, and concatenation of
 such holes are refused. A root's own `#` stringification is admitted on the same
 terms, as `Assert`'s condition text is. A translated inline body may reach a macro
@@ -455,6 +456,13 @@ The typed expression support also covers:
   Local reads require initialization on every path that can reach them;
   unsupported control flow and
   declaration forms remain skips.
+- GNU statement expressions, `({ statements; value; })`, wherever an expression
+  may stand: in a macro, in a statement block and in a translated inline body.
+  The statements are those of a statement block, in a scope of their own, and
+  the last one must be the expression that gives the value. The value is never
+  a place. A statement expression without a final expression, which C gives the
+  type `void`, and one that contains a `return` are skipped. They nest at most
+  8 deep.
 
 Signed overflow follows the inspected undefined or wrapping policy. Arithmetic
 outside C's defined domain is rejected by the safe scalar support. Pointer and
@@ -612,7 +620,8 @@ invocation `{ MACRO(arguments...); }`. This boundary prevents a caller's `else`
 from changing the macro's control flow. If a return marker is needed, put
 `@__pgrx_c_return_as [CMarker];` after the statement boundary.
 
-Macros introducing C locals reject arguments mentioning those local names:
+Macros introducing C locals, in a statement block or a statement expression,
+reject arguments mentioning those local names:
 C substitution can capture a local that Rust macro hygiene would resolve
 differently. A compile-time check inspects stringified arguments, including
 forwarded expression fragments. Matches in fields, paths or strings are also
@@ -732,9 +741,13 @@ with `T_IntList`.
 The lookup itself is a constant. `IsA!` reads the node through the caller's
 pointer, `castNode!` and the list macros call `castNodeImpl`, and `makeNode!` calls
 `palloc0` through `newNode` and stores the tag in the result, so each needs
-`unsafe` against both build flavors. For GCC and Clang, PostgreSQL 15 and 16 define
-`newNode` as a GNU statement expression, which is not translated, so `makeNode` is
-skipped there. PostgreSQL 17 made `newNode` an inline function.
+`unsafe` against both build flavors. PostgreSQL 15 and 16 define `newNode` as a
+macro: a GNU statement expression for GCC and Clang, and for other compilers a
+comma expression that keeps the node in the global `newNodeMacroHolder`, a write
+that needs the caller's `unsafe` like any other. PostgreSQL 17 made `newNode` an
+inline function.
+Each form gives the same `makeNode!`. The size check of the two macro forms
+stringifies the type operand, so a failed check names the Rust type.
 
 A macro is still skipped when a paste puts the operand first or between two
 pasted parts, when the expansion erases, stringifies or pastes the result again,

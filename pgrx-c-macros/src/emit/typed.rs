@@ -137,9 +137,7 @@ impl<'a> Renderer<'a> {
         let expression = analysis.expression.as_ref().expect("candidate expression");
         let locals = expression
             .syntax
-            .statement_body
-            .iter()
-            .flat_map(|body| body.walk())
+            .statements()
             .filter_map(|statement| {
                 let crate::syntax::Statement::Declaration { name, type_name, .. } = statement
                 else {
@@ -269,6 +267,11 @@ impl<'a> Renderer<'a> {
         arguments::descriptor(self.analysis, parameter, self.mode == RenderMode::Witness)
     }
 
+    /// The source spelling of one parameter's operand, for diagnostic text.
+    fn spelling(&self, parameter: usize) -> String {
+        arguments::spelling(self.analysis, parameter, self.mode == RenderMode::Witness)
+    }
+
     /// Name the marker of a collapsed value whose C type is spelled `spelling`.
     ///
     /// An integer typedef whose lowered marker is exactly its kind's marker is named
@@ -344,6 +347,7 @@ impl<'a> Renderer<'a> {
                         | ExpressionKind::Assignment { .. }
                         | ExpressionKind::Update { .. }
                         | ExpressionKind::Comma { .. }
+                        | ExpressionKind::StatementExpression { .. }
                 ),
                 (None, _) => false,
             }))
@@ -376,7 +380,6 @@ impl<'a> Renderer<'a> {
         use super::demands::{Compatibility, call_parameters, possible_null_constant};
         use crate::syntax::Statement;
         let expression = self.analysis.expression.as_ref().expect("candidate expression");
-        let body = expression.syntax.statement_body.as_ref().expect("statement body");
         let declarations = self.frontend.declarations();
         let target = &self.frontend.profile().target;
         let compatibility = Compatibility::new(declarations, target);
@@ -416,7 +419,7 @@ impl<'a> Renderer<'a> {
             }
         }
         let result = &declarations.function_signatures[&self.analysis.name].signature.result;
-        for statement in body.walk() {
+        for statement in expression.syntax.statements() {
             match statement {
                 Statement::Declaration { type_name, initializer: Some(initializer), .. } => {
                     if let Some(ty) =
@@ -827,12 +830,8 @@ impl<'a> Renderer<'a> {
                                         write!(rust, "{text:?}, ").expect("String output");
                                     }
                                     StringPart::Parameter { index } => {
-                                        write!(
-                                            rust,
-                                            "$crate::__pgrx_c_operand!(@stringify; {}), ",
-                                            self.operand(*index)
-                                        )
-                                        .expect("String output");
+                                        write!(rust, "{}, ", self.spelling(*index))
+                                            .expect("String output");
                                     }
                                 }
                             }
@@ -1048,6 +1047,25 @@ impl<'a> Renderer<'a> {
                                 tasks.extend([text("; "), Task::Node(*left, Context::Discard)]);
                             }
                         }
+                        ExpressionKind::StatementExpression { statements, value: result } => {
+                            // A Rust block: the locals live until the value is computed,
+                            // as in C, and the value is never a place. Rendering its
+                            // statements recurses, as deep as the parser lets these nest.
+                            rust.push_str("{ ");
+                            if self.mode == RenderMode::Macro {
+                                super::statements::render_nested(statements, self, rust)?;
+                            } else {
+                                // The value's type needs only the locals it can name.
+                                for statement in statements {
+                                    if let crate::syntax::Statement::Declaration { name, .. } =
+                                        statement
+                                    {
+                                        self.declare_local(name, None, rust)?;
+                                    }
+                                }
+                            }
+                            tasks.extend([text(" }"), value(*result)]);
+                        }
                         ExpressionKind::Dereference { operand } => {
                             write!(
                                 rust,
@@ -1212,7 +1230,7 @@ impl<'a> Renderer<'a> {
                                     super::assertions::render_stop(
                                         &expression.syntax.nodes,
                                         stop,
-                                        |parameter| self.operand(parameter),
+                                        |parameter| self.spelling(parameter),
                                         rust,
                                     );
                                 }
@@ -1856,12 +1874,15 @@ pub(super) fn declared_objects(
                 .as_ref()
                 .zip(objects[*else_value].as_ref())
                 .and_then(|(left, right)| declared_common_object(lowering, left, right)),
-            ExpressionKind::Comma { right, .. } => objects[*right].as_ref().map(|object| {
-                let mut result = object.clone();
-                result.is_const = false;
-                result.is_volatile = false;
-                result
-            }),
+            ExpressionKind::Comma { right: value, .. }
+            | ExpressionKind::StatementExpression { value, .. } => {
+                objects[*value].as_ref().map(|object| {
+                    let mut result = object.clone();
+                    result.is_const = false;
+                    result.is_volatile = false;
+                    result
+                })
+            }
             _ => match &expression.types[index] {
                 crate::analysis::TypeExpression::External { ty } => Some(ty.clone()),
                 _ => None,
@@ -2072,6 +2093,10 @@ pub(super) fn null_pointer_access(
             ExpressionKind::Call { callee, arguments } => {
                 hide(*callee);
                 arguments.iter().copied().for_each(hide);
+            }
+            ExpressionKind::StatementExpression { statements, value } => {
+                crate::syntax::full_expressions(statements).for_each(&mut hide);
+                hide(*value);
             }
             ExpressionKind::Empty
             | ExpressionKind::Parameter { .. }

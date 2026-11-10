@@ -242,9 +242,6 @@ mod tests {
         assert_eq!(value, 42);
     }
 
-    // PostgreSQL 15 and 16 define `newNode` as a GNU statement expression, which is not
-    // translated, so `makeNode` exists from PostgreSQL 17 on.
-    pg::__pgrx_c_classify! { @if_available makeNode {
     /// Checks that `makeNode` allocates a zeroed node of its type operand with the tag C
     /// names for that type, which `nodeTag`, `IsA` and `castNode` then find.
     #[pg_test]
@@ -264,7 +261,6 @@ mod tests {
             pg::pfree(query.cast());
         }
     }
-    } }
 
     /// Checks that the list macros cast a cell's node to their type operand. An
     /// assert-enabled PostgreSQL checks each node's tag in `castNodeImpl` first, and every

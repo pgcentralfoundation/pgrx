@@ -112,9 +112,6 @@ const ALLOWANCES: &[Allowance] = &[
         majors: 15..=15,
         skip: Some("unsupported_literal"),
     },
-    // For GCC and Clang, PostgreSQL 15 and 16 define `newNode`, which `makeNode` expands, as
-    // a GNU statement expression. PostgreSQL 17 made it a static inline function.
-    Allowance { name: "makeNode", majors: 15..=16, skip: Some("statement") },
 ];
 
 /// Require every gated test's macro, and every generated macro pgrx calls, to exist in this build

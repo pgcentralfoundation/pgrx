@@ -92,9 +92,7 @@ pub(super) fn plan<'s>(
         let Some(expression) = &analysis.expression else { continue };
         let locals = expression
             .syntax
-            .statement_body
-            .iter()
-            .flat_map(|body| body.walk())
+            .statements()
             .filter_map(|statement| {
                 let crate::syntax::Statement::Declaration { name, type_name, .. } = statement
                 else {
@@ -517,7 +515,8 @@ pub(super) fn possible_null_constant(
         | ExpressionKind::Assignment { .. }
         | ExpressionKind::AddressOf { .. }
         | ExpressionKind::Call { .. }
-        | ExpressionKind::Comma { .. } => false,
+        | ExpressionKind::Comma { .. }
+        | ExpressionKind::StatementExpression { .. } => false,
         _ => true,
     }
 }
@@ -741,7 +740,7 @@ impl<'a> Constraints<'a> {
                 _ => {}
             }
         }
-        for statement in expression.syntax.statement_body.iter().flat_map(|body| body.walk()) {
+        for statement in expression.syntax.statements() {
             if let crate::syntax::Statement::Declaration {
                 type_name,
                 initializer: Some(initializer),
@@ -854,8 +853,9 @@ impl<'a> Constraints<'a> {
                     index,
                     vec![root, self.representative[*then_value], self.representative[*else_value]],
                 )),
-                ExpressionKind::Comma { right, .. } => {
-                    relations.push((index, vec![root, self.representative[*right]]))
+                ExpressionKind::Comma { right: value, .. }
+                | ExpressionKind::StatementExpression { value, .. } => {
+                    relations.push((index, vec![root, self.representative[*value]]))
                 }
                 ExpressionKind::Unary {
                     operator: UnaryOperator::Plus | UnaryOperator::Negate,
@@ -1142,8 +1142,11 @@ impl<'a> Constraints<'a> {
             ExpressionKind::Group { operand } => {
                 self.sources(operand, expression, objects, depth + 1)
             }
-            ExpressionKind::Comma { right, .. } if objects[node].is_none() => {
-                self.sources(right, expression, objects, depth + 1).map(|sources| {
+            ExpressionKind::Comma { right: value, .. }
+            | ExpressionKind::StatementExpression { value, .. }
+                if objects[node].is_none() =>
+            {
+                self.sources(value, expression, objects, depth + 1).map(|sources| {
                     if sources.values().all(|ty| !ty.is_const && !ty.is_volatile) {
                         return sources;
                     }

@@ -460,8 +460,7 @@ for a tag that names no structure, such as `T_IntList`.
 Each of these macros needs `unsafe` against an assert-enabled and a release
 PostgreSQL alike. `IsA!` reads the node through your pointer. `castNode!` and the
 list macros check the node's tag when PostgreSQL was built with assertions and only
-cast otherwise. `makeNode!` allocates in the current memory context, and is
-generated from PostgreSQL 17 on.
+cast otherwise. `makeNode!` allocates in the current memory context.
 
 ## Mutate storage with an explicit safety argument
 

@@ -283,7 +283,7 @@ pub(super) fn documentation_forms(
             // inside a repetition is safe.
             write!(operands, "$(${name}:tt)+").expect("String output");
             trailing_comma = false;
-        } else if roles == [ParameterRole::Type] {
+        } else if parameter.is_type() {
             write!(operands, "${name}:ty").expect("String output");
         } else if roles.contains(&ParameterRole::Identifier) {
             write!(operands, "${name}:ident").expect("String output");
