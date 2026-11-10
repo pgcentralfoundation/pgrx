@@ -14,6 +14,7 @@
     unused_unsafe,
     reason = "docs.rs builds replace generated C macros with shells, some of which need no unsafe"
 )]
+mod construct;
 mod item;
 mod lexeme;
 
@@ -34,6 +35,7 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer, de};
 use std::ffi::{CStr, CString};
 use std::panic::UnwindSafe;
 
+pub use construct::TsConfig;
 pub use item::{Item, Items, Operand, Operator, WeightSet};
 pub use lexeme::{InvalidWeight, Lexeme, Lexemes, Position, Weight};
 

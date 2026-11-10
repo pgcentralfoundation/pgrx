@@ -533,6 +533,83 @@ mod tests {
         assert_eq!(!x.clone(), x.not());
     }
 
+    fn sql_text<T: FromDatum + IntoDatum>(query: &str) -> T {
+        Spi::get_one::<T>(query).unwrap().unwrap()
+    }
+
+    #[pg_test]
+    fn tsvector_from_text() {
+        use pgrx::datum::tsearch::TsConfig;
+
+        let text = "The quick brown foxes jumped";
+        let current: TsVectorBuf = sql_text(&format!("SELECT to_tsvector('{text}')"));
+        assert_eq!(TsVectorBuf::from_text(text), current);
+        let english = TsConfig::by_name("english").unwrap();
+        let simple = TsConfig::by_name("pg_catalog.simple").unwrap();
+        assert_ne!(english, simple);
+        let expected: TsVectorBuf = sql_text(&format!("SELECT to_tsvector('simple', '{text}')"));
+        assert_eq!(TsVectorBuf::from_text_with(simple, text), expected);
+        let expected: TsVectorBuf = sql_text(&format!("SELECT to_tsvector('english', '{text}')"));
+        assert_eq!(TsVectorBuf::from_text_with(english, text), expected);
+        assert_ne!(TsVectorBuf::from_text_with(simple, text), expected);
+        assert!(TsVectorBuf::from_text("").is_empty());
+    }
+
+    #[pg_test]
+    fn ts_config_lookup() {
+        use pgrx::datum::tsearch::TsConfig;
+
+        assert!(TsConfig::by_name("nope").is_none());
+        assert!(TsConfig::by_name("nope\0").is_none());
+        for malformed in
+            ["", "-", "0", "12345", "a.b.c.d", "nope.simple", "other_db.pg_catalog.simple"]
+        {
+            assert!(TsConfig::by_name(malformed).is_none(), "{malformed:?}");
+        }
+        assert_eq!(TsConfig::by_name("simple"), TsConfig::by_name("pg_catalog.simple"));
+        let current = Spi::get_one::<String>("SHOW default_text_search_config").unwrap().unwrap();
+        let name = current.trim_start_matches("pg_catalog.");
+        assert_eq!(Some(TsConfig::current()), TsConfig::by_name(name));
+    }
+
+    #[pg_test]
+    fn tsquery_from_text() {
+        use pgrx::datum::tsearch::TsConfig;
+
+        let simple = TsConfig::by_name("simple").unwrap();
+        let text = "Fat & (Rats | cats)";
+        let expected: TsQueryBuf = sql_text(&format!("SELECT to_tsquery('simple', '{text}')"));
+        assert_eq!(TsQueryBuf::from_text_with(simple, text).unwrap(), expected);
+        let current: TsQueryBuf = sql_text(&format!("SELECT to_tsquery('{text}')"));
+        assert_eq!(TsQueryBuf::from_text(text).unwrap(), current);
+        assert!(TsQueryBuf::from_text("a &").is_err());
+        assert!(TsQueryBuf::from_text_with(simple, "a <99999> b").is_err());
+    }
+
+    #[pg_test]
+    fn tsquery_from_free_text() {
+        use pgrx::datum::tsearch::TsConfig;
+
+        let simple = TsConfig::by_name("simple").unwrap();
+        let text = "Fat rats: \"cats\" -dogs";
+        let cases = [
+            (TsQueryBuf::from_plain_text_with(simple, text), "plainto_tsquery"),
+            (TsQueryBuf::from_phrase_text_with(simple, text), "phraseto_tsquery"),
+            (TsQueryBuf::from_websearch_text_with(simple, text), "websearch_to_tsquery"),
+        ];
+        for (actual, function) in cases {
+            let expected: TsQueryBuf =
+                sql_text(&format!("SELECT {function}('simple', $${text}$$)"));
+            assert_eq!(actual, expected, "{function}");
+        }
+        let current: TsQueryBuf = sql_text(&format!("SELECT plainto_tsquery($${text}$$)"));
+        assert_eq!(TsQueryBuf::from_plain_text(text), current);
+        let current: TsQueryBuf = sql_text(&format!("SELECT phraseto_tsquery($${text}$$)"));
+        assert_eq!(TsQueryBuf::from_phrase_text(text), current);
+        let current: TsQueryBuf = sql_text(&format!("SELECT websearch_to_tsquery($${text}$$)"));
+        assert_eq!(TsQueryBuf::from_websearch_text(text), current);
+    }
+
     #[pg_test]
     fn weight_labels() {
         assert_eq!(Weight::try_from('a'), Ok(Weight::A));
