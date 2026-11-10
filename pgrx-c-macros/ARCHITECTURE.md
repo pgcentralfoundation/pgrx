@@ -876,10 +876,11 @@ unused outer formal.
 A pasted name gives its formal the type role and has the C type of the
 enumerators it can name. `FrontendOutput::type_enumerators` finds them for a
 prefix: each typedef name of a structure or union for which the prefix followed by
-that name is an enumerator. A name that an active macro hides would expand in C,
-and a name that only one build flavor declares has no binding, so both are left
-out. The enumerators must belong to one enum and share one C type, so one lookup
-serves every type. Otherwise, or when no type has an enumerator, the macro is
+that name is an enumerator. A name that only one build flavor declares has no
+binding, so it is left out. A name that an active macro hides would expand in C,
+so it selects no enumerator, but it still shares its structure with that
+structure's other names (section 12). The enumerators must belong to one enum and
+share one C type, so one lookup serves every type. Otherwise, or when no type has an enumerator, the macro is
 skipped with `token_paste`.
 
 Determine an invocation contract from grouping and statement shape:
@@ -1501,8 +1502,9 @@ enumerator:
 - A record that several C names share, each with its own enumerator, implements
   nothing. PostgreSQL's `OpExpr`, `DistinctExpr` and `NullIfExpr` name one
   structure, which Rust sees as one type. Choosing `T_OpExpr` for it would change
-  what `IsA(node, DistinctExpr)` tests without any sign at the call. The
-  diagnostic lists these names.
+  what `IsA(node, DistinctExpr)` tests without any sign at the call. A name whose
+  enumerator a macro hides or the bindings lack still counts, since Rust can
+  spell that name as the same type. The diagnostic lists these names.
 - A Rust alias or other path of a bound record names the same type and selects the
   same enumerator. An enumerator that C names for something other than a type,
   as `T_IntList` is, has no Rust operand: compare `nodeTag!` with it instead.

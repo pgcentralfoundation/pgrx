@@ -790,20 +790,20 @@ fn expand_prepared<'a>(
             continue;
         }
         restore_invocation_diagnostics(&mut body, prefix);
+        let pastes = operand_pastes.remove(&item.definition.name).unwrap_or_default();
         let mut occurrences = Vec::new();
+        let mut surviving = BTreeSet::new();
         for (index, token) in body.iter().enumerate() {
             if let Some(&parameter) = markers.get(token.spelling.as_str()) {
                 occurrences.push(ParameterOccurrence { parameter, token: index });
+            } else if token.kind == TokenKind::Identifier && pastes.contains_key(&token.spelling) {
+                surviving.insert(token.spelling.as_str());
             }
         }
         // An identifier pasted from fixed text and an operand must survive as a token of
         // its own, where analysis can give it a meaning. One that the expansion erased,
         // stringified or pasted again would otherwise leave no trace of the operand's use.
-        let pastes = operand_pastes.remove(&item.definition.name).unwrap_or_default();
-        let survives = |name: &String| {
-            body.iter().any(|token| token.kind == TokenKind::Identifier && token.spelling == *name)
-        };
-        if !pastes.keys().all(survives) {
+        if surviving.len() != pastes.len() {
             record_skip(
                 &mut results,
                 &item.definition.name,

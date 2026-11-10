@@ -1054,7 +1054,7 @@ fn collect_declarations(unit: &TranslationUnit<'_>) -> (DeclarationCatalog, BTre
                         if let Some(enumeration) = parent.get_type() {
                             catalog
                                 .enumerations
-                                .entry(type_info(enumeration).canonical_spelling)
+                                .entry(enumeration.get_canonical_type().get_display_name())
                                 .or_default()
                                 .push(name.clone());
                         }

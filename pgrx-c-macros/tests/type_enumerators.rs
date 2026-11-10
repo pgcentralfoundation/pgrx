@@ -95,7 +95,7 @@ impl Flavor {
             .rust_edition(bindgen::RustEdition::Edition2024)
             .header(header().to_str().unwrap())
             .clang_args(&frontend.profile().arguments)
-            .allowlist_type("Shape.*|Circle|Square|Segment|Plain|Twin.*|Masked|Paint")
+            .allowlist_type("Shape.*|Circle|Square|Segment|Plain|Twin.*|Masked.*|Paint")
             .default_enum_style(bindgen::EnumVariation::ModuleConsts)
             .rustified_non_exhaustive_enum("ShapeKind")
             .use_core()
@@ -323,8 +323,8 @@ fn a_prefix_pasted_onto_a_type_operand_names_that_types_enumerator() {
     }
 
     // Each bound structure type with a bound enumerator implements the sealed lookup. A
-    // type without an enumerator, one the bindings leave out, one whose enumerator a macro
-    // hides, and one that two C names give different enumerators implement none.
+    // type without an enumerator, one the bindings leave out, and one that two C names give
+    // different enumerators implement none, even when a macro hides one of those names.
     let implementations = |lookup: &str| {
         asserted
             .support
@@ -335,7 +335,11 @@ fn a_prefix_pasted_onto_a_type_operand_names_that_types_enumerator() {
     };
     assert_eq!(implementations("TypeEnumerator_KIND_"), ["Circle", "Segment", "Shape", "Square"]);
     assert_eq!(implementations("TypeEnumerator_PAINT_"), ["Circle", "Square"]);
-    assert!(asserted.support.contains("selects none: Twin, TwinAlias\""), "{}", asserted.support);
+    assert!(
+        asserted.support.contains("selects none: Masked, MaskedAlias; Twin, TwinAlias\""),
+        "{}",
+        asserted.support
+    );
     assert!(!asserted.bindings.contains("struct Unbound"), "{}", asserted.bindings);
 
     // A binding whose value disagrees with Clang's refuses the whole lookup, since any type
@@ -390,9 +394,11 @@ fn a_prefix_pasted_onto_a_type_operand_names_that_types_enumerator() {
     for (invocation, error, explanation) in [
         ("let _ = KindOf!(Plain);", "E0277", UNIMPLEMENTED),
         // Rust sees one type where C has two names with different enumerators.
-        ("let _ = KindOf!(Twin);", "E0277", "selects none: Twin, TwinAlias"),
+        ("let _ = KindOf!(Twin);", "E0277", "selects none: Masked, MaskedAlias; Twin, TwinAlias"),
         ("let _ = KindOf!(TwinAlias);", "E0277", UNIMPLEMENTED),
         ("let _ = KindOf!(Masked);", "E0277", UNIMPLEMENTED),
+        // A macro gives `Masked` another enumerator, so its alias's cannot stand in.
+        ("let _ = KindOf!(MaskedAlias);", "E0277", UNIMPLEMENTED),
         ("let _ = KindOf!(u32);", "E0277", UNIMPLEMENTED),
         ("let _ = unsafe { makeShape!(Plain) };", "E0277", UNIMPLEMENTED),
         // An incomplete type has an enumerator and no size.

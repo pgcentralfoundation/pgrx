@@ -718,8 +718,8 @@ implements the trait when all of these hold:
 - No macro of either name is active, which C would expand instead, and both build
   flavors declare both names.
 - The bindings hold the structure and the enumerator, with the value Clang reports.
-- No other C name of the same structure has an enumerator of its own. PostgreSQL
-  names one structure `OpExpr`, `DistinctExpr` and `NullIfExpr`, with a node tag
+- No other C name of the same structure has an enumerator of its own, even one
+  that a macro hides or the bindings lack. PostgreSQL names one structure `OpExpr`, `DistinctExpr` and `NullIfExpr`, with a node tag
   for each. Rust sees one type, so none of the three names selects a tag; compare
   `nodeTag!` with the enumerator instead.
 

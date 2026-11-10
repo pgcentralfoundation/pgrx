@@ -96,15 +96,14 @@ impl FrontendOutput {
     /// The enumerators that C names by pasting `prefix` onto the name of a structure type.
     ///
     /// A type takes part when its name is a typedef of a structure or union and `prefix`
-    /// followed by that name is an enumerator. An active macro of either name would expand
-    /// in its place, and a name that only one build flavor declares has no binding, so both
-    /// leave a type out. The enumerators must belong to one enum and share one C type, so
-    /// that one lookup serves every type.
+    /// followed by that name is an enumerator. A name that only one build flavor declares has
+    /// no binding, so it leaves a type out. An active macro of either name would expand in
+    /// its place, so such a type selects no enumerator, but it still shares its structure
+    /// with the structure's other names. The enumerators must belong to one enum and share
+    /// one C type, so that one lookup serves every type.
     pub(crate) fn type_enumerators(&self, prefix: &str) -> Result<TypeEnumerators<'_>, String> {
-        let hidden = |name: &str| {
-            self.environment.active.contains_key(name)
-                || self.flavors.flavor_specific.contains(name)
-        };
+        let flavor_specific = |name: &str| self.flavors.flavor_specific.contains(name);
+        let active = |name: &str| self.environment.active.contains_key(name);
         let mut families =
             self.declarations.enumerations.iter().filter_map(|(enumeration, names)| {
                 let members = names
@@ -115,11 +114,14 @@ impl FrontendOutput {
                             .types
                             .get_key_value(enumerator.strip_prefix(prefix)?)
                             .filter(|(_, ty)| ty.category == TypeCategory::Record)?;
-                        (!hidden(type_name) && !hidden(enumerator))
-                            .then_some((type_name.as_str(), enumerator.as_str()))
+                        if flavor_specific(type_name) || flavor_specific(enumerator) {
+                            return None;
+                        }
+                        let usable = !active(type_name) && !active(enumerator);
+                        Some((type_name.as_str(), usable.then_some(enumerator.as_str())))
                     })
                     .collect::<BTreeMap<_, _>>();
-                (!members.is_empty()).then_some((enumeration.as_str(), members))
+                members.values().any(Option::is_some).then_some((enumeration.as_str(), members))
             });
         let (enumeration, members) = families.next().ok_or_else(|| {
             format!("no structure type has a name that `{prefix}` pastes into an enumerator")
@@ -129,8 +131,10 @@ impl FrontendOutput {
                 "`{prefix}` pasted onto structure type names forms enumerators of both `{enumeration}` and `{other}`"
             ));
         }
-        let mut types =
-            members.values().map(|enumerator| &self.declarations.integer_constants[*enumerator].ty);
+        let mut types = members
+            .values()
+            .flatten()
+            .map(|enumerator| &self.declarations.integer_constants[*enumerator].ty);
         let first = types.next().expect("a family has a member");
         let ty = match first.category {
             TypeCategory::Integer(kind) if types.all(|other| other.category == first.category) => {
@@ -176,8 +180,9 @@ pub(crate) struct TypeEnumerators<'a> {
     pub enumeration: &'a str,
     /// The C integer type they share.
     pub ty: IntegerType,
-    /// Each structure type's typedef name with the name of its enumerator.
-    pub members: BTreeMap<&'a str, &'a str>,
+    /// Each structure type's typedef name with the name of its enumerator, or `None` when an
+    /// active macro hides either name.
+    pub members: BTreeMap<&'a str, Option<&'a str>>,
 }
 
 /// Effective C compiler inputs and the target facts verified during inspection.

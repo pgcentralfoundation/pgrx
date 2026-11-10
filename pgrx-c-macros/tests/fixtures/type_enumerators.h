@@ -32,6 +32,7 @@ typedef enum ShapeKind
 	KIND_Twin,
 	KIND_TwinAlias,
 	KIND_Masked,
+	KIND_MaskedAlias,
 	KIND_Unbound,
 	KIND_Count
 } ShapeKind;
@@ -76,11 +77,15 @@ typedef struct Twin
 } Twin;
 typedef Twin TwinAlias;
 
-/* A macro hides this type's enumerator, so C would expand the pasted name. */
+/*
+ * A macro hides this type's enumerator, so C would expand the pasted name. The alias's
+ * enumerator must not stand in for it.
+ */
 typedef struct Masked
 {
 	ShapeKind	kind;
 } Masked;
+typedef Masked MaskedAlias;
 #define KIND_Masked KIND_Circle
 
 /* A type the bindings leave out. KIND_Invalid and KIND_Count name no type at all. */

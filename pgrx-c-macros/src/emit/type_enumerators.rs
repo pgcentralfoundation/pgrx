@@ -59,7 +59,8 @@ fn lookup_name(prefix: &str) -> String {
 /// enumerator. One whose record or enumerator is not bound is left out. So is a record
 /// that several C names would give different enumerators, as PostgreSQL's `OpExpr`,
 /// `DistinctExpr` and `NullIfExpr` name one structure: Rust sees one type, and choosing
-/// one of its enumerators would silently change what the other names mean.
+/// one of its enumerators would silently change what the other names mean. A name whose
+/// enumerator a macro hides or the bindings lack still counts among those names.
 pub(super) fn generate(
     frontend: &FrontendOutput,
     bindings: &BindingCatalog,
@@ -98,8 +99,9 @@ fn lookup(
     let declarations = frontend.declarations();
     let enumerators = frontend.type_enumerators(prefix).map_err(Refusal::Unavailable)?;
     let enumeration = strip_location_directories(enumerators.enumeration);
-    // Each bound record with the C names that select an enumerator for it.
-    let mut records = BTreeMap::<String, Vec<(&str, String)>>::new();
+    // Each bound record with the C names that C pastes into an enumerator for it, and that
+    // enumerator's value when a macro hides neither name and the bindings hold it.
+    let mut records = BTreeMap::<String, Vec<(&str, Option<String>)>>::new();
     for (type_name, enumerator) in &enumerators.members {
         let Ok(record) = lowering
             .record_binding(&declarations.types[*type_name])
@@ -107,32 +109,40 @@ fn lookup(
         else {
             continue;
         };
-        let Ok((path, representation)) = binding_path(bindings, enumerator) else { continue };
-        let (bindgen, clang) = (
-            bindings.integer_constants[*enumerator].value,
-            declarations.integer_constants[*enumerator].value,
-        );
-        if integer_numeric(bindgen) != integer_numeric(clang) {
-            return Err(Refusal::ValueMismatch { name: (*enumerator).into(), bindgen, clang });
+        let mut value = None;
+        if let Some(enumerator) = enumerator
+            && let Ok((path, representation)) = binding_path(bindings, enumerator)
+        {
+            let (bindgen, clang) = (
+                bindings.integer_constants[*enumerator].value,
+                declarations.integer_constants[*enumerator].value,
+            );
+            if integer_numeric(bindgen) != integer_numeric(clang) {
+                return Err(Refusal::ValueMismatch { name: (*enumerator).into(), bindgen, clang });
+            }
+            let mut rust = String::new();
+            let path = format!("crate::{path}");
+            write_binding_value(&mut rust, "c", &path, representation, enumerators.ty);
+            value = Some(rust);
         }
-        let mut value = String::new();
-        write_binding_value(
-            &mut value,
-            "c",
-            &format!("crate::{path}"),
-            representation,
-            enumerators.ty,
-        );
         records.entry(record.replace("$crate", "crate")).or_default().push((type_name, value));
     }
     // Rust sees one type where C has several names, each with its own enumerator, so no
-    // one enumerator is that type's. The error for such a type says so.
+    // one enumerator is that type's, even when a macro hides one of those names. The error
+    // for such a type says so.
     let shared = records
         .values()
         .filter(|names| names.len() > 1)
         .map(|names| names.iter().map(|(name, _)| *name).collect::<Vec<_>>().join(", "))
         .collect::<Vec<_>>();
-    if shared.len() == records.len() {
+    let implemented = records
+        .iter()
+        .filter_map(|(record, names)| match names.as_slice() {
+            [(_, Some(value))] => Some((record, value)),
+            _ => None,
+        })
+        .collect::<Vec<_>>();
+    if implemented.is_empty() {
         return Err(Refusal::Unavailable(format!(
             "no bound structure type has one name that `{prefix}` pastes into a bound enumerator of `{enumeration}`"
         )));
@@ -158,11 +168,9 @@ fn lookup(
     let mut rust = format!(
         "/// The enumerator of `{enumeration}` that C names by pasting `{prefix}` onto a structure type's name.\n#[diagnostic::on_unimplemented(message = {message:?}, label = {label:?}{note})]\npub trait {name}: {SEALS}::Seal_{prefix} {{\n/// The enumerator, with its C type.\nconst VALUE: c::CValue<c::{marker}>;\n}}\n"
     );
-    for (record, names) in &records {
-        if let [(_, value)] = names.as_slice() {
-            writeln!(rust, "impl {SEALS}::Seal_{prefix} for {record} {{}}\nimpl {name} for {record} {{ const VALUE: c::CValue<c::{marker}> = {value}; }}")
-                .expect("String output");
-        }
+    for (record, value) in implemented {
+        writeln!(rust, "impl {SEALS}::Seal_{prefix} for {record} {{}}\nimpl {name} for {record} {{ const VALUE: c::CValue<c::{marker}> = {value}; }}")
+            .expect("String output");
     }
     Ok(rust)
 }
