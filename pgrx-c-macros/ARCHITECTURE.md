@@ -1395,9 +1395,21 @@ Rust *token source*, not a value computed during normalization. The callee selec
 only the context demanded by its enclosing C operator. Unsupported alternatives
 contain a context-local `compile_error!`; discard evaluates the value alternative
 for effects and ignores its result. This preserves repeated substitutions,
-places, and unevaluated operands without creating eager temporaries. A `sizeof`
-witness wraps generated operations in `unsafe`, so it also expands dead checks of
-each caller operand; for a compiled argument those are the checks bracket, the
+places, and unevaluated operands without creating eager temporaries.
+
+A `sizeof` witness renders its operand in a branch that never runs. It wraps the
+operand in `unsafe` only where `emit::assertions::unevaluated_unsafe` finds a need:
+an operation that would need the caller's `unsafe` if it ran, or a caller operand
+outside a nested `sizeof`, which may be a compiled argument or another generated
+macro that performs one. The first test is the rule that decides a macro's own need
+for `unsafe`, so every check counts and both build flavors wrap the same operands.
+Any other operand, such as the address of a global or a checked global read, gets
+no `unsafe` block. A block that is emitted allows `unused_unsafe`, because the
+caller may already be in `unsafe` or may pass an operand that needs none.
+
+A witness that wraps also expands dead checks of each caller operand, outside the
+block, so the block admits no unsafe operation the caller wrote. For a compiled
+argument those are the checks bracket, the
 producing macro's own checks of its caller operands. They are always well typed
 and do not depend on whether any alternative could be rendered. A call to a
 translated inline function passes the same descriptor with only a value

@@ -45,4 +45,26 @@ fn main() {
     println!("copy\t{copy}\t{}", checks());
     // The discarded operand's three reads each check, and then the macro's own read does.
     println!("after\t{}\t{}", GLOBAL_AFTER!(GLOBAL_TOTAL!()).get(), checks());
+    // `sizeof` evaluates nothing, so none of these checks, and none needs `unsafe`: not for
+    // an operand that reads through a pointer, nor for a macro that does.
+    println!(
+        "sizes\t{}\t{}\t{}\t{}\t{}",
+        GLOBAL_SIZE!().get(),
+        GLOBAL_SUM_SIZE!().get(),
+        GLOBAL_POINTEE_SIZE!().get(),
+        GLOBAL_HOOK_SIZE!().get(),
+        checks()
+    );
+    let narrow = 1_i16;
+    let pointer = &raw const narrow;
+    println!(
+        "wider\t{}\t{}\t{}\t{}",
+        GLOBAL_WIDER!(narrow).get(),
+        GLOBAL_WIDER!(GLOBAL_POINTEE!()).get(),
+        GLOBAL_POINTEE_WIDER!().get(),
+        checks()
+    );
+    // SAFETY: the operand is not evaluated. The caller's dereference still needs `unsafe`,
+    // and the macro's own block inside it is no error.
+    println!("wider\t{}", unsafe { GLOBAL_WIDER!(*pointer) }.get());
 }

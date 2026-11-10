@@ -350,6 +350,41 @@ impl<'a> Renderer<'a> {
         result.map_or_else(|| "()".into(), |result| self.value_witness(declared, &result.marker))
     }
 
+    /// Write the start of an operand C does not evaluate, and queue the rest: `operand`
+    /// rendered in `context` as the `Some` of a branch that never runs, which gives a
+    /// `sizeof` its type.
+    ///
+    /// The rendering sits in `unsafe` only when
+    /// [`unevaluated_unsafe`](super::assertions::unevaluated_unsafe) finds an operation
+    /// that needs it. That block would also cover an unsafe operation the caller wrote in
+    /// an operand, so the caller's operands are then checked outside it. The block is
+    /// unused where the caller already wrote `unsafe`, or passed an operand that needs
+    /// none, so it allows that lint.
+    fn unevaluated(
+        &self,
+        operand: NodeId,
+        context: Context,
+        rust: &mut String,
+        tasks: &mut Vec<Task>,
+    ) {
+        if super::assertions::unevaluated_unsafe(
+            self.frontend,
+            self.bindings,
+            self.analysis,
+            self.translations,
+            operand,
+            context,
+            !self.inline_body,
+        ) {
+            write!(rust, "if false {{ {} ::core::option::Option::Some(/* SAFETY: C does not evaluate this operand, and this branch never runs. */ #[allow(unused_unsafe)] unsafe {{ ", self.caller_checks()).expect("String output");
+            tasks.push(Task::Text(" }) } else { ::core::option::Option::None }".into()));
+        } else {
+            rust.push_str("if false { ::core::option::Option::Some(");
+            tasks.push(Task::Text(") } else { ::core::option::Option::None }".into()));
+        }
+        tasks.push(Task::Node(operand, context));
+    }
+
     /// Dead checks of the caller's operands, for a size witness that wraps generated
     /// operations in `unsafe` and for a compiled operand that may reach one.
     ///
@@ -722,29 +757,29 @@ impl<'a> Renderer<'a> {
                                         .field_marker(*base, *indirect, field)
                                         .map_err(failure)?,
                                 };
-                                let checks = self.caller_checks();
-                                write!(rust, "{EXPRESSION}::record::size_of_member_type::<{marker}, _>(if false {{ {checks} ::core::option::Option::Some(unsafe {{ ").expect("String output");
-                                tasks.extend([
-                                    text(" }) } else { ::core::option::Option::None })"),
-                                    value(*base),
-                                ]);
+                                write!(
+                                    rust,
+                                    "{EXPRESSION}::record::size_of_member_type::<{marker}, _>("
+                                )
+                                .expect("String output");
+                                tasks.push(text(")"));
+                                self.unevaluated(*base, Context::Value, rust, &mut tasks);
                                 continue;
                             }
                             let known = self.places[index];
-                            let checks = self.caller_checks();
                             write!(
                                 rust,
-                                "{EXPRESSION}::{}(if false {{ {checks} ::core::option::Option::Some(unsafe {{ ",
+                                "{EXPRESSION}::{}(",
                                 if known { "size_of_place_type" } else { "size_of_value_type" }
                             )
                             .expect("String output");
-                            tasks.extend([
-                                text(" }) } else { ::core::option::Option::None })"),
-                                Task::Node(
-                                    index,
-                                    if known { Context::ReadPlace } else { Context::Value },
-                                ),
-                            ]);
+                            tasks.push(text(")"));
+                            self.unevaluated(
+                                index,
+                                if known { Context::ReadPlace } else { Context::Value },
+                                rust,
+                                &mut tasks,
+                            );
                         }
                         continue;
                     }
