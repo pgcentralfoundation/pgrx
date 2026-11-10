@@ -811,6 +811,35 @@ pub fn SUPPORTED_VERSIONS() -> Vec<PgVersion> {
 pub fn is_supported_major_version(v: u16) -> bool {
     SUPPORTED_VERSIONS().into_iter().any(|pgver| pgver.major == v)
 }
+/// The name of the operating-system account running this process, which is the role and
+/// superuser name PostgreSQL's own tools use by default.
+///
+/// PostgreSQL role names are case-sensitive, so this is the account name as the operating
+/// system records it. On Windows the `USERNAME` environment variable can differ from it in
+/// case: an SSH session has `administrator` where the account is `Administrator`, so a
+/// client that trusts the variable cannot connect to a cluster that `initdb` created.
+pub fn os_user_name() -> eyre::Result<String> {
+    #[cfg(target_os = "windows")]
+    {
+        use winapi::um::winbase::GetUserNameW;
+        // UNLEN, the longest user name, is 256 characters; the buffer also holds the NUL.
+        let mut name = [0_u16; 257];
+        let mut length = name.len() as u32;
+        // SAFETY: `name` is writable for `length` UTF-16 units and `length` is a valid,
+        // initialized count that the call updates to the units written, including the NUL.
+        let succeeded = unsafe { GetUserNameW(name.as_mut_ptr(), &mut length) } != 0;
+        if !succeeded {
+            return Err(std::io::Error::last_os_error())
+                .wrap_err("could not read the operating-system user name");
+        }
+        let name = name.get(..(length as usize).saturating_sub(1)).unwrap_or_default();
+        String::from_utf16(name).wrap_err("the operating-system user name is not valid UTF-16")
+    }
+    #[cfg(not(target_os = "windows"))]
+    {
+        std::env::var("USER").wrap_err("the `USER` environment variable is unset or not UTF-8")
+    }
+}
 
 pub fn createdb(
     pg_config: &PgConfig,

@@ -408,7 +408,7 @@ fn ensure_feature(features: &mut clap_cargo::Features, feature: &str) {
 }
 
 fn connect_client(pg_config: &PgConfig, dbname: &str) -> eyre::Result<Client> {
-    let user = current_user()?;
+    let user = pgrx_pg_config::os_user_name()?;
     postgres::Config::new()
         .host(pg_config.host())
         .port(pg_config.port()?)
@@ -416,12 +416,6 @@ fn connect_client(pg_config: &PgConfig, dbname: &str) -> eyre::Result<Client> {
         .dbname(dbname)
         .connect(NoTls)
         .wrap_err("failed to connect to Postgres benchmark database")
-}
-
-fn current_user() -> eyre::Result<String> {
-    std::env::var("USER")
-        .or_else(|_| std::env::var("USERNAME"))
-        .map_err(|_| eyre!("could not determine current operating-system user from environment"))
 }
 
 fn ensure_persistent_schema(client: &mut Client) -> eyre::Result<()> {
