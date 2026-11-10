@@ -69,6 +69,151 @@ macro_rules! Abs {
     };
 }
 #[cfg(feature = "pg15")]
+/// C macro Assert from c.h:891 (PostgreSQL 15)
+///
+/// ```text
+/// #define Assert( condition ) do { if ( ! ( condition ) ) ExceptionalCondition ( # condition , "FailedAssertion" , __FILE__ , __LINE__ ) ; } while ( 0 )
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
+///
+/// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+///
+#[doc = crate::__pgrx_c_doc_assertions!()]
+///
+#[doc = crate::__pgrx_c_doc_statements!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+#[macro_export]
+macro_rules! Assert {
+    ($condition:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(@unit {
+            let _ = &$condition;
+        })
+    };
+}
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
+/// C macro Assert from c.h:874 (PostgreSQL 16), c.h:890 (PostgreSQL 17), c.h:859 (PostgreSQL 18), c.h:963 (PostgreSQL 19)
+///
+/// ```text
+/// #define Assert( condition ) do { if ( ! ( condition ) ) ExceptionalCondition ( # condition , __FILE__ , __LINE__ ) ; } while ( 0 )
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
+///
+/// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+///
+#[doc = crate::__pgrx_c_doc_assertions!()]
+///
+#[doc = crate::__pgrx_c_doc_statements!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+#[macro_export]
+macro_rules! Assert {
+    ($condition:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(@unit {
+            let _ = &$condition;
+        })
+    };
+}
+#[cfg(feature = "pg15")]
+/// C macro AssertArg from c.h:903 (PostgreSQL 15)
+///
+/// ```text
+/// #define AssertArg( condition ) do { if ( ! ( condition ) ) ExceptionalCondition ( # condition , "BadArgument" , __FILE__ , __LINE__ ) ; } while ( 0 )
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
+///
+/// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+///
+#[doc = crate::__pgrx_c_doc_assertions!()]
+///
+#[doc = crate::__pgrx_c_doc_statements!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+#[macro_export]
+macro_rules! AssertArg {
+    ($condition:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(@unit {
+            let _ = &$condition;
+        })
+    };
+}
+#[cfg(feature = "pg15")]
+/// C macro AssertMacro from c.h:898 (PostgreSQL 15)
+///
+/// ```text
+/// #define AssertMacro( condition ) ( ( void ) ( ( condition ) || ( ExceptionalCondition ( # condition , "FailedAssertion" , __FILE__ , __LINE__ ) , 0 ) ) )
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
+///
+/// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+///
+#[doc = crate::__pgrx_c_doc_assertions!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! AssertMacro {
+    ($condition:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$condition;
+                ($crate::__pgrx_c_macros::expression::profile_value::<true, _>(()))
+            }
+        )
+    };
+}
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
+/// C macro AssertMacro from c.h:886 (PostgreSQL 16), c.h:902 (PostgreSQL 17), c.h:871 (PostgreSQL 18), c.h:975 (PostgreSQL 19)
+///
+/// ```text
+/// #define AssertMacro( condition ) ( ( void ) ( ( condition ) || ( ExceptionalCondition ( # condition , __FILE__ , __LINE__ ) , 0 ) ) )
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
+///
+/// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+///
+#[doc = crate::__pgrx_c_doc_assertions!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! AssertMacro {
+    ($condition:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$condition;
+                ($crate::__pgrx_c_macros::expression::profile_value::<true, _>(()))
+            }
+        )
+    };
+}
+#[cfg(feature = "pg15")]
 /// C macro AssertPointerAlignment from c.h:920 (PostgreSQL 15)
 ///
 /// ```text
@@ -80,6 +225,8 @@ macro_rules! Abs {
 ///
 /// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
+#[doc = crate::__pgrx_c_doc_assertions!()]
+///
 #[doc = crate::__pgrx_c_doc_statements!()]
 ///
 /// # Safety
@@ -88,7 +235,7 @@ macro_rules! Abs {
 ///
 /// # Panics
 ///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! AssertPointerAlignment {
     ($ptr:expr, $bndr:expr $(,)?) => {
@@ -110,6 +257,8 @@ macro_rules! AssertPointerAlignment {
 ///
 /// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
+#[doc = crate::__pgrx_c_doc_assertions!()]
+///
 #[doc = crate::__pgrx_c_doc_statements!()]
 ///
 /// # Safety
@@ -118,13 +267,40 @@ macro_rules! AssertPointerAlignment {
 ///
 /// # Panics
 ///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! AssertPointerAlignment {
     ($ptr:expr, $bndr:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(@unit {
             let _ = &$ptr;
             let _ = &$bndr;
+        })
+    };
+}
+#[cfg(feature = "pg15")]
+/// C macro AssertState from c.h:910 (PostgreSQL 15)
+///
+/// ```text
+/// #define AssertState( condition ) do { if ( ! ( condition ) ) ExceptionalCondition ( # condition , "BadState" , __FILE__ , __LINE__ ) ; } while ( 0 )
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
+///
+/// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+///
+#[doc = crate::__pgrx_c_doc_assertions!()]
+///
+#[doc = crate::__pgrx_c_doc_statements!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+#[macro_export]
+macro_rules! AssertState {
+    ($condition:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(@unit {
+            let _ = &$condition;
         })
     };
 }
@@ -2342,6 +2518,73 @@ macro_rules! TYPEALIGN_DOWN {
         )
     };
 }
+#[cfg(feature = "pg15")]
+/// C macro Trap from c.h:872 (PostgreSQL 15)
+///
+/// ```text
+/// #define Trap( condition , errorType ) do { if ( condition ) ExceptionalCondition ( # condition , ( errorType ) , __FILE__ , __LINE__ ) ; } while ( 0 )
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
+///
+/// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+///
+#[doc = crate::__pgrx_c_doc_assertions!()]
+///
+#[doc = crate::__pgrx_c_doc_statements!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+#[macro_export]
+macro_rules! Trap {
+    ($condition:expr, $errorType:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(@unit {
+            let _ = &$condition;
+            let _ = &$errorType;
+        })
+    };
+}
+#[cfg(feature = "pg15")]
+/// C macro TrapMacro from c.h:886 (PostgreSQL 15)
+///
+/// ```text
+/// #define TrapMacro( condition , errorType ) ( ( bool ) ( ! ( condition ) || ( ExceptionalCondition ( # condition , ( errorType ) , __FILE__ , __LINE__ ) , 0 ) ) )
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
+///
+/// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+///
+#[doc = crate::__pgrx_c_doc_assertions!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! TrapMacro {
+    ($condition:expr, $errorType:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$condition;
+                let _ = &$errorType;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CBool
+                        >()
+                    )
+                )
+            }
+        )
+    };
+}
 /// C macro dgettext from c.h:1226 (PostgreSQL 15), c.h:1208 (PostgreSQL 16), c.h:1200 (PostgreSQL 17), c.h:1169 (PostgreSQL 18), c.h:1278 (PostgreSQL 19)
 ///
 /// ```text
@@ -2659,15 +2902,13 @@ macro_rules! ngettext {
 ///
 /// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
+#[doc = crate::__pgrx_c_doc_assertions!()]
+///
 #[doc = crate::__pgrx_c_doc_statements!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! pg_assume {
     ($expr:expr $(,)?) => {
@@ -2686,10 +2927,6 @@ macro_rules! pg_assume {
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! pg_unreachable {
     () => {
@@ -2797,7 +3034,13 @@ macro_rules! unlikely {
 }
 #[cfg(feature = "pg15")]
 pub use Abs;
+pub use Assert;
+#[cfg(feature = "pg15")]
+pub use AssertArg;
+pub use AssertMacro;
 pub use AssertPointerAlignment;
+#[cfg(feature = "pg15")]
+pub use AssertState;
 pub use BUFFERALIGN;
 pub use BUFFERALIGN_DOWN;
 pub use BoolIsValid;
@@ -2844,6 +3087,10 @@ pub use SQL_STR_DOUBLE;
 pub use TYPEALIGN;
 pub use TYPEALIGN_DOWN;
 pub use TYPEALIGN64;
+#[cfg(feature = "pg15")]
+pub use Trap;
+#[cfg(feature = "pg15")]
+pub use TrapMacro;
 pub use dgettext;
 pub use dngettext;
 pub use gettext;

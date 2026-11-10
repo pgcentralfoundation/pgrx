@@ -170,7 +170,7 @@ macro_rules! IS_VALID_DATE {
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! IS_VALID_JULIAN {
-    ($y:expr, $m:expr, $($d:tt)*) => {
+    ($y:expr, $m:expr, $d:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$y;

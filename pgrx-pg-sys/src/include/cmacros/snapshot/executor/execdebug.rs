@@ -13,7 +13,7 @@
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! ENL1_printf {
-    ($($message:tt)*) => {
+    ($message:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(@unit {})
     };
 }
@@ -29,7 +29,7 @@ macro_rules! ENL1_printf {
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! MJ1_printf {
-    ($s:expr, $($p:tt)*) => {
+    ($s:expr, $p:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(@unit {})
     };
 }
@@ -45,7 +45,7 @@ macro_rules! MJ1_printf {
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! MJ2_printf {
-    ($s:expr, $p1:expr, $($p2:tt)*) => {
+    ($s:expr, $p1:expr, $p2:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(@unit {})
     };
 }
@@ -61,7 +61,7 @@ macro_rules! MJ2_printf {
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! MJ_DEBUG_COMPARE {
-    ($($res:tt)*) => {
+    ($res:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(@unit {})
     };
 }
@@ -77,7 +77,7 @@ macro_rules! MJ_DEBUG_COMPARE {
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! MJ_DEBUG_PROC_NODE {
-    ($($slot:tt)*) => {
+    ($slot:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(@unit {})
     };
 }
@@ -93,7 +93,7 @@ macro_rules! MJ_DEBUG_PROC_NODE {
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! MJ_DEBUG_QUAL {
-    ($clause:expr, $($res:tt)*) => {
+    ($clause:expr, $res:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(@unit {})
     };
 }
@@ -109,7 +109,7 @@ macro_rules! MJ_DEBUG_QUAL {
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! MJ_debugtup {
-    ($($slot:tt)*) => {
+    ($slot:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(@unit {})
     };
 }
@@ -125,7 +125,7 @@ macro_rules! MJ_debugtup {
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! MJ_dump {
-    ($($state:tt)*) => {
+    ($state:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(@unit {})
     };
 }
@@ -141,7 +141,7 @@ macro_rules! MJ_dump {
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! MJ_nodeDisplay {
-    ($($l:tt)*) => {
+    ($l:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(@unit {})
     };
 }
@@ -157,7 +157,7 @@ macro_rules! MJ_nodeDisplay {
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! MJ_printf {
-    ($($s:tt)*) => {
+    ($s:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(@unit {})
     };
 }
@@ -173,7 +173,7 @@ macro_rules! MJ_printf {
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! NL1_printf {
-    ($s:expr, $($a:tt)*) => {
+    ($s:expr, $a:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(@unit {})
     };
 }
@@ -189,7 +189,7 @@ macro_rules! NL1_printf {
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! NL_nodeDisplay {
-    ($($l:tt)*) => {
+    ($l:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(@unit {})
     };
 }
@@ -205,7 +205,7 @@ macro_rules! NL_nodeDisplay {
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! NL_printf {
-    ($($s:tt)*) => {
+    ($s:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(@unit {})
     };
 }
@@ -301,7 +301,7 @@ macro_rules! NULL_OR_TUPLE {
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! SO1_printf {
-    ($s:expr, $($p:tt)*) => {
+    ($s:expr, $p:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(@unit {})
     };
 }
@@ -317,7 +317,7 @@ macro_rules! SO1_printf {
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! SO2_printf {
-    ($s:expr, $p1:expr, $($p2:tt)*) => {
+    ($s:expr, $p1:expr, $p2:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(@unit {})
     };
 }
@@ -333,7 +333,7 @@ macro_rules! SO2_printf {
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! SO_nodeDisplay {
-    ($($l:tt)*) => {
+    ($l:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(@unit {})
     };
 }
@@ -349,7 +349,7 @@ macro_rules! SO_nodeDisplay {
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! SO_printf {
-    ($($s:tt)*) => {
+    ($s:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(@unit {})
     };
 }

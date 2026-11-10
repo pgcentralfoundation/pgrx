@@ -69,14 +69,30 @@ where
     pub fn get(&self, bit_offset: usize, bit_width: u8) -> u64 {
         debug_assert!(bit_width <= 64);
         debug_assert!(bit_offset / 8 < self.storage.as_ref().len());
-        debug_assert!((bit_offset + (bit_width as usize)) / 8 <= self.storage.as_ref().len());
-        let mut val = 0;
-        for i in 0..(bit_width as usize) {
-            if self.get_bit(i + bit_offset) {
-                let index =
-                    if cfg!(target_endian = "big") { bit_width as usize - 1 - i } else { i };
-                val |= 1 << index;
+        debug_assert!((bit_offset + (bit_width as usize) + 7) / 8 <= self.storage.as_ref().len());
+        if bit_width == 0 {
+            return 0;
+        }
+        let mut val = 0u64;
+        let storage = self.storage.as_ref();
+        let start_byte = bit_offset / 8;
+        let bit_shift = bit_offset % 8;
+        let bytes_needed = (bit_width as usize + bit_shift + 7) / 8;
+        if cfg!(target_endian = "big") {
+            for i in 0..bytes_needed {
+                val |= (storage[start_byte + i].reverse_bits() as u64) << (i * 8);
             }
+        } else {
+            for i in 0..bytes_needed {
+                val |= (storage[start_byte + i] as u64) << (i * 8);
+            }
+        }
+        val >>= bit_shift;
+        if bit_width < 64 {
+            val &= (1u64 << bit_width) - 1;
+        }
+        if cfg!(target_endian = "big") {
+            val = val.reverse_bits() >> (64 - bit_width as usize);
         }
         val
     }
@@ -84,14 +100,34 @@ where
     pub unsafe fn raw_get(this: *const Self, bit_offset: usize, bit_width: u8) -> u64 {
         debug_assert!(bit_width <= 64);
         debug_assert!(bit_offset / 8 < core::mem::size_of::<Storage>());
-        debug_assert!((bit_offset + (bit_width as usize)) / 8 <= core::mem::size_of::<Storage>());
-        let mut val = 0;
-        for i in 0..(bit_width as usize) {
-            if unsafe { Self::raw_get_bit(this, i + bit_offset) } {
-                let index =
-                    if cfg!(target_endian = "big") { bit_width as usize - 1 - i } else { i };
-                val |= 1 << index;
+        debug_assert!(
+            (bit_offset + (bit_width as usize) + 7) / 8 <= core::mem::size_of::<Storage>()
+        );
+        if bit_width == 0 {
+            return 0;
+        }
+        let mut val = 0u64;
+        let start_byte = bit_offset / 8;
+        let bit_shift = bit_offset % 8;
+        let bytes_needed = (bit_width as usize + bit_shift + 7) / 8;
+        let storage_ptr = unsafe { core::ptr::addr_of!((*this).storage) as *const u8 };
+        if cfg!(target_endian = "big") {
+            for i in 0..bytes_needed {
+                let byte = unsafe { *storage_ptr.add(start_byte + i) };
+                val |= (byte.reverse_bits() as u64) << (i * 8);
             }
+        } else {
+            for i in 0..bytes_needed {
+                let byte = unsafe { *storage_ptr.add(start_byte + i) };
+                val |= (byte as u64) << (i * 8);
+            }
+        }
+        val >>= bit_shift;
+        if bit_width < 64 {
+            val &= (1u64 << bit_width) - 1;
+        }
+        if cfg!(target_endian = "big") {
+            val = val.reverse_bits() >> (64 - bit_width as usize);
         }
         val
     }
@@ -99,24 +135,357 @@ where
     pub fn set(&mut self, bit_offset: usize, bit_width: u8, val: u64) {
         debug_assert!(bit_width <= 64);
         debug_assert!(bit_offset / 8 < self.storage.as_ref().len());
-        debug_assert!((bit_offset + (bit_width as usize)) / 8 <= self.storage.as_ref().len());
-        for i in 0..(bit_width as usize) {
-            let mask = 1 << i;
-            let val_bit_is_set = val & mask == mask;
-            let index = if cfg!(target_endian = "big") { bit_width as usize - 1 - i } else { i };
-            self.set_bit(index + bit_offset, val_bit_is_set);
+        debug_assert!((bit_offset + (bit_width as usize) + 7) / 8 <= self.storage.as_ref().len());
+        if bit_width == 0 {
+            return;
+        }
+        let mut val = val;
+        if bit_width < 64 {
+            val &= (1u64 << bit_width) - 1;
+        }
+        if cfg!(target_endian = "big") {
+            val = val.reverse_bits() >> (64 - bit_width as usize);
+        }
+        let storage = self.storage.as_mut();
+        let start_byte = bit_offset / 8;
+        let bit_shift = bit_offset % 8;
+        let bytes_needed = (bit_width as usize + bit_shift + 7) / 8;
+        val <<= bit_shift;
+        let field_mask = if bit_width as usize + bit_shift >= 64 {
+            !0u64 << bit_shift
+        } else {
+            ((1u64 << bit_width) - 1) << bit_shift
+        };
+        for i in 0..bytes_needed {
+            let byte_val = (val >> (i * 8)) as u8;
+            let byte_mask = (field_mask >> (i * 8)) as u8;
+            if cfg!(target_endian = "big") {
+                let byte = storage[start_byte + i].reverse_bits();
+                let new_byte = (byte & !byte_mask) | (byte_val & byte_mask);
+                storage[start_byte + i] = new_byte.reverse_bits();
+            } else {
+                storage[start_byte + i] =
+                    (storage[start_byte + i] & !byte_mask) | (byte_val & byte_mask);
+            }
         }
     }
     #[inline]
     pub unsafe fn raw_set(this: *mut Self, bit_offset: usize, bit_width: u8, val: u64) {
         debug_assert!(bit_width <= 64);
         debug_assert!(bit_offset / 8 < core::mem::size_of::<Storage>());
-        debug_assert!((bit_offset + (bit_width as usize)) / 8 <= core::mem::size_of::<Storage>());
-        for i in 0..(bit_width as usize) {
-            let mask = 1 << i;
-            let val_bit_is_set = val & mask == mask;
-            let index = if cfg!(target_endian = "big") { bit_width as usize - 1 - i } else { i };
-            unsafe { Self::raw_set_bit(this, index + bit_offset, val_bit_is_set) };
+        debug_assert!(
+            (bit_offset + (bit_width as usize) + 7) / 8 <= core::mem::size_of::<Storage>()
+        );
+        if bit_width == 0 {
+            return;
+        }
+        let mut val = val;
+        if bit_width < 64 {
+            val &= (1u64 << bit_width) - 1;
+        }
+        if cfg!(target_endian = "big") {
+            val = val.reverse_bits() >> (64 - bit_width as usize);
+        }
+        let start_byte = bit_offset / 8;
+        let bit_shift = bit_offset % 8;
+        let bytes_needed = (bit_width as usize + bit_shift + 7) / 8;
+        val <<= bit_shift;
+        let field_mask = if bit_width as usize + bit_shift >= 64 {
+            !0u64 << bit_shift
+        } else {
+            ((1u64 << bit_width) - 1) << bit_shift
+        };
+        let storage_ptr = unsafe { core::ptr::addr_of_mut!((*this).storage) as *mut u8 };
+        for i in 0..bytes_needed {
+            let byte_val = (val >> (i * 8)) as u8;
+            let byte_mask = (field_mask >> (i * 8)) as u8;
+            let byte_ptr = unsafe { storage_ptr.add(start_byte + i) };
+            if cfg!(target_endian = "big") {
+                let byte = unsafe { (*byte_ptr).reverse_bits() };
+                let new_byte = (byte & !byte_mask) | (byte_val & byte_mask);
+                unsafe { *byte_ptr = new_byte.reverse_bits() };
+            } else {
+                unsafe { *byte_ptr = (*byte_ptr & !byte_mask) | (byte_val & byte_mask) };
+            }
+        }
+    }
+}
+#[doc = " Const-generic methods for efficient bitfield access when offset and width"]
+#[doc = " are known at compile time."]
+impl<const N: usize> __BindgenBitfieldUnit<[u8; N]> {
+    #[doc = " Get a field using const generics for compile-time optimization."]
+    #[doc = " Uses native word size operations when the field fits in usize."]
+    #[inline]
+    pub const fn get_const<const BIT_OFFSET: usize, const BIT_WIDTH: u8>(&self) -> u64 {
+        debug_assert!(BIT_WIDTH <= 64);
+        debug_assert!(BIT_OFFSET / 8 < N);
+        debug_assert!((BIT_OFFSET + (BIT_WIDTH as usize) + 7) / 8 <= N);
+        if BIT_WIDTH == 0 {
+            return 0;
+        }
+        let start_byte = BIT_OFFSET / 8;
+        let bit_shift = BIT_OFFSET % 8;
+        let bytes_needed = (BIT_WIDTH as usize + bit_shift + 7) / 8;
+        if BIT_WIDTH as usize + bit_shift <= usize::BITS as usize {
+            let mut val = 0usize;
+            if cfg!(target_endian = "big") {
+                let mut i = 0;
+                while i < bytes_needed {
+                    val |= (self.storage[start_byte + i].reverse_bits() as usize) << (i * 8);
+                    i += 1;
+                }
+            } else {
+                let mut i = 0;
+                while i < bytes_needed {
+                    val |= (self.storage[start_byte + i] as usize) << (i * 8);
+                    i += 1;
+                }
+            }
+            val >>= bit_shift;
+            if (BIT_WIDTH as u32) < usize::BITS {
+                val &= (1usize << BIT_WIDTH) - 1;
+            }
+            if cfg!(target_endian = "big") {
+                val = val.reverse_bits() >> (usize::BITS as usize - BIT_WIDTH as usize);
+            }
+            val as u64
+        } else {
+            let mut val = 0u64;
+            if cfg!(target_endian = "big") {
+                let mut i = 0;
+                while i < bytes_needed {
+                    val |= (self.storage[start_byte + i].reverse_bits() as u64) << (i * 8);
+                    i += 1;
+                }
+            } else {
+                let mut i = 0;
+                while i < bytes_needed {
+                    val |= (self.storage[start_byte + i] as u64) << (i * 8);
+                    i += 1;
+                }
+            }
+            val >>= bit_shift;
+            if BIT_WIDTH < 64 {
+                val &= (1u64 << BIT_WIDTH) - 1;
+            }
+            if cfg!(target_endian = "big") {
+                val = val.reverse_bits() >> (64 - BIT_WIDTH as usize);
+            }
+            val
+        }
+    }
+    #[doc = " Set a field using const generics for compile-time optimization."]
+    #[doc = " Uses native word size operations when the field fits in usize."]
+    #[inline]
+    pub fn set_const<const BIT_OFFSET: usize, const BIT_WIDTH: u8>(&mut self, val: u64) {
+        debug_assert!(BIT_WIDTH <= 64);
+        debug_assert!(BIT_OFFSET / 8 < N);
+        debug_assert!((BIT_OFFSET + (BIT_WIDTH as usize) + 7) / 8 <= N);
+        if BIT_WIDTH == 0 {
+            return;
+        }
+        let start_byte = BIT_OFFSET / 8;
+        let bit_shift = BIT_OFFSET % 8;
+        let bytes_needed = (BIT_WIDTH as usize + bit_shift + 7) / 8;
+        if BIT_WIDTH as usize + bit_shift <= usize::BITS as usize {
+            let mut val = val as usize;
+            if (BIT_WIDTH as u32) < usize::BITS {
+                val &= (1usize << BIT_WIDTH) - 1;
+            }
+            if cfg!(target_endian = "big") {
+                val = val.reverse_bits() >> (usize::BITS as usize - BIT_WIDTH as usize);
+            }
+            val <<= bit_shift;
+            let field_mask = if BIT_WIDTH as usize + bit_shift >= usize::BITS as usize {
+                !0usize << bit_shift
+            } else {
+                ((1usize << BIT_WIDTH) - 1) << bit_shift
+            };
+            let mut i = 0;
+            while i < bytes_needed {
+                let byte_val = (val >> (i * 8)) as u8;
+                let byte_mask = (field_mask >> (i * 8)) as u8;
+                if cfg!(target_endian = "big") {
+                    let byte = self.storage[start_byte + i].reverse_bits();
+                    let new_byte = (byte & !byte_mask) | (byte_val & byte_mask);
+                    self.storage[start_byte + i] = new_byte.reverse_bits();
+                } else {
+                    self.storage[start_byte + i] =
+                        (self.storage[start_byte + i] & !byte_mask) | (byte_val & byte_mask);
+                }
+                i += 1;
+            }
+        } else {
+            let mut val = val;
+            if BIT_WIDTH < 64 {
+                val &= (1u64 << BIT_WIDTH) - 1;
+            }
+            if cfg!(target_endian = "big") {
+                val = val.reverse_bits() >> (64 - BIT_WIDTH as usize);
+            }
+            val <<= bit_shift;
+            let field_mask = if BIT_WIDTH as usize + bit_shift >= 64 {
+                !0u64 << bit_shift
+            } else {
+                ((1u64 << BIT_WIDTH) - 1) << bit_shift
+            };
+            let mut i = 0;
+            while i < bytes_needed {
+                let byte_val = (val >> (i * 8)) as u8;
+                let byte_mask = (field_mask >> (i * 8)) as u8;
+                if cfg!(target_endian = "big") {
+                    let byte = self.storage[start_byte + i].reverse_bits();
+                    let new_byte = (byte & !byte_mask) | (byte_val & byte_mask);
+                    self.storage[start_byte + i] = new_byte.reverse_bits();
+                } else {
+                    self.storage[start_byte + i] =
+                        (self.storage[start_byte + i] & !byte_mask) | (byte_val & byte_mask);
+                }
+                i += 1;
+            }
+        }
+    }
+    #[doc = " Raw pointer get using const generics for compile-time optimization."]
+    #[doc = " Uses native word size operations when the field fits in usize."]
+    #[inline]
+    pub const unsafe fn raw_get_const<const BIT_OFFSET: usize, const BIT_WIDTH: u8>(
+        this: *const Self,
+    ) -> u64 {
+        debug_assert!(BIT_WIDTH <= 64);
+        debug_assert!(BIT_OFFSET / 8 < N);
+        debug_assert!((BIT_OFFSET + (BIT_WIDTH as usize) + 7) / 8 <= N);
+        if BIT_WIDTH == 0 {
+            return 0;
+        }
+        let start_byte = BIT_OFFSET / 8;
+        let bit_shift = BIT_OFFSET % 8;
+        let bytes_needed = (BIT_WIDTH as usize + bit_shift + 7) / 8;
+        let storage_ptr = unsafe { core::ptr::addr_of!((*this).storage) as *const u8 };
+        if BIT_WIDTH as usize + bit_shift <= usize::BITS as usize {
+            let mut val = 0usize;
+            if cfg!(target_endian = "big") {
+                let mut i = 0;
+                while i < bytes_needed {
+                    let byte = unsafe { *storage_ptr.add(start_byte + i) };
+                    val |= (byte.reverse_bits() as usize) << (i * 8);
+                    i += 1;
+                }
+            } else {
+                let mut i = 0;
+                while i < bytes_needed {
+                    let byte = unsafe { *storage_ptr.add(start_byte + i) };
+                    val |= (byte as usize) << (i * 8);
+                    i += 1;
+                }
+            }
+            val >>= bit_shift;
+            if (BIT_WIDTH as u32) < usize::BITS {
+                val &= (1usize << BIT_WIDTH) - 1;
+            }
+            if cfg!(target_endian = "big") {
+                val = val.reverse_bits() >> (usize::BITS as usize - BIT_WIDTH as usize);
+            }
+            val as u64
+        } else {
+            let mut val = 0u64;
+            if cfg!(target_endian = "big") {
+                let mut i = 0;
+                while i < bytes_needed {
+                    let byte = unsafe { *storage_ptr.add(start_byte + i) };
+                    val |= (byte.reverse_bits() as u64) << (i * 8);
+                    i += 1;
+                }
+            } else {
+                let mut i = 0;
+                while i < bytes_needed {
+                    let byte = unsafe { *storage_ptr.add(start_byte + i) };
+                    val |= (byte as u64) << (i * 8);
+                    i += 1;
+                }
+            }
+            val >>= bit_shift;
+            if BIT_WIDTH < 64 {
+                val &= (1u64 << BIT_WIDTH) - 1;
+            }
+            if cfg!(target_endian = "big") {
+                val = val.reverse_bits() >> (64 - BIT_WIDTH as usize);
+            }
+            val
+        }
+    }
+    #[doc = " Raw pointer set using const generics for compile-time optimization."]
+    #[doc = " Uses native word size operations when the field fits in usize."]
+    #[inline]
+    pub unsafe fn raw_set_const<const BIT_OFFSET: usize, const BIT_WIDTH: u8>(
+        this: *mut Self,
+        val: u64,
+    ) {
+        debug_assert!(BIT_WIDTH <= 64);
+        debug_assert!(BIT_OFFSET / 8 < N);
+        debug_assert!((BIT_OFFSET + (BIT_WIDTH as usize) + 7) / 8 <= N);
+        if BIT_WIDTH == 0 {
+            return;
+        }
+        let start_byte = BIT_OFFSET / 8;
+        let bit_shift = BIT_OFFSET % 8;
+        let bytes_needed = (BIT_WIDTH as usize + bit_shift + 7) / 8;
+        let storage_ptr = this.cast::<[u8; N]>().cast::<u8>();
+        if BIT_WIDTH as usize + bit_shift <= usize::BITS as usize {
+            let mut val = val as usize;
+            if (BIT_WIDTH as u32) < usize::BITS {
+                val &= (1usize << BIT_WIDTH) - 1;
+            }
+            if cfg!(target_endian = "big") {
+                val = val.reverse_bits() >> (usize::BITS as usize - BIT_WIDTH as usize);
+            }
+            val <<= bit_shift;
+            let field_mask = if BIT_WIDTH as usize + bit_shift >= usize::BITS as usize {
+                !0usize << bit_shift
+            } else {
+                ((1usize << BIT_WIDTH) - 1) << bit_shift
+            };
+            let mut i = 0;
+            while i < bytes_needed {
+                let byte_val = (val >> (i * 8)) as u8;
+                let byte_mask = (field_mask >> (i * 8)) as u8;
+                let byte_ptr = unsafe { storage_ptr.add(start_byte + i) };
+                if cfg!(target_endian = "big") {
+                    let byte = unsafe { (*byte_ptr).reverse_bits() };
+                    let new_byte = (byte & !byte_mask) | (byte_val & byte_mask);
+                    unsafe { *byte_ptr = new_byte.reverse_bits() };
+                } else {
+                    unsafe { *byte_ptr = (*byte_ptr & !byte_mask) | (byte_val & byte_mask) };
+                }
+                i += 1;
+            }
+        } else {
+            let mut val = val;
+            if BIT_WIDTH < 64 {
+                val &= (1u64 << BIT_WIDTH) - 1;
+            }
+            if cfg!(target_endian = "big") {
+                val = val.reverse_bits() >> (64 - BIT_WIDTH as usize);
+            }
+            val <<= bit_shift;
+            let field_mask = if BIT_WIDTH as usize + bit_shift >= 64 {
+                !0u64 << bit_shift
+            } else {
+                ((1u64 << BIT_WIDTH) - 1) << bit_shift
+            };
+            let mut i = 0;
+            while i < bytes_needed {
+                let byte_val = (val >> (i * 8)) as u8;
+                let byte_mask = (field_mask >> (i * 8)) as u8;
+                let byte_ptr = unsafe { storage_ptr.add(start_byte + i) };
+                if cfg!(target_endian = "big") {
+                    let byte = unsafe { (*byte_ptr).reverse_bits() };
+                    let new_byte = (byte & !byte_mask) | (byte_val & byte_mask);
+                    unsafe { *byte_ptr = new_byte.reverse_bits() };
+                } else {
+                    unsafe { *byte_ptr = (*byte_ptr & !byte_mask) | (byte_val & byte_mask) };
+                }
+                i += 1;
+            }
         }
     }
 }
@@ -194,7 +563,7 @@ pub const PG_MINORVERSION_NUM: u32 = 15;
 pub const PG_USE_STDBOOL: u32 = 1;
 pub const PG_VERSION: &::core::ffi::CStr = c"16.15";
 pub const PG_VERSION_NUM: u32 = 160015;
-pub const PG_VERSION_STR : & :: core :: ffi :: CStr = c"PostgreSQL 16.15 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0, 64-bit" ;
+pub const PG_VERSION_STR : & :: core :: ffi :: CStr = c"PostgreSQL 16.15 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 11.4.0-1ubuntu1~22.04.3) 11.4.0, 64-bit" ;
 pub const RELSEG_SIZE: u32 = 131072;
 pub const SIZEOF_BOOL: u32 = 1;
 pub const SIZEOF_LONG: u32 = 8;
@@ -202,7 +571,6 @@ pub const SIZEOF_OFF_T: u32 = 8;
 pub const SIZEOF_SIZE_T: u32 = 8;
 pub const SIZEOF_VOID_P: u32 = 8;
 pub const STDC_HEADERS: u32 = 1;
-pub const USE_ASSERT_CHECKING: u32 = 1;
 pub const USE_ICU: u32 = 1;
 pub const USE_SSE42_CRC32C_WITH_RUNTIME_CHECK: u32 = 1;
 pub const USE_SYSV_SHARED_MEMORY: u32 = 1;
@@ -6736,10 +7104,7 @@ pub const DEFAULT_UNK_SEL: f64 = 0.005;
 pub const DEFAULT_NOT_UNK_SEL: f64 = 0.995;
 pub const SELFLAG_USED_DEFAULT: u32 = 1;
 pub type pg_int64 = ::core::ffi::c_long;
-pub type __gnuc_va_list = __builtin_va_list;
-pub type __uint16_t = ::core::ffi::c_ushort;
-pub type __uint64_t = ::core::ffi::c_ulong;
-pub type __uint_least16_t = __uint16_t;
+pub type va_list = __builtin_va_list;
 pub type __dev_t = ::core::ffi::c_ulong;
 pub type __uid_t = ::core::ffi::c_uint;
 pub type __gid_t = ::core::ffi::c_uint;
@@ -6752,17 +7117,17 @@ pub type __socklen_t = ::core::ffi::c_uint;
 pub type __sig_atomic_t = ::core::ffi::c_int;
 pub type FILE = _IO_FILE;
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct _IO_marker {
     _unused: [u8; 0],
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct _IO_codecvt {
     _unused: [u8; 0],
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct _IO_wide_data {
     _unused: [u8; 0],
 }
@@ -6785,9 +7150,7 @@ pub struct _IO_FILE {
     pub _markers: *mut _IO_marker,
     pub _chain: *mut _IO_FILE,
     pub _fileno: ::core::ffi::c_int,
-    pub _bitfield_align_1: [u32; 0],
-    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 3usize]>,
-    pub _short_backupbuf: [::core::ffi::c_char; 1usize],
+    pub _flags2: ::core::ffi::c_int,
     pub _old_offset: __off_t,
     pub _cur_column: ::core::ffi::c_ushort,
     pub _vtable_offset: ::core::ffi::c_schar,
@@ -6798,11 +7161,9 @@ pub struct _IO_FILE {
     pub _wide_data: *mut _IO_wide_data,
     pub _freeres_list: *mut _IO_FILE,
     pub _freeres_buf: *mut ::core::ffi::c_void,
-    pub _prevchain: *mut *mut _IO_FILE,
+    pub __pad5: usize,
     pub _mode: ::core::ffi::c_int,
-    pub _unused3: ::core::ffi::c_int,
-    pub _total_written: __uint64_t,
-    pub _unused2: [::core::ffi::c_char; 8usize],
+    pub _unused2: [::core::ffi::c_char; 20usize],
 }
 impl Default for _IO_FILE {
     fn default() -> Self {
@@ -6813,51 +7174,6 @@ impl Default for _IO_FILE {
         }
     }
 }
-impl _IO_FILE {
-    #[inline]
-    pub fn _flags2(&self) -> ::core::ffi::c_int {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(0usize, 24u8) as u32) }
-    }
-    #[inline]
-    pub fn set__flags2(&mut self, val: ::core::ffi::c_int) {
-        unsafe {
-            let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_1.set(0usize, 24u8, val as u64)
-        }
-    }
-    #[inline]
-    pub unsafe fn _flags2_raw(this: *const Self) -> ::core::ffi::c_int {
-        unsafe {
-            ::core::mem::transmute(<__BindgenBitfieldUnit<[u8; 3usize]>>::raw_get(
-                ::core::ptr::addr_of!((*this)._bitfield_1),
-                0usize,
-                24u8,
-            ) as u32)
-        }
-    }
-    #[inline]
-    pub unsafe fn set__flags2_raw(this: *mut Self, val: ::core::ffi::c_int) {
-        unsafe {
-            let val: u32 = ::core::mem::transmute(val);
-            <__BindgenBitfieldUnit<[u8; 3usize]>>::raw_set(
-                ::core::ptr::addr_of_mut!((*this)._bitfield_1),
-                0usize,
-                24u8,
-                val as u64,
-            )
-        }
-    }
-    #[inline]
-    pub fn new_bitfield_1(_flags2: ::core::ffi::c_int) -> __BindgenBitfieldUnit<[u8; 3usize]> {
-        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 3usize]> = Default::default();
-        __bindgen_bitfield_unit.set(0usize, 24u8, {
-            let _flags2: u32 = unsafe { ::core::mem::transmute(_flags2) };
-            _flags2 as u64
-        });
-        __bindgen_bitfield_unit
-    }
-}
-pub type va_list = __gnuc_va_list;
 pub type off_t = __off_t;
 pub type wchar_t = ::core::ffi::c_int;
 #[repr(C)]
@@ -7168,6 +7484,8 @@ impl Default for ErrorData {
 pub type emit_log_hook_type =
     ::core::option::Option<unsafe extern "C-unwind" fn(edata: *mut ErrorData)>;
 pub mod PGErrorVerbosity {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const PGERROR_TERSE: Type = 0;
     pub const PGERROR_DEFAULT: Type = 1;
@@ -7238,6 +7556,8 @@ pub struct pg_itm_in {
     pub tm_year: ::core::ffi::c_int,
 }
 pub mod pg_cryptohash_type {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const PG_MD5: Type = 0;
     pub const PG_SHA1: Type = 1;
@@ -7247,11 +7567,13 @@ pub mod pg_cryptohash_type {
     pub const PG_SHA512: Type = 5;
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct pg_cryptohash_ctx {
     _unused: [u8; 0],
 }
 pub mod ScanDirection {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_int;
     pub const BackwardScanDirection: Type = -1;
     pub const NoMovementScanDirection: Type = 0;
@@ -7330,6 +7652,8 @@ pub struct Pg_magic_struct {
 pub type PGModuleMagicFunction =
     ::core::option::Option<unsafe extern "C-unwind" fn() -> *const Pg_magic_struct>;
 pub mod FmgrHookEventType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const FHET_START: Type = 0;
     pub const FHET_END: Type = 1;
@@ -7374,128 +7698,131 @@ pub struct BlockIdData {
 }
 pub type BlockId = *mut BlockIdData;
 #[repr(C)]
-#[repr(align(4))]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct ItemIdData {
-    pub _bitfield_align_1: [u16; 0],
+    pub _bindgen_align: [u32; 0],
     pub _bitfield_1: __BindgenBitfieldUnit<[u8; 4usize]>,
 }
 impl ItemIdData {
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub fn lp_off(&self) -> ::core::ffi::c_uint {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(0usize, 15u8) as u32) }
+        unsafe { ::core::mem::transmute(self._bitfield_1.get_const::<0usize, 15u8>() as u32) }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub fn set_lp_off(&mut self, val: ::core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_1.set(0usize, 15u8, val as u64)
+            self._bitfield_1.set_const::<0usize, 15u8>(val as u64)
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub unsafe fn lp_off_raw(this: *const Self) -> ::core::ffi::c_uint {
         unsafe {
-            ::core::mem::transmute(<__BindgenBitfieldUnit<[u8; 4usize]>>::raw_get(
-                ::core::ptr::addr_of!((*this)._bitfield_1),
+            ::core::mem::transmute(<__BindgenBitfieldUnit<[u8; 4usize]>>::raw_get_const::<
                 0usize,
                 15u8,
-            ) as u32)
+            >(::core::ptr::addr_of!((*this)._bitfield_1)) as u32)
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub unsafe fn set_lp_off_raw(this: *mut Self, val: ::core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_set(
+            <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_set_const::<0usize, 15u8>(
                 ::core::ptr::addr_of_mut!((*this)._bitfield_1),
-                0usize,
-                15u8,
                 val as u64,
             )
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub fn lp_flags(&self) -> ::core::ffi::c_uint {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(15usize, 2u8) as u32) }
+        unsafe { ::core::mem::transmute(self._bitfield_1.get_const::<15usize, 2u8>() as u32) }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub fn set_lp_flags(&mut self, val: ::core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_1.set(15usize, 2u8, val as u64)
+            self._bitfield_1.set_const::<15usize, 2u8>(val as u64)
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub unsafe fn lp_flags_raw(this: *const Self) -> ::core::ffi::c_uint {
         unsafe {
-            ::core::mem::transmute(<__BindgenBitfieldUnit<[u8; 4usize]>>::raw_get(
-                ::core::ptr::addr_of!((*this)._bitfield_1),
+            ::core::mem::transmute(<__BindgenBitfieldUnit<[u8; 4usize]>>::raw_get_const::<
                 15usize,
                 2u8,
-            ) as u32)
+            >(::core::ptr::addr_of!((*this)._bitfield_1)) as u32)
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub unsafe fn set_lp_flags_raw(this: *mut Self, val: ::core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_set(
+            <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_set_const::<15usize, 2u8>(
                 ::core::ptr::addr_of_mut!((*this)._bitfield_1),
-                15usize,
-                2u8,
                 val as u64,
             )
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub fn lp_len(&self) -> ::core::ffi::c_uint {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(17usize, 15u8) as u32) }
+        unsafe { ::core::mem::transmute(self._bitfield_1.get_const::<17usize, 15u8>() as u32) }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub fn set_lp_len(&mut self, val: ::core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_1.set(17usize, 15u8, val as u64)
+            self._bitfield_1.set_const::<17usize, 15u8>(val as u64)
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub unsafe fn lp_len_raw(this: *const Self) -> ::core::ffi::c_uint {
         unsafe {
-            ::core::mem::transmute(<__BindgenBitfieldUnit<[u8; 4usize]>>::raw_get(
-                ::core::ptr::addr_of!((*this)._bitfield_1),
+            ::core::mem::transmute(<__BindgenBitfieldUnit<[u8; 4usize]>>::raw_get_const::<
                 17usize,
                 15u8,
-            ) as u32)
+            >(::core::ptr::addr_of!((*this)._bitfield_1)) as u32)
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub unsafe fn set_lp_len_raw(this: *mut Self, val: ::core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_set(
+            <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_set_const::<17usize, 15u8>(
                 ::core::ptr::addr_of_mut!((*this)._bitfield_1),
-                17usize,
-                15u8,
                 val as u64,
             )
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub fn new_bitfield_1(
         lp_off: ::core::ffi::c_uint,
         lp_flags: ::core::ffi::c_uint,
         lp_len: ::core::ffi::c_uint,
     ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
-        __bindgen_bitfield_unit.set(0usize, 15u8, {
+        __bindgen_bitfield_unit.set_const::<0usize, 15u8>({
             let lp_off: u32 = unsafe { ::core::mem::transmute(lp_off) };
             lp_off as u64
         });
-        __bindgen_bitfield_unit.set(15usize, 2u8, {
+        __bindgen_bitfield_unit.set_const::<15usize, 2u8>({
             let lp_flags: u32 = unsafe { ::core::mem::transmute(lp_flags) };
             lp_flags as u64
         });
-        __bindgen_bitfield_unit.set(17usize, 15u8, {
+        __bindgen_bitfield_unit.set_const::<17usize, 15u8>({
             let lp_len: u32 = unsafe { ::core::mem::transmute(lp_len) };
             lp_len as u64
         });
@@ -7530,6 +7857,8 @@ pub struct pg_atomic_uint64 {
 }
 pub type dsm_handle = uint32;
 pub mod dsm_op {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const DSM_OP_CREATE: Type = 0;
     pub const DSM_OP_ATTACH: Type = 1;
@@ -7537,14 +7866,14 @@ pub mod dsm_op {
     pub const DSM_OP_DESTROY: Type = 3;
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct dsm_segment {
     _unused: [u8; 0],
 }
 pub type on_dsm_detach_callback =
     ::core::option::Option<unsafe extern "C-unwind" fn(arg1: *mut dsm_segment, arg: Datum)>;
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct dsa_area {
     _unused: [u8; 0],
 }
@@ -7552,17 +7881,17 @@ pub type dsa_pointer = uint64;
 pub type dsa_pointer_atomic = pg_atomic_uint64;
 pub type dsa_handle = dsm_handle;
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct TIDBitmap {
     _unused: [u8; 0],
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct TBMIterator {
     _unused: [u8; 0],
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct TBMSharedIterator {
     _unused: [u8; 0],
 }
@@ -8106,6 +8435,8 @@ pub type Selectivity = f64;
 pub type Cost = f64;
 pub type Cardinality = f64;
 pub mod CmdType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const CMD_UNKNOWN: Type = 0;
     pub const CMD_SELECT: Type = 1;
@@ -8117,6 +8448,8 @@ pub mod CmdType {
     pub const CMD_NOTHING: Type = 7;
 }
 pub mod JoinType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const JOIN_INNER: Type = 0;
     pub const JOIN_LEFT: Type = 1;
@@ -8129,6 +8462,8 @@ pub mod JoinType {
     pub const JOIN_UNIQUE_INNER: Type = 8;
 }
 pub mod AggStrategy {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const AGG_PLAIN: Type = 0;
     pub const AGG_SORTED: Type = 1;
@@ -8136,12 +8471,16 @@ pub mod AggStrategy {
     pub const AGG_MIXED: Type = 3;
 }
 pub mod AggSplit {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const AGGSPLIT_SIMPLE: Type = 0;
     pub const AGGSPLIT_INITIAL_SERIAL: Type = 6;
     pub const AGGSPLIT_FINAL_DESERIAL: Type = 9;
 }
 pub mod SetOpCmd {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const SETOPCMD_INTERSECT: Type = 0;
     pub const SETOPCMD_INTERSECT_ALL: Type = 1;
@@ -8149,17 +8488,23 @@ pub mod SetOpCmd {
     pub const SETOPCMD_EXCEPT_ALL: Type = 3;
 }
 pub mod SetOpStrategy {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const SETOP_SORTED: Type = 0;
     pub const SETOP_HASHED: Type = 1;
 }
 pub mod OnConflictAction {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const ONCONFLICT_NONE: Type = 0;
     pub const ONCONFLICT_NOTHING: Type = 1;
     pub const ONCONFLICT_UPDATE: Type = 2;
 }
 pub mod LimitOption {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const LIMIT_OPTION_COUNT: Type = 0;
     pub const LIMIT_OPTION_WITH_TIES: Type = 1;
@@ -8378,6 +8723,8 @@ impl Default for TupleDescData {
 pub type TupleDesc = *mut TupleDescData;
 pub type RelFileNumber = Oid;
 pub mod ForkNumber {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_int;
     pub const InvalidForkNumber: Type = -1;
     pub const MAIN_FORKNUM: Type = 0;
@@ -8404,6 +8751,8 @@ impl Default for Bitmapset {
     }
 }
 pub mod BMS_Comparison {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const BMS_EQUAL: Type = 0;
     pub const BMS_SUBSET1: Type = 1;
@@ -8411,6 +8760,8 @@ pub mod BMS_Comparison {
     pub const BMS_DIFFERENT: Type = 3;
 }
 pub mod BMS_Membership {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const BMS_EMPTY_SET: Type = 0;
     pub const BMS_SINGLETON: Type = 1;
@@ -8419,6 +8770,8 @@ pub mod BMS_Membership {
 pub type Relation = *mut RelationData;
 pub type RelationPtr = *mut Relation;
 pub mod IndexAttrBitmapKind {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const INDEX_ATTR_BITMAP_KEY: Type = 0;
     pub const INDEX_ATTR_BITMAP_PRIMARY_KEY: Type = 1;
@@ -8491,12 +8844,14 @@ impl Default for pairingheap {
 }
 pub type Buffer = ::core::ffi::c_int;
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct BufferAccessStrategyData {
     _unused: [u8; 0],
 }
 pub type BufferAccessStrategy = *mut BufferAccessStrategyData;
 pub mod SnapshotType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const SNAPSHOT_MVCC: Type = 0;
     pub const SNAPSHOT_SELF: Type = 1;
@@ -8584,6 +8939,8 @@ pub type IndexScanDesc = *mut IndexScanDescData;
 pub type SysScanDesc = *mut SysScanDescData;
 pub type ParallelIndexScanDesc = *mut ParallelIndexScanDescData;
 pub mod IndexUniqueCheck {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const UNIQUE_CHECK_NO: Type = 0;
     pub const UNIQUE_CHECK_YES: Type = 1;
@@ -8597,6 +8954,8 @@ pub struct IndexOrderByDistance {
     pub isnull: bool,
 }
 pub mod IndexAMProperty {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const AMPROP_UNKNOWN: Type = 0;
     pub const AMPROP_ASC: Type = 1;
@@ -9183,6 +9542,8 @@ impl Default for varatt_expanded {
     }
 }
 pub mod vartag_external {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const VARTAG_INDIRECT: Type = 1;
     pub const VARTAG_EXPANDED_RO: Type = 2;
@@ -9490,6 +9851,8 @@ pub struct WalUsage {
     pub wal_bytes: uint64,
 }
 pub mod InstrumentOption {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const INSTRUMENT_TIMER: Type = 1;
     pub const INSTRUMENT_BUFFERS: Type = 2;
@@ -9619,6 +9982,8 @@ impl Default for ParamsErrorCbData {
     }
 }
 pub mod LockClauseStrength {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const LCS_NONE: Type = 0;
     pub const LCS_FORKEYSHARE: Type = 1;
@@ -9627,12 +9992,16 @@ pub mod LockClauseStrength {
     pub const LCS_FORUPDATE: Type = 4;
 }
 pub mod LockWaitPolicy {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const LockWaitBlock: Type = 0;
     pub const LockWaitSkip: Type = 1;
     pub const LockWaitError: Type = 2;
 }
 pub mod LockTupleMode {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const LockTupleKeyShare: Type = 0;
     pub const LockTupleShare: Type = 1;
@@ -9656,6 +10025,8 @@ impl Default for Alias {
     }
 }
 pub mod OnCommitAction {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const ONCOMMIT_NOOP: Type = 0;
     pub const ONCOMMIT_PRESERVE_ROWS: Type = 1;
@@ -9793,6 +10164,8 @@ impl Default for Const {
     }
 }
 pub mod ParamKind {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const PARAM_EXTERN: Type = 0;
     pub const PARAM_EXEC: Type = 1;
@@ -9920,6 +10293,8 @@ impl Default for SubscriptingRef {
     }
 }
 pub mod CoercionContext {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const COERCION_IMPLICIT: Type = 0;
     pub const COERCION_ASSIGNMENT: Type = 1;
@@ -9927,6 +10302,8 @@ pub mod CoercionContext {
     pub const COERCION_EXPLICIT: Type = 3;
 }
 pub mod CoercionForm {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const COERCE_EXPLICIT_CALL: Type = 0;
     pub const COERCE_EXPLICIT_CAST: Type = 1;
@@ -10021,6 +10398,8 @@ impl Default for ScalarArrayOpExpr {
     }
 }
 pub mod BoolExprType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const AND_EXPR: Type = 0;
     pub const OR_EXPR: Type = 1;
@@ -10044,6 +10423,8 @@ impl Default for BoolExpr {
     }
 }
 pub mod SubLinkType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const EXISTS_SUBLINK: Type = 0;
     pub const ALL_SUBLINK: Type = 1;
@@ -10345,6 +10726,8 @@ impl Default for RowExpr {
     }
 }
 pub mod RowCompareType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const ROWCOMPARE_LT: Type = 1;
     pub const ROWCOMPARE_LE: Type = 2;
@@ -10392,6 +10775,8 @@ impl Default for CoalesceExpr {
     }
 }
 pub mod MinMaxOp {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const IS_GREATEST: Type = 0;
     pub const IS_LEAST: Type = 1;
@@ -10417,6 +10802,8 @@ impl Default for MinMaxExpr {
     }
 }
 pub mod SQLValueFunctionOp {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const SVFOP_CURRENT_DATE: Type = 0;
     pub const SVFOP_CURRENT_TIME: Type = 1;
@@ -10453,6 +10840,8 @@ impl Default for SQLValueFunction {
     }
 }
 pub mod XmlExprOp {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const IS_XMLCONCAT: Type = 0;
     pub const IS_XMLELEMENT: Type = 1;
@@ -10464,6 +10853,8 @@ pub mod XmlExprOp {
     pub const IS_DOCUMENT: Type = 7;
 }
 pub mod XmlOptionType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const XMLOPTION_DOCUMENT: Type = 0;
     pub const XMLOPTION_CONTENT: Type = 1;
@@ -10493,6 +10884,8 @@ impl Default for XmlExpr {
     }
 }
 pub mod JsonEncoding {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const JS_ENC_DEFAULT: Type = 0;
     pub const JS_ENC_UTF8: Type = 1;
@@ -10500,6 +10893,8 @@ pub mod JsonEncoding {
     pub const JS_ENC_UTF32: Type = 3;
 }
 pub mod JsonFormatType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const JS_FORMAT_DEFAULT: Type = 0;
     pub const JS_FORMAT_JSON: Type = 1;
@@ -10557,6 +10952,8 @@ impl Default for JsonValueExpr {
     }
 }
 pub mod JsonConstructorType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const JSCTOR_JSON_OBJECT: Type = 1;
     pub const JSCTOR_JSON_ARRAY: Type = 2;
@@ -10586,6 +10983,8 @@ impl Default for JsonConstructorExpr {
     }
 }
 pub mod JsonValueType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const JS_TYPE_ANY: Type = 0;
     pub const JS_TYPE_OBJECT: Type = 1;
@@ -10612,6 +11011,8 @@ impl Default for JsonIsPredicate {
     }
 }
 pub mod NullTestType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const IS_NULL: Type = 0;
     pub const IS_NOT_NULL: Type = 1;
@@ -10635,6 +11036,8 @@ impl Default for NullTest {
     }
 }
 pub mod BoolTestType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const IS_TRUE: Type = 0;
     pub const IS_NOT_TRUE: Type = 1;
@@ -10940,25 +11343,29 @@ impl Default for BitString {
 }
 pub type PartitionBoundInfo = *mut PartitionBoundInfoData;
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct PartitionKeyData {
     _unused: [u8; 0],
 }
 pub type PartitionKey = *mut PartitionKeyData;
 pub type PartitionDesc = *mut PartitionDescData;
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct PartitionDirectoryData {
     _unused: [u8; 0],
 }
 pub type PartitionDirectory = *mut PartitionDirectoryData;
 pub mod OverridingKind {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const OVERRIDING_NOT_SET: Type = 0;
     pub const OVERRIDING_USER_VALUE: Type = 1;
     pub const OVERRIDING_SYSTEM_VALUE: Type = 2;
 }
 pub mod QuerySource {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const QSRC_ORIGINAL: Type = 0;
     pub const QSRC_PARSER: Type = 1;
@@ -10967,6 +11374,8 @@ pub mod QuerySource {
     pub const QSRC_NON_INSTEAD_RULE: Type = 4;
 }
 pub mod SortByDir {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const SORTBY_DEFAULT: Type = 0;
     pub const SORTBY_ASC: Type = 1;
@@ -10974,19 +11383,23 @@ pub mod SortByDir {
     pub const SORTBY_USING: Type = 3;
 }
 pub mod SortByNulls {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const SORTBY_NULLS_DEFAULT: Type = 0;
     pub const SORTBY_NULLS_FIRST: Type = 1;
     pub const SORTBY_NULLS_LAST: Type = 2;
 }
 pub mod SetQuantifier {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const SET_QUANTIFIER_DEFAULT: Type = 0;
     pub const SET_QUANTIFIER_ALL: Type = 1;
     pub const SET_QUANTIFIER_DISTINCT: Type = 2;
 }
 pub type AclMode = uint64;
-#[doc = "\tQuery Tree"]
+#[doc = "Query Tree"]
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct Query {
@@ -11043,7 +11456,7 @@ impl Default for Query {
         }
     }
 }
-#[doc = "\tSupporting data structures for Parse Trees\n\n\tMost of these node types appear in raw parsetrees output by the grammar,\n\tand get transformed to something else by the analyzer.  A few of them\n\tare used as-is in transformed querytrees."]
+#[doc = "Supporting data structures for Parse Trees\n\nMost of these node types appear in raw parsetrees output by the grammar,\nand get transformed to something else by the analyzer.  A few of them\nare used as-is in transformed querytrees."]
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct TypeName {
@@ -11099,6 +11512,8 @@ impl Default for ParamRef {
     }
 }
 pub mod A_Expr_Kind {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const AEXPR_OP: Type = 0;
     pub const AEXPR_OP_ANY: Type = 1;
@@ -11205,6 +11620,8 @@ impl Default for CollateClause {
     }
 }
 pub mod RoleSpecType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const ROLESPEC_CSTRING: Type = 0;
     pub const ROLESPEC_CURRENT_ROLE: Type = 1;
@@ -11542,6 +11959,8 @@ impl Default for TableLikeClause {
     }
 }
 pub mod TableLikeOption {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const CREATE_TABLE_LIKE_COMMENTS: Type = 1;
     pub const CREATE_TABLE_LIKE_COMPRESSION: Type = 2;
@@ -11577,6 +11996,8 @@ impl Default for IndexElem {
     }
 }
 pub mod DefElemAction {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const DEFELEM_UNSPEC: Type = 0;
     pub const DEFELEM_SET: Type = 1;
@@ -11658,6 +12079,8 @@ impl Default for PartitionElem {
     }
 }
 pub mod PartitionStrategy {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const PARTITION_STRATEGY_LIST: Type = 108;
     pub const PARTITION_STRATEGY_RANGE: Type = 114;
@@ -11703,6 +12126,8 @@ impl Default for PartitionBoundSpec {
     }
 }
 pub mod PartitionRangeDatumKind {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_int;
     pub const PARTITION_RANGE_DATUM_MINVALUE: Type = -1;
     pub const PARTITION_RANGE_DATUM_VALUE: Type = 0;
@@ -11743,6 +12168,8 @@ impl Default for PartitionCmd {
     }
 }
 pub mod RTEKind {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const RTE_RELATION: Type = 0;
     pub const RTE_SUBQUERY: Type = 1;
@@ -11860,6 +12287,8 @@ impl Default for TableSampleClause {
     }
 }
 pub mod WCOKind {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const WCO_VIEW_CHECK: Type = 0;
     pub const WCO_RLS_INSERT_CHECK: Type = 1;
@@ -11907,6 +12336,8 @@ impl Default for SortGroupClause {
     }
 }
 pub mod GroupingSetKind {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const GROUPING_SET_EMPTY: Type = 0;
     pub const GROUPING_SET_SIMPLE: Type = 1;
@@ -12033,6 +12464,8 @@ impl Default for OnConflictClause {
     }
 }
 pub mod CTEMaterialize {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const CTEMaterializeDefault: Type = 0;
     pub const CTEMaterializeAlways: Type = 1;
@@ -12306,7 +12739,7 @@ impl Default for JsonArrayAgg {
         }
     }
 }
-#[doc = "\t\tRaw Grammar Output Statements"]
+#[doc = "Raw Grammar Output Statements"]
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct RawStmt {
@@ -12324,7 +12757,7 @@ impl Default for RawStmt {
         }
     }
 }
-#[doc = "\t\tOptimizable Statements"]
+#[doc = "Optimizable Statements"]
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct InsertStmt {
@@ -12405,6 +12838,8 @@ impl Default for MergeStmt {
     }
 }
 pub mod SetOperation {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const SETOP_NONE: Type = 0;
     pub const SETOP_UNION: Type = 1;
@@ -12502,7 +12937,9 @@ impl Default for PLAssignStmt {
     }
 }
 pub mod ObjectType {
-    #[doc = "\t\tOther Statements (no optimizations required)\n\n\t\tThese are not touched by parser/analyze.c except to put them into\n\t\tthe utilityStmt field of a Query.  This is eventually passed to\n\t\tProcessUtility (by-passing rewriting and planning).  Some of the\n\t\tstatements do need attention from parse analysis, and this is\n\t\tdone by routines in parser/parse_utilcmd.c after ProcessUtility\n\t\treceives the command for execution.\n\t\tDECLARE CURSOR, EXPLAIN, and CREATE TABLE AS are special cases:\n\t\tthey contain optimizable statements, which get processed normally\n\t\tby parser/analyze.c."]
+    #[allow(unused_imports)]
+    use super::*;
+    #[doc = "Other Statements (no optimizations required)\n\nThese are not touched by parser/analyze.c except to put them into\nthe utilityStmt field of a Query.  This is eventually passed to\nProcessUtility (by-passing rewriting and planning).  Some of the\nstatements do need attention from parse analysis, and this is\ndone by routines in parser/parse_utilcmd.c after ProcessUtility\nreceives the command for execution.\nDECLARE CURSOR, EXPLAIN, and CREATE TABLE AS are special cases:\nthey contain optimizable statements, which get processed normally\nby parser/analyze.c."]
     pub type Type = ::core::ffi::c_uint;
     pub const OBJECT_ACCESS_METHOD: Type = 0;
     pub const OBJECT_AGGREGATE: Type = 1;
@@ -12576,6 +13013,8 @@ impl Default for CreateSchemaStmt {
     }
 }
 pub mod DropBehavior {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const DROP_RESTRICT: Type = 0;
     pub const DROP_CASCADE: Type = 1;
@@ -12599,6 +13038,8 @@ impl Default for AlterTableStmt {
     }
 }
 pub mod AlterTableType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const AT_AddColumn: Type = 0;
     pub const AT_AddColumnToView: Type = 1;
@@ -12741,6 +13182,8 @@ impl Default for AlterDomainStmt {
     }
 }
 pub mod GrantTargetType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const ACL_TARGET_OBJECT: Type = 0;
     pub const ACL_TARGET_ALL_IN_SCHEMA: Type = 1;
@@ -12862,6 +13305,8 @@ impl Default for CopyStmt {
     }
 }
 pub mod VariableSetKind {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const VAR_SET_VALUE: Type = 0;
     pub const VAR_SET_DEFAULT: Type = 1;
@@ -12930,6 +13375,8 @@ impl Default for CreateStmt {
     }
 }
 pub mod ConstrType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const CONSTR_NULL: Type = 0;
     pub const CONSTR_NOTNULL: Type = 1;
@@ -13252,6 +13699,8 @@ impl Default for DropUserMappingStmt {
     }
 }
 pub mod ImportForeignSchemaType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const FDW_IMPORT_SCHEMA_ALL: Type = 0;
     pub const FDW_IMPORT_SCHEMA_LIMIT_TO: Type = 1;
@@ -13418,6 +13867,8 @@ impl Default for CreatePLangStmt {
     }
 }
 pub mod RoleStmtType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const ROLESTMT_ROLE: Type = 0;
     pub const ROLESTMT_USER: Type = 1;
@@ -13744,6 +14195,8 @@ impl Default for ClosePortalStmt {
     }
 }
 pub mod FetchDirection {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const FETCH_FORWARD: Type = 0;
     pub const FETCH_BACKWARD: Type = 1;
@@ -13883,6 +14336,8 @@ impl Default for CreateFunctionStmt {
     }
 }
 pub mod FunctionParameterMode {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const FUNC_PARAM_IN: Type = 105;
     pub const FUNC_PARAM_OUT: Type = 111;
@@ -14169,6 +14624,8 @@ impl Default for UnlistenStmt {
     }
 }
 pub mod TransactionStmtKind {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const TRANS_STMT_BEGIN: Type = 0;
     pub const TRANS_STMT_START: Type = 1;
@@ -14269,6 +14726,8 @@ impl Default for AlterEnumStmt {
     }
 }
 pub mod ViewCheckOption {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const NO_CHECK_OPTION: Type = 0;
     pub const LOCAL_CHECK_OPTION: Type = 1;
@@ -14522,6 +14981,8 @@ impl Default for CheckPointStmt {
     }
 }
 pub mod DiscardMode {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const DISCARD_ALL: Type = 0;
     pub const DISCARD_PLANS: Type = 1;
@@ -14577,6 +15038,8 @@ impl Default for ConstraintsSetStmt {
     }
 }
 pub mod ReindexObjectType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const REINDEX_OBJECT_INDEX: Type = 0;
     pub const REINDEX_OBJECT_TABLE: Type = 1;
@@ -14756,6 +15219,8 @@ impl Default for AlterTSDictionaryStmt {
     }
 }
 pub mod AlterTSConfigType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const ALTER_TSCONFIG_ADD_MAPPING: Type = 0;
     pub const ALTER_TSCONFIG_ALTER_MAPPING_FOR_TOKEN: Type = 1;
@@ -14802,6 +15267,8 @@ impl Default for PublicationTable {
     }
 }
 pub mod PublicationObjSpecType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const PUBLICATIONOBJ_TABLE: Type = 0;
     pub const PUBLICATIONOBJ_TABLES_IN_SCHEMA: Type = 1;
@@ -14845,6 +15312,8 @@ impl Default for CreatePublicationStmt {
     }
 }
 pub mod AlterPublicationAction {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const AP_AddObjects: Type = 0;
     pub const AP_DropObjects: Type = 1;
@@ -14888,6 +15357,8 @@ impl Default for CreateSubscriptionStmt {
     }
 }
 pub mod AlterSubscriptionType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const ALTER_SUBSCRIPTION_OPTIONS: Type = 0;
     pub const ALTER_SUBSCRIPTION_CONNECTION: Type = 1;
@@ -15305,6 +15776,8 @@ impl Default for TidRangeScan {
     }
 }
 pub mod SubqueryScanStatus {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const SUBQUERY_SCAN_UNKNOWN: Type = 0;
     pub const SUBQUERY_SCAN_TRIVIAL: Type = 1;
@@ -15836,6 +16309,8 @@ impl Default for Limit {
     }
 }
 pub mod RowMarkType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const ROW_MARK_EXCLUSIVE: Type = 0;
     pub const ROW_MARK_NOKEYEXCLUSIVE: Type = 1;
@@ -15939,6 +16414,8 @@ impl Default for PartitionPruneStepOp {
     }
 }
 pub mod PartitionPruneCombineOp {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const PARTPRUNE_COMBINE_UNION: Type = 0;
     pub const PARTPRUNE_COMBINE_INTERSECT: Type = 1;
@@ -15976,6 +16453,8 @@ impl Default for PlanInvalItem {
     }
 }
 pub mod MonotonicFunction {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const MONOTONICFUNC_NONE: Type = 0;
     pub const MONOTONICFUNC_INCREASING: Type = 1;
@@ -16076,12 +16555,12 @@ impl Default for HASHELEMENT {
     }
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct HASHHDR {
     _unused: [u8; 0],
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct HTAB {
     _unused: [u8; 0],
 }
@@ -16111,6 +16590,8 @@ impl Default for HASHCTL {
     }
 }
 pub mod HASHACTION {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const HASH_FIND: Type = 0;
     pub const HASH_ENTER: Type = 1;
@@ -16134,6 +16615,8 @@ impl Default for HASH_SEQ_STATUS {
     }
 }
 pub mod EphemeralNameRelationType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const ENR_NAMED_TUPLESTORE: Type = 0;
 }
@@ -16173,7 +16656,7 @@ impl Default for EphemeralNamedRelationData {
 }
 pub type EphemeralNamedRelation = *mut EphemeralNamedRelationData;
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct QueryEnvironment {
     _unused: [u8; 0],
 }
@@ -16264,18 +16747,22 @@ impl Default for dirent {
     }
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct __dirstream {
     _unused: [u8; 0],
 }
 pub type DIR = __dirstream;
 pub mod RecoveryInitSyncMethod {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const RECOVERY_INIT_SYNC_METHOD_FSYNC: Type = 0;
     pub const RECOVERY_INIT_SYNC_METHOD_SYNCFS: Type = 1;
 }
 pub type File = ::core::ffi::c_int;
 pub mod FileExtendMethod {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const FILE_EXTEND_METHOD_POSIX_FALLOCATE: Type = 0;
     pub const FILE_EXTEND_METHOD_WRITE_ZEROS: Type = 1;
@@ -16314,12 +16801,12 @@ impl Default for SharedFileSet {
     }
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct SharedTuplestore {
     _unused: [u8; 0],
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct SharedTuplestoreAccessor {
     _unused: [u8; 0],
 }
@@ -16370,12 +16857,12 @@ pub struct IndexAttributeBitMapData {
 }
 pub type IndexAttributeBitMap = *mut IndexAttributeBitMapData;
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct LogicalTapeSet {
     _unused: [u8; 0],
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct LogicalTape {
     _unused: [u8; 0],
 }
@@ -16385,12 +16872,12 @@ pub struct TapeShare {
     pub firstblocknumber: ::core::ffi::c_long,
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct Tuplesortstate {
     _unused: [u8; 0],
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct Sharedsort {
     _unused: [u8; 0],
 }
@@ -16412,6 +16899,8 @@ impl Default for SortCoordinateData {
 }
 pub type SortCoordinate = *mut SortCoordinateData;
 pub mod TuplesortMethod {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const SORT_TYPE_STILL_IN_PROGRESS: Type = 0;
     pub const SORT_TYPE_TOP_N_HEAPSORT: Type = 1;
@@ -16420,6 +16909,8 @@ pub mod TuplesortMethod {
     pub const SORT_TYPE_EXTERNAL_MERGE: Type = 8;
 }
 pub mod TuplesortSpaceType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const SORT_SPACE_TYPE_DISK: Type = 0;
     pub const SORT_SPACE_TYPE_MEMORY: Type = 1;
@@ -16512,12 +17003,12 @@ impl Default for TuplesortPublic {
     }
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct Tuplestorestate {
     _unused: [u8; 0],
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct CopyMultiInsertBuffer {
     _unused: [u8; 0],
 }
@@ -16646,12 +17137,16 @@ impl Default for ExprContext {
     }
 }
 pub mod ExprDoneCond {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const ExprSingleResult: Type = 0;
     pub const ExprMultipleResult: Type = 1;
     pub const ExprEndResult: Type = 2;
 }
 pub mod SetFunctionReturnMode {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const SFRM_ValuePerCall: Type = 1;
     pub const SFRM_Materialize: Type = 2;
@@ -16964,6 +17459,8 @@ impl Default for tuplehash_hash {
     }
 }
 pub mod tuplehash_status {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const tuplehash_SH_EMPTY: Type = 0;
     pub const tuplehash_SH_IN_USE: Type = 1;
@@ -17089,6 +17586,8 @@ impl Default for SubPlanState {
     }
 }
 pub mod DomainConstraintType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const DOM_CONSTRAINT_NOTNULL: Type = 0;
     pub const DOM_CONSTRAINT_CHECK: Type = 1;
@@ -17256,7 +17755,7 @@ impl Default for ModifyTableState {
     }
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct ParallelAppendState {
     _unused: [u8; 0],
 }
@@ -17556,6 +18055,8 @@ impl Default for BitmapIndexScanState {
     }
 }
 pub mod SharedBitmapState {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const BM_INITIAL: Type = 0;
     pub const BM_INPROGRESS: Type = 1;
@@ -17669,7 +18170,7 @@ impl Default for SubqueryScanState {
     }
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct FunctionScanPerFuncState {
     _unused: [u8; 0],
 }
@@ -17866,7 +18367,7 @@ impl Default for NestLoopState {
     }
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct MergeJoinClauseData {
     _unused: [u8; 0],
 }
@@ -17953,17 +18454,17 @@ impl Default for MaterialState {
     }
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct MemoizeEntry {
     _unused: [u8; 0],
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct MemoizeTuple {
     _unused: [u8; 0],
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct MemoizeKey {
     _unused: [u8; 0],
 }
@@ -18095,6 +18596,8 @@ pub struct SharedIncrementalSortInfo {
     pub sinfo: __IncompleteArrayField<IncrementalSortInfo>,
 }
 pub mod IncrementalSortExecutionStatus {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const INCSORT_LOADFULLSORT: Type = 0;
     pub const INCSORT_LOADPREFIXSORT: Type = 1;
@@ -18233,18 +18736,20 @@ impl Default for AggState {
     }
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct WindowStatePerFuncData {
     _unused: [u8; 0],
 }
 pub type WindowStatePerFunc = *mut WindowStatePerFuncData;
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct WindowStatePerAggData {
     _unused: [u8; 0],
 }
 pub type WindowStatePerAgg = *mut WindowStatePerAggData;
 pub mod WindowAggStatus {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const WINDOWAGG_DONE: Type = 0;
     pub const WINDOWAGG_RUN: Type = 1;
@@ -18358,7 +18863,7 @@ impl Default for GatherState {
     }
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct GMReaderTupleBuffer {
     _unused: [u8; 0],
 }
@@ -18425,7 +18930,7 @@ impl Default for HashState {
     }
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct SetOpStatePerGroupData {
     _unused: [u8; 0],
 }
@@ -18472,6 +18977,8 @@ impl Default for LockRowsState {
     }
 }
 pub mod LimitStateCond {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const LIMIT_INITIAL: Type = 0;
     pub const LIMIT_RESCAN: Type = 1;
@@ -18521,12 +19028,12 @@ pub struct BrinStatsData {
     pub revmapNumPages: BlockNumber,
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct DomainConstraintCache {
     _unused: [u8; 0],
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct TypeCacheEnumData {
     _unused: [u8; 0],
 }
@@ -18602,7 +19109,7 @@ impl Default for DomainConstraintRef {
     }
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct SharedRecordTypmodRegistry {
     _unused: [u8; 0],
 }
@@ -18711,12 +19218,14 @@ pub struct BrinTuple {
     pub bt_info: uint8,
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct BrinRevmap {
     _unused: [u8; 0],
 }
 pub type RmgrId = uint8;
 pub mod RmgrIds {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const RM_XLOG_ID: Type = 0;
     pub const RM_XACT_ID: Type = 1;
@@ -18975,6 +19484,8 @@ impl Default for XLogReaderState {
     }
 }
 pub mod XLogPageReadResult {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_int;
     pub const XLREAD_SUCCESS: Type = 0;
     pub const XLREAD_FAIL: Type = -1;
@@ -19026,12 +19537,14 @@ pub struct xl_brin_desummarize {
     pub regOffset: OffsetNumber,
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct ResourceOwnerData {
     _unused: [u8; 0],
 }
 pub type ResourceOwner = *mut ResourceOwnerData;
 pub mod ResourceReleasePhase {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const RESOURCE_RELEASE_BEFORE_LOCKS: Type = 0;
     pub const RESOURCE_RELEASE_LOCKS: Type = 1;
@@ -19047,6 +19560,8 @@ pub type ResourceReleaseCallback = ::core::option::Option<
 >;
 pub type Block = *mut ::core::ffi::c_void;
 pub mod BufferAccessStrategyType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const BAS_NORMAL: Type = 0;
     pub const BAS_BULKREAD: Type = 1;
@@ -19054,6 +19569,8 @@ pub mod BufferAccessStrategyType {
     pub const BAS_VACUUM: Type = 3;
 }
 pub mod ReadBufferMode {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const RBM_NORMAL: Type = 0;
     pub const RBM_ZERO_AND_LOCK: Type = 1;
@@ -19068,6 +19585,8 @@ pub struct PrefetchBufferResult {
     pub initiated_io: bool,
 }
 pub mod ExtendBufferedFlags {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const EB_SKIP_EXTENSION_LOCK: Type = 1;
     pub const EB_PERFORMING_RECOVERY: Type = 2;
@@ -19093,6 +19612,8 @@ impl Default for BufferManagerRelation {
     }
 }
 pub mod SyncRequestType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const SYNC_REQUEST: Type = 0;
     pub const SYNC_UNLINK_REQUEST: Type = 1;
@@ -19100,6 +19621,8 @@ pub mod SyncRequestType {
     pub const SYNC_FILTER_REQUEST: Type = 3;
 }
 pub mod SyncRequestHandler {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const SYNC_HANDLER_MD: Type = 0;
     pub const SYNC_HANDLER_CLOG: Type = 1;
@@ -19168,12 +19691,12 @@ impl Default for pg_tm {
     }
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct pg_tz {
     _unused: [u8; 0],
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct pg_tzenum {
     _unused: [u8; 0],
 }
@@ -19200,18 +19723,24 @@ impl Default for BackupState {
     }
 }
 pub mod ArchiveMode {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const ARCHIVE_MODE_OFF: Type = 0;
     pub const ARCHIVE_MODE_ON: Type = 1;
     pub const ARCHIVE_MODE_ALWAYS: Type = 2;
 }
 pub mod WalLevel {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const WAL_LEVEL_MINIMAL: Type = 0;
     pub const WAL_LEVEL_REPLICA: Type = 1;
     pub const WAL_LEVEL_LOGICAL: Type = 2;
 }
 pub mod WalCompression {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const WAL_COMPRESSION_NONE: Type = 0;
     pub const WAL_COMPRESSION_PGLZ: Type = 1;
@@ -19219,6 +19748,8 @@ pub mod WalCompression {
     pub const WAL_COMPRESSION_ZSTD: Type = 3;
 }
 pub mod RecoveryState {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const RECOVERY_STATE_CRASH: Type = 0;
     pub const RECOVERY_STATE_ARCHIVE: Type = 1;
@@ -19241,6 +19772,8 @@ pub struct CheckpointStatsData {
     pub ckpt_agg_sync_time: uint64,
 }
 pub mod WALAvailability {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const WALAVAIL_INVALID_LSN: Type = 0;
     pub const WALAVAIL_RESERVED: Type = 1;
@@ -19249,6 +19782,8 @@ pub mod WALAvailability {
     pub const WALAVAIL_REMOVED: Type = 4;
 }
 pub mod SessionBackupState {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const SESSION_BACKUP_NONE: Type = 0;
     pub const SESSION_BACKUP_RUNNING: Type = 1;
@@ -19388,6 +19923,8 @@ impl Default for XLogRecData {
     }
 }
 pub mod RecoveryTargetAction {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const RECOVERY_TARGET_ACTION_PAUSE: Type = 0;
     pub const RECOVERY_TARGET_ACTION_PROMOTE: Type = 1;
@@ -19587,6 +20124,8 @@ impl Default for PublicationRelInfo {
     }
 }
 pub mod PublicationPartOpt {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const PUBLICATION_PART_ROOT: Type = 0;
     pub const PUBLICATION_PART_LEAF: Type = 1;
@@ -19801,6 +20340,8 @@ pub struct AutoVacOpts {
     pub analyze_scale_factor: float8,
 }
 pub mod StdRdOptIndexCleanup {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const STDRD_OPTION_VACUUM_INDEX_CLEANUP_AUTO: Type = 0;
     pub const STDRD_OPTION_VACUUM_INDEX_CLEANUP_OFF: Type = 1;
@@ -19828,6 +20369,8 @@ impl Default for StdRdOptions {
     }
 }
 pub mod ViewOptCheckOption {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const VIEW_OPTION_CHECK_OPTION_NOT_SET: Type = 0;
     pub const VIEW_OPTION_CHECK_OPTION_LOCAL: Type = 1;
@@ -19851,7 +20394,7 @@ impl Default for ViewOptions {
     }
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct GenericXLogState {
     _unused: [u8; 0],
 }
@@ -19920,11 +20463,13 @@ impl Default for RBTNode {
     }
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct RBTree {
     _unused: [u8; 0],
 }
 pub mod RBTOrderControl {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const LeftRightWalk: Type = 0;
     pub const RightLeftWalk: Type = 1;
@@ -20021,6 +20566,8 @@ impl Default for GinBtreeStack {
 }
 pub type GinBtree = *mut GinBtreeData;
 pub mod GinPlaceToPageRC {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const GPTP_NO_WORK: Type = 0;
     pub const GPTP_INSERT: Type = 1;
@@ -20135,7 +20682,7 @@ impl Default for GinBtreeDataLeafInsertData {
     }
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct GinVacuumState {
     _unused: [u8; 0],
 }
@@ -20467,7 +21014,7 @@ impl Default for GistEntryVector {
     }
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct BufFile {
     _unused: [u8; 0],
 }
@@ -20717,6 +21264,8 @@ impl Default for GISTBuildBuffers {
     }
 }
 pub mod GistOptBufferingMode {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const GIST_OPTION_BUFFERING_AUTO: Type = 0;
     pub const GIST_OPTION_BUFFERING_ON: Type = 1;
@@ -20905,7 +21454,7 @@ pub struct HashOptions {
     pub fillfactor: ::core::ffi::c_int,
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct HSpool {
     _unused: [u8; 0],
 }
@@ -21154,7 +21703,9 @@ impl Default for SysScanDescData {
     }
 }
 pub type sig_atomic_t = __sig_atomic_t;
-pub mod _bindgen_ty_14 {
+pub mod _bindgen_ty_13 {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const SIGEV_SIGNAL: Type = 0;
     pub const SIGEV_NONE: Type = 1;
@@ -21279,6 +21830,8 @@ impl Default for SharedInvalidationMessage {
     }
 }
 pub mod SyncCommitLevel {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const SYNCHRONOUS_COMMIT_OFF: Type = 0;
     pub const SYNCHRONOUS_COMMIT_LOCAL_FLUSH: Type = 1;
@@ -21287,6 +21840,8 @@ pub mod SyncCommitLevel {
     pub const SYNCHRONOUS_COMMIT_REMOTE_APPLY: Type = 4;
 }
 pub mod XactEvent {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const XACT_EVENT_COMMIT: Type = 0;
     pub const XACT_EVENT_PARALLEL_COMMIT: Type = 1;
@@ -21301,6 +21856,8 @@ pub type XactCallback = ::core::option::Option<
     unsafe extern "C-unwind" fn(event: XactEvent::Type, arg: *mut ::core::ffi::c_void),
 >;
 pub mod SubXactEvent {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const SUBXACT_EVENT_START_SUB: Type = 0;
     pub const SUBXACT_EVENT_COMMIT_SUB: Type = 1;
@@ -21554,6 +22111,8 @@ impl Default for xl_xact_parsed_abort {
     }
 }
 pub mod ScanOptions {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const SO_TYPE_SEQSCAN: Type = 1;
     pub const SO_TYPE_BITMAPSCAN: Type = 2;
@@ -21567,6 +22126,8 @@ pub mod ScanOptions {
     pub const SO_TEMP_SNAPSHOT: Type = 512;
 }
 pub mod TM_Result {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const TM_Ok: Type = 0;
     pub const TM_Invisible: Type = 1;
@@ -21577,6 +22138,8 @@ pub mod TM_Result {
     pub const TM_WouldBlock: Type = 6;
 }
 pub mod TU_UpdateIndexes {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const TU_None: Type = 0;
     pub const TU_All: Type = 1;
@@ -21967,7 +22530,7 @@ impl Default for ShmemIndexEnt {
     }
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct shm_toc {
     _unused: [u8; 0],
 }
@@ -22022,6 +22585,8 @@ impl Default for IndexFetchHeapData {
     }
 }
 pub mod HTSV_Result {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const HEAPTUPLE_DEAD: Type = 0;
     pub const HEAPTUPLE_LIVE: Type = 1;
@@ -22066,7 +22631,7 @@ impl Default for HeapPageFreeze {
     }
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct GlobalVisState {
     _unused: [u8; 0],
 }
@@ -22323,6 +22888,8 @@ impl Default for BulkInsertStateData {
     }
 }
 pub mod MultiXactStatus {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const MultiXactStatusForKeyShare: Type = 0;
     pub const MultiXactStatusForShare: Type = 1;
@@ -22738,6 +23305,8 @@ pub struct xl_btree_newroot {
 }
 pub type bgworker_main_type = ::core::option::Option<unsafe extern "C-unwind" fn(main_arg: Datum)>;
 pub mod BgWorkerStartTime {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const BgWorkerStart_PostmasterStart: Type = 0;
     pub const BgWorkerStart_ConsistentState: Type = 1;
@@ -22767,6 +23336,8 @@ impl Default for BackgroundWorker {
     }
 }
 pub mod BgwHandleStatus {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const BGWH_STARTED: Type = 0;
     pub const BGWH_NOT_YET_STARTED: Type = 1;
@@ -22774,7 +23345,7 @@ pub mod BgwHandleStatus {
     pub const BGWH_POSTMASTER_DIED: Type = 3;
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct BackgroundWorkerHandle {
     _unused: [u8; 0],
 }
@@ -22804,6 +23375,8 @@ impl Default for WaitEvent {
     }
 }
 pub mod LWLockWaitState {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const LW_WS_NOT_WAITING: Type = 0;
     pub const LW_WS_WAITING: Type = 1;
@@ -22847,12 +23420,16 @@ impl Default for NamedLWLockTranche {
     }
 }
 pub mod LWLockMode {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const LW_EXCLUSIVE: Type = 0;
     pub const LW_SHARED: Type = 1;
     pub const LW_WAIT_UNTIL_FREE: Type = 2;
 }
 pub mod BuiltinTrancheIds {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const LWTRANCHE_XACT_BUFFER: Type = 48;
     pub const LWTRANCHE_COMMITTS_BUFFER: Type = 49;
@@ -22912,6 +23489,8 @@ impl Default for LockMethodData {
 pub type LockMethod = *const LockMethodData;
 pub type LOCKMETHODID = uint16;
 pub mod LockTagType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const LOCKTAG_RELATION: Type = 0;
     pub const LOCKTAG_RELATION_EXTEND: Type = 1;
@@ -23096,6 +23675,8 @@ impl Default for BlockedProcsData {
     }
 }
 pub mod LockAcquireResult {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const LOCKACQUIRE_NOT_AVAIL: Type = 0;
     pub const LOCKACQUIRE_OK: Type = 1;
@@ -23103,6 +23684,8 @@ pub mod LockAcquireResult {
     pub const LOCKACQUIRE_ALREADY_CLEAR: Type = 3;
 }
 pub mod DeadLockState {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const DS_NOT_YET_CHECKED: Type = 0;
     pub const DS_NO_DEADLOCK: Type = 1;
@@ -23111,7 +23694,7 @@ pub mod DeadLockState {
     pub const DS_BLOCKED_BY_AUTOVACUUM: Type = 4;
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct PGSemaphoreData {
     _unused: [u8; 0],
 }
@@ -23137,6 +23720,8 @@ impl Default for XidCache {
     }
 }
 pub mod ProcWaitStatus {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const PROC_WAIT_STATUS_OK: Type = 0;
     pub const PROC_WAIT_STATUS_WAITING: Type = 1;
@@ -23236,12 +23821,12 @@ impl Default for PROC_HDR {
     }
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct shm_mq {
     _unused: [u8; 0],
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct shm_mq_handle {
     _unused: [u8; 0],
 }
@@ -23261,6 +23846,8 @@ impl Default for shm_mq_iovec {
     }
 }
 pub mod shm_mq_result {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const SHM_MQ_SUCCESS: Type = 0;
     pub const SHM_MQ_WOULD_BLOCK: Type = 1;
@@ -23328,6 +23915,8 @@ impl Default for ParallelWorkerContext {
     }
 }
 pub mod CommandTag {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const CMDTAG_UNKNOWN: Type = 0;
     pub const CMDTAG_ALTER_ACCESS_METHOD: Type = 1;
@@ -23539,6 +24128,8 @@ impl Default for QueryCompletion {
     }
 }
 pub mod CommandDest {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const DestNone: Type = 0;
     pub const DestDebug: Type = 1;
@@ -23608,6 +24199,8 @@ impl Default for QueryDesc {
     }
 }
 pub mod PlanCacheMode {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const PLAN_CACHE_MODE_AUTO: Type = 0;
     pub const PLAN_CACHE_MODE_FORCE_GENERIC_PLAN: Type = 1;
@@ -23702,6 +24295,8 @@ impl Default for CachedExpression {
     }
 }
 pub mod PortalStrategy {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const PORTAL_ONE_SELECT: Type = 0;
     pub const PORTAL_ONE_RETURNING: Type = 1;
@@ -23710,6 +24305,8 @@ pub mod PortalStrategy {
     pub const PORTAL_MULTI_QUERY: Type = 4;
 }
 pub mod PortalStatus {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const PORTAL_NEW: Type = 0;
     pub const PORTAL_DEFINED: Type = 1;
@@ -23766,6 +24363,8 @@ impl Default for PortalData {
     }
 }
 pub mod relopt_type {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const RELOPT_TYPE_BOOL: Type = 0;
     pub const RELOPT_TYPE_INT: Type = 1;
@@ -23774,6 +24373,8 @@ pub mod relopt_type {
     pub const RELOPT_TYPE_STRING: Type = 4;
 }
 pub mod relopt_kind {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const RELOPT_KIND_LOCAL: Type = 0;
     pub const RELOPT_KIND_HEAP: Type = 1;
@@ -24007,7 +24608,7 @@ impl Default for local_relopts {
     }
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct RewriteStateData {
     _unused: [u8; 0],
 }
@@ -24030,7 +24631,7 @@ impl Default for LogicalRewriteMappingData {
     }
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct dshash_table {
     _unused: [u8; 0],
 }
@@ -24061,7 +24662,7 @@ pub struct dshash_parameters {
     pub tranche_id: ::core::ffi::c_int,
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct dshash_table_item {
     _unused: [u8; 0],
 }
@@ -24104,6 +24705,8 @@ impl Default for Session {
     }
 }
 pub mod SlruPageStatus {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const SLRU_PAGE_EMPTY: Type = 0;
     pub const SLRU_PAGE_READ_IN_PROGRESS: Type = 1;
@@ -24219,6 +24822,8 @@ impl Default for spgChooseIn {
     }
 }
 pub mod spgChooseResultType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const spgMatchNode: Type = 1;
     pub const spgAddNode: Type = 2;
@@ -24634,147 +25239,153 @@ impl Default for SpGistCache {
     }
 }
 #[repr(C)]
-#[repr(align(4))]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct SpGistInnerTupleData {
-    pub _bitfield_align_1: [u16; 0],
+    pub _bindgen_align: [u32; 0],
     pub _bitfield_1: __BindgenBitfieldUnit<[u8; 4usize]>,
     pub size: uint16,
 }
 impl SpGistInnerTupleData {
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub fn tupstate(&self) -> ::core::ffi::c_uint {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(0usize, 2u8) as u32) }
+        unsafe { ::core::mem::transmute(self._bitfield_1.get_const::<0usize, 2u8>() as u32) }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub fn set_tupstate(&mut self, val: ::core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_1.set(0usize, 2u8, val as u64)
+            self._bitfield_1.set_const::<0usize, 2u8>(val as u64)
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub unsafe fn tupstate_raw(this: *const Self) -> ::core::ffi::c_uint {
         unsafe {
-            ::core::mem::transmute(<__BindgenBitfieldUnit<[u8; 4usize]>>::raw_get(
-                ::core::ptr::addr_of!((*this)._bitfield_1),
-                0usize,
-                2u8,
-            ) as u32)
+            ::core::mem::transmute(
+                <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_get_const::<0usize, 2u8>(
+                    ::core::ptr::addr_of!((*this)._bitfield_1),
+                ) as u32,
+            )
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub unsafe fn set_tupstate_raw(this: *mut Self, val: ::core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_set(
+            <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_set_const::<0usize, 2u8>(
                 ::core::ptr::addr_of_mut!((*this)._bitfield_1),
-                0usize,
-                2u8,
                 val as u64,
             )
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub fn allTheSame(&self) -> ::core::ffi::c_uint {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(2usize, 1u8) as u32) }
+        unsafe { ::core::mem::transmute(self._bitfield_1.get_const::<2usize, 1u8>() as u32) }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub fn set_allTheSame(&mut self, val: ::core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_1.set(2usize, 1u8, val as u64)
+            self._bitfield_1.set_const::<2usize, 1u8>(val as u64)
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub unsafe fn allTheSame_raw(this: *const Self) -> ::core::ffi::c_uint {
         unsafe {
-            ::core::mem::transmute(<__BindgenBitfieldUnit<[u8; 4usize]>>::raw_get(
-                ::core::ptr::addr_of!((*this)._bitfield_1),
-                2usize,
-                1u8,
-            ) as u32)
+            ::core::mem::transmute(
+                <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_get_const::<2usize, 1u8>(
+                    ::core::ptr::addr_of!((*this)._bitfield_1),
+                ) as u32,
+            )
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub unsafe fn set_allTheSame_raw(this: *mut Self, val: ::core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_set(
+            <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_set_const::<2usize, 1u8>(
                 ::core::ptr::addr_of_mut!((*this)._bitfield_1),
-                2usize,
-                1u8,
                 val as u64,
             )
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub fn nNodes(&self) -> ::core::ffi::c_uint {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(3usize, 13u8) as u32) }
+        unsafe { ::core::mem::transmute(self._bitfield_1.get_const::<3usize, 13u8>() as u32) }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub fn set_nNodes(&mut self, val: ::core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_1.set(3usize, 13u8, val as u64)
+            self._bitfield_1.set_const::<3usize, 13u8>(val as u64)
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub unsafe fn nNodes_raw(this: *const Self) -> ::core::ffi::c_uint {
         unsafe {
-            ::core::mem::transmute(<__BindgenBitfieldUnit<[u8; 4usize]>>::raw_get(
-                ::core::ptr::addr_of!((*this)._bitfield_1),
+            ::core::mem::transmute(<__BindgenBitfieldUnit<[u8; 4usize]>>::raw_get_const::<
                 3usize,
                 13u8,
-            ) as u32)
+            >(::core::ptr::addr_of!((*this)._bitfield_1)) as u32)
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub unsafe fn set_nNodes_raw(this: *mut Self, val: ::core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_set(
+            <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_set_const::<3usize, 13u8>(
                 ::core::ptr::addr_of_mut!((*this)._bitfield_1),
-                3usize,
-                13u8,
                 val as u64,
             )
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub fn prefixSize(&self) -> ::core::ffi::c_uint {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(16usize, 16u8) as u32) }
+        unsafe { ::core::mem::transmute(self._bitfield_1.get_const::<16usize, 16u8>() as u32) }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub fn set_prefixSize(&mut self, val: ::core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_1.set(16usize, 16u8, val as u64)
+            self._bitfield_1.set_const::<16usize, 16u8>(val as u64)
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub unsafe fn prefixSize_raw(this: *const Self) -> ::core::ffi::c_uint {
         unsafe {
-            ::core::mem::transmute(<__BindgenBitfieldUnit<[u8; 4usize]>>::raw_get(
-                ::core::ptr::addr_of!((*this)._bitfield_1),
+            ::core::mem::transmute(<__BindgenBitfieldUnit<[u8; 4usize]>>::raw_get_const::<
                 16usize,
                 16u8,
-            ) as u32)
+            >(::core::ptr::addr_of!((*this)._bitfield_1)) as u32)
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub unsafe fn set_prefixSize_raw(this: *mut Self, val: ::core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_set(
+            <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_set_const::<16usize, 16u8>(
                 ::core::ptr::addr_of_mut!((*this)._bitfield_1),
-                16usize,
-                16u8,
                 val as u64,
             )
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub fn new_bitfield_1(
         tupstate: ::core::ffi::c_uint,
         allTheSame: ::core::ffi::c_uint,
@@ -24782,19 +25393,19 @@ impl SpGistInnerTupleData {
         prefixSize: ::core::ffi::c_uint,
     ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
-        __bindgen_bitfield_unit.set(0usize, 2u8, {
+        __bindgen_bitfield_unit.set_const::<0usize, 2u8>({
             let tupstate: u32 = unsafe { ::core::mem::transmute(tupstate) };
             tupstate as u64
         });
-        __bindgen_bitfield_unit.set(2usize, 1u8, {
+        __bindgen_bitfield_unit.set_const::<2usize, 1u8>({
             let allTheSame: u32 = unsafe { ::core::mem::transmute(allTheSame) };
             allTheSame as u64
         });
-        __bindgen_bitfield_unit.set(3usize, 13u8, {
+        __bindgen_bitfield_unit.set_const::<3usize, 13u8>({
             let nNodes: u32 = unsafe { ::core::mem::transmute(nNodes) };
             nNodes as u64
         });
-        __bindgen_bitfield_unit.set(16usize, 16u8, {
+        __bindgen_bitfield_unit.set_const::<16usize, 16u8>({
             let prefixSize: u32 = unsafe { ::core::mem::transmute(prefixSize) };
             prefixSize as u64
         });
@@ -24807,89 +25418,93 @@ pub type SpGistNodeTuple = *mut SpGistNodeTupleData;
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct SpGistLeafTupleData {
-    pub _bitfield_align_1: [u32; 0],
+    pub _bindgen_align: [u32; 0],
     pub _bitfield_1: __BindgenBitfieldUnit<[u8; 4usize]>,
     pub t_info: uint16,
     pub heapPtr: ItemPointerData,
 }
 impl SpGistLeafTupleData {
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub fn tupstate(&self) -> ::core::ffi::c_uint {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(0usize, 2u8) as u32) }
+        unsafe { ::core::mem::transmute(self._bitfield_1.get_const::<0usize, 2u8>() as u32) }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub fn set_tupstate(&mut self, val: ::core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_1.set(0usize, 2u8, val as u64)
+            self._bitfield_1.set_const::<0usize, 2u8>(val as u64)
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub unsafe fn tupstate_raw(this: *const Self) -> ::core::ffi::c_uint {
         unsafe {
-            ::core::mem::transmute(<__BindgenBitfieldUnit<[u8; 4usize]>>::raw_get(
-                ::core::ptr::addr_of!((*this)._bitfield_1),
-                0usize,
-                2u8,
-            ) as u32)
+            ::core::mem::transmute(
+                <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_get_const::<0usize, 2u8>(
+                    ::core::ptr::addr_of!((*this)._bitfield_1),
+                ) as u32,
+            )
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub unsafe fn set_tupstate_raw(this: *mut Self, val: ::core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_set(
+            <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_set_const::<0usize, 2u8>(
                 ::core::ptr::addr_of_mut!((*this)._bitfield_1),
-                0usize,
-                2u8,
                 val as u64,
             )
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub fn size(&self) -> ::core::ffi::c_uint {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(2usize, 30u8) as u32) }
+        unsafe { ::core::mem::transmute(self._bitfield_1.get_const::<2usize, 30u8>() as u32) }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub fn set_size(&mut self, val: ::core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_1.set(2usize, 30u8, val as u64)
+            self._bitfield_1.set_const::<2usize, 30u8>(val as u64)
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub unsafe fn size_raw(this: *const Self) -> ::core::ffi::c_uint {
         unsafe {
-            ::core::mem::transmute(<__BindgenBitfieldUnit<[u8; 4usize]>>::raw_get(
-                ::core::ptr::addr_of!((*this)._bitfield_1),
+            ::core::mem::transmute(<__BindgenBitfieldUnit<[u8; 4usize]>>::raw_get_const::<
                 2usize,
                 30u8,
-            ) as u32)
+            >(::core::ptr::addr_of!((*this)._bitfield_1)) as u32)
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub unsafe fn set_size_raw(this: *mut Self, val: ::core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_set(
+            <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_set_const::<2usize, 30u8>(
                 ::core::ptr::addr_of_mut!((*this)._bitfield_1),
-                2usize,
-                30u8,
                 val as u64,
             )
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub fn new_bitfield_1(
         tupstate: ::core::ffi::c_uint,
         size: ::core::ffi::c_uint,
     ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
-        __bindgen_bitfield_unit.set(0usize, 2u8, {
+        __bindgen_bitfield_unit.set_const::<0usize, 2u8>({
             let tupstate: u32 = unsafe { ::core::mem::transmute(tupstate) };
             tupstate as u64
         });
-        __bindgen_bitfield_unit.set(2usize, 30u8, {
+        __bindgen_bitfield_unit.set_const::<2usize, 30u8>({
             let size: u32 = unsafe { ::core::mem::transmute(size) };
             size as u64
         });
@@ -24899,7 +25514,6 @@ impl SpGistLeafTupleData {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct SpGistDeadTupleData {
-    pub _bitfield_align_1: [u32; 0],
     pub _bitfield_1: __BindgenBitfieldUnit<[u8; 4usize]>,
     pub t_info: uint16,
     pub pointer: ItemPointerData,
@@ -24916,82 +25530,86 @@ impl Default for SpGistDeadTupleData {
 }
 impl SpGistDeadTupleData {
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub fn tupstate(&self) -> ::core::ffi::c_uint {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(0usize, 2u8) as u32) }
+        unsafe { ::core::mem::transmute(self._bitfield_1.get_const::<0usize, 2u8>() as u32) }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub fn set_tupstate(&mut self, val: ::core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_1.set(0usize, 2u8, val as u64)
+            self._bitfield_1.set_const::<0usize, 2u8>(val as u64)
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub unsafe fn tupstate_raw(this: *const Self) -> ::core::ffi::c_uint {
         unsafe {
-            ::core::mem::transmute(<__BindgenBitfieldUnit<[u8; 4usize]>>::raw_get(
-                ::core::ptr::addr_of!((*this)._bitfield_1),
-                0usize,
-                2u8,
-            ) as u32)
+            ::core::mem::transmute(
+                <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_get_const::<0usize, 2u8>(
+                    ::core::ptr::addr_of!((*this)._bitfield_1),
+                ) as u32,
+            )
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub unsafe fn set_tupstate_raw(this: *mut Self, val: ::core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_set(
+            <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_set_const::<0usize, 2u8>(
                 ::core::ptr::addr_of_mut!((*this)._bitfield_1),
-                0usize,
-                2u8,
                 val as u64,
             )
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub fn size(&self) -> ::core::ffi::c_uint {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(2usize, 30u8) as u32) }
+        unsafe { ::core::mem::transmute(self._bitfield_1.get_const::<2usize, 30u8>() as u32) }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub fn set_size(&mut self, val: ::core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_1.set(2usize, 30u8, val as u64)
+            self._bitfield_1.set_const::<2usize, 30u8>(val as u64)
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub unsafe fn size_raw(this: *const Self) -> ::core::ffi::c_uint {
         unsafe {
-            ::core::mem::transmute(<__BindgenBitfieldUnit<[u8; 4usize]>>::raw_get(
-                ::core::ptr::addr_of!((*this)._bitfield_1),
+            ::core::mem::transmute(<__BindgenBitfieldUnit<[u8; 4usize]>>::raw_get_const::<
                 2usize,
                 30u8,
-            ) as u32)
+            >(::core::ptr::addr_of!((*this)._bitfield_1)) as u32)
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub unsafe fn set_size_raw(this: *mut Self, val: ::core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_set(
+            <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_set_const::<2usize, 30u8>(
                 ::core::ptr::addr_of_mut!((*this)._bitfield_1),
-                2usize,
-                30u8,
                 val as u64,
             )
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub fn new_bitfield_1(
         tupstate: ::core::ffi::c_uint,
         size: ::core::ffi::c_uint,
     ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
-        __bindgen_bitfield_unit.set(0usize, 2u8, {
+        __bindgen_bitfield_unit.set_const::<0usize, 2u8>({
             let tupstate: u32 = unsafe { ::core::mem::transmute(tupstate) };
             tupstate as u64
         });
-        __bindgen_bitfield_unit.set(2usize, 30u8, {
+        __bindgen_bitfield_unit.set_const::<2usize, 30u8>({
             let size: u32 = unsafe { ::core::mem::transmute(size) };
             size as u64
         });
@@ -25160,6 +25778,8 @@ pub struct TimeLineHistoryEntry {
     pub end: XLogRecPtr,
 }
 pub mod ToastCompressionId {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const TOAST_PGLZ_COMPRESSION_ID: Type = 0;
     pub const TOAST_LZ4_COMPRESSION_ID: Type = 1;
@@ -25210,6 +25830,8 @@ pub struct toast_compress_header {
 }
 pub type Relids = *mut Bitmapset;
 pub mod CostSelector {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const STARTUP_COST: Type = 0;
     pub const TOTAL_COST: Type = 1;
@@ -25228,6 +25850,8 @@ pub struct AggClauseCosts {
     pub transitionSpace: Size,
 }
 pub mod UpperRelationKind {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const UPPERREL_SETOP: Type = 0;
     pub const UPPERREL_PARTIAL_GROUP_AGG: Type = 1;
@@ -25389,6 +26013,8 @@ impl Default for PartitionSchemeData {
 }
 pub type PartitionScheme = *mut PartitionSchemeData;
 pub mod RelOptKind {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const RELOPT_BASEREL: Type = 0;
     pub const RELOPT_JOINREL: Type = 1;
@@ -25662,6 +26288,8 @@ impl Default for PathKey {
     }
 }
 pub mod VolatileFunctionStatus {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const VOLATILITY_UNKNOWN: Type = 0;
     pub const VOLATILITY_VOLATILE: Type = 1;
@@ -25980,6 +26608,8 @@ impl Default for MemoizePath {
     }
 }
 pub mod UniquePathMethod {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const UNIQUE_PATH_NOOP: Type = 0;
     pub const UNIQUE_PATH_HASH: Type = 1;
@@ -26670,6 +27300,8 @@ impl Default for JoinPathExtraData {
     }
 }
 pub mod PartitionwiseAggregateType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const PARTITIONWISE_AGGREGATE_NONE: Type = 0;
     pub const PARTITIONWISE_AGGREGATE_FULL: Type = 1;
@@ -26836,7 +27468,7 @@ impl Default for AttrMissing {
     }
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct GlobalTransactionData {
     _unused: [u8; 0],
 }
@@ -26851,13 +27483,15 @@ pub type TwoPhaseCallback = ::core::option::Option<
 >;
 pub type TwoPhaseRmgrId = uint8;
 pub mod RecoveryPrefetchValue {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const RECOVERY_PREFETCH_OFF: Type = 0;
     pub const RECOVERY_PREFETCH_ON: Type = 1;
     pub const RECOVERY_PREFETCH_TRY: Type = 2;
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct XLogPrefetcher {
     _unused: [u8; 0],
 }
@@ -26890,6 +27524,8 @@ impl Default for CheckPoint {
     }
 }
 pub mod DBState {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const DB_STARTUP: Type = 0;
     pub const DB_SHUTDOWNED: Type = 1;
@@ -26947,6 +27583,8 @@ impl Default for ControlFileData {
     }
 }
 pub mod RecoveryTargetType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const RECOVERY_TARGET_UNSET: Type = 0;
     pub const RECOVERY_TARGET_XID: Type = 1;
@@ -26956,12 +27594,16 @@ pub mod RecoveryTargetType {
     pub const RECOVERY_TARGET_IMMEDIATE: Type = 5;
 }
 pub mod RecoveryTargetTimeLineGoal {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const RECOVERY_TARGET_TIMELINE_CONTROLFILE: Type = 0;
     pub const RECOVERY_TARGET_TIMELINE_LATEST: Type = 1;
     pub const RECOVERY_TARGET_TIMELINE_NUMERIC: Type = 2;
 }
 pub mod RecoveryPauseState {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const RECOVERY_NOT_PAUSED: Type = 0;
     pub const RECOVERY_PAUSE_REQUESTED: Type = 1;
@@ -27015,6 +27657,8 @@ impl Default for XLogStats {
     }
 }
 pub mod HotStandbyState {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const STANDBY_DISABLED: Type = 0;
     pub const STANDBY_INITIALIZED: Type = 1;
@@ -27022,6 +27666,8 @@ pub mod HotStandbyState {
     pub const STANDBY_SNAPSHOT_READY: Type = 3;
 }
 pub mod XLogRedoAction {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const BLK_NEEDS_REDO: Type = 0;
     pub const BLK_DONE: Type = 1;
@@ -27034,6 +27680,8 @@ pub struct ReadLocalXLogPageNoWaitPrivate {
     pub end_of_wal: bool,
 }
 pub mod DependencyType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const DEPENDENCY_NORMAL: Type = 110;
     pub const DEPENDENCY_AUTO: Type = 97;
@@ -27044,6 +27692,8 @@ pub mod DependencyType {
     pub const DEPENDENCY_AUTO_EXTENSION: Type = 120;
 }
 pub mod SharedDependencyType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const SHARED_DEPENDENCY_OWNER: Type = 111;
     pub const SHARED_DEPENDENCY_ACL: Type = 97;
@@ -27052,11 +27702,13 @@ pub mod SharedDependencyType {
     pub const SHARED_DEPENDENCY_INVALID: Type = 0;
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct ObjectAddresses {
     _unused: [u8; 0],
 }
 pub mod ObjectClass {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const OCLASS_CLASS: Type = 0;
     pub const OCLASS_PROC: Type = 1;
@@ -27102,6 +27754,8 @@ pub mod ObjectClass {
 }
 pub type CatalogIndexState = *mut ResultRelInfo;
 pub mod ParseExprKind {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const EXPR_KIND_NONE: Type = 0;
     pub const EXPR_KIND_OTHER: Type = 1;
@@ -27316,6 +27970,8 @@ impl Default for CookedConstraint {
     }
 }
 pub mod IndexStateFlagsAction {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const INDEX_CREATE_SET_READY: Type = 0;
     pub const INDEX_CREATE_SET_VALID: Type = 1;
@@ -27378,6 +28034,8 @@ impl Default for _FuncCandidateList {
 }
 pub type FuncCandidateList = *mut _FuncCandidateList;
 pub mod TempNamespaceStatus {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const TEMP_NAMESPACE_NOT_TEMP: Type = 0;
     pub const TEMP_NAMESPACE_IDLE: Type = 1;
@@ -27401,6 +28059,8 @@ impl Default for OverrideSearchPath {
     }
 }
 pub mod RVROption {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const RVR_MISSING_OK: Type = 1;
     pub const RVR_NOWAIT: Type = 2;
@@ -27415,6 +28075,8 @@ pub type RangeVarGetRelidCallback = ::core::option::Option<
     ),
 >;
 pub mod ObjectAccessType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const OAT_POST_CREATE: Type = 0;
     pub const OAT_DROP: Type = 1;
@@ -27630,12 +28292,16 @@ impl Default for FormData_pg_authid {
 }
 pub type Form_pg_authid = *mut FormData_pg_authid;
 pub mod CoercionCodes {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const COERCION_CODE_IMPLICIT: Type = 105;
     pub const COERCION_CODE_ASSIGNMENT: Type = 97;
     pub const COERCION_CODE_EXPLICIT: Type = 101;
 }
 pub mod CoercionMethod {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const COERCION_METHOD_FUNCTION: Type = 102;
     pub const COERCION_METHOD_BINARY: Type = 98;
@@ -27715,6 +28381,8 @@ impl Default for FormData_pg_constraint {
 }
 pub type Form_pg_constraint = *mut FormData_pg_constraint;
 pub mod ConstraintCategory {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const CONSTRAINT_RELATION: Type = 0;
     pub const CONSTRAINT_DOMAIN: Type = 1;
@@ -27963,12 +28631,14 @@ impl Default for ArrayMapState {
     }
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct ArrayIteratorData {
     _unused: [u8; 0],
 }
 pub type ArrayIterator = *mut ArrayIteratorData;
 pub mod GucContext {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const PGC_INTERNAL: Type = 0;
     pub const PGC_POSTMASTER: Type = 1;
@@ -27979,6 +28649,8 @@ pub mod GucContext {
     pub const PGC_USERSET: Type = 6;
 }
 pub mod GucSource {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const PGC_S_DEFAULT: Type = 0;
     pub const PGC_S_DYNAMIC_DEFAULT: Type = 1;
@@ -28088,6 +28760,8 @@ pub type GucEnumAssignHook = ::core::option::Option<
 pub type GucShowHook =
     ::core::option::Option<unsafe extern "C-unwind" fn() -> *const ::core::ffi::c_char>;
 pub mod GucAction {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const GUC_ACTION_SET: Type = 0;
     pub const GUC_ACTION_LOCAL: Type = 1;
@@ -28312,6 +28986,8 @@ impl Default for FormData_pg_init_privs {
 }
 pub type Form_pg_init_privs = *mut FormData_pg_init_privs;
 pub mod InitPrivsType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const INITPRIVS_INITDB: Type = 105;
     pub const INITPRIVS_EXTENSION: Type = 101;
@@ -28389,11 +29065,15 @@ impl Default for AclItem {
 }
 pub type Acl = ArrayType;
 pub mod AclMaskHow {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const ACLMASK_ALL: Type = 0;
     pub const ACLMASK_ANY: Type = 1;
 }
 pub mod AclResult {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const ACLCHECK_OK: Type = 0;
     pub const ACLCHECK_NO_PRIV: Type = 1;
@@ -29179,6 +29859,8 @@ pub struct ClusterParams {
     pub options: bits32,
 }
 pub mod CopyHeaderChoice {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const COPY_HEADER_FALSE: Type = 0;
     pub const COPY_HEADER_TRUE: Type = 1;
@@ -29221,7 +29903,7 @@ impl Default for CopyFormatOptions {
 }
 pub type CopyFromState = *mut CopyFromStateData;
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct CopyToStateData {
     _unused: [u8; 0],
 }
@@ -29262,7 +29944,7 @@ impl Default for TriggerData {
     }
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct AfterTriggersTableData {
     _unused: [u8; 0],
 }
@@ -29288,12 +29970,16 @@ impl Default for TransitionCaptureState {
     }
 }
 pub mod CopySource {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const COPY_FILE: Type = 0;
     pub const COPY_FRONTEND: Type = 1;
     pub const COPY_CALLBACK: Type = 2;
 }
 pub mod EolType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const EOL_UNKNOWN: Type = 0;
     pub const EOL_NL: Type = 1;
@@ -29301,6 +29987,8 @@ pub mod EolType {
     pub const EOL_CRNL: Type = 3;
 }
 pub mod CopyInsertMethod {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const CIM_SINGLE: Type = 0;
     pub const CIM_MULTI: Type = 1;
@@ -29437,6 +30125,8 @@ impl Default for InternalGrant {
     }
 }
 pub mod CollectedCommandType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const SCT_Simple: Type = 0;
     pub const SCT_AlterTable: Type = 1;
@@ -29743,6 +30433,8 @@ impl Default for TupOutputState {
     }
 }
 pub mod ExplainFormat {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const EXPLAIN_FORMAT_TEXT: Type = 0;
     pub const EXPLAIN_FORMAT_XML: Type = 1;
@@ -29899,6 +30591,8 @@ pub struct TableSpaceOpts {
     pub maintenance_io_concurrency: ::core::ffi::c_int,
 }
 pub mod PasswordType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const PASSWORD_TYPE_PLAINTEXT: Type = 0;
     pub const PASSWORD_TYPE_MD5: Type = 1;
@@ -29914,7 +30608,7 @@ pub type check_password_hook_type = ::core::option::Option<
     ),
 >;
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct ParallelVacuumState {
     _unused: [u8; 0],
 }
@@ -29978,6 +30672,8 @@ impl Default for VacAttrStats {
     }
 }
 pub mod VacOptValue {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const VACOPTVALUE_UNSPECIFIED: Type = 0;
     pub const VACOPTVALUE_AUTO: Type = 1;
@@ -30192,7 +30888,7 @@ impl Default for AggStatePerHashData {
     }
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct ScalarArrayOpExprHashTable {
     _unused: [u8; 0],
 }
@@ -30226,6 +30922,8 @@ impl Default for ExprEvalRowtypeCache {
     }
 }
 pub mod ExprEvalOp {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const EEOP_DONE: Type = 0;
     pub const EEOP_INNER_FETCHSOME: Type = 1;
@@ -31119,7 +31817,7 @@ impl Default for JsonConstructorExprState {
     }
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct SharedExecutorInstrumentation {
     _unused: [u8; 0],
 }
@@ -31172,7 +31870,7 @@ impl Default for PartitionPruneContext {
     }
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct PartitionDispatchData {
     _unused: [u8; 0],
 }
@@ -31379,6 +32077,8 @@ impl Default for ParallelHashJoinBatchAccessor {
     }
 }
 pub mod ParallelHashGrowth {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const PHJ_GROWTH_OK: Type = 0;
     pub const PHJ_GROWTH_NEED_MORE_BUCKETS: Type = 1;
@@ -31483,11 +32183,13 @@ impl Default for HashJoinTableData {
     }
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct SharedHashJoinBatch {
     _unused: [u8; 0],
 }
 pub mod RawParseMode {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const RAW_PARSE_DEFAULT: Type = 0;
     pub const RAW_PARSE_TYPE_NAME: Type = 1;
@@ -31497,6 +32199,8 @@ pub mod RawParseMode {
     pub const RAW_PARSE_PLPGSQL_ASSIGN3: Type = 5;
 }
 pub mod BackslashQuoteType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const BACKSLASH_QUOTE_OFF: Type = 0;
     pub const BACKSLASH_QUOTE_ON: Type = 1;
@@ -32084,6 +32788,8 @@ impl Default for FuncCallContext {
     }
 }
 pub mod TypeFuncClass {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const TYPEFUNC_SCALAR: Type = 0;
     pub const TYPEFUNC_COMPOSITE: Type = 1;
@@ -32138,6 +32844,8 @@ pub struct JitProviderCallbacks {
 }
 pub type pg_wchar = ::core::ffi::c_uint;
 pub mod pg_enc {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const PG_SQL_ASCII: Type = 0;
     pub const PG_EUC_JP: Type = 1;
@@ -32315,12 +33023,14 @@ pub struct pg_local_to_utf_combined {
 pub type utf_local_conversion_func =
     ::core::option::Option<unsafe extern "C-unwind" fn(code: uint32) -> uint32>;
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct Port {
     _unused: [u8; 0],
 }
 pub type pg_stack_base_t = *mut ::core::ffi::c_char;
 pub mod BackendType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const B_INVALID: Type = 0;
     pub const B_ARCHIVER: Type = 1;
@@ -32338,13 +33048,17 @@ pub mod BackendType {
     pub const B_WAL_WRITER: Type = 13;
 }
 pub mod ProcessingMode {
-    #[doc = "\t  pmod.h --\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t *\n\t\t\tPOSTGRES processing mode definitions.                            *"]
+    #[allow(unused_imports)]
+    use super::*;
+    #[doc = "pmod.h --\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t *\nPOSTGRES processing mode definitions.                            *"]
     pub type Type = ::core::ffi::c_uint;
     pub const BootstrapProcessing: Type = 0;
     pub const InitProcessing: Type = 1;
     pub const NormalProcessing: Type = 2;
 }
 pub mod AuxProcType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_int;
     pub const NotAnAuxProcess: Type = -1;
     pub const StartupProcess: Type = 0;
@@ -32566,6 +33280,8 @@ impl Default for JumbleState {
     }
 }
 pub mod ComputeQueryIdType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const COMPUTE_QUERY_ID_OFF: Type = 0;
     pub const COMPUTE_QUERY_ID_ON: Type = 1;
@@ -32573,6 +33289,8 @@ pub mod ComputeQueryIdType {
     pub const COMPUTE_QUERY_ID_REGRESS: Type = 3;
 }
 pub mod ReplicationKind {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const REPLICATION_KIND_PHYSICAL: Type = 0;
     pub const REPLICATION_KIND_LOGICAL: Type = 1;
@@ -32865,6 +33583,8 @@ impl Default for WindowFuncLists {
     }
 }
 pub mod ConstraintExclusionType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const CONSTRAINT_EXCLUSION_OFF: Type = 0;
     pub const CONSTRAINT_EXCLUSION_ON: Type = 1;
@@ -32939,6 +33659,8 @@ pub struct City {
     pub select_list: ::core::ffi::c_int,
 }
 pub mod DebugParallelMode {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const DEBUG_PARALLEL_OFF: Type = 0;
     pub const DEBUG_PARALLEL_ON: Type = 1;
@@ -32979,6 +33701,8 @@ pub type ec_matches_callback_type = ::core::option::Option<
     ) -> bool,
 >;
 pub mod PathKeysComparison {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const PATHKEYS_EQUAL: Type = 0;
     pub const PATHKEYS_BETTER1: Type = 1;
@@ -33022,6 +33746,8 @@ pub type post_parse_analyze_hook_type = ::core::option::Option<
 >;
 pub type TYPCATEGORY = ::core::ffi::c_char;
 pub mod CoercionPathType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const COERCION_PATH_NONE: Type = 0;
     pub const COERCION_PATH_FUNC: Type = 1;
@@ -33030,6 +33756,8 @@ pub mod CoercionPathType {
     pub const COERCION_PATH_COERCEVIAIO: Type = 4;
 }
 pub mod FuncDetailCode {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const FUNCDETAIL_NOTFOUND: Type = 0;
     pub const FUNCDETAIL_MULTIPLE: Type = 1;
@@ -33172,6 +33900,8 @@ impl Default for PartitionDescData {
     }
 }
 pub mod ProgressCommandType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const PROGRESS_COMMAND_INVALID: Type = 0;
     pub const PROGRESS_COMMAND_VACUUM: Type = 1;
@@ -33240,6 +33970,8 @@ pub struct CancelRequestPacket {
     pub cancelAuthCode: uint32,
 }
 pub mod BackendState {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const STATE_UNDEFINED: Type = 0;
     pub const STATE_IDLE: Type = 1;
@@ -33340,6 +34072,8 @@ impl Default for LocalPgBackendStatus {
     }
 }
 pub mod WaitEventActivity {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const WAIT_EVENT_ARCHIVER_MAIN: Type = 83886080;
     pub const WAIT_EVENT_AUTOVACUUM_MAIN: Type = 83886081;
@@ -33356,6 +34090,8 @@ pub mod WaitEventActivity {
     pub const WAIT_EVENT_WAL_WRITER_MAIN: Type = 83886092;
 }
 pub mod WaitEventClient {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const WAIT_EVENT_CLIENT_READ: Type = 100663296;
     pub const WAIT_EVENT_CLIENT_WRITE: Type = 100663297;
@@ -33367,6 +34103,8 @@ pub mod WaitEventClient {
     pub const WAIT_EVENT_WAL_SENDER_WRITE_DATA: Type = 100663303;
 }
 pub mod WaitEventIPC {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const WAIT_EVENT_APPEND_READY: Type = 134217728;
     pub const WAIT_EVENT_ARCHIVE_CLEANUP_COMMAND: Type = 134217729;
@@ -33424,6 +34162,8 @@ pub mod WaitEventIPC {
     pub const WAIT_EVENT_WAL_RECEIVER_UPSTREAM_CATCHUP: Type = 134217781;
 }
 pub mod WaitEventTimeout {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const WAIT_EVENT_BASE_BACKUP_THROTTLE: Type = 150994944;
     pub const WAIT_EVENT_CHECKPOINT_WRITE_DELAY: Type = 150994945;
@@ -33436,6 +34176,8 @@ pub mod WaitEventTimeout {
     pub const WAIT_EVENT_VACUUM_TRUNCATE: Type = 150994952;
 }
 pub mod WaitEventIO {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const WAIT_EVENT_BASEBACKUP_READ: Type = 167772160;
     pub const WAIT_EVENT_BASEBACKUP_SYNC: Type = 167772161;
@@ -33514,6 +34256,8 @@ pub mod WaitEventIO {
     pub const WAIT_EVENT_VERSION_FILE_SYNC: Type = 167772234;
 }
 pub mod PgStat_Kind {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const PGSTAT_KIND_INVALID: Type = 0;
     pub const PGSTAT_KIND_DATABASE: Type = 1;
@@ -33529,18 +34273,24 @@ pub mod PgStat_Kind {
     pub const PGSTAT_KIND_WAL: Type = 11;
 }
 pub mod TrackFunctionsLevel {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const TRACK_FUNC_OFF: Type = 0;
     pub const TRACK_FUNC_PL: Type = 1;
     pub const TRACK_FUNC_ALL: Type = 2;
 }
 pub mod PgStat_FetchConsistency {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const PGSTAT_FETCH_CONSISTENCY_NONE: Type = 0;
     pub const PGSTAT_FETCH_CONSISTENCY_CACHE: Type = 1;
     pub const PGSTAT_FETCH_CONSISTENCY_SNAPSHOT: Type = 2;
 }
 pub mod SessionEndType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const DISCONNECT_NOT_YET: Type = 0;
     pub const DISCONNECT_NORMAL: Type = 1;
@@ -33679,11 +34429,15 @@ pub struct PgStat_CheckpointerStats {
     pub buf_fsync_backend: PgStat_Counter,
 }
 pub mod IOObject {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const IOOBJECT_RELATION: Type = 0;
     pub const IOOBJECT_TEMP_RELATION: Type = 1;
 }
 pub mod IOContext {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const IOCONTEXT_BULKREAD: Type = 0;
     pub const IOCONTEXT_BULKWRITE: Type = 1;
@@ -33691,6 +34445,8 @@ pub mod IOContext {
     pub const IOCONTEXT_VACUUM: Type = 3;
 }
 pub mod IOOp {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const IOOP_EVICT: Type = 0;
     pub const IOOP_EXTEND: Type = 1;
@@ -33889,18 +34645,24 @@ impl Default for ExpandedRecordFieldInfo {
     }
 }
 pub mod PLpgSQL_nsitem_type {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const PLPGSQL_NSTYPE_LABEL: Type = 0;
     pub const PLPGSQL_NSTYPE_VAR: Type = 1;
     pub const PLPGSQL_NSTYPE_REC: Type = 2;
 }
 pub mod PLpgSQL_label_type {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const PLPGSQL_LABEL_BLOCK: Type = 0;
     pub const PLPGSQL_LABEL_LOOP: Type = 1;
     pub const PLPGSQL_LABEL_OTHER: Type = 2;
 }
 pub mod PLpgSQL_datum_type {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const PLPGSQL_DTYPE_VAR: Type = 0;
     pub const PLPGSQL_DTYPE_ROW: Type = 1;
@@ -33909,6 +34671,8 @@ pub mod PLpgSQL_datum_type {
     pub const PLPGSQL_DTYPE_PROMISE: Type = 4;
 }
 pub mod PLpgSQL_promise_type {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const PLPGSQL_PROMISE_NONE: Type = 0;
     pub const PLPGSQL_PROMISE_TG_NAME: Type = 1;
@@ -33924,12 +34688,16 @@ pub mod PLpgSQL_promise_type {
     pub const PLPGSQL_PROMISE_TG_TAG: Type = 11;
 }
 pub mod PLpgSQL_type_type {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const PLPGSQL_TTYPE_SCALAR: Type = 0;
     pub const PLPGSQL_TTYPE_REC: Type = 1;
     pub const PLPGSQL_TTYPE_PSEUDO: Type = 2;
 }
 pub mod PLpgSQL_stmt_type {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const PLPGSQL_STMT_BLOCK: Type = 0;
     pub const PLPGSQL_STMT_ASSIGN: Type = 1;
@@ -33959,7 +34727,9 @@ pub mod PLpgSQL_stmt_type {
     pub const PLPGSQL_STMT_COMMIT: Type = 25;
     pub const PLPGSQL_STMT_ROLLBACK: Type = 26;
 }
-pub mod _bindgen_ty_32 {
+pub mod _bindgen_ty_31 {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const PLPGSQL_RC_OK: Type = 0;
     pub const PLPGSQL_RC_EXIT: Type = 1;
@@ -33967,6 +34737,8 @@ pub mod _bindgen_ty_32 {
     pub const PLPGSQL_RC_CONTINUE: Type = 3;
 }
 pub mod PLpgSQL_getdiag_kind {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const PLPGSQL_GETDIAG_ROW_COUNT: Type = 0;
     pub const PLPGSQL_GETDIAG_ROUTINE_OID: Type = 1;
@@ -33983,6 +34755,8 @@ pub mod PLpgSQL_getdiag_kind {
     pub const PLPGSQL_GETDIAG_SCHEMA_NAME: Type = 12;
 }
 pub mod PLpgSQL_raise_option_type {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const PLPGSQL_RAISEOPTION_ERRCODE: Type = 0;
     pub const PLPGSQL_RAISEOPTION_MESSAGE: Type = 1;
@@ -33995,12 +34769,14 @@ pub mod PLpgSQL_raise_option_type {
     pub const PLPGSQL_RAISEOPTION_SCHEMA: Type = 8;
 }
 pub mod PLpgSQL_resolve_option {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const PLPGSQL_RESOLVE_ERROR: Type = 0;
     pub const PLPGSQL_RESOLVE_VARIABLE: Type = 1;
     pub const PLPGSQL_RESOLVE_COLUMN: Type = 2;
 }
-#[doc = " Node and structure definitions"]
+#[doc = "Node and structure definitions"]
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct PLpgSQL_type {
@@ -34899,6 +35675,8 @@ impl Default for PLpgSQL_func_hashkey {
     }
 }
 pub mod PLpgSQL_trigtype {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const PLPGSQL_DML_TRIGGER: Type = 0;
     pub const PLPGSQL_EVENT_TRIGGER: Type = 1;
@@ -35106,13 +35884,17 @@ impl Default for PLwdatum {
     }
 }
 pub mod IdentifierLookup {
-    #[doc = " Global variable declarations"]
+    #[allow(unused_imports)]
+    use super::*;
+    #[doc = "Global variable declarations"]
     pub type Type = ::core::ffi::c_uint;
     pub const IDENTIFIER_LOOKUP_NORMAL: Type = 0;
     pub const IDENTIFIER_LOOKUP_DECLARE: Type = 1;
     pub const IDENTIFIER_LOOKUP_EXPR: Type = 2;
 }
 pub mod AutoVacuumWorkItemType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const AVW_BRINSummarizeRange: Type = 0;
 }
@@ -35161,6 +35943,8 @@ impl Default for PipeProtoChunk {
     }
 }
 pub mod DebugLogicalRepStreamingMode {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const DEBUG_LOGICAL_REP_STREAMING_BUFFERED: Type = 0;
     pub const DEBUG_LOGICAL_REP_STREAMING_IMMEDIATE: Type = 1;
@@ -35182,6 +35966,8 @@ impl Default for ReorderBufferTupleBuf {
     }
 }
 pub mod ReorderBufferChangeType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const REORDER_BUFFER_CHANGE_INSERT: Type = 0;
     pub const REORDER_BUFFER_CHANGE_UPDATE: Type = 1;
@@ -35572,6 +36358,8 @@ impl Default for ReorderBuffer {
     }
 }
 pub mod OutputPluginOutputType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const OUTPUT_PLUGIN_BINARY_OUTPUT: Type = 0;
     pub const OUTPUT_PLUGIN_TEXTUAL_OUTPUT: Type = 1;
@@ -35756,6 +36544,8 @@ pub struct OutputPluginCallbacks {
     pub stream_truncate_cb: LogicalDecodeStreamTruncateCB,
 }
 pub mod LogicalRepMsgType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const LOGICAL_REP_MSG_BEGIN: Type = 66;
     pub const LOGICAL_REP_MSG_COMMIT: Type = 67;
@@ -35928,12 +36718,16 @@ impl Default for LogicalRepStreamAbortData {
     }
 }
 pub mod CRSSnapshotAction {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const CRS_EXPORT_SNAPSHOT: Type = 0;
     pub const CRS_NOEXPORT_SNAPSHOT: Type = 1;
     pub const CRS_USE_SNAPSHOT: Type = 2;
 }
 pub mod WalRcvState {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const WALRCV_STOPPED: Type = 0;
     pub const WALRCV_STARTING: Type = 1;
@@ -36035,11 +36829,13 @@ impl Default for WalRcvStreamOptions {
     }
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct WalReceiverConn {
     _unused: [u8; 0],
 }
 pub mod WalRcvExecStatus {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const WALRCV_ERROR: Type = 0;
     pub const WALRCV_OK_COMMAND: Type = 1;
@@ -36171,12 +36967,16 @@ pub struct WalReceiverFunctionsType {
     pub walrcv_disconnect: walrcv_disconnect_fn,
 }
 pub mod ReplicationSlotPersistency {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const RS_PERSISTENT: Type = 0;
     pub const RS_EPHEMERAL: Type = 1;
     pub const RS_TEMPORARY: Type = 2;
 }
 pub mod ReplicationSlotInvalidationCause {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const RS_INVAL_NONE: Type = 0;
     pub const RS_INVAL_WAL_REMOVED: Type = 1;
@@ -36382,6 +37182,8 @@ impl Default for PGOutputData {
     }
 }
 pub mod SnapBuildState {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_int;
     pub const SNAPBUILD_START: Type = -1;
     pub const SNAPBUILD_BUILDING_SNAPSHOT: Type = 0;
@@ -36389,7 +37191,7 @@ pub mod SnapBuildState {
     pub const SNAPBUILD_CONSISTENT: Type = 2;
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct SnapBuild {
     _unused: [u8; 0],
 }
@@ -36414,6 +37216,8 @@ pub struct SyncRepConfigData {
     pub member_names: __IncompleteArrayField<::core::ffi::c_char>,
 }
 pub mod WalSndState {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const WALSNDSTATE_STARTUP: Type = 0;
     pub const WALSNDSTATE_BACKUP: Type = 1;
@@ -36501,12 +37305,16 @@ impl Default for LogicalRepWorker {
     }
 }
 pub mod ParallelTransState {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const PARALLEL_TRANS_UNKNOWN: Type = 0;
     pub const PARALLEL_TRANS_STARTED: Type = 1;
     pub const PARALLEL_TRANS_FINISHED: Type = 2;
 }
 pub mod PartialFileSetState {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const FS_EMPTY: Type = 0;
     pub const FS_SERIALIZE_IN_PROGRESS: Type = 1;
@@ -36579,6 +37387,8 @@ impl Default for replace_rte_variables_context {
     }
 }
 pub mod ReplaceVarsNoMatchOption {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const REPLACEVARS_REPORT_ERROR: Type = 0;
     pub const REPLACEVARS_CHANGE_VARNO: Type = 1;
@@ -36950,6 +37760,8 @@ impl Default for LargeObjectDesc {
     }
 }
 pub mod XLTW_Oper {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const XLTW_None: Type = 0;
     pub const XLTW_Update: Type = 1;
@@ -36983,18 +37795,24 @@ impl Default for PGShmemHeader {
     }
 }
 pub mod HugePagesType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const HUGE_PAGES_OFF: Type = 0;
     pub const HUGE_PAGES_ON: Type = 1;
     pub const HUGE_PAGES_TRY: Type = 2;
 }
 pub mod PGShmemType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const SHMEM_TYPE_WINDOWS: Type = 0;
     pub const SHMEM_TYPE_SYSV: Type = 1;
     pub const SHMEM_TYPE_MMAP: Type = 2;
 }
 pub mod PMSignalReason {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const PMSIGNAL_RECOVERY_STARTED: Type = 0;
     pub const PMSIGNAL_BEGIN_HOT_STANDBY: Type = 1;
@@ -37007,13 +37825,15 @@ pub mod PMSignalReason {
     pub const NUM_PMSIGNALS: Type = 8;
 }
 pub mod QuitSignalReason {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const PMQUIT_NOT_SENT: Type = 0;
     pub const PMQUIT_FOR_CRASH: Type = 1;
     pub const PMQUIT_FOR_STOP: Type = 2;
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct PMSignalData {
     _unused: [u8; 0],
 }
@@ -37214,6 +38034,8 @@ pub struct LOCALPREDICATELOCK {
     pub childLocks: ::core::ffi::c_int,
 }
 pub mod PredicateLockTargetType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const PREDLOCKTAG_RELATION: Type = 0;
     pub const PREDLOCKTAG_PAGE: Type = 1;
@@ -37236,6 +38058,8 @@ impl Default for PredicateLockData {
     }
 }
 pub mod TwoPhasePredicateRecordType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const TWOPHASEPREDICATERECORD_XACT: Type = 0;
     pub const TWOPHASEPREDICATERECORD_LOCK: Type = 1;
@@ -37292,6 +38116,8 @@ impl Default for TwoPhasePredicateRecord {
     }
 }
 pub mod ProcSignalReason {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const PROCSIG_CATCHUP_INTERRUPT: Type = 0;
     pub const PROCSIG_NOTIFY_INTERRUPT: Type = 1;
@@ -37310,6 +38136,8 @@ pub mod ProcSignalReason {
     pub const NUM_PROCSIGNALS: Type = 14;
 }
 pub mod ProcSignalBarrierType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const PROCSIGNAL_BARRIER_SMGRRELEASE: Type = 0;
 }
@@ -37366,6 +38194,8 @@ impl Default for xl_invalidations {
     }
 }
 pub mod subxids_array_status {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const SUBXIDS_IN_ARRAY: Type = 0;
     pub const SUBXIDS_MISSING: Type = 1;
@@ -37393,6 +38223,8 @@ impl Default for RunningTransactionsData {
 }
 pub type RunningTransactions = *mut RunningTransactionsData;
 pub mod LogStmtLevel {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const LOGSTMT_NONE: Type = 0;
     pub const LOGSTMT_DDL: Type = 1;
@@ -37400,6 +38232,8 @@ pub mod LogStmtLevel {
     pub const LOGSTMT_ALL: Type = 3;
 }
 pub mod ProcessUtilityContext {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const PROCESS_UTILITY_TOPLEVEL: Type = 0;
     pub const PROCESS_UTILITY_QUERY: Type = 1;
@@ -37527,10 +38361,9 @@ impl Default for TSConfigCacheEntry {
         }
     }
 }
-pub type char16_t = __uint_least16_t;
-pub type UChar = char16_t;
+pub type UChar = u16;
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct UCollator {
     _unused: [u8; 0],
 }
@@ -37604,125 +38437,130 @@ impl Default for tsearch_readline_state {
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct WordEntry {
-    pub _bitfield_align_1: [u32; 0],
+    pub _bindgen_align: [u32; 0],
     pub _bitfield_1: __BindgenBitfieldUnit<[u8; 4usize]>,
 }
 impl WordEntry {
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub fn haspos(&self) -> uint32 {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(0usize, 1u8) as u32) }
+        unsafe { ::core::mem::transmute(self._bitfield_1.get_const::<0usize, 1u8>() as u32) }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub fn set_haspos(&mut self, val: uint32) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_1.set(0usize, 1u8, val as u64)
+            self._bitfield_1.set_const::<0usize, 1u8>(val as u64)
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub unsafe fn haspos_raw(this: *const Self) -> uint32 {
         unsafe {
-            ::core::mem::transmute(<__BindgenBitfieldUnit<[u8; 4usize]>>::raw_get(
-                ::core::ptr::addr_of!((*this)._bitfield_1),
-                0usize,
-                1u8,
-            ) as u32)
+            ::core::mem::transmute(
+                <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_get_const::<0usize, 1u8>(
+                    ::core::ptr::addr_of!((*this)._bitfield_1),
+                ) as u32,
+            )
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub unsafe fn set_haspos_raw(this: *mut Self, val: uint32) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_set(
+            <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_set_const::<0usize, 1u8>(
                 ::core::ptr::addr_of_mut!((*this)._bitfield_1),
-                0usize,
-                1u8,
                 val as u64,
             )
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub fn len(&self) -> uint32 {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(1usize, 11u8) as u32) }
+        unsafe { ::core::mem::transmute(self._bitfield_1.get_const::<1usize, 11u8>() as u32) }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub fn set_len(&mut self, val: uint32) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_1.set(1usize, 11u8, val as u64)
+            self._bitfield_1.set_const::<1usize, 11u8>(val as u64)
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub unsafe fn len_raw(this: *const Self) -> uint32 {
         unsafe {
-            ::core::mem::transmute(<__BindgenBitfieldUnit<[u8; 4usize]>>::raw_get(
-                ::core::ptr::addr_of!((*this)._bitfield_1),
+            ::core::mem::transmute(<__BindgenBitfieldUnit<[u8; 4usize]>>::raw_get_const::<
                 1usize,
                 11u8,
-            ) as u32)
+            >(::core::ptr::addr_of!((*this)._bitfield_1)) as u32)
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub unsafe fn set_len_raw(this: *mut Self, val: uint32) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_set(
+            <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_set_const::<1usize, 11u8>(
                 ::core::ptr::addr_of_mut!((*this)._bitfield_1),
-                1usize,
-                11u8,
                 val as u64,
             )
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub fn pos(&self) -> uint32 {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(12usize, 20u8) as u32) }
+        unsafe { ::core::mem::transmute(self._bitfield_1.get_const::<12usize, 20u8>() as u32) }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub fn set_pos(&mut self, val: uint32) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_1.set(12usize, 20u8, val as u64)
+            self._bitfield_1.set_const::<12usize, 20u8>(val as u64)
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub unsafe fn pos_raw(this: *const Self) -> uint32 {
         unsafe {
-            ::core::mem::transmute(<__BindgenBitfieldUnit<[u8; 4usize]>>::raw_get(
-                ::core::ptr::addr_of!((*this)._bitfield_1),
+            ::core::mem::transmute(<__BindgenBitfieldUnit<[u8; 4usize]>>::raw_get_const::<
                 12usize,
                 20u8,
-            ) as u32)
+            >(::core::ptr::addr_of!((*this)._bitfield_1)) as u32)
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub unsafe fn set_pos_raw(this: *mut Self, val: uint32) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_set(
+            <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_set_const::<12usize, 20u8>(
                 ::core::ptr::addr_of_mut!((*this)._bitfield_1),
-                12usize,
-                20u8,
                 val as u64,
             )
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub fn new_bitfield_1(
         haspos: uint32,
         len: uint32,
         pos: uint32,
     ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
-        __bindgen_bitfield_unit.set(0usize, 1u8, {
+        __bindgen_bitfield_unit.set_const::<0usize, 1u8>({
             let haspos: u32 = unsafe { ::core::mem::transmute(haspos) };
             haspos as u64
         });
-        __bindgen_bitfield_unit.set(1usize, 11u8, {
+        __bindgen_bitfield_unit.set_const::<1usize, 11u8>({
             let len: u32 = unsafe { ::core::mem::transmute(len) };
             len as u64
         });
-        __bindgen_bitfield_unit.set(12usize, 20u8, {
+        __bindgen_bitfield_unit.set_const::<12usize, 20u8>({
             let pos: u32 = unsafe { ::core::mem::transmute(pos) };
             pos as u64
         });
@@ -37758,84 +38596,86 @@ pub struct QueryOperand {
     pub weight: uint8,
     pub prefix: bool,
     pub valcrc: int32,
-    pub _bitfield_align_1: [u32; 0],
     pub _bitfield_1: __BindgenBitfieldUnit<[u8; 4usize]>,
 }
 impl QueryOperand {
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub fn length(&self) -> uint32 {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(0usize, 12u8) as u32) }
+        unsafe { ::core::mem::transmute(self._bitfield_1.get_const::<0usize, 12u8>() as u32) }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub fn set_length(&mut self, val: uint32) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_1.set(0usize, 12u8, val as u64)
+            self._bitfield_1.set_const::<0usize, 12u8>(val as u64)
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub unsafe fn length_raw(this: *const Self) -> uint32 {
         unsafe {
-            ::core::mem::transmute(<__BindgenBitfieldUnit<[u8; 4usize]>>::raw_get(
-                ::core::ptr::addr_of!((*this)._bitfield_1),
+            ::core::mem::transmute(<__BindgenBitfieldUnit<[u8; 4usize]>>::raw_get_const::<
                 0usize,
                 12u8,
-            ) as u32)
+            >(::core::ptr::addr_of!((*this)._bitfield_1)) as u32)
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub unsafe fn set_length_raw(this: *mut Self, val: uint32) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_set(
+            <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_set_const::<0usize, 12u8>(
                 ::core::ptr::addr_of_mut!((*this)._bitfield_1),
-                0usize,
-                12u8,
                 val as u64,
             )
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub fn distance(&self) -> uint32 {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(12usize, 20u8) as u32) }
+        unsafe { ::core::mem::transmute(self._bitfield_1.get_const::<12usize, 20u8>() as u32) }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub fn set_distance(&mut self, val: uint32) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_1.set(12usize, 20u8, val as u64)
+            self._bitfield_1.set_const::<12usize, 20u8>(val as u64)
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub unsafe fn distance_raw(this: *const Self) -> uint32 {
         unsafe {
-            ::core::mem::transmute(<__BindgenBitfieldUnit<[u8; 4usize]>>::raw_get(
-                ::core::ptr::addr_of!((*this)._bitfield_1),
+            ::core::mem::transmute(<__BindgenBitfieldUnit<[u8; 4usize]>>::raw_get_const::<
                 12usize,
                 20u8,
-            ) as u32)
+            >(::core::ptr::addr_of!((*this)._bitfield_1)) as u32)
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub unsafe fn set_distance_raw(this: *mut Self, val: uint32) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_set(
+            <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_set_const::<12usize, 20u8>(
                 ::core::ptr::addr_of_mut!((*this)._bitfield_1),
-                12usize,
-                20u8,
                 val as u64,
             )
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub fn new_bitfield_1(length: uint32, distance: uint32) -> __BindgenBitfieldUnit<[u8; 4usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
-        __bindgen_bitfield_unit.set(0usize, 12u8, {
+        __bindgen_bitfield_unit.set_const::<0usize, 12u8>({
             let length: u32 = unsafe { ::core::mem::transmute(length) };
             length as u64
         });
-        __bindgen_bitfield_unit.set(12usize, 20u8, {
+        __bindgen_bitfield_unit.set_const::<12usize, 20u8>({
             let distance: u32 = unsafe { ::core::mem::transmute(distance) };
             distance as u64
         });
@@ -37893,7 +38733,6 @@ impl Default for LexDescr {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct HeadlineWordEntry {
-    pub _bitfield_align_1: [u16; 0],
     pub _bitfield_1: __BindgenBitfieldUnit<[u8; 4usize]>,
     pub pos: WordEntryPos,
     pub word: *mut ::core::ffi::c_char,
@@ -37910,270 +38749,286 @@ impl Default for HeadlineWordEntry {
 }
 impl HeadlineWordEntry {
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub fn selected(&self) -> uint32 {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(0usize, 1u8) as u32) }
+        unsafe { ::core::mem::transmute(self._bitfield_1.get_const::<0usize, 1u8>() as u32) }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub fn set_selected(&mut self, val: uint32) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_1.set(0usize, 1u8, val as u64)
+            self._bitfield_1.set_const::<0usize, 1u8>(val as u64)
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub unsafe fn selected_raw(this: *const Self) -> uint32 {
         unsafe {
-            ::core::mem::transmute(<__BindgenBitfieldUnit<[u8; 4usize]>>::raw_get(
-                ::core::ptr::addr_of!((*this)._bitfield_1),
-                0usize,
-                1u8,
-            ) as u32)
+            ::core::mem::transmute(
+                <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_get_const::<0usize, 1u8>(
+                    ::core::ptr::addr_of!((*this)._bitfield_1),
+                ) as u32,
+            )
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub unsafe fn set_selected_raw(this: *mut Self, val: uint32) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_set(
+            <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_set_const::<0usize, 1u8>(
                 ::core::ptr::addr_of_mut!((*this)._bitfield_1),
-                0usize,
-                1u8,
                 val as u64,
             )
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub fn in_(&self) -> uint32 {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(1usize, 1u8) as u32) }
+        unsafe { ::core::mem::transmute(self._bitfield_1.get_const::<1usize, 1u8>() as u32) }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub fn set_in(&mut self, val: uint32) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_1.set(1usize, 1u8, val as u64)
+            self._bitfield_1.set_const::<1usize, 1u8>(val as u64)
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub unsafe fn in__raw(this: *const Self) -> uint32 {
         unsafe {
-            ::core::mem::transmute(<__BindgenBitfieldUnit<[u8; 4usize]>>::raw_get(
-                ::core::ptr::addr_of!((*this)._bitfield_1),
-                1usize,
-                1u8,
-            ) as u32)
+            ::core::mem::transmute(
+                <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_get_const::<1usize, 1u8>(
+                    ::core::ptr::addr_of!((*this)._bitfield_1),
+                ) as u32,
+            )
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub unsafe fn set_in_raw(this: *mut Self, val: uint32) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_set(
+            <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_set_const::<1usize, 1u8>(
                 ::core::ptr::addr_of_mut!((*this)._bitfield_1),
-                1usize,
-                1u8,
                 val as u64,
             )
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub fn replace(&self) -> uint32 {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(2usize, 1u8) as u32) }
+        unsafe { ::core::mem::transmute(self._bitfield_1.get_const::<2usize, 1u8>() as u32) }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub fn set_replace(&mut self, val: uint32) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_1.set(2usize, 1u8, val as u64)
+            self._bitfield_1.set_const::<2usize, 1u8>(val as u64)
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub unsafe fn replace_raw(this: *const Self) -> uint32 {
         unsafe {
-            ::core::mem::transmute(<__BindgenBitfieldUnit<[u8; 4usize]>>::raw_get(
-                ::core::ptr::addr_of!((*this)._bitfield_1),
-                2usize,
-                1u8,
-            ) as u32)
+            ::core::mem::transmute(
+                <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_get_const::<2usize, 1u8>(
+                    ::core::ptr::addr_of!((*this)._bitfield_1),
+                ) as u32,
+            )
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub unsafe fn set_replace_raw(this: *mut Self, val: uint32) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_set(
+            <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_set_const::<2usize, 1u8>(
                 ::core::ptr::addr_of_mut!((*this)._bitfield_1),
-                2usize,
-                1u8,
                 val as u64,
             )
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub fn repeated(&self) -> uint32 {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(3usize, 1u8) as u32) }
+        unsafe { ::core::mem::transmute(self._bitfield_1.get_const::<3usize, 1u8>() as u32) }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub fn set_repeated(&mut self, val: uint32) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_1.set(3usize, 1u8, val as u64)
+            self._bitfield_1.set_const::<3usize, 1u8>(val as u64)
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub unsafe fn repeated_raw(this: *const Self) -> uint32 {
         unsafe {
-            ::core::mem::transmute(<__BindgenBitfieldUnit<[u8; 4usize]>>::raw_get(
-                ::core::ptr::addr_of!((*this)._bitfield_1),
-                3usize,
-                1u8,
-            ) as u32)
+            ::core::mem::transmute(
+                <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_get_const::<3usize, 1u8>(
+                    ::core::ptr::addr_of!((*this)._bitfield_1),
+                ) as u32,
+            )
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub unsafe fn set_repeated_raw(this: *mut Self, val: uint32) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_set(
+            <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_set_const::<3usize, 1u8>(
                 ::core::ptr::addr_of_mut!((*this)._bitfield_1),
-                3usize,
-                1u8,
                 val as u64,
             )
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub fn skip(&self) -> uint32 {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(4usize, 1u8) as u32) }
+        unsafe { ::core::mem::transmute(self._bitfield_1.get_const::<4usize, 1u8>() as u32) }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub fn set_skip(&mut self, val: uint32) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_1.set(4usize, 1u8, val as u64)
+            self._bitfield_1.set_const::<4usize, 1u8>(val as u64)
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub unsafe fn skip_raw(this: *const Self) -> uint32 {
         unsafe {
-            ::core::mem::transmute(<__BindgenBitfieldUnit<[u8; 4usize]>>::raw_get(
-                ::core::ptr::addr_of!((*this)._bitfield_1),
-                4usize,
-                1u8,
-            ) as u32)
+            ::core::mem::transmute(
+                <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_get_const::<4usize, 1u8>(
+                    ::core::ptr::addr_of!((*this)._bitfield_1),
+                ) as u32,
+            )
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub unsafe fn set_skip_raw(this: *mut Self, val: uint32) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_set(
+            <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_set_const::<4usize, 1u8>(
                 ::core::ptr::addr_of_mut!((*this)._bitfield_1),
-                4usize,
-                1u8,
                 val as u64,
             )
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub fn unused(&self) -> uint32 {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(5usize, 3u8) as u32) }
+        unsafe { ::core::mem::transmute(self._bitfield_1.get_const::<5usize, 3u8>() as u32) }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub fn set_unused(&mut self, val: uint32) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_1.set(5usize, 3u8, val as u64)
+            self._bitfield_1.set_const::<5usize, 3u8>(val as u64)
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub unsafe fn unused_raw(this: *const Self) -> uint32 {
         unsafe {
-            ::core::mem::transmute(<__BindgenBitfieldUnit<[u8; 4usize]>>::raw_get(
-                ::core::ptr::addr_of!((*this)._bitfield_1),
-                5usize,
-                3u8,
-            ) as u32)
+            ::core::mem::transmute(
+                <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_get_const::<5usize, 3u8>(
+                    ::core::ptr::addr_of!((*this)._bitfield_1),
+                ) as u32,
+            )
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub unsafe fn set_unused_raw(this: *mut Self, val: uint32) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_set(
+            <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_set_const::<5usize, 3u8>(
                 ::core::ptr::addr_of_mut!((*this)._bitfield_1),
-                5usize,
-                3u8,
                 val as u64,
             )
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub fn type_(&self) -> uint32 {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(8usize, 8u8) as u32) }
+        unsafe { ::core::mem::transmute(self._bitfield_1.get_const::<8usize, 8u8>() as u32) }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub fn set_type(&mut self, val: uint32) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_1.set(8usize, 8u8, val as u64)
+            self._bitfield_1.set_const::<8usize, 8u8>(val as u64)
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub unsafe fn type__raw(this: *const Self) -> uint32 {
         unsafe {
-            ::core::mem::transmute(<__BindgenBitfieldUnit<[u8; 4usize]>>::raw_get(
-                ::core::ptr::addr_of!((*this)._bitfield_1),
-                8usize,
-                8u8,
-            ) as u32)
+            ::core::mem::transmute(
+                <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_get_const::<8usize, 8u8>(
+                    ::core::ptr::addr_of!((*this)._bitfield_1),
+                ) as u32,
+            )
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub unsafe fn set_type_raw(this: *mut Self, val: uint32) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_set(
+            <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_set_const::<8usize, 8u8>(
                 ::core::ptr::addr_of_mut!((*this)._bitfield_1),
-                8usize,
-                8u8,
                 val as u64,
             )
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub fn len(&self) -> uint32 {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(16usize, 16u8) as u32) }
+        unsafe { ::core::mem::transmute(self._bitfield_1.get_const::<16usize, 16u8>() as u32) }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub fn set_len(&mut self, val: uint32) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_1.set(16usize, 16u8, val as u64)
+            self._bitfield_1.set_const::<16usize, 16u8>(val as u64)
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub unsafe fn len_raw(this: *const Self) -> uint32 {
         unsafe {
-            ::core::mem::transmute(<__BindgenBitfieldUnit<[u8; 4usize]>>::raw_get(
-                ::core::ptr::addr_of!((*this)._bitfield_1),
+            ::core::mem::transmute(<__BindgenBitfieldUnit<[u8; 4usize]>>::raw_get_const::<
                 16usize,
                 16u8,
-            ) as u32)
+            >(::core::ptr::addr_of!((*this)._bitfield_1)) as u32)
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub unsafe fn set_len_raw(this: *mut Self, val: uint32) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_set(
+            <__BindgenBitfieldUnit<[u8; 4usize]>>::raw_set_const::<16usize, 16u8>(
                 ::core::ptr::addr_of_mut!((*this)._bitfield_1),
-                16usize,
-                16u8,
                 val as u64,
             )
         }
     }
     #[inline]
+    #[allow(unnecessary_transmutes)]
     pub fn new_bitfield_1(
         selected: uint32,
         in_: uint32,
@@ -38185,35 +39040,35 @@ impl HeadlineWordEntry {
         len: uint32,
     ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
-        __bindgen_bitfield_unit.set(0usize, 1u8, {
+        __bindgen_bitfield_unit.set_const::<0usize, 1u8>({
             let selected: u32 = unsafe { ::core::mem::transmute(selected) };
             selected as u64
         });
-        __bindgen_bitfield_unit.set(1usize, 1u8, {
+        __bindgen_bitfield_unit.set_const::<1usize, 1u8>({
             let in_: u32 = unsafe { ::core::mem::transmute(in_) };
             in_ as u64
         });
-        __bindgen_bitfield_unit.set(2usize, 1u8, {
+        __bindgen_bitfield_unit.set_const::<2usize, 1u8>({
             let replace: u32 = unsafe { ::core::mem::transmute(replace) };
             replace as u64
         });
-        __bindgen_bitfield_unit.set(3usize, 1u8, {
+        __bindgen_bitfield_unit.set_const::<3usize, 1u8>({
             let repeated: u32 = unsafe { ::core::mem::transmute(repeated) };
             repeated as u64
         });
-        __bindgen_bitfield_unit.set(4usize, 1u8, {
+        __bindgen_bitfield_unit.set_const::<4usize, 1u8>({
             let skip: u32 = unsafe { ::core::mem::transmute(skip) };
             skip as u64
         });
-        __bindgen_bitfield_unit.set(5usize, 3u8, {
+        __bindgen_bitfield_unit.set_const::<5usize, 3u8>({
             let unused: u32 = unsafe { ::core::mem::transmute(unused) };
             unused as u64
         });
-        __bindgen_bitfield_unit.set(8usize, 8u8, {
+        __bindgen_bitfield_unit.set_const::<8usize, 8u8>({
             let type_: u32 = unsafe { ::core::mem::transmute(type_) };
             type_ as u64
         });
-        __bindgen_bitfield_unit.set(16usize, 16u8, {
+        __bindgen_bitfield_unit.set_const::<16usize, 16u8>({
             let len: u32 = unsafe { ::core::mem::transmute(len) };
             len as u64
         });
@@ -38291,13 +39146,13 @@ impl Default for DictSubState {
     }
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct TSVectorParseStateData {
     _unused: [u8; 0],
 }
 pub type TSVectorParseState = *mut TSVectorParseStateData;
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct TSQueryParserStateData {
     _unused: [u8; 0],
 }
@@ -38364,6 +39219,8 @@ impl Default for ParsedText {
     }
 }
 pub mod TSTernaryValue {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const TS_NO: Type = 0;
     pub const TS_YES: Type = 1;
@@ -38423,7 +39280,7 @@ pub struct TimeTzADT {
     pub zone: int32,
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct tzEntry {
     _unused: [u8; 0],
 }
@@ -38472,6 +39329,8 @@ impl Default for DateTimeErrorExtra {
     }
 }
 pub mod config_type {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const PGC_BOOL: Type = 0;
     pub const PGC_INT: Type = 1;
@@ -38513,6 +39372,8 @@ impl Default for config_var_value {
     }
 }
 pub mod config_group {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const UNGROUPED: Type = 0;
     pub const FILE_LOCATIONS: Type = 1;
@@ -38560,6 +39421,8 @@ pub mod config_group {
     pub const DEVELOPER_OPTIONS: Type = 43;
 }
 pub mod GucStackState {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const GUC_SAVE: Type = 0;
     pub const GUC_SET: Type = 1;
@@ -38736,12 +39599,14 @@ impl Default for config_enum {
     }
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct NumericData {
     _unused: [u8; 0],
 }
 pub type Numeric = *mut NumericData;
 pub mod JsonbIteratorToken {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const WJB_DONE: Type = 0;
     pub const WJB_KEY: Type = 1;
@@ -38766,6 +39631,8 @@ pub struct Jsonb {
     pub root: JsonbContainer,
 }
 pub mod jbvType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const jbvNull: Type = 0;
     pub const jbvString: Type = 1;
@@ -38924,6 +39791,8 @@ impl Default for JsonbParseState {
     }
 }
 pub mod JsonbIterState {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const JBI_ARRAY_START: Type = 0;
     pub const JBI_ARRAY_ELEM: Type = 1;
@@ -38972,6 +39841,8 @@ impl Default for OpBtreeInterpretation {
     }
 }
 pub mod IOFuncSelector {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const IOFunc_input: Type = 0;
     pub const IOFunc_output: Type = 1;
@@ -39035,6 +39906,8 @@ impl Default for RangeBound {
     }
 }
 pub mod CheckEnableRlsResult {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const RLS_NONE: Type = 0;
     pub const RLS_NONE_ENV: Type = 1;
@@ -39113,6 +39986,8 @@ pub type get_index_stats_hook_type = ::core::option::Option<
     ) -> bool,
 >;
 pub mod SysCacheIdentifier {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const AGGFNOID: Type = 0;
     pub const AMNAME: Type = 1;
@@ -39200,6 +40075,8 @@ pub mod SysCacheIdentifier {
     pub const EXTENSIONOID: Type = 83;
 }
 pub mod TimeoutId {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const STARTUP_PACKET_TIMEOUT: Type = 0;
     pub const DEADLOCK_TIMEOUT: Type = 1;
@@ -39218,6 +40095,8 @@ pub mod TimeoutId {
 }
 pub type timeout_handler_proc = ::core::option::Option<unsafe extern "C-unwind" fn()>;
 pub mod TimeoutType {
+    #[allow(unused_imports)]
+    use super::*;
     pub type Type = ::core::ffi::c_uint;
     pub const TMPARAM_AFTER: Type = 0;
     pub const TMPARAM_AT: Type = 1;
@@ -39512,6 +40391,16 @@ unsafe extern "C-unwind" {
         uid: *mut uid_t,
         gid: *mut gid_t,
     ) -> ::core::ffi::c_int;
+    pub fn strlcat(
+        dst: *mut ::core::ffi::c_char,
+        src: *const ::core::ffi::c_char,
+        siz: usize,
+    ) -> usize;
+    pub fn strlcpy(
+        dst: *mut ::core::ffi::c_char,
+        src: *const ::core::ffi::c_char,
+        siz: usize,
+    ) -> usize;
     pub fn pg_get_user_name(
         user_id: uid_t,
         buffer: *mut ::core::ffi::c_char,
@@ -40567,8 +41456,6 @@ unsafe extern "C-unwind" {
     -> *mut TBMSharedIterator;
     pub fn tbm_calculate_entries(maxbytes: f64) -> ::core::ffi::c_long;
     pub static mut no_such_variable: ::core::ffi::c_int;
-    #[link_name = "castNodeImpl__pgrx_cshim"]
-    pub fn castNodeImpl(type_: NodeTag, ptr: *mut ::core::ffi::c_void) -> *mut Node;
     pub fn outNode(str_: *mut StringInfoData, obj: *const ::core::ffi::c_void);
     pub fn outToken(str_: *mut StringInfoData, s: *const ::core::ffi::c_char);
     pub fn outBitmapset(str_: *mut StringInfoData, bms: *const Bitmapset);
@@ -40864,7 +41751,6 @@ unsafe extern "C-unwind" {
     pub fn RelationCacheInvalidateEntry(relationId: Oid);
     pub fn RelationCacheInvalidate(debug_discard: bool);
     pub fn RelationCloseSmgrByOid(relationId: Oid);
-    pub fn AssertPendingSyncs_RelationCache();
     pub fn AtEOXact_RelationCache(isCommit: bool);
     pub fn AtEOSubXact_RelationCache(
         isCommit: bool,
@@ -41288,7 +42174,6 @@ unsafe extern "C-unwind" {
     pub fn ForceTransactionIdLimitUpdate() -> bool;
     pub fn GetNewObjectId() -> Oid;
     pub fn StopGeneratingPinnedObjectIds();
-    pub fn AssertTransactionIdInAllowableRange(xid: TransactionId);
     #[link_name = "ReadNextTransactionId__pgrx_cshim"]
     pub fn ReadNextTransactionId() -> TransactionId;
     #[link_name = "TransactionIdRetreatedBy__pgrx_cshim"]
@@ -42733,7 +43618,6 @@ unsafe extern "C-unwind" {
     ) -> Buffer;
     pub fn InitBufferPoolAccess();
     pub fn AtEOXact_Buffers(isCommit: bool);
-    pub fn AssertBufferLocksPermitCatalogRead();
     pub fn PrintBufferLeakWarning(buffer: Buffer);
     pub fn CheckPointBuffers(flags: ::core::ffi::c_int);
     pub fn BufferGetBlockNumber(buffer: Buffer) -> BlockNumber;
@@ -45704,7 +46588,6 @@ unsafe extern "C-unwind" {
     pub fn LockReassignCurrentOwner(locallocks: *mut *mut LOCALLOCK, nlocks: ::core::ffi::c_int);
     pub fn LockHeldByMe(locktag: *const LOCKTAG, lockmode: LOCKMODE) -> bool;
     pub fn LockOrStrongerHeldByMe(locktag: *const LOCKTAG, lockmode: LOCKMODE) -> bool;
-    pub fn GetLockMethodLocalHash() -> *mut HTAB;
     pub fn LockHasWaiters(locktag: *const LOCKTAG, lockmode: LOCKMODE, sessionLock: bool) -> bool;
     pub fn GetLockConflicts(
         locktag: *const LOCKTAG,
@@ -46291,7 +47174,6 @@ unsafe extern "C-unwind" {
     ) -> ::core::ffi::c_int;
     pub fn SimpleLruWritePage(ctl: SlruCtl, slotno: ::core::ffi::c_int);
     pub fn SimpleLruWriteAll(ctl: SlruCtl, allow_redirtied: bool);
-    pub fn SlruPagePrecedesUnitTests(ctl: SlruCtl, per_page: ::core::ffi::c_int);
     pub fn SimpleLruTruncate(ctl: SlruCtl, cutoffPage: ::core::ffi::c_int);
     pub fn SimpleLruDoesPhysicalPageExist(ctl: SlruCtl, pageno: ::core::ffi::c_int) -> bool;
     pub fn SlruScanDirectory(
@@ -49147,7 +50029,6 @@ unsafe extern "C-unwind" {
         print_to_stderr: bool,
     );
     pub fn MemoryContextAllowInCriticalSection(context: MemoryContext, allow: bool);
-    pub fn MemoryContextCheck(context: MemoryContext);
     pub fn HandleLogMemoryContextInterrupt();
     pub fn ProcessLogMemoryContextInterrupt();
     pub fn AllocSetContextCreateInternal(
@@ -51840,7 +52721,7 @@ unsafe extern "C-unwind" {
     pub fn pq_getmsgstring(msg: StringInfo) -> *const ::core::ffi::c_char;
     pub fn pq_getmsgrawstring(msg: StringInfo) -> *const ::core::ffi::c_char;
     pub fn pq_getmsgend(msg: StringInfo);
-    #[doc = "\t  System interrupt and critical section handling\n\n There are two types of interrupts that a running backend needs to accept\n without messing up its state: QueryCancel (SIGINT) and ProcDie (SIGTERM).\n In both cases, we need to be able to clean up the current transaction\n gracefully, so we can't respond to the interrupt instantaneously ---\n there's no guarantee that internal data structures would be self-consistent\n if the code is interrupted at an arbitrary instant.  Instead, the signal\n handlers set flags that are checked periodically during execution.\n\n The CHECK_FOR_INTERRUPTS() macro is called at strategically located spots\n where it is normally safe to accept a cancel or die interrupt.  In some\n cases, we invoke CHECK_FOR_INTERRUPTS() inside low-level subroutines that\n might sometimes be called in contexts that do *not* want to allow a cancel\n or die interrupt.  The HOLD_INTERRUPTS() and RESUME_INTERRUPTS() macros\n allow code to ensure that no cancel or die interrupt will be accepted,\n even if CHECK_FOR_INTERRUPTS() gets called in a subroutine.  The interrupt\n will be held off until CHECK_FOR_INTERRUPTS() is done outside any\n HOLD_INTERRUPTS() ... RESUME_INTERRUPTS() section.\n\n There is also a mechanism to prevent query cancel interrupts, while still\n allowing die interrupts: HOLD_CANCEL_INTERRUPTS() and\n RESUME_CANCEL_INTERRUPTS().\n\n Note that ProcessInterrupts() has also acquired a number of tasks that\n do not necessarily cause a query-cancel-or-die response.  Hence, it's\n possible that it will just clear InterruptPending and return.\n\n INTERRUPTS_PENDING_CONDITION() can be checked to see whether an\n interrupt needs to be serviced, without trying to do so immediately.\n Some callers are also interested in INTERRUPTS_CAN_BE_PROCESSED(),\n which tells whether ProcessInterrupts is sure to clear the interrupt.\n\n Special mechanisms are used to let an interrupt be accepted when we are\n waiting for a lock or when we are waiting for command input (but, of\n course, only if the interrupt holdoff counter is zero).  See the\n related code for details.\n\n A lost connection is handled similarly, although the loss of connection\n does not raise a signal, but is detected when we fail to write to the\n socket. If there was a signal for a broken connection, we could make use of\n it by setting ClientConnectionLost in the signal handler.\n\n A related, but conceptually distinct, mechanism is the \"critical section\"\n mechanism.  A critical section not only holds off cancel/die interrupts,\n but causes any ereport(ERROR) or ereport(FATAL) to become ereport(PANIC)\n --- that is, a system-wide reset is forced.  Needless to say, only really\n *critical* code should be marked as a critical section!\tCurrently, this\n mechanism is only used for XLOG-related code.\n"]
+    #[doc = "System interrupt and critical section handling\n\nThere are two types of interrupts that a running backend needs to accept\nwithout messing up its state: QueryCancel (SIGINT) and ProcDie (SIGTERM).\nIn both cases, we need to be able to clean up the current transaction\ngracefully, so we can't respond to the interrupt instantaneously ---\nthere's no guarantee that internal data structures would be self-consistent\nif the code is interrupted at an arbitrary instant.  Instead, the signal\nhandlers set flags that are checked periodically during execution.\n\nThe CHECK_FOR_INTERRUPTS() macro is called at strategically located spots\nwhere it is normally safe to accept a cancel or die interrupt.  In some\ncases, we invoke CHECK_FOR_INTERRUPTS() inside low-level subroutines that\nmight sometimes be called in contexts that do *not* want to allow a cancel\nor die interrupt.  The HOLD_INTERRUPTS() and RESUME_INTERRUPTS() macros\nallow code to ensure that no cancel or die interrupt will be accepted,\neven if CHECK_FOR_INTERRUPTS() gets called in a subroutine.  The interrupt\nwill be held off until CHECK_FOR_INTERRUPTS() is done outside any\nHOLD_INTERRUPTS() ... RESUME_INTERRUPTS() section.\n\nThere is also a mechanism to prevent query cancel interrupts, while still\nallowing die interrupts: HOLD_CANCEL_INTERRUPTS() and\nRESUME_CANCEL_INTERRUPTS().\n\nNote that ProcessInterrupts() has also acquired a number of tasks that\ndo not necessarily cause a query-cancel-or-die response.  Hence, it's\npossible that it will just clear InterruptPending and return.\n\nINTERRUPTS_PENDING_CONDITION() can be checked to see whether an\ninterrupt needs to be serviced, without trying to do so immediately.\nSome callers are also interested in INTERRUPTS_CAN_BE_PROCESSED(),\nwhich tells whether ProcessInterrupts is sure to clear the interrupt.\n\nSpecial mechanisms are used to let an interrupt be accepted when we are\nwaiting for a lock or when we are waiting for command input (but, of\ncourse, only if the interrupt holdoff counter is zero).  See the\nrelated code for details.\n\nA lost connection is handled similarly, although the loss of connection\ndoes not raise a signal, but is detected when we fail to write to the\nsocket. If there was a signal for a broken connection, we could make use of\nit by setting ClientConnectionLost in the signal handler.\n\nA related, but conceptually distinct, mechanism is the \"critical section\"\nmechanism.  A critical section not only holds off cancel/die interrupts,\nbut causes any ereport(ERROR) or ereport(FATAL) to become ereport(PANIC)\n--- that is, a system-wide reset is forced.  Needless to say, only really\n*critical* code should be marked as a critical section!\tCurrently, this\nmechanism is only used for XLOG-related code."]
     pub static mut InterruptPending: sig_atomic_t;
     pub static mut QueryCancelPending: sig_atomic_t;
     pub static mut ProcDiePending: sig_atomic_t;
@@ -51855,7 +52736,7 @@ unsafe extern "C-unwind" {
     pub static mut QueryCancelHoldoffCount: uint32;
     pub static mut CritSectionCount: uint32;
     pub fn ProcessInterrupts();
-    #[doc = "\t  globals.h --\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t *"]
+    #[doc = "globals.h --\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t *"]
     pub static mut PostmasterPid: pid_t;
     pub static mut IsPostmasterEnvironment: bool;
     pub static mut IsUnderPostmaster: bool;
@@ -51950,7 +52831,7 @@ unsafe extern "C-unwind" {
     pub fn superuser_arg(roleid: Oid) -> bool;
     pub static mut Mode: ProcessingMode::Type;
     pub static mut MyAuxProcType: AuxProcType::Type;
-    #[doc = "\t  pinit.h --\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t *\n\t\t\tPOSTGRES initialization and cleanup definitions.                 *"]
+    #[doc = "pinit.h --\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t *\nPOSTGRES initialization and cleanup definitions.                 *"]
     pub fn pg_split_opts(
         argv: *mut *mut ::core::ffi::c_char,
         argcp: *mut ::core::ffi::c_int,
@@ -55368,7 +56249,7 @@ unsafe extern "C-unwind" {
     pub static mut plpgsql_curr_compile: *mut PLpgSQL_function;
     pub static mut plpgsql_compile_tmp_cxt: MemoryContext;
     pub static mut plpgsql_plugin_ptr: *mut *mut PLpgSQL_plugin;
-    #[doc = " Function declarations"]
+    #[doc = "Function declarations"]
     pub fn plpgsql_compile(fcinfo: FunctionCallInfo, forValidator: bool) -> *mut PLpgSQL_function;
     pub fn plpgsql_compile_inline(proc_source: *mut ::core::ffi::c_char) -> *mut PLpgSQL_function;
     pub fn plpgsql_parser_setup(pstate: *mut ParseState, expr: *mut PLpgSQL_expr);
@@ -61951,12 +62832,6 @@ unsafe extern "C-unwind" {
 pub const ACLITEM_ALL_GOPTION_BITS: usize = 18446744069414584320;
 #[doc = " Compiler-verified C object macro `ACLITEM_ALL_PRIV_BITS`, omitted by bindgen."]
 pub const ACLITEM_ALL_PRIV_BITS: usize = 4294967295;
-#[doc = " Compiler-verified C object macro `ALLOCSET_DEFAULT_SIZES`, omitted by bindgen."]
-pub const ALLOCSET_DEFAULT_SIZES: i32 = 8388608;
-#[doc = " Compiler-verified C object macro `ALLOCSET_SMALL_SIZES`, omitted by bindgen."]
-pub const ALLOCSET_SMALL_SIZES: i32 = 8192;
-#[doc = " Compiler-verified C object macro `ALLOCSET_START_SMALL_SIZES`, omitted by bindgen."]
-pub const ALLOCSET_START_SMALL_SIZES: i32 = 8388608;
 #[doc = " Compiler-verified C object macro `ALL_SET`, omitted by bindgen."]
 pub const ALL_SET: u32 = 4294967295;
 #[doc = " Compiler-verified C object macro `ATTRIBUTE_FIXED_PART_SIZE`, omitted by bindgen."]
@@ -62608,9 +63483,9 @@ pub const HAVE_DECL_PWRITEV: i32 = 1;
 #[doc = " Compiler-verified C object macro `HAVE_DECL_STRCHRNUL`, omitted by bindgen."]
 pub const HAVE_DECL_STRCHRNUL: i32 = 1;
 #[doc = " Compiler-verified C object macro `HAVE_DECL_STRLCAT`, omitted by bindgen."]
-pub const HAVE_DECL_STRLCAT: i32 = 1;
+pub const HAVE_DECL_STRLCAT: i32 = 0;
 #[doc = " Compiler-verified C object macro `HAVE_DECL_STRLCPY`, omitted by bindgen."]
-pub const HAVE_DECL_STRLCPY: i32 = 1;
+pub const HAVE_DECL_STRLCPY: i32 = 0;
 #[doc = " Compiler-verified C object macro `HAVE_DECL_STRNLEN`, omitted by bindgen."]
 pub const HAVE_DECL_STRNLEN: i32 = 1;
 #[doc = " Compiler-verified C object macro `HAVE_DECL_TIMINGSAFE_BCMP`, omitted by bindgen."]
@@ -62739,10 +63614,6 @@ pub const HAVE_STRERROR_R: i32 = 1;
 pub const HAVE_STRINGS_H: i32 = 1;
 #[doc = " Compiler-verified C object macro `HAVE_STRING_H`, omitted by bindgen."]
 pub const HAVE_STRING_H: i32 = 1;
-#[doc = " Compiler-verified C object macro `HAVE_STRLCAT`, omitted by bindgen."]
-pub const HAVE_STRLCAT: i32 = 1;
-#[doc = " Compiler-verified C object macro `HAVE_STRLCPY`, omitted by bindgen."]
-pub const HAVE_STRLCPY: i32 = 1;
 #[doc = " Compiler-verified C object macro `HAVE_STRNLEN`, omitted by bindgen."]
 pub const HAVE_STRNLEN: i32 = 1;
 #[doc = " Compiler-verified C object macro `HAVE_STRSIGNAL`, omitted by bindgen."]
@@ -67544,4 +68415,4 @@ impl ::core::fmt::Display for XmlSerialize {
 #[doc = r" The release generation of these bindings, checked by the documentation snapshot."]
 #[doc(hidden)]
 pub const __PGRX_GENERATION: &str =
-    "3e6f233b1e8463965b537e73148e62810ffe888e8e6684fdde97eb0308e5be8e";
+    "8c09a833369df5b90ac584777f92b89f53640aaf626307a69df2e0173ba84a87";

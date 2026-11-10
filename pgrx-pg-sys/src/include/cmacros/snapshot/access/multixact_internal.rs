@@ -269,7 +269,7 @@ macro_rules! MultiXactIdToOffsetSegment {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function MultiXactOffsetStorageSize from multixact_internal.h:125 (PostgreSQL 19)
+/// C inline function MultiXactOffsetStorageSize from multixact_internal.h:125 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline uint64
@@ -285,7 +285,11 @@ macro_rules! MultiXactIdToOffsetSegment {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+///
+#[doc = crate::__pgrx_c_doc_assertions!()]
 ///
 /// # Safety
 ///
@@ -293,7 +297,7 @@ macro_rules! MultiXactIdToOffsetSegment {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Integer division/remainder rejects zero divisors and signed MIN / -1 overflow. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! MultiXactOffsetStorageSize {
     ($new_offset:expr, $old_offset:expr $(,)?) => {
@@ -301,11 +305,7 @@ macro_rules! MultiXactOffsetStorageSize {
             @value {
                 let _ = &$new_offset;
                 let _ = &$old_offset;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_types::uint64
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_types::uint64>()
             }
         )
     };

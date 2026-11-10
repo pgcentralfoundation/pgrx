@@ -162,8 +162,8 @@ macro_rules! EOHPGetRODatum {
         )
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C inline function EOHPGetRODatum from expandeddatum.h:144 (PostgreSQL 16–18)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
+/// C inline function EOHPGetRODatum from expandeddatum.h:144 (PostgreSQL 16–19)
 ///
 /// ```c
 /// static inline Datum
@@ -190,44 +190,6 @@ macro_rules! EOHPGetRODatum {
             @value {
                 let _ = &$eohptr;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_types::Datum>()
-            }
-        )
-    };
-}
-#[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function EOHPGetRODatum from expandeddatum.h:144 (PostgreSQL 19)
-///
-/// ```c
-/// static inline Datum
-/// EOHPGetRODatum(const struct ExpandedObjectHeader *eohptr)
-/// {
-/// 	return PointerGetDatum(eohptr->eoh_ro_ptr);
-/// }
-/// ```
-///
-///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! EOHPGetRODatum {
-    ($eohptr:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$eohptr;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLong,
-                            $crate::__pgrx_c_bindings::Datum
-                        >>()
-                )
             }
         )
     };
@@ -266,8 +228,8 @@ macro_rules! EOHPGetRWDatum {
         )
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C inline function EOHPGetRWDatum from expandeddatum.h:138 (PostgreSQL 16–18)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
+/// C inline function EOHPGetRWDatum from expandeddatum.h:138 (PostgreSQL 16–19)
 ///
 /// ```c
 /// static inline Datum
@@ -294,44 +256,6 @@ macro_rules! EOHPGetRWDatum {
             @value {
                 let _ = &$eohptr;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_types::Datum>()
-            }
-        )
-    };
-}
-#[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function EOHPGetRWDatum from expandeddatum.h:138 (PostgreSQL 19)
-///
-/// ```c
-/// static inline Datum
-/// EOHPGetRWDatum(const struct ExpandedObjectHeader *eohptr)
-/// {
-/// 	return PointerGetDatum(eohptr->eoh_rw_ptr);
-/// }
-/// ```
-///
-///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! EOHPGetRWDatum {
-    ($eohptr:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$eohptr;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLong,
-                            $crate::__pgrx_c_bindings::Datum
-                        >>()
-                )
             }
         )
     };

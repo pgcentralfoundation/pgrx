@@ -13,7 +13,7 @@
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! BKI_ARRAY_DEFAULT {
-    ($($value:tt)*) => {
+    ($value:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(@unit {})
     };
 }
@@ -29,7 +29,7 @@ macro_rules! BKI_ARRAY_DEFAULT {
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! BKI_DEFAULT {
-    ($($value:tt)*) => {
+    ($value:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(@unit {})
     };
 }
@@ -45,7 +45,7 @@ macro_rules! BKI_DEFAULT {
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! BKI_LOOKUP {
-    ($($catalog:tt)*) => {
+    ($catalog:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(@unit {})
     };
 }
@@ -61,7 +61,7 @@ macro_rules! BKI_LOOKUP {
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! BKI_LOOKUP_OPT {
-    ($($catalog:tt)*) => {
+    ($catalog:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(@unit {})
     };
 }
@@ -77,7 +77,7 @@ macro_rules! BKI_LOOKUP_OPT {
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! BKI_ROWTYPE_OID {
-    ($oid:expr, $($oidmacro:tt)*) => {
+    ($oid:expr, $oidmacro:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(@unit {})
     };
 }

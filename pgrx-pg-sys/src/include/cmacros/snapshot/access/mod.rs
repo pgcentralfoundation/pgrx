@@ -109,10 +109,8 @@ pub use rmgr::*;
 mod sdir;
 #[allow(unused_imports)]
 pub use sdir::*;
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
 #[path = "slru.rs"]
 mod slru;
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
 #[allow(unused_imports)]
 pub use slru::*;
 #[path = "spgist_private.rs"]

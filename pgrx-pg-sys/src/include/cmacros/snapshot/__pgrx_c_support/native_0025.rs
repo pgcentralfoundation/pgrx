@@ -1,5 +1,277 @@
 // Shared generated C macro support.
 
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_nodeid>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::xl_commit_ts_set>
+{
+    type Member = c::CUnsignedShort;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 8;
+}
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::xl_commit_ts_set, <<c::expression::CRecord<crate::__pgrx_c_bindings::xl_commit_ts_set> as c::expression::OrdinaryField<Field_nodeid>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).nodeid) };
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
+#[doc(hidden)]
+pub struct Field_mainxid;
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
+const _: () =
+    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::xl_commit_ts_set, mainxid) == 12);
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_mainxid>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::xl_commit_ts_set>
+{
+    type Member =
+        c::expression::CIntegerStorage<c::CUnsignedInt, crate::__pgrx_c_bindings::TransactionId>;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 12;
+}
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::xl_commit_ts_set, <<c::expression::CRecord<crate::__pgrx_c_bindings::xl_commit_ts_set> as c::expression::OrdinaryField<Field_mainxid>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).mainxid) };
+#[cfg(any(feature = "pg15", feature = "pg16"))]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::xl_commit_ts_truncate>() == 8);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::xl_commit_ts_truncate>() == 4);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::xl_commit_ts_truncate {}
+const _: () =
+    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::xl_commit_ts_truncate, pageno) == 0);
+#[cfg(any(feature = "pg15", feature = "pg16"))]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_pageno>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::xl_commit_ts_truncate>
+{
+    type Member = c::CInt;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 0;
+}
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::xl_commit_ts_truncate, <<c::expression::CRecord<crate::__pgrx_c_bindings::xl_commit_ts_truncate> as c::expression::OrdinaryField<Field_pageno>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).pageno) };
+#[cfg(any(feature = "pg15", feature = "pg16"))]
+const _: () = assert!(
+    ::core::mem::offset_of!(crate::__pgrx_c_bindings::xl_commit_ts_truncate, oldestXid) == 4
+);
+#[cfg(any(feature = "pg15", feature = "pg16"))]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_oldestXid>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::xl_commit_ts_truncate>
+{
+    type Member =
+        c::expression::CIntegerStorage<c::CUnsignedInt, crate::__pgrx_c_bindings::TransactionId>;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 4;
+}
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::xl_commit_ts_truncate, <<c::expression::CRecord<crate::__pgrx_c_bindings::xl_commit_ts_truncate> as c::expression::OrdinaryField<Field_oldestXid>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).oldestXid) };
+#[doc(hidden)]
+pub struct Field_db_id;
+const _: () = {
+    assert!(
+        ::core::mem::size_of::<crate::__pgrx_c_bindings::xl_dbase_create_file_copy_rec>() == 16
+    );
+    assert!(
+        ::core::mem::align_of::<crate::__pgrx_c_bindings::xl_dbase_create_file_copy_rec>() == 4
+    );
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::xl_dbase_create_file_copy_rec {}
+const _: () = assert!(
+    ::core::mem::offset_of!(crate::__pgrx_c_bindings::xl_dbase_create_file_copy_rec, db_id) == 0
+);
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_db_id>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::xl_dbase_create_file_copy_rec>
+{
+    type Member = c::expression::CIntegerStorage<c::CUnsignedInt, crate::__pgrx_c_bindings::Oid>;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 0;
+}
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::xl_dbase_create_file_copy_rec, <<c::expression::CRecord<crate::__pgrx_c_bindings::xl_dbase_create_file_copy_rec> as c::expression::OrdinaryField<Field_db_id>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).db_id) };
+#[doc(hidden)]
+pub struct Field_tablespace_id;
+const _: () = assert!(
+    ::core::mem::offset_of!(crate::__pgrx_c_bindings::xl_dbase_create_file_copy_rec, tablespace_id)
+        == 4
+);
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_tablespace_id>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::xl_dbase_create_file_copy_rec>
+{
+    type Member = c::expression::CIntegerStorage<c::CUnsignedInt, crate::__pgrx_c_bindings::Oid>;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 4;
+}
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::xl_dbase_create_file_copy_rec, <<c::expression::CRecord<crate::__pgrx_c_bindings::xl_dbase_create_file_copy_rec> as c::expression::OrdinaryField<Field_tablespace_id>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).tablespace_id) };
+#[doc(hidden)]
+pub struct Field_src_db_id;
+const _: () = assert!(
+    ::core::mem::offset_of!(crate::__pgrx_c_bindings::xl_dbase_create_file_copy_rec, src_db_id)
+        == 8
+);
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_src_db_id>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::xl_dbase_create_file_copy_rec>
+{
+    type Member = c::expression::CIntegerStorage<c::CUnsignedInt, crate::__pgrx_c_bindings::Oid>;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 8;
+}
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::xl_dbase_create_file_copy_rec, <<c::expression::CRecord<crate::__pgrx_c_bindings::xl_dbase_create_file_copy_rec> as c::expression::OrdinaryField<Field_src_db_id>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).src_db_id) };
+#[doc(hidden)]
+pub struct Field_src_tablespace_id;
+const _: () = assert!(
+    ::core::mem::offset_of!(
+        crate::__pgrx_c_bindings::xl_dbase_create_file_copy_rec,
+        src_tablespace_id
+    ) == 12
+);
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_src_tablespace_id>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::xl_dbase_create_file_copy_rec>
+{
+    type Member = c::expression::CIntegerStorage<c::CUnsignedInt, crate::__pgrx_c_bindings::Oid>;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 12;
+}
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::xl_dbase_create_file_copy_rec, <<c::expression::CRecord<crate::__pgrx_c_bindings::xl_dbase_create_file_copy_rec> as c::expression::OrdinaryField<Field_src_tablespace_id>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).src_tablespace_id) };
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::xl_dbase_create_wal_log_rec>() == 8);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::xl_dbase_create_wal_log_rec>() == 4);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::xl_dbase_create_wal_log_rec {}
+const _: () = assert!(
+    ::core::mem::offset_of!(crate::__pgrx_c_bindings::xl_dbase_create_wal_log_rec, db_id) == 0
+);
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_db_id>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::xl_dbase_create_wal_log_rec>
+{
+    type Member = c::expression::CIntegerStorage<c::CUnsignedInt, crate::__pgrx_c_bindings::Oid>;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 0;
+}
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::xl_dbase_create_wal_log_rec, <<c::expression::CRecord<crate::__pgrx_c_bindings::xl_dbase_create_wal_log_rec> as c::expression::OrdinaryField<Field_db_id>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).db_id) };
+const _: () = assert!(
+    ::core::mem::offset_of!(crate::__pgrx_c_bindings::xl_dbase_create_wal_log_rec, tablespace_id)
+        == 4
+);
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_tablespace_id>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::xl_dbase_create_wal_log_rec>
+{
+    type Member = c::expression::CIntegerStorage<c::CUnsignedInt, crate::__pgrx_c_bindings::Oid>;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 4;
+}
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::xl_dbase_create_wal_log_rec, <<c::expression::CRecord<crate::__pgrx_c_bindings::xl_dbase_create_wal_log_rec> as c::expression::OrdinaryField<Field_tablespace_id>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).tablespace_id) };
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::xl_dbase_drop_rec>() == 8);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::xl_dbase_drop_rec>() == 4);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::xl_dbase_drop_rec {}
+const _: () =
+    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::xl_dbase_drop_rec, db_id) == 0);
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_db_id>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::xl_dbase_drop_rec>
+{
+    type Member = c::expression::CIntegerStorage<c::CUnsignedInt, crate::__pgrx_c_bindings::Oid>;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 0;
+}
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::xl_dbase_drop_rec, <<c::expression::CRecord<crate::__pgrx_c_bindings::xl_dbase_drop_rec> as c::expression::OrdinaryField<Field_db_id>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).db_id) };
+const _: () = assert!(
+    ::core::mem::offset_of!(crate::__pgrx_c_bindings::xl_dbase_drop_rec, ntablespaces) == 4
+);
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_ntablespaces>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::xl_dbase_drop_rec>
+{
+    type Member = c::CInt;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 4;
+}
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::xl_dbase_drop_rec, <<c::expression::CRecord<crate::__pgrx_c_bindings::xl_dbase_drop_rec> as c::expression::OrdinaryField<Field_ntablespaces>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).ntablespaces) };
+#[doc(hidden)]
+pub struct Field_end_time;
+#[cfg(any(feature = "pg15", feature = "pg16"))]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::xl_end_of_recovery>() == 16);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::xl_end_of_recovery>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::xl_end_of_recovery {}
+const _: () =
+    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::xl_end_of_recovery, end_time) == 0);
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_end_time>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::xl_end_of_recovery>
+{
+    type Member = c::CLong;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 0;
+}
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::xl_end_of_recovery, <<c::expression::CRecord<crate::__pgrx_c_bindings::xl_end_of_recovery> as c::expression::OrdinaryField<Field_end_time>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).end_time) };
+const _: () = assert!(
+    ::core::mem::offset_of!(crate::__pgrx_c_bindings::xl_end_of_recovery, ThisTimeLineID) == 8
+);
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_ThisTimeLineID>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::xl_end_of_recovery>
+{
+    type Member = c::CUnsignedInt;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 8;
+}
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::xl_end_of_recovery, <<c::expression::CRecord<crate::__pgrx_c_bindings::xl_end_of_recovery> as c::expression::OrdinaryField<Field_ThisTimeLineID>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).ThisTimeLineID) };
+const _: () = assert!(
+    ::core::mem::offset_of!(crate::__pgrx_c_bindings::xl_end_of_recovery, PrevTimeLineID) == 12
+);
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_PrevTimeLineID>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::xl_end_of_recovery>
+{
+    type Member = c::CUnsignedInt;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 12;
+}
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::xl_end_of_recovery, <<c::expression::CRecord<crate::__pgrx_c_bindings::xl_end_of_recovery> as c::expression::OrdinaryField<Field_PrevTimeLineID>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).PrevTimeLineID) };
+#[doc(hidden)]
+pub struct Field_bmsize;
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::xl_hash_add_ovfl_page>() == 4);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::xl_hash_add_ovfl_page>() == 2);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::xl_hash_add_ovfl_page {}
+const _: () =
+    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::xl_hash_add_ovfl_page, bmsize) == 0);
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_bmsize>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::xl_hash_add_ovfl_page>
+{
+    type Member = c::CUnsignedShort;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 0;
+}
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::xl_hash_add_ovfl_page, <<c::expression::CRecord<crate::__pgrx_c_bindings::xl_hash_add_ovfl_page> as c::expression::OrdinaryField<Field_bmsize>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).bmsize) };
+#[doc(hidden)]
+pub struct Field_bmpage_found;
+const _: () = assert!(
+    ::core::mem::offset_of!(crate::__pgrx_c_bindings::xl_hash_add_ovfl_page, bmpage_found) == 2
+);
 // SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
 unsafe impl c::expression::OrdinaryField<Field_bmpage_found>
     for c::expression::CRecord<crate::__pgrx_c_bindings::xl_hash_add_ovfl_page>
@@ -3885,350 +4157,3 @@ impl c::expression::NativeType for crate::__pgrx_c_bindings::pg_tzenum {
     type Marker = c::expression::COpaque<Self>;
 }
 impl c::sealed::Sealed for crate::__pgrx_c_bindings::pg_tz {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::pg_tz {
-    type Marker = c::expression::COpaque<Self>;
-}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::pg_cryptohash_ctx {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::pg_cryptohash_ctx {
-    type Marker = c::expression::COpaque<Self>;
-}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::memoize_hash {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::memoize_hash {
-    type Marker = c::expression::COpaque<Self>;
-}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::dsm_segment {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::dsm_segment {
-    type Marker = c::expression::COpaque<Self>;
-}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::dshash_table_item {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::dshash_table_item {
-    type Marker = c::expression::COpaque<Self>;
-}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::dshash_table {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::dshash_table {
-    type Marker = c::expression::COpaque<Self>;
-}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::dsa_area {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::dsa_area {
-    type Marker = c::expression::COpaque<Self>;
-}
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::dlist_mutable_iter>() == 24);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::dlist_mutable_iter>() == 8);
-};
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::dlist_mutable_iter {}
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::dlist_iter>() == 16);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::dlist_iter>() == 8);
-};
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::dlist_iter {}
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::config_var_value>() == 16);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::config_var_value>() == 8);
-};
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::config_var_value {}
-#[cfg(feature = "pg15")]
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::config_string>() == 168);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::config_string>() == 8);
-};
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::config_string {}
-#[cfg(feature = "pg15")]
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::config_real>() == 184);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::config_real>() == 8);
-};
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::config_real {}
-#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::bkend {}
-#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-impl c::expression::NativeType for crate::__pgrx_c_bindings::bkend {
-    type Marker = c::expression::COpaque<Self>;
-}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::binaryheap {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::binaryheap {
-    type Marker = c::expression::COpaque<Self>;
-}
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::__locale_struct>() == 232);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::__locale_struct>() == 8);
-};
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::__locale_struct {}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::__locale_data {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::__locale_data {
-    type Marker = c::expression::COpaque<Self>;
-}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::__dirstream {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::__dirstream {
-    type Marker = c::expression::COpaque<Self>;
-}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::_MdfdVec {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::_MdfdVec {
-    type Marker = c::expression::COpaque<Self>;
-}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::_IO_wide_data {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::_IO_wide_data {
-    type Marker = c::expression::COpaque<Self>;
-}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::_IO_marker {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::_IO_marker {
-    type Marker = c::expression::COpaque<Self>;
-}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::_IO_codecvt {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::_IO_codecvt {
-    type Marker = c::expression::COpaque<Self>;
-}
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::XLogReaderRoutine>() == 24);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::XLogReaderRoutine>() == 8);
-};
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::XLogReaderRoutine {}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::XLogPrefetcher {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::XLogPrefetcher {
-    type Marker = c::expression::COpaque<Self>;
-}
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::WorkTableScanState>() == 232);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::WorkTableScanState>() == 8);
-};
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::WorkTableScanState {}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::WindowStatePerFuncData {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::WindowStatePerFuncData {
-    type Marker = c::expression::COpaque<Self>;
-}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::WindowStatePerAggData {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::WindowStatePerAggData {
-    type Marker = c::expression::COpaque<Self>;
-}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::WindowObjectData {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::WindowObjectData {
-    type Marker = c::expression::COpaque<Self>;
-}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::WaitEventSet {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::WaitEventSet {
-    type Marker = c::expression::COpaque<Self>;
-}
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::ValuesScan>() == 120);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::ValuesScan>() == 8);
-};
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::ValuesScan {}
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::UniqueState>() == 208);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::UniqueState>() == 8);
-};
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::UniqueState {}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::TypeCacheEnumData {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::TypeCacheEnumData {
-    type Marker = c::expression::COpaque<Self>;
-}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::Tuplestorestate {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::Tuplestorestate {
-    type Marker = c::expression::COpaque<Self>;
-}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::Tuplesortstate {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::Tuplesortstate {
-    type Marker = c::expression::COpaque<Self>;
-}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::TupleQueueReader {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::TupleQueueReader {
-    type Marker = c::expression::COpaque<Self>;
-}
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::TupleConversionMap>() == 56);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::TupleConversionMap>() == 8);
-};
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::TupleConversionMap {}
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::TupOutputState>() == 16);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::TupOutputState>() == 8);
-};
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::TupOutputState {}
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::TidScan>() == 120);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::TidScan>() == 8);
-};
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::TidScan {}
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::TidRangeScan>() == 120);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::TidRangeScan>() == 8);
-};
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::TidRangeScan {}
-#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::TidRangePath>() == 80);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::TidRangePath>() == 8);
-};
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::TidRangePath {}
-#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::TidPath>() == 80);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::TidPath>() == 8);
-};
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::TidPath {}
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::TableFuncScan>() == 120);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::TableFuncScan>() == 8);
-};
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::TableFuncScan {}
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::TableFuncRoutine>() == 64);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::TableFuncRoutine>() == 8);
-};
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::TableFuncRoutine {}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::TSVectorParseStateData {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::TSVectorParseStateData {
-    type Marker = c::expression::COpaque<Self>;
-}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::TSQueryParserStateData {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::TSQueryParserStateData {
-    type Marker = c::expression::COpaque<Self>;
-}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::TIDBitmap {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::TIDBitmap {
-    type Marker = c::expression::COpaque<Self>;
-}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::TBMSharedIterator {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::TBMSharedIterator {
-    type Marker = c::expression::COpaque<Self>;
-}
-#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::TBMIterator {}
-#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-impl c::expression::NativeType for crate::__pgrx_c_bindings::TBMIterator {
-    type Marker = c::expression::COpaque<Self>;
-}
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::SysScanDescData>() == 48);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::SysScanDescData>() == 8);
-};
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::SysScanDescData {}
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::SubscriptExecSteps>() == 32);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::SubscriptExecSteps>() == 8);
-};
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::SubscriptExecSteps {}
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::SubqueryScanState>() == 232);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::SubqueryScanState>() == 8);
-};
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::SubqueryScanState {}
-#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::SubqueryScanPath>() == 80);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::SubqueryScanPath>() == 8);
-};
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::SubqueryScanPath {}
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::SpGistLUPCache>() == 64);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::SpGistLUPCache>() == 4);
-};
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::SpGistLUPCache {}
-#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::SortPath>() == 80);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::SortPath>() == 8);
-};
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::SortPath {}
-#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::SnapBuild {}
-#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-impl c::expression::NativeType for crate::__pgrx_c_bindings::SnapBuild {
-    type Marker = c::expression::COpaque<Self>;
-}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::Sharedsort {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::Sharedsort {
-    type Marker = c::expression::COpaque<Self>;
-}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::SharedTuplestoreAccessor {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::SharedTuplestoreAccessor {
-    type Marker = c::expression::COpaque<Self>;
-}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::SharedTuplestore {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::SharedTuplestore {
-    type Marker = c::expression::COpaque<Self>;
-}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::SharedRecordTypmodRegistry {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::SharedRecordTypmodRegistry {
-    type Marker = c::expression::COpaque<Self>;
-}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::SharedHashJoinBatch {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::SharedHashJoinBatch {
-    type Marker = c::expression::COpaque<Self>;
-}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::SharedExecutorInstrumentation {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::SharedExecutorInstrumentation {
-    type Marker = c::expression::COpaque<Self>;
-}
-#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::SetOpStatePerGroupData {}
-#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-impl c::expression::NativeType for crate::__pgrx_c_bindings::SetOpStatePerGroupData {
-    type Marker = c::expression::COpaque<Self>;
-}
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::Session>() == 40);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::Session>() == 8);
-};
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::Session {}
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::SeqScan>() == 112);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::SeqScan>() == 8);
-};
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::SeqScan {}
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::SemiAntiJoinFactors>() == 16);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::SemiAntiJoinFactors>() == 8);
-};
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::SemiAntiJoinFactors {}
-#[cfg(feature = "pg15")]
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::SelectLimit {}
-#[cfg(feature = "pg15")]
-impl c::expression::NativeType for crate::__pgrx_c_bindings::SelectLimit {
-    type Marker = c::expression::COpaque<Self>;
-}
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::ScanState>() == 224);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::ScanState>() == 8);
-};
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::ScanState {}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::ScalarArrayOpExprHashTable {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::ScalarArrayOpExprHashTable {
-    type Marker = c::expression::COpaque<Self>;
-}
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::SampleScan>() == 120);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::SampleScan>() == 8);
-};
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::SampleScan {}
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::SERIALIZABLEXID>() == 16);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::SERIALIZABLEXID>() == 8);
-};
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::SERIALIZABLEXID {}
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::RowSecurityDesc>() == 16);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::RowSecurityDesc>() == 8);
-};
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::RowSecurityDesc {}
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::RmgrData>() == 64);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::RmgrData>() == 8);
-};
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::RmgrData {}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::RewriteStateData {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::RewriteStateData {
-    type Marker = c::expression::COpaque<Self>;
-}
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::RevmapContents>() == 6);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::RevmapContents>() == 2);
-};
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::RevmapContents {}
-#[cfg(feature = "pg15")]
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::ResultRelInfoExtra>() == 16);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::ResultRelInfoExtra>() == 8);
-};
-#[cfg(feature = "pg15")]
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::ResultRelInfoExtra {}
