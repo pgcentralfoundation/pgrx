@@ -63,8 +63,8 @@ mod frontend;
 /// Index directed edges in both directions and find strongly connected components in a fixed order.
 mod graph;
 pub use frontend::{
-    Flavors, FrontendError, SystemIncludeDirectory, SystemIncludes, c_header_path,
-    compile_native_support, inspect, sha256_hex, split_recorded_cflags,
+    Flavors, FrontendError, MSVC_POINTER_TYPE_WARNING, SystemIncludeDirectory, SystemIncludes,
+    c_header_path, compile_native_support, inspect, sha256_hex, split_recorded_cflags,
 };
 /// Parse bounded source syntax while preserving formal holes, grouping, and structural operands.
 mod syntax;

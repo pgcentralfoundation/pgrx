@@ -2290,6 +2290,10 @@ fn extra_bindgen_clang_args(pg_config: &PgConfig) -> eyre::Result<Vec<String>> {
         // used to compile PostgreSQL.
         out.extend(flags.iter().cloned());
     }
+    if env_tracked("CARGO_CFG_TARGET_ENV").as_deref() == Some("msvc") {
+        // Bindgen parses the same headers as macro inspection, which adds this for itself.
+        out.push(pgrx_c_macros::MSVC_POINTER_TYPE_WARNING.into());
+    }
     if env_tracked("CARGO_CFG_TARGET_OS").as_deref() == Some("macos") {
         // Find the `-isysroot` flags so we can warn about them, so something
         // reasonable shows up if/when the build fails.
