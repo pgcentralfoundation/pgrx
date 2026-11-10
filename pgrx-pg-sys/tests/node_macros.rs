@@ -81,13 +81,12 @@ unsafe fn casts_check_the_tag_in_every_build<Uninstantiated>(
 /// needs `unsafe` in both builds.
 ///
 /// PostgreSQL 15 and 16 define `newNode`, which `makeNode` expands, as a macro whose form
-/// depends on the compiler. For GCC and Clang it is a GNU statement expression, which is
-/// not translated. PostgreSQL 17 made it an inline function, so `makeNode` is checked from
-/// there on.
+/// depends on the compiler: a GNU statement expression for GCC and Clang, and otherwise a
+/// comma expression that keeps the node in the global `newNodeMacroHolder`. PostgreSQL 17
+/// made it an inline function. Every form gives the same macro.
 ///
 /// # Safety
 /// The caller runs on a backend thread with a current memory context.
-#[cfg(not(any(feature = "pg15", feature = "pg16")))]
 #[allow(dead_code)]
 unsafe fn make_node_needs_unsafe_in_every_build<Uninstantiated>() -> *mut pg::Query {
     // SAFETY: the caller provides the backend in which `newNode` allocates. A `Query` is

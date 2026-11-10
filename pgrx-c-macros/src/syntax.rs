@@ -27,6 +27,9 @@ const MAX_TOKENS: usize = 4096;
 /// Bound nested parser recursion while leaving long left-associated expressions in the iterative
 /// arena.
 const MAX_DEPTH: usize = 64;
+/// Bound statement expressions nested in one another. Each restarts the expression and
+/// statement nesting budgets, and analysis and emission recurse once into each.
+const MAX_STATEMENT_EXPRESSIONS: usize = 8;
 
 /// Half-open indices into a macro's replacement-token list, including comment tokens.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -74,26 +77,57 @@ impl StatementBody {
     /// Visit statements in source order, yielding blocks before their children.
     /// Scopes remain explicit; callers that execute statements must honor them.
     pub fn walk(&self) -> impl Iterator<Item = &Statement> {
-        let mut scopes = vec![self.statements.iter()];
-        std::iter::from_fn(move || {
-            loop {
-                let scope = scopes.last_mut()?;
-                if let Some(statement) = scope.next() {
-                    match statement {
-                        Statement::Block { statements, .. } => scopes.push(statements.iter()),
-                        Statement::If { then_branch, else_branch, .. } => {
-                            if let Some(otherwise) = else_branch {
-                                scopes.push(std::slice::from_ref(otherwise.as_ref()).iter());
-                            }
-                            scopes.push(std::slice::from_ref(then_branch.as_ref()).iter());
+        walk(&self.statements)
+    }
+}
+
+/// Visit `statements` in source order, yielding blocks and conditionals before their
+/// children. It does not enter the statement expressions their expressions hold.
+fn walk(statements: &[Statement]) -> impl Iterator<Item = &Statement> {
+    let mut scopes = vec![statements.iter()];
+    std::iter::from_fn(move || {
+        loop {
+            let scope = scopes.last_mut()?;
+            if let Some(statement) = scope.next() {
+                match statement {
+                    Statement::Block { statements, .. } => scopes.push(statements.iter()),
+                    Statement::If { then_branch, else_branch, .. } => {
+                        if let Some(otherwise) = else_branch {
+                            scopes.push(std::slice::from_ref(otherwise.as_ref()).iter());
                         }
-                        _ => {}
+                        scopes.push(std::slice::from_ref(then_branch.as_ref()).iter());
                     }
-                    return Some(statement);
+                    _ => {}
                 }
-                scopes.pop();
+                return Some(statement);
             }
-        })
+            scopes.pop();
+        }
+    })
+}
+
+/// The expressions `statements` evaluate: each expression statement, initializer,
+/// condition and returned value, through nested blocks and branches.
+pub(crate) fn full_expressions(statements: &[Statement]) -> impl Iterator<Item = NodeId> {
+    walk(statements).filter_map(|statement| match statement {
+        Statement::Expression { expression, .. } | Statement::Return { expression, .. } => {
+            Some(*expression)
+        }
+        Statement::Declaration { initializer, .. } => *initializer,
+        Statement::If { condition, .. } => Some(*condition),
+        Statement::Block { .. } => None,
+    })
+}
+
+impl Expression {
+    /// Every statement of the replacement: those of a statement body, and those of each
+    /// statement expression in the arena. A local's name is unique among them.
+    pub fn statements(&self) -> impl Iterator<Item = &Statement> {
+        let nested = self.nodes.iter().flat_map(|node| match &node.kind {
+            ExpressionKind::StatementExpression { statements, .. } => walk(statements),
+            _ => walk(&[]),
+        });
+        self.statement_body.iter().flat_map(|body| body.walk()).chain(nested)
     }
 }
 
@@ -388,6 +422,15 @@ pub enum ExpressionKind {
         /// Formal index supplying the type whose C name completes the pasted name.
         parameter: usize,
     },
+    /// A GNU statement expression, `({ statements; value; })`: the statements run in order
+    /// in their own scope, and the last one is the expression that gives the value.
+    StatementExpression {
+        /// The statements before the value, sharing one lexical scope with it.
+        statements: Vec<Statement>,
+        /// The final expression statement's operand, whose value and type the whole
+        /// expression has. It is never a place.
+        value: NodeId,
+    },
     /// A non-evaluated record/member path preserving structural type and field holes.
     OffsetOf {
         /// Non-evaluated record designator for an offsetof computation.
@@ -647,6 +690,8 @@ struct Parser<'a, F> {
     ambiguous_casts: HashSet<NodeId>,
     /// One shared expression arena for the complete expression or structured statement replacement.
     nodes: Vec<ExpressionNode>,
+    /// How many statement expressions enclose the token being parsed.
+    statement_expressions: usize,
     /// Catalog-backed predicate admitting concrete C type spellings into the cast grammar.
     is_type: F,
     /// Original replacement-token count used to report complete boundaries after comment filtering.
@@ -712,6 +757,7 @@ fn parse(
         aligned_parameters: HashSet::new(),
         ambiguous_casts: HashSet::new(),
         nodes: Vec::new(),
+        statement_expressions: 0,
         is_type,
         original_len: tokens.len(),
     };
@@ -965,6 +1011,13 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
         }
         match spelling {
             "__builtin_offsetof" => return self.offset_of(start),
+            "(" if self
+                .tokens
+                .get(self.position + 1)
+                .is_some_and(|next| next.token.spelling == "{") =>
+            {
+                return self.statement_expression();
+            }
             "(" => {
                 if let Some((end, type_name)) = self.flat_type(")") {
                     self.position = end + 1;
@@ -3177,5 +3230,123 @@ mod tests {
                 "{source:?}",
             );
         }
+    }
+
+    /// A statement expression is one expression node that owns its statements and names
+    /// its value, wherever an expression may stand.
+    #[test]
+    fn statement_expressions_keep_their_statements_scope_and_value() {
+        let source = [
+            "(", "(", "{", "int", "tmp", ";", "tmp", "=", "x", ";", "if", "(", "tmp", ")", "tmp",
+            "++", ";", "tmp", ";", "}", ")", "+", "1", ")",
+        ];
+        for parsed in [
+            parse_expression(&tokens(&source), &["x".into()], |name| name == "int").unwrap(),
+            parse_replacement(&tokens(&source), &["x".into()], |name| name == "int").unwrap(),
+        ] {
+            assert!(parsed.statement_body.is_none());
+            let (index, statements, value) = parsed
+                .nodes
+                .iter()
+                .enumerate()
+                .find_map(|(index, node)| match &node.kind {
+                    ExpressionKind::StatementExpression { statements, value } => {
+                        Some((index, statements, *value))
+                    }
+                    _ => None,
+                })
+                .unwrap();
+            // The node spans its parentheses, and its children precede it.
+            assert_eq!(parsed.nodes[index].tokens, TokenRange { start: 1, end: 21 });
+            assert!(value < index);
+            assert_eq!(parsed.nodes[value].kind, ExpressionKind::Identifier { name: "tmp".into() });
+            assert!(matches!(
+                statements.as_slice(),
+                [
+                    Statement::Declaration { name, initializer: None, .. },
+                    Statement::Expression { .. },
+                    Statement::If { else_branch: None, .. },
+                ] if name == "tmp"
+            ));
+            assert_eq!(parsed.statements().count(), 4);
+            assert_eq!(full_expressions(statements).count(), 3);
+        }
+        // Inside a statement body too, whose own statements come first.
+        let body = [
+            "do", "{", "int", "out", "=", "(", "{", "int", "tmp", "=", "x", ";", "tmp", ";", "}",
+            ")", ";", "}", "while", "(", "0", ")",
+        ];
+        let parsed =
+            parse_replacement(&tokens(&body), &["x".into()], |name| name == "int").unwrap();
+        let names = parsed
+            .statements()
+            .filter_map(|statement| match statement {
+                Statement::Declaration { name, .. } => Some(name.as_str()),
+                _ => None,
+            })
+            .collect::<Vec<_>>();
+        assert_eq!(names, ["out", "tmp"]);
+    }
+
+    /// A statement expression needs a value, cannot return, and keeps C's scopes.
+    #[test]
+    fn statement_expressions_without_a_value_or_with_other_scopes_are_refused() {
+        for (source, message) in [
+            // No last expression: empty, a declaration, a conditional, and an empty statement.
+            (vec!["(", "{", "}", ")"], "must end with the expression"),
+            (vec!["(", "{", "int", "tmp", "=", "x", ";", "}", ")"], "must end with the expression"),
+            (
+                vec!["(", "{", "if", "(", "x", ")", "x", "++", ";", "}", ")"],
+                "must end with the expression",
+            ),
+            (vec!["(", "{", "x", ";", ";", "}", ")"], "must end with the expression"),
+            (
+                vec!["(", "{", "return", "x", ";", "}", ")"],
+                "a return inside a statement expression",
+            ),
+            (
+                vec!["(", "{", "if", "(", "x", ")", "return", "1", ";", "x", ";", "}", ")"],
+                "a return inside a statement expression",
+            ),
+            (vec!["(", "{", "x", ";"], "is not closed"),
+            // A local keeps one binding: it shadows no formal or other local, is not named
+            // before its declaration, and is not named after its block.
+            (vec!["(", "{", "int", "x", "=", "1", ";", "x", ";", "}", ")"], "cannot shadow"),
+            (
+                vec![
+                    "(", "{", "int", "tmp", "=", "1", ";", "(", "{", "int", "tmp", "=", "2", ";",
+                    "tmp", ";", "}", ")", ";", "}", ")",
+                ],
+                "cannot shadow",
+            ),
+            (
+                vec!["tmp", "+", "(", "{", "int", "tmp", "=", "1", ";", "tmp", ";", "}", ")"],
+                "an earlier identifier's binding",
+            ),
+            (
+                vec!["(", "{", "int", "tmp", "=", "1", ";", "tmp", ";", "}", ")", "+", "tmp"],
+                "outside its C block scope",
+            ),
+        ] {
+            let error = parse_replacement(&tokens(&source), &["x".into()], |name| name == "int")
+                .expect_err(&format!("{source:?}"));
+            assert_eq!(error.kind, SyntaxErrorKind::Statement, "{source:?}");
+            assert!(error.message.contains(message), "{source:?}: {error:?}");
+        }
+        // Each nested one is the value of the one around it.
+        let nested = |levels: usize| {
+            std::iter::repeat_n(["(", "{"], levels)
+                .flatten()
+                .chain(["1"])
+                .chain(std::iter::repeat_n([";", "}", ")"], levels).flatten())
+                .collect::<Vec<_>>()
+        };
+        parse_replacement(&tokens(&nested(MAX_STATEMENT_EXPRESSIONS)), &[], |_| false).unwrap();
+        assert_eq!(
+            parse_replacement(&tokens(&nested(MAX_STATEMENT_EXPRESSIONS + 1)), &[], |_| false)
+                .unwrap_err()
+                .kind,
+            SyntaxErrorKind::BudgetExceeded
+        );
     }
 }

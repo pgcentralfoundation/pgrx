@@ -82,7 +82,7 @@ pub(super) fn matcher(analysis: &MacroAnalysis) -> String {
             matcher.push_str(", ");
         }
         let fragment = match parameter.roles.as_slice() {
-            [ParameterRole::Type] => "ty",
+            _ if parameter.is_type() => "ty",
             [ParameterRole::Identifier] => "ident",
             _ => "tt",
         };
@@ -102,6 +102,19 @@ pub(super) fn matcher(analysis: &MacroAnalysis) -> String {
 pub(super) fn descriptor(analysis: &MacroAnalysis, index: usize, shell: bool) -> String {
     let name = name(analysis, index);
     if shell { format!("(@native [${name}])") } else { format!("${name}") }
+}
+
+/// A Rust `&'static str` expression for the source spelling of one parameter's operand,
+/// which stands in for the C spelling in diagnostic text.
+///
+/// A type operand is one `ty` fragment, which `stringify!` spells whole. Any other operand
+/// keeps its original tokens in its descriptor.
+pub(super) fn spelling(analysis: &MacroAnalysis, index: usize, shell: bool) -> String {
+    if analysis.parameters[index].is_type() {
+        format!("::core::stringify!(${})", name(analysis, index))
+    } else {
+        format!("$crate::__pgrx_c_operand!(@stringify; {})", descriptor(analysis, index, shell))
+    }
 }
 
 /// Check caller-authored unsafe operations separately from generated unevaluated C operations.
@@ -184,9 +197,7 @@ pub(super) fn generate(analysis: &MacroAnalysis) -> Result<Option<ArgumentAdapte
         let last = next == analysis.parameters.len();
         // An unused operand is classified like an evaluated one, so dead code can check
         // that an operand which needs `unsafe` has it, whether or not C evaluates it.
-        if parameter.roles.contains(&ParameterRole::Type)
-            && parameter.roles != [ParameterRole::Type]
-        {
+        if parameter.roles.contains(&ParameterRole::Type) && !parameter.is_type() {
             return Err(skip(
                 analysis,
                 SkipReasonCode::UnsupportedType,
@@ -223,7 +234,7 @@ pub(super) fn generate(analysis: &MacroAnalysis) -> Result<Option<ArgumentAdapte
         // :expr fallback, which could otherwise try parsing a native escape.
         let endings = if last { vec!["", ", $($rest:tt)*"] } else { vec![", $($rest:tt)*"] };
         let atomic = parameter.uses.iter().any(|usage| !usage.grouped);
-        if parameter.roles.contains(&ParameterRole::Spelling) {
+        if parameter.roles.contains(&ParameterRole::Spelling) && !parameter.is_type() {
             // Preserve token trees before any :expr fragment can turn them into
             // an opaque syntax node. Groups retain their delimiters and spans;
             // an outer comma is the same argument separator as in C.
@@ -242,7 +253,7 @@ pub(super) fn generate(analysis: &MacroAnalysis) -> Result<Option<ArgumentAdapte
             }
             continue;
         }
-        if parameter.roles != [ParameterRole::Type]
+        if !parameter.is_type()
             && !parameter.roles.contains(&ParameterRole::Identifier)
             && !parameter.roles.contains(&ParameterRole::FieldDesignator)
         {
@@ -275,7 +286,7 @@ pub(super) fn generate(analysis: &MacroAnalysis) -> Result<Option<ArgumentAdapte
         for ending in endings {
             let rest = if ending.is_empty() { "" } else { "$($rest)*" };
             let state = format!("[p{next} $mode [$($done)*] [{rest}]]");
-            if parameter.roles == [ParameterRole::Type] {
+            if parameter.is_type() {
                 writeln!(rust, "(@p{index} $mode:ident [$($done:tt)*]; $argument:ty{ending}) => {{ $crate::{normalizer}!(@p{next} $mode [$($done)* $argument,]; {rest}) }};").expect("String output");
                 continue;
             }

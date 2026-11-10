@@ -180,6 +180,20 @@ pub struct ParameterAnalysis {
     pub uses: Vec<ParameterUse>,
 }
 
+impl ParameterAnalysis {
+    /// Whether the caller supplies a type for this operand.
+    ///
+    /// A type operand may also be stringified: its tokens reach the macro body whole, so
+    /// its spelling needs nothing more of the invocation.
+    pub fn is_type(&self) -> bool {
+        self.roles.contains(&ParameterRole::Type)
+            && self
+                .roles
+                .iter()
+                .all(|role| matches!(role, ParameterRole::Type | ParameterRole::Spelling))
+    }
+}
+
 /// C macro formals and caller-scope identifiers have different hygiene rules.
 /// Rust callers supply free identifiers explicitly after the original formals.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
@@ -602,11 +616,9 @@ pub(crate) fn analyze_active_with_constants(
     if compiler_expanded {
         let mut captures = BTreeMap::new();
         let locals = syntax
-            .statement_body
-            .iter()
-            .flat_map(|body| body.walk())
+            .statements()
             .filter_map(|statement| match statement {
-                Statement::Declaration { name, .. } => Some(name.as_str()),
+                Statement::Declaration { name, .. } => Some(name.clone()),
                 _ => None,
             })
             .collect::<BTreeSet<_>>();
@@ -809,9 +821,7 @@ pub(crate) fn analyze_active_with_constants(
                 syntax.statement_body.as_ref().is_some_and(|body| body.return_tokens.is_some());
             let statement_boundary =
                 syntax.statement_body.as_ref().is_some_and(|body| body.requires_boundary);
-            if syntax.statement_body.as_ref().is_some_and(|body| {
-                body.walk().any(|statement| matches!(statement, Statement::If { .. }))
-            }) {
+            if syntax.statements().any(|statement| matches!(statement, Statement::If { .. })) {
                 helpers.insert(HelperRequirement::CTruth);
             }
             let expression_boundary = !statements
@@ -829,6 +839,7 @@ pub(crate) fn analyze_active_with_constants(
                         | ExpressionKind::Call { .. }
                         | ExpressionKind::Member { .. }
                         | ExpressionKind::Index { .. }
+                        | ExpressionKind::StatementExpression { .. }
                         | ExpressionKind::OffsetOf { .. }
                 );
             if expression_boundary && !compiler_expanded {
@@ -878,18 +889,21 @@ pub(crate) fn analyze_active_with_constants(
                 result.evaluation.requirements.push(EvaluationRequirement::UnspecifiedOperandOrder);
             }
             if result.expression.as_ref().is_some_and(|expression| {
-                expression.syntax.statement_body.as_ref().is_some_and(|body| {
-                    body.walk().any(|statement| matches!(statement, Statement::If { .. }))
-                }) || expression.syntax.nodes.iter().any(|node| {
-                    matches!(
-                        node.kind,
-                        ExpressionKind::Conditional { .. }
-                            | ExpressionKind::Binary {
-                                operator: BinaryOperator::LogicalAnd | BinaryOperator::LogicalOr,
-                                ..
-                            }
-                    )
-                })
+                expression
+                    .syntax
+                    .statements()
+                    .any(|statement| matches!(statement, Statement::If { .. }))
+                    || expression.syntax.nodes.iter().any(|node| {
+                        matches!(
+                            node.kind,
+                            ExpressionKind::Conditional { .. }
+                                | ExpressionKind::Binary {
+                                    operator: BinaryOperator::LogicalAnd
+                                        | BinaryOperator::LogicalOr,
+                                    ..
+                                }
+                        )
+                    })
             }) {
                 result.evaluation.requirements.push(EvaluationRequirement::PreserveLazyBranches);
             }
@@ -1165,7 +1179,7 @@ fn analyze_types(
     let catalog = frontend.declarations();
     let target = &frontend.profile().target;
     let mut locals = HashMap::new();
-    for statement in expression.statement_body.iter().flat_map(|body| body.walk()) {
+    for statement in expression.statements() {
         let Statement::Declaration { name, type_name, tokens, .. } = statement else {
             continue;
         };
@@ -1453,6 +1467,7 @@ fn analyze_types(
                 common_type(&types, *then_value, *else_value, target)
             }
             ExpressionKind::Comma { right, .. } => types[*right].clone(),
+            ExpressionKind::StatementExpression { value, .. } => types[*value].clone(),
             ExpressionKind::Call { callee, arguments } => {
                 let mut callee = *callee;
                 while let ExpressionKind::Group { operand } = expression.nodes[callee].kind {
@@ -1583,113 +1598,122 @@ fn analyze_types(
 /// Initialization is proved at complete statement and condition boundaries.
 /// Every path that can continue must initialize a local before its later read.
 /// Taking an address or passing it to a function does not prove that C wrote it.
-fn validate_local_initialization(
-    expression: &Expression,
-    locals: &HashMap<&str, TypeInfo>,
+fn validate_local_initialization<'a>(
+    expression: &'a Expression,
+    locals: &HashMap<&'a str, TypeInfo>,
 ) -> Result<(), TypeFailure> {
-    let Some(body) = expression.statement_body.as_ref().filter(|_| !locals.is_empty()) else {
+    if locals.is_empty() {
         return Ok(());
-    };
-    /// Reject full-expression combinations whose evaluation or mutation constraints cannot be safely
-    /// established.
-    fn check_full_expression<'a>(
-        expression: &Expression,
-        root: NodeId,
-        locals: &HashMap<&'a str, TypeInfo>,
-        initialized: &mut HashSet<&'a str>,
-    ) -> Result<(), TypeFailure> {
-        check_local_reads(expression, root, locals, initialized)?;
-        let mut root = root;
-        while let ExpressionKind::Group { operand } = expression.nodes[root].kind {
-            root = operand;
-        }
-        if let ExpressionKind::Assignment { operator: None, mut place, .. } =
-            expression.nodes[root].kind
-        {
-            while let ExpressionKind::Group { operand } = expression.nodes[place].kind {
-                place = operand;
-            }
-            if let ExpressionKind::Identifier { name } = &expression.nodes[place].kind
-                && let Some((&name, _)) = locals.get_key_value(name.as_str())
-            {
-                initialized.insert(name);
-            }
-        }
-        Ok(())
     }
-    // A terminating path contributes no state to a later join: C never reaches it.
-    // Each surviving branch must establish every local read after the conditional.
-    /// Validate statement scopes and declared locals alongside the expression arena before emission.
-    fn check_statements<'a>(
-        expression: &Expression,
-        statements: &'a [Statement],
-        locals: &HashMap<&'a str, TypeInfo>,
-        initialized: &mut HashSet<&'a str>,
-    ) -> Result<bool, TypeFailure> {
-        for statement in statements {
-            match statement {
-                Statement::Declaration { name, initializer, .. } => {
-                    if let Some(initializer) = initializer {
-                        check_full_expression(expression, *initializer, locals, initialized)?;
-                        initialized.insert(name.as_str());
-                    }
+    let mut initialized = HashSet::new();
+    match &expression.statement_body {
+        Some(body) => check_statements(expression, &body.statements, locals, &mut initialized)
+            .map(|_returns| ()),
+        // Only a statement expression declares locals here; the walk checks each.
+        None => check_local_reads(expression, expression.root, locals, &initialized),
+    }
+}
+
+/// Check one full expression's reads, then grant the initialization a direct assignment
+/// to a local makes.
+fn check_full_expression<'a>(
+    expression: &'a Expression,
+    root: NodeId,
+    locals: &HashMap<&'a str, TypeInfo>,
+    initialized: &mut HashSet<&'a str>,
+) -> Result<(), TypeFailure> {
+    check_local_reads(expression, root, locals, initialized)?;
+    let mut root = root;
+    while let ExpressionKind::Group { operand } = expression.nodes[root].kind {
+        root = operand;
+    }
+    if let ExpressionKind::Assignment { operator: None, mut place, .. } =
+        expression.nodes[root].kind
+    {
+        while let ExpressionKind::Group { operand } = expression.nodes[place].kind {
+            place = operand;
+        }
+        if let ExpressionKind::Identifier { name } = &expression.nodes[place].kind
+            && let Some((&name, _)) = locals.get_key_value(name.as_str())
+        {
+            initialized.insert(name);
+        }
+    }
+    Ok(())
+}
+
+/// Check `statements` in order and report whether every path through them returns.
+///
+/// A terminating path contributes no state to a later join: C never reaches it. Each
+/// surviving branch must establish every local read after the conditional.
+fn check_statements<'a>(
+    expression: &'a Expression,
+    statements: &'a [Statement],
+    locals: &HashMap<&'a str, TypeInfo>,
+    initialized: &mut HashSet<&'a str>,
+) -> Result<bool, TypeFailure> {
+    for statement in statements {
+        match statement {
+            Statement::Declaration { name, initializer, .. } => {
+                if let Some(initializer) = initializer {
+                    check_full_expression(expression, *initializer, locals, initialized)?;
+                    initialized.insert(name.as_str());
                 }
-                Statement::Expression { expression: root, .. } => {
-                    check_full_expression(expression, *root, locals, initialized)?;
-                }
-                Statement::Block { statements, .. } => {
-                    if check_statements(expression, statements, locals, initialized)? {
-                        return Ok(true);
-                    }
-                }
-                Statement::Return { expression: root, .. } => {
-                    check_local_reads(expression, *root, locals, initialized)?;
+            }
+            Statement::Expression { expression: root, .. } => {
+                check_full_expression(expression, *root, locals, initialized)?;
+            }
+            Statement::Block { statements, .. } => {
+                if check_statements(expression, statements, locals, initialized)? {
                     return Ok(true);
                 }
-                Statement::If { condition, then_branch, else_branch, .. } => {
-                    check_full_expression(expression, *condition, locals, initialized)?;
-                    let mut then_initialized = initialized.clone();
-                    let then_returns = check_statements(
+            }
+            Statement::Return { expression: root, .. } => {
+                check_local_reads(expression, *root, locals, initialized)?;
+                return Ok(true);
+            }
+            Statement::If { condition, then_branch, else_branch, .. } => {
+                check_full_expression(expression, *condition, locals, initialized)?;
+                let mut then_initialized = initialized.clone();
+                let then_returns = check_statements(
+                    expression,
+                    std::slice::from_ref(then_branch.as_ref()),
+                    locals,
+                    &mut then_initialized,
+                )?;
+                let mut else_initialized = initialized.clone();
+                let else_returns = if let Some(else_branch) = else_branch {
+                    check_statements(
                         expression,
-                        std::slice::from_ref(then_branch.as_ref()),
+                        std::slice::from_ref(else_branch.as_ref()),
                         locals,
-                        &mut then_initialized,
-                    )?;
-                    let mut else_initialized = initialized.clone();
-                    let else_returns = if let Some(else_branch) = else_branch {
-                        check_statements(
-                            expression,
-                            std::slice::from_ref(else_branch.as_ref()),
-                            locals,
-                            &mut else_initialized,
-                        )?
-                    } else {
-                        false
-                    };
-                    match (then_returns, else_returns) {
-                        (true, true) => return Ok(true),
-                        (false, true) => *initialized = then_initialized,
-                        (true, false) => *initialized = else_initialized,
-                        (false, false) => {
-                            then_initialized.retain(|name| else_initialized.contains(name));
-                            *initialized = then_initialized;
-                        }
+                        &mut else_initialized,
+                    )?
+                } else {
+                    false
+                };
+                match (then_returns, else_returns) {
+                    (true, true) => return Ok(true),
+                    (false, true) => *initialized = then_initialized,
+                    (true, false) => *initialized = else_initialized,
+                    (false, false) => {
+                        then_initialized.retain(|name| else_initialized.contains(name));
+                        *initialized = then_initialized;
                     }
                 }
             }
         }
-        Ok(false)
     }
-    check_statements(expression, &body.statements, locals, &mut HashSet::new()).map(|_| ())
+    Ok(false)
 }
 
 /// Require supported straight-line initialization before a local read can become a generated Rust
 /// expression.
-fn check_local_reads(
-    expression: &Expression,
+fn check_local_reads<'a>(
+    expression: &'a Expression,
     root: NodeId,
-    locals: &HashMap<&str, TypeInfo>,
-    initialized: &HashSet<&str>,
+    locals: &HashMap<&'a str, TypeInfo>,
+    initialized: &HashSet<&'a str>,
 ) -> Result<(), TypeFailure> {
     // Keep the walk iterative: left-associated C expressions can have a deep arena
     // even when the recursive parser's nesting budget is satisfied.
@@ -1729,6 +1753,15 @@ fn check_local_reads(
             ExpressionKind::Call { callee, arguments } => {
                 work.push((*callee, true));
                 work.extend(arguments.iter().map(|argument| (*argument, true)));
+            }
+            ExpressionKind::StatementExpression { statements, value } => {
+                // Its statements run in order from the state at this full expression. What
+                // they initialize is not carried out: C does not order them against the
+                // other operands of this expression. The parser bounds how deeply these
+                // nest, which bounds this recursion.
+                let mut inner = initialized.clone();
+                check_statements(expression, statements, locals, &mut inner)?;
+                check_local_reads(expression, *value, locals, &inner)?;
             }
             // sizeof is unevaluated; type operands have no value reads.
             _ => {}

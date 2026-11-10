@@ -74,7 +74,8 @@ pub(super) fn plan(frontend: &FrontendOutput, analysis: &MacroAnalysis) -> Vec<D
             ExpressionKind::Conditional { condition, then_value, else_value } => {
                 fixed[*condition] && fixed[*then_value] && fixed[*else_value]
             }
-            ExpressionKind::Comma { right, .. } => fixed[*right],
+            ExpressionKind::Comma { right: value, .. }
+            | ExpressionKind::StatementExpression { value, .. } => fixed[*value],
             ExpressionKind::Call { arguments, .. } if expect => {
                 if fixed[arguments[1]] {
                     decisions[index] = Decision::Static;

@@ -957,15 +957,17 @@ fn render_adapters(
     let operands = macros.iter().any(|emission| {
         matches!(emission.status, EmissionStatus::Emitted { .. })
             && emission.analysis.parameters.iter().any(|parameter| {
-                // Unused operands are classified too, for their dead safety checks.
-                parameter.roles.iter().any(|role| {
-                    matches!(
-                        role,
-                        crate::ParameterRole::Value
-                            | crate::ParameterRole::Spelling
-                            | crate::ParameterRole::Unused
-                    )
-                })
+                // Unused operands are classified too, for their dead safety checks. A type
+                // operand is never classified.
+                !parameter.is_type()
+                    && parameter.roles.iter().any(|role| {
+                        matches!(
+                            role,
+                            crate::ParameterRole::Value
+                                | crate::ParameterRole::Spelling
+                                | crate::ParameterRole::Unused
+                        )
+                    })
             })
     });
     rust.push_str(&crate::format_rust_macros(&arguments::shared(&exports, operands)?)?);
@@ -1319,8 +1321,9 @@ fn render(
     let returning = statement_body.is_some_and(|body| body.return_tokens.is_some());
     let statement_boundary = statement_body.is_some_and(|body| body.requires_boundary);
     let normalizer = arguments.as_ref().map(|arguments| arguments.normalizer.as_str());
+    // A translated body holds no caller tokens, so its locals need no guard.
     let local_guard =
-        if statement_body.is_some() { statements::guard(analysis, normalizer)? } else { None };
+        if inline_body.is_none() { statements::guard(analysis, normalizer)? } else { None };
     let invoke = |mode: &str, prefix: &str| match normalizer {
         None => format!("$crate::{identifier}!(@{mode}; {prefix}$($raw)*)"),
         Some(_) if local_guard.is_some() => {
@@ -1421,7 +1424,10 @@ fn render(
         comment.push_str(documentation::STATEMENTS);
     }
     if local_guard.is_some() {
-        comment.push_str(" Caller argument tokens must not mention the macro's C local names, even inside groups: those invocations are rejected because C substitution can capture locals that Rust hygiene would resolve differently. The scope check also inspects forwarded expression fragments and is bounded to 4096 stringified bytes. Matches in fields, paths or strings are conservatively rejected.");
+        // The sentence continues a statement body's paragraph. The locals of a statement
+        // expression, in any other macro, get a paragraph of their own.
+        comment.push_str(if statement_body.is_some() { " " } else { "\n\n" });
+        comment.push_str("Caller argument tokens must not mention the macro's C local names, even inside groups: those invocations are rejected because C substitution can capture locals that Rust hygiene would resolve differently. The scope check also inspects forwarded expression fragments and is bounded to 4096 stringified bytes. Matches in fields, paths or strings are conservatively rejected.");
     }
     let explicit_boundary = inline_body.is_none()
         && analysis.invocation == crate::InvocationContract::ExplicitExpressionBoundary;
@@ -1628,6 +1634,10 @@ fn render(
                 )
                 .expect("String output");
             }
+        }
+        // The locals of a statement expression need the guard that a statement body's do.
+        if let Some(guard) = &local_guard {
+            rust.push_str(guard);
         }
         if explicit_boundary {
             let call = invoke("__pgrx_emit_public", "");

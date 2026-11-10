@@ -750,6 +750,18 @@ assignment, and updates as distinct node kinds. `sizeof`, alignment, type-formal
 casts, and `offsetof` have dedicated structural nodes. A member-name formal is
 an identifier role; a type formal is a type role, not a value expression.
 
+A GNU statement expression, `({ statements; value; })`, is one node,
+`StatementExpression { statements, value }`, formed where a primary expression
+begins with `(` followed by `{`. Its statements use the statement grammar below
+and belong to the node, in a scope of their own; their expressions are earlier
+nodes of the same arena, so children still precede parents. The last statement
+must be an expression statement, which becomes `value` and gives the node its
+type. With any other last statement, an empty one included, C gives the
+expression the type `void`, and the parser refuses it. It also refuses a `return`
+inside one: `return` is modeled as leaving a whole statement body. The value is
+never a place, like the right operand of a comma. PostgreSQL 15 and 16 define
+`newNode` this way for GCC and Clang.
+
 Concrete type spellings must resolve through the C catalog. For a formal that
 could be either a cast type or a parenthesized value/callee, collect independent
 evidence for its type role and reparse. Do not decide that `(T)(x)` is a cast
@@ -806,6 +818,9 @@ dependency string containing formal markers retains its C text template and
 holes, but is admitted only as a grouped direct `const char *` argument of a
 fixed nonvariadic native void diagnostic. The emitted holes stringify outer
 Rust invocation tokens without evaluation; ASCII token spelling is checked.
+A hole may be a type operand: `arguments::spelling` writes `stringify!` of its
+`ty` fragment, and `__pgrx_c_operand!(@stringify; ...)` of any other operand's
+descriptor.
 This contract does not promise a caller-dependent C array extent. Returning,
 addressing, measuring, concatenating, or doing pointer arithmetic on these
 diagnostic holes is refused. A root's own `#` stringification takes the same
@@ -841,6 +856,16 @@ intersect continuing paths and exclude returning paths. The parser must consume
 the entire replacement; a supported
 prefix followed by unknown tokens never becomes an accepted macro.
 
+These rules cover the statements of every statement expression as well as those
+of a statement body: `Expression::statements` yields both, and a local's name is
+unique among them and the formals. A statement expression's scope ends at its
+closing parenthesis. Its statements are checked in order from the locals already
+initialized where its full expression starts. What they initialize is not carried
+out of it, since C does not order them against the other operands of that
+expression. Statement expressions nest at most 8 deep; each restarts the
+expression and statement depth budgets, and analysis and emission recurse once
+into each.
+
 ## 8. Symbolic semantic analysis
 
 `session.analyze(name)` analyzes the trusted expansion and restores original C
@@ -862,8 +887,11 @@ The vector references node indices for promotion/common-type relationships.
 Resolve named constants independently and associate their facts with source
 nodes. Do not resolve a generic operand by probing one convenient `u32` call.
 
-Walk uses to establish each formal's syntactic roles: value, type, identifier,
-field designator, unused, or unknown. Readable/writable place requirements are
+Walk uses to establish each formal's syntactic roles: value, spelling, type,
+identifier, field designator, unused, or unknown. A type operand may also be
+stringified, since its tokens reach the macro body whole;
+`ParameterAnalysis::is_type` names that case, and a type role with any other
+role is refused. Readable/writable place requirements are
 contextual semantic capabilities established later, not a parameter role.
 Track occurrence positions and evaluation obligations.
 An undeclared caller-scope identifier can become an additional explicit capture
@@ -1077,7 +1105,7 @@ Preserve original ASCII C formal names as Rust metavariables, such as `$privs`.
 Rust keywords can name metavariables, but `$crate` is reserved. Unsupported
 formal spellings produce a skip rather than silently replacing every name with
 an index. Synthetic capture and return-marker names are collision-checked.
-Type-only parameters use `ty` fragments; member designators use `ident`;
+Type parameters use `ty` fragments, stringified or not; member designators use `ident`;
 contextual value operands use token descriptors.
 
 For a normal value argument, classify supported token forms without evaluating
@@ -1113,6 +1141,7 @@ still have these internal context arms.
 | `&&`, `||` | Rust lazy control flow plus C truth conversion and C `int` result. |
 | `?:` | Evaluate the condition and exactly one arm; determine the common C result without executing the other arm. |
 | Comma | Discard the left result after its effects, then evaluate the right result. |
+| Statement expression | A Rust block: the statements in order, as in a statement body, then the value. The locals live until the value is computed. |
 | Assignment | Compute the destination place once, apply C implicit destination conversion, store, return the C assignment result. |
 | Compound assignment / update | Compute the place once, preserve the read-modify-write behavior and prefix/postfix result distinction. |
 | Address/member/index | Retain raw places, declared qualifiers, promoted anonymous-field paths, and array behavior. |
@@ -1139,8 +1168,9 @@ entry with a supplied C marker where it does not.
 Initialized locals receive their declared C storage and assignment conversion.
 Track definite initialization across branches and scopes. Generated statement
 guards inspect argument token spellings against introduced local names: Rust
-macro hygiene cannot silently change C's textual local-name capture. Reject
-uncertain capture shapes. Preserve `if` branch laziness and explicit statement
+macro hygiene cannot silently change C's textual local-name capture. An
+expression macro whose statement expressions declare locals has the same guard.
+Reject uncertain capture shapes. Preserve `if` branch laziness and explicit statement
 boundaries.
 
 Some expression-like return helpers can be used with a caller-written Rust
@@ -1978,7 +2008,8 @@ like every evaluated or unused operand, it is an `expr`. Every arm expands to th
   branch hints. A call's witness is its declared result, or `()` for a void
   function. Every other node renders as in the real arm, so member, load and
   array-decay types still come from the runtime's traits. A comma renders only
-  its right operand, and the witness never delegates to another macro's
+  its right operand, a statement expression declares its own locals and renders
+  only its value, and the witness never delegates to another macro's
   internal arms, so it never names a translated callee's value arm. The shell
   evaluates `if false { finish(witness) } else { panic }`, which has the real
   macro's `CExpression<V>` type.
@@ -2354,6 +2385,7 @@ instead of rejecting the macros it was probing.
 | Distinct dependencies per root | 4,096 |
 | Parser replacement tokens | 4,096 |
 | Parser depth | 64 |
+| Nested statement expressions | 8 |
 | Closed-paste preprocessing passes | 8 |
 | Argument normalization formals | 64 |
 | Argument classifier token budget | 64 |

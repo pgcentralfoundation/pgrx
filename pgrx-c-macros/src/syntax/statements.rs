@@ -46,7 +46,9 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
             || !matches!(self.spelling(), Some("return" | "do" | "{" | ";" | "if"))
             || self.spelling().is_some_and(|name| self.parameters.contains_key(name))
         {
-            return self.expression(0, 0).map(|root| (root, None));
+            let root = self.expression(0, 0)?;
+            self.check_local_scopes(None)?;
+            return Ok((root, None));
         }
         let requires_boundary = self.spelling() == Some("if");
         let ParsedScope { statements, tokens, first_return, always_returns } =
@@ -57,12 +59,25 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
         };
         let body =
             StatementBody { statements, tokens, return_tokens, always_returns, requires_boundary };
+        self.check_local_scopes(Some(&body))?;
+        Ok((root, Some(body)))
+    }
+
+    /// Require every local to keep the binding and scope C gives it: no local shares a
+    /// name with a formal or another local, and each use lies between its declaration and
+    /// the end of its block. The locals are those of the statement body, if any, and of
+    /// each statement expression in the arena.
+    fn check_local_scopes(&self, body: Option<&StatementBody>) -> Result<(), SyntaxError> {
         let mut declarations = HashMap::new();
-        let mut scopes = body
-            .statements
-            .iter()
-            .map(|statement| (statement, body.tokens.end))
-            .collect::<Vec<_>>();
+        let mut scopes = Vec::new();
+        if let Some(body) = body {
+            scopes.extend(body.statements.iter().map(|statement| (statement, body.tokens.end)));
+        }
+        for node in &self.nodes {
+            if let ExpressionKind::StatementExpression { statements, .. } = &node.kind {
+                scopes.extend(statements.iter().map(|statement| (statement, node.tokens.end)));
+            }
+        }
         while let Some((statement, end)) = scopes.pop() {
             match statement {
                 Statement::Declaration { name, tokens, .. } => {
@@ -110,7 +125,56 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
                 }
             }
         }
-        Ok((root, Some(body)))
+        Ok(())
+    }
+
+    /// Parse a GNU statement expression, `({ statements; value; })`, at its opening
+    /// parenthesis. Its last statement must be the expression that gives its value. No
+    /// statement may return: a `return` is modeled only as leaving a whole statement body.
+    pub(super) fn statement_expression(&mut self) -> Result<NodeId, SyntaxError> {
+        if self.statement_expressions >= MAX_STATEMENT_EXPRESSIONS {
+            return Err(self.error(
+                SyntaxErrorKind::BudgetExceeded,
+                format!(
+                    "statement expressions nest beyond the {MAX_STATEMENT_EXPRESSIONS}-level analysis budget"
+                ),
+            ));
+        }
+        self.statement_expressions += 1;
+        let start = self.tokens[self.position].index;
+        self.position += 2;
+        let mut statements = Vec::new();
+        while self.spelling() != Some("}") {
+            if self.spelling().is_none() {
+                return Err(
+                    self.error(SyntaxErrorKind::Statement, "a statement expression is not closed")
+                );
+            }
+            let parsed = self.statement(0, false, true)?;
+            if let Some((_, tokens)) = parsed.first_return {
+                return Err(SyntaxError {
+                    kind: SyntaxErrorKind::Statement,
+                    tokens,
+                    message: "a return inside a statement expression is not modeled".into(),
+                });
+            }
+            statements.push(parsed.statement);
+        }
+        self.position += 1;
+        self.expect(")")?;
+        self.statement_expressions -= 1;
+        let tokens = TokenRange { start, end: self.tokens[self.position - 1].index + 1 };
+        // With any other last statement, an empty one included, C gives the expression
+        // the type void.
+        let Some(Statement::Expression { expression: value, .. }) = statements.pop() else {
+            return Err(SyntaxError {
+                kind: SyntaxErrorKind::Statement,
+                tokens,
+                message: "a statement expression must end with the expression that is its value"
+                    .into(),
+            });
+        };
+        Ok(self.push(ExpressionKind::StatementExpression { statements, value }, tokens))
     }
 
     /// Parse an ordered block and derive first-return and all-paths-return metadata without

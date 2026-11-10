@@ -24,6 +24,9 @@ enum Returns<'a> {
     /// holding its body, converted to the function's C return type marker. A void
     /// function, without a marker, has no return statements.
     Inline(Option<&'a str>),
+    /// The statements of a statement expression, which the parser admits only without a
+    /// return.
+    Nowhere,
 }
 
 /// Lower an entire admitted statement body, preserving ordered effects and return context.
@@ -146,6 +149,16 @@ pub(super) fn render_inline(
     Ok(rust)
 }
 
+/// Lower the statements of a statement expression, in order, into the block that
+/// `renderer` opened for it and that its value closes.
+pub(super) fn render_nested(
+    statements: &[Statement],
+    renderer: &typed::Renderer<'_>,
+    rust: &mut String,
+) -> Result<(), SkipReason> {
+    render_statements(statements, renderer, Returns::Nowhere, rust)
+}
+
 /// Label of the block holding a translated inline function body; `return` breaks out of it.
 const INLINE_LABEL: &str = "__pgrx_c_inline";
 /// Prefix of the bindings holding a translated inline function's evaluated arguments.
@@ -218,6 +231,9 @@ fn render_statements(
                     Returns::Inline(None) => {
                         unreachable!("render refuses void bodies that contain a return")
                     }
+                    Returns::Nowhere => {
+                        unreachable!("the parser refuses a return inside a statement expression")
+                    }
                 }
                 .expect("String output");
                 renderer.render(*expression, typed::Context::Value, rust)?;
@@ -262,13 +278,10 @@ pub(super) fn guard(
     analysis: &MacroAnalysis,
     normalizer: Option<&str>,
 ) -> Result<Option<String>, SkipReason> {
-    let body = analysis
-        .expression
-        .as_ref()
-        .and_then(|expression| expression.syntax.statement_body.as_ref())
-        .expect("statement body");
-    let names = body
-        .walk()
+    let expression = analysis.expression.as_ref().expect("candidate expression");
+    let names = expression
+        .syntax
+        .statements()
         .filter_map(|statement| match statement {
             Statement::Declaration { name, .. } => Some(name.as_str()),
             _ => None,
@@ -279,7 +292,7 @@ pub(super) fn guard(
             analysis,
             crate::SkipReasonCode::BudgetExceeded,
             "C local-scope checking exceeds its 64-declaration bound",
-            Some(body.tokens),
+            expression.syntax.statement_body.as_ref().map(|body| body.tokens),
         ));
     }
     if names.is_empty() {
