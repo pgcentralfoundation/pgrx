@@ -51,6 +51,10 @@ impl TsConfig {
             oid.map(Self)
         })
         .catch_when(PgSqlErrorCode::ERRCODE_UNDEFINED_OBJECT, |_| None)
+        // Before Postgres 16, `regconfigin` raises `ERRCODE_UNDEFINED_SCHEMA` for a name whose
+        // schema does not exist. That code shares this variant's SQLSTATE. Later versions
+        // report the configuration as undefined instead.
+        .catch_when(PgSqlErrorCode::ERRCODE_INVALID_SCHEMA_NAME, |_| None)
         .catch_when(PgSqlErrorCode::ERRCODE_INVALID_NAME, |_| None)
         .catch_when(PgSqlErrorCode::ERRCODE_SYNTAX_ERROR, |_| None)
         .catch_when(PgSqlErrorCode::ERRCODE_FEATURE_NOT_SUPPORTED, |_| None)
