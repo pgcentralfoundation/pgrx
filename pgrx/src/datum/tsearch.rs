@@ -17,6 +17,7 @@
 mod construct;
 mod item;
 mod lexeme;
+mod rank;
 
 use crate::callconv::{Arg, ArgAbi};
 use crate::datum::{FromDatum, IntoDatum};
@@ -38,6 +39,7 @@ use std::panic::UnwindSafe;
 pub use construct::TsConfig;
 pub use item::{Item, Items, Operand, Operator, WeightSet};
 pub use lexeme::{InvalidWeight, Lexeme, Lexemes, Position, Weight};
+pub use rank::{RankNormalization, RankWeights};
 
 /// Size of the varlena header and the `size` field that precede the entries of both types.
 const HEADER_SIZE: usize = 8;

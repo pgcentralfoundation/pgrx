@@ -610,6 +610,63 @@ mod tests {
         assert_eq!(TsQueryBuf::from_websearch_text(text), current);
     }
 
+    fn sql_rank(query: &str) -> f32 {
+        Spi::get_one::<f32>(query).unwrap().unwrap()
+    }
+
+    #[pg_test]
+    fn ranking_matches_sql() {
+        use pgrx::datum::tsearch::{RankNormalization, RankWeights};
+
+        let v: TsVectorBuf = "a:1A,5 b:2B,3C c:4D,9 d:7".parse().unwrap();
+        let q: TsQueryBuf = "a & (b | c)".parse().unwrap();
+        let (vs, qs) = (v.to_string(), q.to_string());
+        let sql = |f: &str, args: &str| sql_rank(&format!("SELECT {f}({args})"));
+        let vq = format!("$${vs}$$::tsvector, $${qs}$$::tsquery");
+
+        assert_eq!(v.rank(&q), sql("ts_rank", &vq));
+        assert_eq!(v.rank_cd(&q), sql("ts_rank_cd", &vq));
+
+        let norm = RankNormalization::LOG_LENGTH | RankNormalization::UNIQUE_WORDS;
+        assert_eq!(v.rank_with(&q, None, norm), sql("ts_rank", &format!("{vq}, {}", norm.bits())));
+        let norm = RankNormalization::MEAN_DISTANCE | RankNormalization::RANK_PLUS_ONE;
+        assert_eq!(
+            v.rank_cd_with(&q, None, norm),
+            sql("ts_rank_cd", &format!("{vq}, {}", norm.bits()))
+        );
+
+        let w = RankWeights { a: 0.9, b: 0.5, c: 0.3, d: 0.05 };
+        let array = "'{0.05, 0.3, 0.5, 0.9}'::float4[]";
+        let norm = RankNormalization::LENGTH;
+        assert_eq!(
+            v.rank_with(&q, Some(w), norm),
+            sql("ts_rank", &format!("{array}, {vq}, {}", norm.bits()))
+        );
+        assert_eq!(
+            v.rank_cd_with(&q, Some(w), RankNormalization::default()),
+            sql("ts_rank_cd", &format!("{array}, {vq}, 0"))
+        );
+        assert_ne!(v.rank_with(&q, Some(w), norm), v.rank_with(&q, None, norm));
+    }
+
+    #[pg_test]
+    fn ranking_without_match_is_zero() {
+        let v: TsVectorBuf = "a:1".parse().unwrap();
+        let q: TsQueryBuf = "z".parse().unwrap();
+        assert_eq!(v.rank(&q), 0.0);
+        assert_eq!(v.rank_cd(&q), 0.0);
+    }
+
+    #[pg_test(error = "weight out of range")]
+    fn ranking_weight_above_one() {
+        use pgrx::datum::tsearch::{RankNormalization, RankWeights};
+
+        let v: TsVectorBuf = "a:1".parse().unwrap();
+        let q: TsQueryBuf = "a".parse().unwrap();
+        let w = RankWeights { a: 1.5, b: 0.0, c: 0.0, d: 0.0 };
+        v.rank_with(&q, Some(w), RankNormalization::default());
+    }
+
     #[pg_test]
     fn weight_labels() {
         assert_eq!(Weight::try_from('a'), Ok(Weight::A));
