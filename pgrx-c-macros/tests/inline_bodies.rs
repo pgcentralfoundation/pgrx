@@ -71,6 +71,12 @@ const TRANSLATED: &[&str] = &[
     "BODY_ORDER",
     // Only the conversion of its integer result is floating.
     "BODY_RETURN_FMA",
+    // libclang 15 and earlier report no tag for a record that only a typedef names.
+    "BODY_UNTAGGED",
+    // A header entered again after the function defines the macro again at the same place,
+    // and nothing was read while its `#undef` left the macro undefined.
+    "BODY_AGAIN_USE",
+    "BODY_AGAIN_REACHED",
     // A scalar member of a record value.
     "BODY_ARRAY_COUNT",
 ];
@@ -139,6 +145,12 @@ const NATIVE: &[&str] = &[
     "BODY_GUARDED_SECOND",
     // Trigraphs are not modeled.
     "BODY_TRIGRAPH_HASH",
+    // A macro defined again at the same place was undefined at the function, where its
+    // name is an enum constant.
+    "BODY_AGAIN_GAP_USE",
+    // The header reads a declaration while its `#undef` leaves the macro undefined, so the
+    // function could have been read there.
+    "BODY_AGAIN_SEEN_USE",
 ];
 
 /// Documented panic conditions of a cast, and of a native or indirect call.
@@ -287,7 +299,7 @@ fn translated_bodies_match_their_original_definitions() {
     // BODY_EARLY and BODY_ARRAY_SELECT are called twice and each other native root once,
     // BODY_ARRAY only by the translated BODY_ARRAY_COUNT. The translated BODY_RECURSIVE
     // calls itself natively once.
-    rust.push_str("const EXPECTED_GUARDS: usize = 38;\n");
+    rust.push_str("const EXPECTED_GUARDS: usize = 40;\n");
     rust.push_str("fn pure() -> i32 { BODY_MACRO!(1_i32).get() + BODY_CALLER!(1_i32).get() }\n");
     rust.push_str(include_str!("fixtures/inline_bodies.rs"));
     let profile = frontend.profile();

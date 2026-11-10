@@ -336,7 +336,17 @@ cannot be inferred from a declaration's name or broad type category:
    its last definition before the expansion and still be active at the end of
    the unit. Undefinitions are not recorded, so this is what proves the
    end-of-unit expansion identical, unless a `pop_macro` pragma restored a
-   definition that was undefined or replaced at the body. libclang records no
+   definition that was undefined or replaced at the body. A header entered
+   again may define such a macro again after the expansion, as Clang's
+   `<stddef.h>` defines `NULL` for each glibc header that sets `__need_NULL`;
+   without this, no body that reaches `NULL` would be translated on Linux. The
+   macro then needs its first definition before the expansion and every
+   recorded definition at one location, which gives them one replacement list.
+   It also must never have been undefined while the preprocessor read
+   anything: when any macro has two definitions, one driver pass with
+   `-E -dD` writes each executed `#define` and `#undef` among the unit's
+   tokens, and every `#undef` of the name must be followed by its `#define`
+   with only blank lines and line markers between them. libclang records no
    pragmas, so the text of every file in the unit is searched after removing its
    line splices, and so is every command-line `-D` definition, since a
    `_Pragma` in one pops wherever it is expanded. A name that a pop pragma names
@@ -1474,6 +1484,13 @@ operations, and validity-aware `MaybeUninit` transport when its ABI is proved;
 it does not thereby acquire a conversion from an arbitrary initialized Rust
 value. Incomplete records retain an opaque identity and cannot acquire
 complete-object size or value operations.
+
+A C record is paired with its Rust binding through its tag, a typedef that names
+it, or a field of a record already paired. Every qualified spelling of one
+declaration, such as `const BOX`, takes the pairing of that declaration.
+libclang 15 and earlier report no tag for a record that only a typedef names, so
+without this a `const BOX *` parameter had no binding there and its macro was
+skipped.
 
 Enums retain nominal C identity separately from compatible integer kind and
 Rust storage. Check each native Rust enum discriminant before enabling its

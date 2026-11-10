@@ -60,3 +60,66 @@ error[E0133]: call to unsafe function `pgrx::pg_sys::__pgrx_c_macros::expression
    |
    = note: consult the function's documentation for information on how to avoid undefined behavior
    = note: this error originates in the macro `$crate::newNode` which comes from the expansion of the macro `pg_sys::makeNode` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0133]: call to unsafe function `pgrx::__pgrx_c_generated::Inline_castNodeImpl` is unsafe and requires unsafe block
+  --> tests/compile-fail/c-macro-node-macros-need-unsafe.rs:25:5
+   |
+25 |     pg_sys::linitial_node!(pg_sys::Query, list).get()
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ call to unsafe function
+   |
+   = note: consult the function's documentation for information on how to avoid undefined behavior
+   = note: this error originates in the macro `$crate::linitial_node` which comes from the expansion of the macro `pg_sys::linitial_node` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0133]: call to unsafe function `pgrx::pg_sys::__pgrx_c_macros::expression::load` is unsafe and requires unsafe block
+  --> tests/compile-fail/c-macro-node-macros-need-unsafe.rs:25:5
+   |
+25 |     pg_sys::linitial_node!(pg_sys::Query, list).get()
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ call to unsafe function
+   |
+   = note: consult the function's documentation for information on how to avoid undefined behavior
+   = note: this error originates in the macro `$crate::linitial_node` which comes from the expansion of the macro `pg_sys::linitial_node` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0133]: call to unsafe function `pgrx::pg_sys::__pgrx_c_macros::expression::project` is unsafe and requires unsafe block
+  --> tests/compile-fail/c-macro-node-macros-need-unsafe.rs:25:5
+   |
+25 |     pg_sys::linitial_node!(pg_sys::Query, list).get()
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ call to unsafe function
+   |
+   = note: consult the function's documentation for information on how to avoid undefined behavior
+   = note: this error originates in the macro `$crate::linitial_node` which comes from the expansion of the macro `pg_sys::linitial_node` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0133]: call to unsafe function `pgrx::pg_sys::__pgrx_c_macros::expression::load` is unsafe and requires unsafe block
+  --> tests/compile-fail/c-macro-node-macros-need-unsafe.rs:25:5
+   |
+25 |     pg_sys::linitial_node!(pg_sys::Query, list).get()
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ call to unsafe function
+   |
+   = note: consult the function's documentation for information on how to avoid undefined behavior
+   = note: this error originates in the macro `$crate::list_nth_cell` which comes from the expansion of the macro `pg_sys::linitial_node` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0133]: call to unsafe function `pgrx::pg_sys::__pgrx_c_macros::expression::project` is unsafe and requires unsafe block
+  --> tests/compile-fail/c-macro-node-macros-need-unsafe.rs:25:5
+   |
+25 |     pg_sys::linitial_node!(pg_sys::Query, list).get()
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ call to unsafe function
+   |
+   = note: consult the function's documentation for information on how to avoid undefined behavior
+   = note: this error originates in the macro `$crate::list_nth_cell` which comes from the expansion of the macro `pg_sys::linitial_node` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0133]: call to unsafe function `pgrx::pg_sys::__pgrx_c_macros::expression::load` is unsafe and requires unsafe block
+  --> tests/compile-fail/c-macro-node-macros-need-unsafe.rs:25:5
+   |
+25 |     pg_sys::linitial_node!(pg_sys::Query, list).get()
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ call to unsafe function
+   |
+   = note: consult the function's documentation for information on how to avoid undefined behavior
+   = note: this error originates in the macro `$crate::list_nth_cell` which comes from the expansion of the macro `pg_sys::linitial_node` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0133]: call to unsafe function `pgrx::pg_sys::__pgrx_c_macros::expression::project` is unsafe and requires unsafe block
+  --> tests/compile-fail/c-macro-node-macros-need-unsafe.rs:25:5
+   |
+25 |     pg_sys::linitial_node!(pg_sys::Query, list).get()
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ call to unsafe function
+   |
+   = note: consult the function's documentation for information on how to avoid undefined behavior
+   = note: this error originates in the macro `$crate::list_nth_cell` which comes from the expansion of the macro `pg_sys::linitial_node` (in Nightly builds, run with -Z macro-backtrace for more info)

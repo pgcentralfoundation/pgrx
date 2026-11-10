@@ -322,10 +322,17 @@ impl<'a> Lowering<'a> {
 
     /// Record identities are anchored by compiler names/typedefs or a field of
     /// an already matched parent. Structurally similar standalone records never
-    /// establish interchangeable C identities.
+    /// establish interchangeable C identities. Every qualified spelling of one
+    /// declaration shares its anchor: libclang 15 and earlier report no tag for a
+    /// record that only a typedef names, so `const BOX` has no name to anchor it.
     fn index_records(&mut self) {
         let mut pending = VecDeque::new();
         let mut candidate_cache = BTreeMap::new();
+        let declarations = self.declarations;
+        let mut spellings = BTreeMap::<&str, Vec<&String>>::new();
+        for (canonical, record) in &declarations.records {
+            spellings.entry(record.identity.as_str()).or_default().push(canonical);
+        }
         for (canonical, record) in &self.declarations.records {
             if let Some(binding) =
                 record.name.as_ref().and_then(|name| self.bindings.records.get(name))
@@ -355,6 +362,11 @@ impl<'a> Lowering<'a> {
                 continue;
             }
             let Some(record) = self.declarations.records.get(&canonical) else { continue };
+            for &spelling in &spellings[record.identity.as_str()] {
+                if *spelling != canonical {
+                    pending.push_back((spelling.clone(), path.clone()));
+                }
+            }
             let Some(binding) = self.records_by_path.get(&path).copied() else { continue };
             if record.kind != binding.kind {
                 continue;
