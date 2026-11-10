@@ -23,7 +23,6 @@ use std::num::NonZeroUsize;
 use std::path::{Path, PathBuf};
 use std::process::Stdio;
 use std::sync::OnceLock;
-use std::time::Duration;
 
 #[cfg(not(target_os = "windows"))]
 static PROCESS_ENV_DENYLIST: &[&str] = &[
@@ -242,7 +241,7 @@ fn download_postgres(
     pgrx_home: &Path,
     init: &Init,
 ) -> eyre::Result<PgConfig> {
-    use crate::command::http_agent;
+    use crate::command::{download_with_retries, http_agent};
 
     println!(
         "{} Postgres v{} from {}",
@@ -256,7 +255,9 @@ fn download_postgres(
         // The archive is deleted with this directory once it is unpacked.
         let download_dir = tempfile::tempdir_in(pgrx_home)?;
         let archive = download_dir.path().join(url.rsplit_once('/').map_or(url, |(_, file)| file));
-        download_postgres_archive_with_retries(&http_client, url, &archive, &pg_config.version()?)?;
+        download_with_retries(&format!("Postgres v{}", pg_config.version()?), || {
+            download_postgres_archive_once(&http_client, url, &archive)
+        })?;
         untar(&archive, pgrx_home, pg_config, init)?
     };
     configure_postgres(pg_config, &pgdir, init)?;
@@ -264,43 +265,8 @@ fn download_postgres(
     make_install_postgres(pg_config, &pgdir, init) // returns a new PgConfig object
 }
 
-fn download_postgres_archive_with_retries(
-    http_client: &ureq::Agent,
-    url: &str,
-    archive: &Path,
-    pg_version: &str,
-) -> eyre::Result<()> {
-    let max_attempts = 4;
-    for failed_attempt in 1..=max_attempts {
-        match download_postgres_archive_once(http_client, url, archive) {
-            Ok(()) => return Ok(()),
-            Err(error) => {
-                if failed_attempt == max_attempts {
-                    return Err(error);
-                }
-
-                let retry_delay = match failed_attempt {
-                    1 => Duration::from_secs(1),
-                    2 => Duration::from_secs(2),
-                    3 => Duration::from_secs(4),
-                    _ => unreachable!("final attempt returns above"),
-                };
-
-                println!(
-                    "{} Postgres v{pg_version} download attempt {failed_attempt}/{max_attempts} failed; retrying in {}s: {}",
-                    "      Warning".bold().yellow(),
-                    retry_delay.as_secs(),
-                    download_error_summary(&error),
-                );
-                std::thread::sleep(retry_delay);
-            }
-        }
-    }
-
-    unreachable!("download attempt loop should return")
-}
-
-/// Writes the archive at `url` to `archive`, streaming it instead of holding it in memory.
+/// Writes the archive at `url` to `archive`, replacing any earlier attempt's partial file and
+/// streaming it instead of holding it in memory.
 fn download_postgres_archive_once(
     http_client: &ureq::Agent,
     url: &str,
@@ -328,10 +294,6 @@ fn download_postgres_status_error(url: &str, status: u16, body: &[u8]) -> eyre::
         url.yellow().bold(),
         String::from_utf8_lossy(body),
     )
-}
-
-fn download_error_summary(error: &eyre::Report) -> String {
-    error.to_string().lines().next().unwrap_or("unknown download error").to_owned()
 }
 
 fn untar(
@@ -766,16 +728,4 @@ pub(crate) fn initdb(bindir: &Path, datadir: &Path) -> eyre::Result<()> {
     }
 
     Ok(())
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn download_error_summary_keeps_retry_warning_single_line() {
-        let error = eyre!("first line\nsecond line");
-
-        assert_eq!(download_error_summary(&error), "first line");
-    }
 }
