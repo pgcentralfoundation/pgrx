@@ -256,7 +256,7 @@ jobs:
       - name: Run universal macOS binding build harness
         if: matrix.platform == 'macos' && contains(needs.plan.outputs.crates, 'pgrx-bindgen')
         run: |
-          rustup target add aarch64-apple-darwin x86_64-apple-darwin
+          tools/ci/retry.sh rustup target add aarch64-apple-darwin x86_64-apple-darwin
           cargo test --locked --package pgrx-bindgen --test macro_build \
             universal_macos_installations_build_both_slices -- --include-ignored --exact --test-threads=1
 
@@ -317,7 +317,7 @@ jobs:
           grep -q 'on aarch64' "$server/pg_config.h" || { echo "fetched headers are not aarch64"; exit 1; }
           echo "server=$server" >> "$GITHUB_OUTPUT"
           sudo apt-get install -y -qq --no-install-recommends crossbuild-essential-arm64 > /dev/null
-          rustup target add aarch64-unknown-linux-gnu
+          tools/ci/retry.sh rustup target add aarch64-unknown-linux-gnu
       # Only this step sees the target headers; tests elsewhere check that builds without them
       # refuse. Build scripts still generate bindings and C macros from the aarch64 headers and
       # compile the aarch64 C shim; checking skips only Rust code generation and linking, which
@@ -347,7 +347,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: tools/ci/setup.sh
-      - run: rustup toolchain install "$MIRI_TOOLCHAIN" --profile minimal --component miri,rust-src,rustfmt
+      - run: tools/ci/retry.sh rustup toolchain install "$MIRI_TOOLCHAIN" --profile minimal --component miri,rust-src,rustfmt
       - uses: Swatinem/rust-cache@v2
         with:
           shared-key: miri
@@ -485,7 +485,7 @@ jobs:
       - name: Fetch every locked crate and set up the aarch64 cross build
         run: |
           cargo fetch --locked
-          rustup target add aarch64-unknown-linux-gnu
+          tools/ci/retry.sh rustup target add aarch64-unknown-linux-gnu
           sudo apt-get install -y -qq --no-install-recommends crossbuild-essential-arm64 > /dev/null
       - name: Run the binding build harnesses
         env:
@@ -671,7 +671,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: tools/ci/setup.sh
-      - run: rustup toolchain install beta --profile minimal --component rustfmt && rustc --version
+      - run: tools/ci/retry.sh rustup toolchain install beta --profile minimal --component rustfmt && rustc --version
       - uses: Swatinem/rust-cache@v2
         with:
           shared-key: beta
@@ -729,7 +729,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: tools/ci/setup.sh
-      - run: rustup toolchain install nightly --profile minimal --component rustfmt
+      - run: tools/ci/retry.sh rustup toolchain install nightly --profile minimal --component rustfmt
       - uses: Swatinem/rust-cache@v2
         with:
           shared-key: docsrs

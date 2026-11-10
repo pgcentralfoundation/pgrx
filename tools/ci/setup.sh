@@ -64,7 +64,10 @@ components=(--component rustfmt)
 for component in ${RUST_COMPONENTS:-}; do
     components+=(--component "$component")
 done
-rustup toolchain install "$toolchain" --profile minimal --no-self-update "${components[@]}"
+# rustup retries a failed component download itself, but not the channel manifest it fetches
+# first.
+tools/ci/retry.sh rustup toolchain install "$toolchain" --profile minimal --no-self-update \
+    "${components[@]}"
 
 # Dependencies build without debuginfo, which would only enlarge the cache and slow linking.
 # Workspace crates keep the workspace profile's line tables for backtraces, except on Windows.
@@ -95,14 +98,8 @@ configs=()
 # job until its time limit. apt-get gives up on a connection that is silent for 30 seconds
 # and tries each download three more times; a failed run is tried three times in all.
 apt_get() {
-    local attempt=1
-    until sudo apt-get -o Acquire::Retries=3 -o Acquire::http::Timeout=30 \
-        -o Acquire::https::Timeout=30 -o DPkg::Lock::Timeout=120 "$@"; do
-        (( attempt < 3 )) || return 1
-        echo "retrying apt-get $1 after attempt $attempt failed" >&2
-        sleep $((attempt * 10))
-        attempt=$((attempt + 1))
-    done
+    tools/ci/retry.sh sudo apt-get -o Acquire::Retries=3 -o Acquire::http::Timeout=30 \
+        -o Acquire::https::Timeout=30 -o DPkg::Lock::Timeout=120 "$@"
 }
 
 setup_linux() {
