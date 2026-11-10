@@ -37,7 +37,7 @@ jobs:
       pg: ${{ steps.plan.outputs.pg }}
       crates: ${{ steps.plan.outputs.crates }}
       miri: ${{ steps.plan.outputs.miri }}
-      cmacros_clang14: ${{ steps.plan.outputs.cmacros_clang14 }}
+      clang: ${{ steps.plan.outputs.clang }}
       bindgen_harness: ${{ steps.plan.outputs.bindgen_harness }}
       ui: ${{ steps.plan.outputs.ui }}
       bench: ${{ steps.plan.outputs.bench }}
@@ -365,23 +365,40 @@ jobs:
           MIRIFLAGS=-Zmiri-strict-provenance cargo "+$MIRI_TOOLCHAIN" miri test --package pgrx \
             --features "pg$PG_VER" --no-default-features --lib varlena
 
-  # The other jobs load the newest libclang that they install; only this one covers Ubuntu
-  # 22.04's own Clang 14 for the C macro generator's tests.
-  cmacros-clang14:
-    name: pgrx-c-macros with Clang 14
+  # A libclang that cannot analyze a macro makes the generator skip it, which no test run under
+  # that libclang can see. So every Clang major runs the generator's tests, generates each
+  # PostgreSQL version's macros and tests PostgreSQL 18's, on both Linux architectures, and
+  # clang-compare then requires the majors to have generated the same macros. Ubuntu 22.04
+  # has Clang 14 and 15, Ubuntu 24.04 has 14 to 20, and apt.llvm.org has the rest for both
+  # architectures, so no major is left out. 23 is the newest release there.
+  clang:
+    name: ${{ matrix.platform }} Clang ${{ matrix.clang }} C macros
     needs: plan
-    if: needs.plan.outputs.cmacros_clang14 == 'true'
-    runs-on: ubuntu-22.04
+    if: needs.plan.outputs.clang == 'true'
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [linux-x64, linux-arm64]
+        clang: [14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+        include:
+          - { platform: linux-x64, os: ubuntu-22.04 }
+          - { platform: linux-arm64, os: ubuntu-24.04-arm }
     env:
-      CLANG_VER: 14
+      CLANG_VER: ${{ matrix.clang }}
+      PG_HEADER_VERS: 15 16 17 18 19
     steps:
       - uses: actions/checkout@v4
-      - run: tools/ci/setup.sh
+      - name: Set up Rust, Clang ${{ matrix.clang }} and the PostgreSQL headers
+        run: tools/ci/setup.sh
+      # An architecture's cells share the cache that its Clang 21 cell saves on pushes to
+      # develop. The Clang version changes none of the third-party crates but clang-sys.
       - uses: Swatinem/rust-cache@v2
         with:
-          shared-key: cmacros-clang14
-          save-if: ${{ env.SAVE_RUST_CACHE == 'true' }}
+          shared-key: clang-${{ matrix.platform }}
+          cache-bin: "false"
+          save-if: ${{ env.SAVE_RUST_CACHE == 'true' && matrix.clang == 21 }}
       - name: Restore cargo-nextest
         id: nextest
         uses: actions/cache@v4
@@ -393,7 +410,60 @@ jobs:
         uses: taiki-e/install-action@v2
         with:
           tool: cargo-nextest
-      - run: cargo nextest run --locked --no-fail-fast --package pgrx-c-macros
+      - name: Test the C macro generator
+        id: generator
+        run: cargo nextest run --locked --no-fail-fast --package pgrx-c-macros
+      # The later steps run even when a test step failed, so one run shows everything a
+      # Clang breaks. PostgreSQL 18 builds last, for the tests that follow.
+      - name: Generate every PostgreSQL version's macros
+        if: ${{ !cancelled() && steps.generator.conclusion != 'skipped' }}
+        run: |
+          cargo build --locked -p pgrx-ci
+          target/debug/pgrx-ci macro-summaries --clang "$CLANG_VER" \
+            --out "$RUNNER_TEMP/macro-summaries" 15 16 17 19 18
+      - name: Test the generated PostgreSQL 18 macros
+        if: ${{ !cancelled() && steps.generator.conclusion != 'skipped' }}
+        run: cargo test --locked --package pgrx-pg-sys --features pg18 --no-default-features
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() && steps.generator.conclusion != 'skipped' }}
+        with:
+          name: macro-summaries-${{ matrix.platform }}-clang${{ matrix.clang }}
+          path: ${{ runner.temp }}/macro-summaries
+          if-no-files-found: error
+          retention-days: 7
+
+  # Fails when a macro is generated under one Clang major and skipped under another, or is
+  # generated with a different safety or calling contract; see tools/ci/src/macros.rs. It runs
+  # even when a cell failed, to compare the summaries that the other cells uploaded.
+  clang-compare:
+    name: C macros agree across Clang versions
+    needs: [plan, clang]
+    if: ${{ !cancelled() && needs.plan.outputs.clang == 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: macro-summaries-*
+          path: ${{ runner.temp }}/macro-summaries
+      # The plan job built and cached this run's driver.
+      - name: Restore the CI driver
+        id: driver
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/pgrx-ci
+          key: pgrx-ci-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('tools/ci/**', 'Cargo.lock', 'rust-toolchain.toml') }}
+      - name: Build the CI driver
+        if: steps.driver.outputs.cache-hit != 'true'
+        run: |
+          tools/ci/setup.sh
+          cargo build --locked -p pgrx-ci
+          mkdir -p "$RUNNER_TEMP/pgrx-ci"
+          cp target/debug/pgrx-ci "$RUNNER_TEMP/pgrx-ci/"
+      - name: Compare the macros each Clang generated
+        run: |
+          "$RUNNER_TEMP/pgrx-ci/pgrx-ci" macro-compare "$RUNNER_TEMP/macro-summaries"
 
   # These build isolated fixture crates with synthetic headers, so one job covers them.
   bindgen-harness:

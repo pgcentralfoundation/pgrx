@@ -94,7 +94,9 @@ enum Subjects {
 const JOBS: &[(&str, Subjects)] = &[
     // Miri checks pointer provenance in pgrx-pg-sys's Datum and pgrx's fcinfo and varlena.
     ("miri", Subjects::Packages(&["pgrx-pg-sys", "pgrx"])),
-    ("cmacros_clang14", Subjects::Packages(&["pgrx-c-macros"])),
+    // Every supported Clang runs the generator's tests, generates pgrx-pg-sys's macros
+    // through pgrx-bindgen's build script and runs pgrx-pg-sys's tests of them.
+    ("clang", Subjects::Packages(&["pgrx-c-macros", "pgrx-bindgen", "pgrx-pg-sys"])),
     ("bindgen_harness", Subjects::Packages(&["pgrx-bindgen"])),
     ("ui", Subjects::Packages(&["pgrx-unit-tests"])),
     ("bench", Subjects::Packages(&["benching", "pgrx-bench"])),
@@ -648,6 +650,7 @@ mod tests {
         assert_eq!(output(&plan, &graph, "pg"), "arrays pgrx-tests pgrx-unit-tests");
         assert_eq!(output(&plan, &graph, "crates"), "cargo-pgrx");
         assert_eq!(output(&plan, &graph, "miri"), "false");
+        assert_eq!(output(&plan, &graph, "clang"), "false");
         assert_eq!(output(&plan, &graph, "docsrs"), "false");
     }
 
@@ -681,7 +684,7 @@ mod tests {
         let plan = Plan::new(&graph, Some(&files(&["pgrx-c-macros/tests/call_oracle.rs"])));
         assert_eq!(output(&plan, &graph, "pg"), "");
         assert_eq!(output(&plan, &graph, "crates"), "pgrx-c-macros");
-        assert_eq!(output(&plan, &graph, "cmacros_clang14"), "true");
+        assert_eq!(output(&plan, &graph, "clang"), "true");
         assert_eq!(output(&plan, &graph, "package"), "false");
         // pgrx-pg-sys's tests include pgrx-c-macros' oracle support.
         let plan = Plan::new(&graph, Some(&files(&["pgrx-c-macros/tests/support/oracle.rs"])));
@@ -698,8 +701,26 @@ mod tests {
         let plan = Plan::new(&graph, Some(&files(&["pgrx-pg-sys/src/c_macros/support.rs"])));
         assert!(plan.affected.contains("pgrx-pg-sys"));
         assert_eq!(output(&plan, &graph, "crates"), "cargo-pgrx pgrx-c-macros");
-        assert_eq!(output(&plan, &graph, "cmacros_clang14"), "true");
+        assert_eq!(output(&plan, &graph, "clang"), "true");
         assert_eq!(output(&plan, &graph, "bindgen_harness"), "false");
+    }
+
+    #[test]
+    fn the_clang_jobs_follow_the_generator_and_the_bindings() {
+        let graph = graph();
+        for path in [
+            "pgrx-pg-config/src/lib.rs",
+            "pgrx-bindgen/src/build.rs",
+            "pgrx-pg-sys/tests/oracle.rs",
+            "pgrx-macros/src/lib.rs",
+        ] {
+            let plan = Plan::new(&graph, Some(&files(&[path])));
+            assert_eq!(output(&plan, &graph, "clang"), "true", "{path}");
+        }
+        for path in ["pgrx/src/lib.rs", "pgrx-tests/src/lib.rs"] {
+            let plan = Plan::new(&graph, Some(&files(&[path])));
+            assert_eq!(output(&plan, &graph, "clang"), "false", "{path}");
+        }
     }
 
     #[test]

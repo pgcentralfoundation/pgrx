@@ -9,6 +9,8 @@
 #
 # Environment:
 #   PG_VER           PostgreSQL major version to install and configure; empty installs none
+#   PG_HEADER_VERS   Linux only: more PostgreSQL major versions, separated by spaces, to
+#                    configure for builds. Only their server headers and pg_config are installed.
 #   CLANG_VER        Linux only: the Clang whose libclang the build loads. Empty installs the
 #                    distribution's Clang when PG_VER is set, and none otherwise.
 #   RUST_COMPONENTS  extra rustup components, separated by spaces
@@ -86,9 +88,12 @@ EOF
 fi
 
 pg_config=""
+# The `pgNN = 'path'` lines of PGRX_HOME's config.toml.
+configs=()
 
 setup_linux() {
-    local codename packages=()
+    local codename version versions packages=()
+    read -ra versions <<< "${PG_VER:-} ${PG_HEADER_VERS:-}"
     codename="$(. /etc/os-release && echo "$VERSION_CODENAME")"
 
     if [[ -n "${CLANG_VER:-}" ]]; then
@@ -102,11 +107,11 @@ setup_linux() {
         # The build loads the newest libclang it finds unless told which one to use.
         github_env "LIBCLANG_PATH=/usr/lib/llvm-$CLANG_VER/lib"
         github_env "CLANG_PATH=/usr/bin/clang-$CLANG_VER"
-    elif [[ -n "${PG_VER:-}" ]]; then
+    elif (( ${#versions[@]} )); then
         packages+=(clang libclang-dev llvm-dev)
     fi
 
-    if [[ -n "${PG_VER:-}" ]]; then
+    if (( ${#versions[@]} )); then
         local repo="https://apt.postgresql.org/pub/repos/apt"
         local key="/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc"
         sudo install -d "$(dirname "$key")" /etc/postgresql-common/createcluster.d
@@ -116,11 +121,16 @@ setup_linux() {
         echo "create_main_cluster = false" \
             | sudo tee /etc/postgresql-common/createcluster.d/ci.conf > /dev/null
         {
-            echo "deb [signed-by=$key] $repo $codename-pgdg main $PG_VER"
+            echo "deb [signed-by=$key] $repo $codename-pgdg main ${versions[*]}"
             # Beta and release-candidate packages live in the snapshot repository.
-            echo "deb [signed-by=$key] $repo $codename-pgdg-snapshot main $PG_VER"
+            echo "deb [signed-by=$key] $repo $codename-pgdg-snapshot main ${versions[*]}"
         } | sudo tee /etc/apt/sources.list.d/pgdg.list > /dev/null
-        packages+=("postgresql-$PG_VER" "postgresql-server-dev-$PG_VER")
+        if [[ -n "${PG_VER:-}" ]]; then
+            packages+=("postgresql-$PG_VER")
+        fi
+        for version in "${versions[@]}"; do
+            packages+=("postgresql-server-dev-$version")
+        done
     fi
 
     if (( ${#packages[@]} )); then
@@ -133,6 +143,10 @@ setup_linux() {
         sudo chmod a+rwx "$("$pg_config" --pkglibdir)" "$("$pg_config" --sharedir)/extension" \
             /var/run/postgresql
     fi
+    # postgresql-server-dev-NN depends on the client package, which holds pg_config.
+    for version in ${PG_HEADER_VERS:-}; do
+        configs+=("pg$version = '/usr/lib/postgresql/$version/bin/pg_config'")
+    done
 }
 
 setup_macos() {
@@ -189,14 +203,18 @@ setup_windows() {
 
 if [[ -n "$pg_config" ]]; then
     "$pg_config" --version
+    github_env "PG_CONFIG=$pg_config"
+    # A TOML literal string keeps a Windows path as it is.
+    configs+=("pg$PG_VER = '$pg_config'")
+fi
+
+if (( ${#configs[@]} )); then
     pgrx_home="$RUNNER_TEMP/pgrx-home"
     if [[ "$platform" == windows ]]; then
         pgrx_home="$(cygpath -m "$pgrx_home")"
     fi
     mkdir -p "$pgrx_home"
     github_env "PGRX_HOME=$pgrx_home"
-    github_env "PG_CONFIG=$pg_config"
-    # A TOML literal string keeps a Windows path as it is.
-    printf "[configs]\npg%s = '%s'\n" "$PG_VER" "$pg_config" > "$pgrx_home/config.toml"
+    printf '%s\n' "[configs]" "${configs[@]}" > "$pgrx_home/config.toml"
     cat "$pgrx_home/config.toml"
 fi
