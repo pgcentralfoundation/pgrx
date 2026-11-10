@@ -20,9 +20,8 @@ fn make_node_allocates() -> *mut pg_sys::Query {
     pg_sys::makeNode!(pg_sys::Query).get()
 }
 
-// The list macros read a cell of the caller's list and then check its node as `castNode` does.
-fn list_macros_read_their_list(list: *mut pg_sys::List) -> *mut pg_sys::Query {
-    pg_sys::linitial_node!(pg_sys::Query, list).get()
-}
+// The list macros need `unsafe` too. Their diagnostics name the list functions they reach,
+// which a platform's headers decide whether to translate, so `pgrx-pg-sys`'s `node_macros`
+// test pins them instead.
 
 fn main() {}
