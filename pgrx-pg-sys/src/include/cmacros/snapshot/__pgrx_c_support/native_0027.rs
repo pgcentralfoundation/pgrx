@@ -1,5 +1,46 @@
 // Shared generated C macro support.
 
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::HashPath {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_HashPath as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::HashState {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::HashState {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_HashState as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::IdentifySystemCmd {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::IdentifySystemCmd {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_IdentifySystemCmd as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::ImportForeignSchemaStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::ImportForeignSchemaStmt {
+    const VALUE: c::CValue<c::CInt> = c::CValue::<c::CInt>::new(
+        crate::__pgrx_c_bindings::NodeTag::T_ImportForeignSchemaStmt as i32,
+    );
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::IncrementalSort {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::IncrementalSort {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_IncrementalSort as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::IncrementalSortPath {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::IncrementalSortPath {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_IncrementalSortPath as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::IncrementalSortState {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::IncrementalSortState {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_IncrementalSortState as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::IndexAmRoutine {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::IndexAmRoutine {
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_IndexAmRoutine as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::IndexClause {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::IndexClause {
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_IndexClause as i32);
@@ -5951,46 +5992,3 @@ unsafe impl c::expression::OrdinaryField<Field_attnum>
     type Declared = FieldReadWrite;
     const OFFSET: usize = 74;
 }
-#[cfg(any(feature = "pg16", feature = "pg17"))]
-const _: () = assert!(
-    ::core::mem::offset_of!(crate::__pgrx_c_bindings::FormData_pg_attribute, attcacheoff) == 76
-);
-#[cfg(any(feature = "pg16", feature = "pg17"))]
-// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
-unsafe impl c::expression::OrdinaryField<Field_attcacheoff>
-    for c::expression::CRecord<crate::__pgrx_c_bindings::FormData_pg_attribute>
-{
-    type Member = c::CInt;
-    type Declared = FieldReadWrite;
-    const OFFSET: usize = 76;
-}
-#[cfg(any(feature = "pg16", feature = "pg17"))]
-const _: () = assert!(
-    ::core::mem::offset_of!(crate::__pgrx_c_bindings::FormData_pg_attribute, atttypmod) == 80
-);
-#[cfg(any(feature = "pg16", feature = "pg17"))]
-// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
-unsafe impl c::expression::OrdinaryField<Field_atttypmod>
-    for c::expression::CRecord<crate::__pgrx_c_bindings::FormData_pg_attribute>
-{
-    type Member = c::CInt;
-    type Declared = FieldReadWrite;
-    const OFFSET: usize = 80;
-}
-#[cfg(any(feature = "pg16", feature = "pg17"))]
-const _: () = assert!(
-    ::core::mem::offset_of!(crate::__pgrx_c_bindings::FormData_pg_attribute, attndims) == 84
-);
-#[cfg(any(feature = "pg16", feature = "pg17"))]
-// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
-unsafe impl c::expression::OrdinaryField<Field_attndims>
-    for c::expression::CRecord<crate::__pgrx_c_bindings::FormData_pg_attribute>
-{
-    type Member = c::CShort;
-    type Declared = FieldReadWrite;
-    const OFFSET: usize = 84;
-}
-#[cfg(any(feature = "pg16", feature = "pg17"))]
-const _: () = assert!(
-    ::core::mem::offset_of!(crate::__pgrx_c_bindings::FormData_pg_attribute, attbyval) == 86
-);

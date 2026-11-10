@@ -578,36 +578,6 @@ impl c::expression::NativeFunctionSignature
 const _: () = assert!(
     ::core::mem::size_of::<
         ::core::option::Option<
-            unsafe extern "C-unwind" fn(*const ::core::ffi::c_void) -> *mut ::core::ffi::c_void,
-        >,
-    >() == 8
-);
-#[cfg(feature = "pg19")]
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(*const ::core::ffi::c_void) -> *mut ::core::ffi::c_void,
-        >,
-    >() == 8
-);
-#[cfg(feature = "pg19")]
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_void__0p__0l__const__void__0p__0r;
-#[cfg(feature = "pg19")]
-impl c::sealed::Sealed for Signature_void__0p__0l__const__void__0p__0r {}
-#[cfg(feature = "pg19")]
-impl c::expression::NativeFunctionSignature for Signature_void__0p__0l__const__void__0p__0r {
-    type Physical = PhysicalFunction_C_unwind_1<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(*const ::core::ffi::c_void) -> *mut ::core::ffi::c_void,
-        >,
-    >;
-}
-#[cfg(feature = "pg19")]
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<
             unsafe extern "C-unwind" fn(
                 *mut crate::__pgrx_c_bindings::PlannerInfo,
                 i32,
@@ -5975,3 +5945,19 @@ unsafe impl c::expression::OrdinaryField<Field_location>
     type Declared = FieldReadWrite;
     const OFFSET: usize = 64;
 }
+#[cfg(feature = "pg19")]
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<
+    crate::__pgrx_c_bindings::IndexElem,
+    <<c::expression::CRecord<crate::__pgrx_c_bindings::IndexElem> as c::expression::OrdinaryField<
+        Field_location,
+    >>::Member as c::expression::CType>::Storage,
+> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).location) };
+#[cfg(feature = "pg19")]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::IndexFetchHeapData>() == 32);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::IndexFetchHeapData>() == 8);
+};
+#[cfg(feature = "pg19")]
+const _: () =
+    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::IndexFetchHeapData, xs_cbuf) == 16);

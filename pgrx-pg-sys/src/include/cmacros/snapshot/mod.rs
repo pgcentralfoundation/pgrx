@@ -5,7 +5,7 @@
 // pg16 documentation shells: 1686 value, 86 unit, 52 diverging, 0 untyped
 // pg17 documentation shells: 1743 value, 88 unit, 52 diverging, 0 untyped
 // pg18 documentation shells: 1780 value, 85 unit, 52 diverging, 0 untyped
-// pg19 documentation shells: 1855 value, 86 unit, 53 diverging, 0 untyped
+// pg19 documentation shells: 1854 value, 86 unit, 53 diverging, 0 untyped
 /// Expansion of every documentation-snapshot shell. Real C macros are generated for each build.
 ///
 /// Typed arms name the real macro's result type behind `if false`; every arm panics if run.
@@ -2017,7 +2017,6 @@ macro_rules! __pgrx_c_classify_version {
     (@if_available bmw_popcount { $($items:tt)* }) => { $($items)* };
     (@if_available bmw_rightmost_one_pos { $($items:tt)* }) => { $($items)* };
     (@if_available clause_sides_match_join { $($items:tt)* }) => { $($items)* };
-    (@if_available copyObject { $($items:tt)* }) => { $($items)* };
     (@if_available dclist_count { $($items:tt)* }) => { $($items)* };
     (@if_available dclist_delete_from { $($items:tt)* }) => { $($items)* };
     (@if_available dclist_delete_from_thoroughly { $($items:tt)* }) => { $($items)* };
@@ -2846,7 +2845,7 @@ macro_rules! __pgrx_c_classify_version {
 const _: () = ::core::assert!(
     ::core::matches!(
         crate::__pgrx_c_bindings::__PGRX_GENERATION.as_bytes(),
-        b"5024018bffbd166f7d8a4100d60159bac3563a54088f1a75b954e41b16542207"
+        b"bf2b0ef382c0ebabbb4e006e5f65edc408443fefad5a718d8ef2e0fa5f1afa67"
     ),
     "the documentation snapshot was generated with bindings other than src/include/pg15.rs; regenerate them together"
 );
@@ -2854,7 +2853,7 @@ const _: () = ::core::assert!(
 const _: () = ::core::assert!(
     ::core::matches!(
         crate::__pgrx_c_bindings::__PGRX_GENERATION.as_bytes(),
-        b"8c09a833369df5b90ac584777f92b89f53640aaf626307a69df2e0173ba84a87"
+        b"e62d692d9ef342799640fc7de840265044a6c2c896226afadc6cf3d1626553ff"
     ),
     "the documentation snapshot was generated with bindings other than src/include/pg16.rs; regenerate them together"
 );
@@ -2862,7 +2861,7 @@ const _: () = ::core::assert!(
 const _: () = ::core::assert!(
     ::core::matches!(
         crate::__pgrx_c_bindings::__PGRX_GENERATION.as_bytes(),
-        b"187948a408850cc3c2cd9a05aa2a1a4fb465937f4579434d270c191e35bf0cec"
+        b"1670255202862b1a3e262157e6a4ce7868266681cdb01b487558c42bc47e41e6"
     ),
     "the documentation snapshot was generated with bindings other than src/include/pg17.rs; regenerate them together"
 );
@@ -2870,7 +2869,7 @@ const _: () = ::core::assert!(
 const _: () = ::core::assert!(
     ::core::matches!(
         crate::__pgrx_c_bindings::__PGRX_GENERATION.as_bytes(),
-        b"2ace24f4866a33cd74864f4eead19ecf4c3f192438167dce191a80fed684dd6c"
+        b"0aaa8025cf6946155a2f2c7ba28ec4ca2b8d340a10ea0198a704b5d1c5470599"
     ),
     "the documentation snapshot was generated with bindings other than src/include/pg18.rs; regenerate them together"
 );
@@ -2878,7 +2877,7 @@ const _: () = ::core::assert!(
 const _: () = ::core::assert!(
     ::core::matches!(
         crate::__pgrx_c_bindings::__PGRX_GENERATION.as_bytes(),
-        b"919e3d588cdaed946b2a14032276ebf78ad3d8265655133d4294bc35b3b4b794"
+        b"c43bec3bd1cc4841a394ac22597f8f6c8186d93ec445f0a14108021ee7c703f7"
     ),
     "the documentation snapshot was generated with bindings other than src/include/pg19.rs; regenerate them together"
 );

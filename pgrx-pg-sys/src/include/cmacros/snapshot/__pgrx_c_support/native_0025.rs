@@ -1,5 +1,38 @@
 // Shared generated C macro support.
 
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::xl_clog_truncate, <<c::expression::CRecord<crate::__pgrx_c_bindings::xl_clog_truncate> as c::expression::OrdinaryField<Field_oldestXactDb>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).oldestXactDb) };
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
+#[doc(hidden)]
+pub struct Field_timestamp;
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::xl_commit_ts_set>() == 16);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::xl_commit_ts_set>() == 8);
+};
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::xl_commit_ts_set {}
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
+const _: () =
+    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::xl_commit_ts_set, timestamp) == 0);
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_timestamp>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::xl_commit_ts_set>
+{
+    type Member = c::CLong;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 0;
+}
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::xl_commit_ts_set, <<c::expression::CRecord<crate::__pgrx_c_bindings::xl_commit_ts_set> as c::expression::OrdinaryField<Field_timestamp>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).timestamp) };
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
+#[doc(hidden)]
+pub struct Field_nodeid;
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
+const _: () =
+    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::xl_commit_ts_set, nodeid) == 8);
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
 // SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
 unsafe impl c::expression::OrdinaryField<Field_nodeid>
@@ -4111,49 +4144,3 @@ const _: () = {
     assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::xl_seq_rec>() == 4);
 };
 impl c::expression::NativeRecord for crate::__pgrx_c_bindings::xl_seq_rec {}
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::xl_hash_update_meta_page>() == 8);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::xl_hash_update_meta_page>() == 8);
-};
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::xl_hash_update_meta_page {}
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::varatt_indirect>() == 8);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::varatt_indirect>() == 8);
-};
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::varatt_indirect {}
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::varatt_expanded>() == 8);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::varatt_expanded>() == 8);
-};
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::varatt_expanded {}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::tzEntry {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::tzEntry {
-    type Marker = c::expression::COpaque<Self>;
-}
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::slist_iter>() == 8);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::slist_iter>() == 8);
-};
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::slist_iter {}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::shm_toc {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::shm_toc {
-    type Marker = c::expression::COpaque<Self>;
-}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::shm_mq_handle {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::shm_mq_handle {
-    type Marker = c::expression::COpaque<Self>;
-}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::shm_mq {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::shm_mq {
-    type Marker = c::expression::COpaque<Self>;
-}
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::relopt_real>() == 56);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::relopt_real>() == 8);
-};
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::relopt_real {}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::pg_tzenum {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::pg_tzenum {
-    type Marker = c::expression::COpaque<Self>;
-}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::pg_tz {}
