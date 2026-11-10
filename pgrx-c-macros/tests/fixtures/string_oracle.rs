@@ -72,8 +72,9 @@ fn main() {
         let expected_line = line!() + 1;
         STRING_DIAGNOSTIC_MULTI!(first, (* second));
         string_diagnostics(concat!(file!(), "\0").as_ptr().cast(), expected_line as i32);
+        // The argument is unused, so Rust checks it in dead code without evaluating it.
         let expected_line = line!() + 1;
-        STRING_TEXT_FORMAL!(undefined);
+        STRING_TEXT_FORMAL!(panic!("an unused operand is not evaluated"));
         string_diagnostics(concat!(file!(), "\0").as_ptr().cast(), expected_line as i32);
         evaluations.set(0);
         let expected_line = line!() + 1;

@@ -21,7 +21,6 @@ use crate::{
 };
 use serde::Serialize;
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
-use std::io::Read;
 use std::path::{Path, PathBuf};
 
 /// Retain readable object-macro symbols only after independent atomicity, type, value, and
@@ -176,6 +175,9 @@ pub enum ExpansionSkipCode {
     CompilerRejected,
     /// Compiler output lacks complete, unambiguous probe boundaries or proof diagnostics.
     UnrecognizedOutput,
+    /// Assert-enabled and release PostgreSQL define the macro, or one it expands, in ways no
+    /// single definition serves, so neither build flavor generates it.
+    BuildFlavor,
 }
 
 /// Limits apply to source construction, dependency inspection, and expanded output.
@@ -367,23 +369,8 @@ pub(crate) fn prepare_inner_with_objects(
                 continue;
             }
         };
-        if active.definition.tokens[body_start..]
-            .iter()
-            .any(|token| matches!(token.spelling.as_str(), "#" | "%:"))
-        {
-            record_skip(
-                &mut results,
-                &name,
-                skip(
-                    ExpansionSkipCode::Stringification,
-                    "root stringification requires a C preprocessing operand-spelling contract",
-                    Some(&name),
-                    frontend,
-                ),
-                frontend,
-            );
-            continue;
-        }
+        // A stringified root formal becomes a stringification of the Rust invocation's
+        // tokens, which analysis admits only as diagnostic text, as for a dependency.
         let (closure, pastes) = match dependencies.closure(active_name) {
             Ok(closure) => closure,
             Err(reason) => {
@@ -391,6 +378,14 @@ pub(crate) fn prepare_inner_with_objects(
                 continue;
             }
         };
+        if let Some(reason) = flavor_conflict(
+            frontend,
+            std::iter::once(name.as_str())
+                .chain(closure.iter().map(|dependency| dependency.name.as_str())),
+        ) {
+            record_skip(&mut results, &name, reason, frontend);
+            continue;
+        }
         let index = prepared.len();
         let markers = parameters
             .iter()
@@ -510,9 +505,15 @@ pub(crate) fn prepare_synthetic(
                 Ok((reached, false))
                     if std::iter::once(name.as_str())
                         .chain(reached.iter().map(|dependency| dependency.name.as_str()))
-                        .any(|name| dependencies.nodes[name].stringifies) =>
+                        .any(|name| {
+                            dependencies.nodes[name].stringifies
+                                && !frontend.environment().active.get(name).is_some_and(|active| {
+                                    stringifies_diagnostics(&active.definition)
+                                })
+                        }) =>
                 {
-                    // The body's tokens are replayed with a space between each pair.
+                    // The body's tokens are replayed with a space between each pair, so a
+                    // stringification can spell its operand with different spacing.
                     refuse(
                         &mut results,
                         ExpansionSkipCode::Stringification,
@@ -521,6 +522,14 @@ pub(crate) fn prepare_synthetic(
                     continue 'definitions;
                 }
                 Ok((reached, false)) => {
+                    if let Some(reason) = flavor_conflict(
+                        frontend,
+                        std::iter::once(name.as_str())
+                            .chain(reached.iter().map(|dependency| dependency.name.as_str())),
+                    ) {
+                        record_skip(&mut results, &definition.name, reason, frontend);
+                        continue 'definitions;
+                    }
                     closure.insert(
                         name.clone(),
                         ExpansionDependency {
@@ -1152,6 +1161,17 @@ fn significant_tokens(definition: &MacroDefinition) -> Vec<&str> {
         .collect()
 }
 
+/// Why no build flavor generates a macro that is, or expands, one of `names`: the first of
+/// them that assert-enabled and release PostgreSQL define irreconcilably.
+fn flavor_conflict<'a>(
+    frontend: &FrontendOutput,
+    names: impl Iterator<Item = &'a str>,
+) -> Option<ExpansionSkip> {
+    let conflicts = &frontend.flavors.conflicts;
+    let (name, reason) = names.filter_map(|name| conflicts.get_key_value(name)).next()?;
+    Some(skip(ExpansionSkipCode::BuildFlavor, reason, Some(name), frontend))
+}
+
 /// Attach a structured refusal to one requested macro while preserving dependency source spans.
 fn record_skip(
     results: &mut BTreeMap<String, ExpansionResult>,
@@ -1503,8 +1523,27 @@ pub(crate) fn dynamic_builtin(name: &str) -> bool {
         )
 }
 
+/// Whether a macro stringifies only the condition it reports through
+/// `ExceptionalCondition`, as PostgreSQL's assertions do.
+///
+/// That text is only a diagnostic, so a synthetic replacement may reach it although
+/// replaying the body's tokens can change the spacing of the condition's spelling.
+fn stringifies_diagnostics(definition: &MacroDefinition) -> bool {
+    let tokens = definition
+        .tokens
+        .iter()
+        .filter(|token| token.kind != TokenKind::Comment)
+        .collect::<Vec<_>>();
+    tokens.iter().enumerate().all(|(index, token)| {
+        !matches!(token.spelling.as_str(), "#" | "%:")
+            || index.checked_sub(2).is_some_and(|call| {
+                tokens[call].spelling == "ExceptionalCondition" && tokens[call + 1].spelling == "("
+            })
+    })
+}
+
 /// Invocation-sensitive diagnostics with an explicit Rust source-location contract.
-fn invocation_diagnostic(name: &str) -> bool {
+pub(crate) fn invocation_diagnostic(name: &str) -> bool {
     matches!(name, "__FILE__" | "__LINE__")
 }
 
@@ -1654,7 +1693,8 @@ struct ProbeDirectory(
 struct ProbeSource {
     /// Owned scratch directory for probe files.
     directory: ProbeDirectory,
-    /// Original main-file bytes that every probe repeats before its invocations.
+    /// The main file, with the definitions both build flavors share, that every probe
+    /// repeats before its invocations.
     original: Vec<u8>,
     /// Collision-free prefix for probe markers.
     prefix: String,
@@ -1662,21 +1702,15 @@ struct ProbeSource {
 
 /// Read the main file once for a batch of compiler probes.
 impl ProbeSource {
-    /// Read the original main file, or return `None` when it and the probe separators
-    /// exceed the source budget.
+    /// Read the main file, or return `None` when it and the probe separators exceed the
+    /// source budget.
     fn read(
         frontend: &FrontendOutput,
         limits: ExpansionLimits,
     ) -> Result<Option<Self>, FrontendError> {
-        let header = &frontend.profile().header;
-        let error = |source| FrontendError::FileIo { path: header.clone(), source };
-        let file = std::fs::File::open(header).map_err(error)?;
-        let read_limit = u64::try_from(limits.source_bytes).unwrap_or(u64::MAX).saturating_add(1);
-        let mut original = Vec::new();
-        file.take(read_limit).read_to_end(&mut original).map_err(error)?;
-        if original.len().checked_add(2).is_none_or(|bytes| bytes > limits.source_bytes) {
+        let Some(original) = frontend.main_source(limits.source_bytes.saturating_sub(2))? else {
             return Ok(None);
-        }
+        };
         Ok(Some(Self { directory: ProbeDirectory::new()?, original, prefix: namespace(frontend) }))
     }
 

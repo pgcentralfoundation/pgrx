@@ -47,7 +47,8 @@ pub(crate) enum Exit {
 }
 
 /// Run `command` with its standard output and error captured together, in the order it wrote
-/// them, killing it after `limit`.
+/// them, killing it after `limit`. A command that is killed also reports the processes it had
+/// started, which show what it was waiting for.
 ///
 /// The output goes to a file rather than a pipe. A test binary can leave a process behind,
 /// such as a PostgreSQL server, that inherited its output handles; a pipe would not reach its
@@ -65,6 +66,7 @@ pub(crate) fn run_captured(mut command: Command, limit: Duration) -> eyre::Resul
     let mut child = command.spawn().wrap_err_with(|| format!("starting `{description}`"))?;
     drop(command);
     let started = Instant::now();
+    let mut waiting_on = String::new();
     let exit = loop {
         if let Some(status) =
             child.try_wait().wrap_err_with(|| format!("waiting for `{description}`"))?
@@ -72,6 +74,7 @@ pub(crate) fn run_captured(mut command: Command, limit: Duration) -> eyre::Resul
             break Exit::Status(status);
         }
         if started.elapsed() >= limit {
+            waiting_on = descendants(child.id());
             // The process may have exited since the check above, so a failed kill is fine.
             let _ = child.kill();
             let _ = child.wait();
@@ -81,7 +84,60 @@ pub(crate) fn run_captured(mut command: Command, limit: Duration) -> eyre::Resul
     };
     let output = std::fs::read(&log.path)
         .wrap_err_with(|| format!("reading the output of `{description}`"))?;
-    Ok((exit, String::from_utf8_lossy(&output).into_owned()))
+    Ok((exit, String::from_utf8_lossy(&output).into_owned() + &waiting_on))
+}
+
+/// Describe the processes `root` started, directly or not, that are still running. A hung
+/// command is usually waiting for one of them. Failing to list processes describes none.
+fn descendants(root: u32) -> String {
+    let mut list = if cfg!(windows) {
+        let mut list = Command::new("powershell");
+        list.args([
+            "-NoProfile",
+            "-Command",
+            "Get-CimInstance Win32_Process | ForEach-Object { \"$($_.ProcessId) $($_.ParentProcessId) $($_.CommandLine)\" }",
+        ]);
+        list
+    } else {
+        let mut list = Command::new("ps");
+        list.args(["-eo", "pid=,ppid=,args="]);
+        list
+    };
+    match list.output() {
+        Ok(output) => describe_descendants(root, &String::from_utf8_lossy(&output.stdout)),
+        Err(_) => String::new(),
+    }
+}
+
+/// The lines of `listing`, each a process id, its parent's id and its command line, for the
+/// processes below `root`, parents before children.
+fn describe_descendants(root: u32, listing: &str) -> String {
+    let processes: Vec<(u32, u32, &str)> = listing
+        .lines()
+        .filter_map(|line| {
+            let line = line.trim_start();
+            let (pid, rest) = line.split_once(char::is_whitespace)?;
+            let rest = rest.trim_start();
+            let (parent, command) = rest.split_once(char::is_whitespace).unwrap_or((rest, ""));
+            Some((pid.parse().ok()?, parent.parse().ok()?, command.trim()))
+        })
+        .collect();
+    let mut described = String::new();
+    let mut parents = vec![root];
+    // Process ids are reused, so a listing can hold a cycle; visit each process once.
+    let mut seen = vec![root];
+    while let Some(parent) = parents.pop() {
+        for (pid, _, command) in processes.iter().filter(|process| process.1 == parent) {
+            if !seen.contains(pid) {
+                seen.push(*pid);
+                parents.push(*pid);
+                described.push_str(&format!(
+                    "still running: process {pid}, started by {parent}: {command}\n"
+                ));
+            }
+        }
+    }
+    described
 }
 
 /// A log file removed when dropped.
@@ -137,5 +193,27 @@ mod tests {
         let (exit, output) = run_captured(command, Duration::from_millis(500)).unwrap();
         assert!(matches!(exit, Exit::TimedOut));
         assert_eq!(output, "partial\n");
+    }
+
+    #[test]
+    fn a_hung_command_reports_the_processes_it_started() {
+        let mut command = Command::new("sh");
+        command.args(["-c", "echo partial; sleep 31; echo unreachable"]);
+        let (exit, output) = run_captured(command, Duration::from_millis(500)).unwrap();
+        assert!(matches!(exit, Exit::TimedOut));
+        let (partial, waiting_on) = output.split_once('\n').unwrap();
+        assert_eq!(partial, "partial");
+        assert!(waiting_on.starts_with("still running: process "), "{waiting_on}");
+        assert!(waiting_on.trim_end().ends_with(": sleep 31"), "{waiting_on}");
+    }
+
+    #[test]
+    fn descendants_are_listed_parents_first_and_once() {
+        let listing = "1 0 init\n 10 1 test binary\n11 10 cargo pgrx install\n12 11 rustc --crate-name x\n13 1 unrelated\n10 12 reused id\n";
+        assert_eq!(
+            describe_descendants(10, listing),
+            "still running: process 11, started by 10: cargo pgrx install\nstill running: process 12, started by 11: rustc --crate-name x\n"
+        );
+        assert_eq!(describe_descendants(13, listing), "");
     }
 }

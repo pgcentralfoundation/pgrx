@@ -134,9 +134,8 @@ const MACROS: &[(&str, Kind, &str)] = &[
     ("DOC_BITS", Kind::Value, "unsafe { DOC_BITS!(bits) }"),
     ("DOC_OID", Kind::Value, "DOC_OID!(word)"),
     ("DOC_NOTHING", Kind::Value, "DOC_NOTHING!()"),
-    // An unused argument may be empty or any tokens, as the C macro ignores it.
-    ("DOC_IGNORE", Kind::Value, "DOC_IGNORE!()"),
-    ("DOC_IGNORE", Kind::Value, "DOC_IGNORE!(record->value)"),
+    // An unused argument is an expression the macro checks in dead code but never evaluates.
+    ("DOC_IGNORE", Kind::Value, "DOC_IGNORE!(value)"),
     ("DOC_IGNORE_FIRST", Kind::Value, "DOC_IGNORE_FIRST!(record, value)"),
     ("DOC_EMPTY", Kind::Unit, "DOC_EMPTY!();"),
     ("DOC_SWAP", Kind::Unit, "unsafe { DOC_SWAP!(pointer, other) }"),
@@ -196,12 +195,6 @@ const DIVERGENCES: &[(&str, &str, &str)] = &[
     ("nested increment", "unsafe { DOC_POSTINC!(DOC_FIELD!(record)) };", "E0745"),
     ("nested address", "unsafe { DOC_ADDRESS_OF!(DOC_FIELD!(record)) };", "E0745"),
     ("nested read place", "unsafe { DOC_NAME!(DOC_NAME_OF!(holder)) };", "E0745"),
-    // An unused or only stringified argument followed by another must be an expression.
-    (
-        "unparsed argument",
-        "DOC_IGNORE_FIRST!(record->value, value);",
-        "`->` is not valid syntax for field accesses",
-    ),
     // The internal native operand form.
     (
         "internal native form",

@@ -19,7 +19,7 @@
 
 #![cfg(not(docsrs))]
 
-/// Ask this build's original compiler profile whether assertions are enabled.
+/// Read this build's PostgreSQL major version.
 #[path = "support/postgres_oracle.rs"]
 mod postgres_oracle;
 
@@ -96,41 +96,21 @@ struct Allowance {
     majors: RangeInclusive<u16>,
     /// Exact skip code, or `None` when the installed headers do not define the macro.
     skip: Option<&'static str>,
-    /// Whether the difference exists only in assertion-enabled C profiles.
-    assertions_only: bool,
 }
 
 /// Every allowed way for a gated macro to be missing. Anything else fails, including a new skip
 /// code for a listed name, so each addition here must name the profile difference it accepts.
 const ALLOWANCES: &[Allowance] = &[
     // macro_api.rs gates on an undefined name to check the unavailable branch.
-    Allowance {
-        name: "__PGRX_REVIEW_MACRO_THAT_DOES_NOT_EXIST",
-        majors: 0..=u16::MAX,
-        skip: None,
-        assertions_only: false,
-    },
+    Allowance { name: "__PGRX_REVIEW_MACRO_THAT_DOES_NOT_EXIST", majors: 0..=u16::MAX, skip: None },
     // PostgreSQL 16 introduced soft error contexts.
-    Allowance { name: "SOFT_ERROR_OCCURRED", majors: 15..=15, skip: None, assertions_only: false },
+    Allowance { name: "SOFT_ERROR_OCCURRED", majors: 15..=15, skip: None },
     // PostgreSQL 15's timespec conversions use floating-point literals.
-    Allowance {
-        name: "INSTR_TIME_GET_DOUBLE",
-        majors: 15..=15,
-        skip: Some("unsupported_literal"),
-        assertions_only: false,
-    },
+    Allowance { name: "INSTR_TIME_GET_DOUBLE", majors: 15..=15, skip: Some("unsupported_literal") },
     Allowance {
         name: "INSTR_TIME_GET_MILLISEC",
         majors: 15..=15,
         skip: Some("unsupported_literal"),
-        assertions_only: false,
-    },
-    // AssertMacro expands IsA's token pasting only when assertions are enabled.
-    Allowance {
-        name: "GetCTETargetList",
-        majors: 0..=u16::MAX,
-        skip: Some("dynamic_builtin"),
-        assertions_only: true,
     },
 ];
 
@@ -158,7 +138,6 @@ fn every_availability_gated_macro_is_emitted() {
     for (name, files) in called_names(&build) {
         gated.entry(name).or_default().extend(files);
     }
-    let mut assertions = None;
     let mut missing = Vec::new();
     for (name, files) in &gated {
         let reason = match emissions.get(name) {
@@ -168,11 +147,7 @@ fn every_availability_gated_macro_is_emitted() {
         };
         let skip = reason.map(|reason| reason.code.as_str());
         let allowed = ALLOWANCES.iter().any(|allowance| {
-            allowance.name == name
-                && allowance.majors.contains(&major)
-                && allowance.skip == skip
-                && (!allowance.assertions_only
-                    || *assertions.get_or_insert_with(assertions_enabled))
+            allowance.name == name && allowance.majors.contains(&major) && allowance.skip == skip
         });
         if !allowed {
             let cause = reason.map_or("not in report".into(), |reason| {
@@ -722,16 +697,4 @@ fn cfg_arguments<'a>(predicate: &'a str, name: &str) -> Option<Vec<&'a str>> {
     arguments.push(inner[start..].trim());
     arguments.retain(|argument| !argument.is_empty());
     Some(arguments)
-}
-
-/// Report whether this build's original C profile defines USE_ASSERT_CHECKING.
-fn assertions_enabled() -> bool {
-    let output = postgres_oracle::run(
-        "#include <stdio.h>\n#undef printf\nint main(void) {\n#ifdef USE_ASSERT_CHECKING\n    printf(\"1\\n\");\n#else\n    printf(\"0\\n\");\n#endif\n    return 0;\n}\n",
-    );
-    match output.trim() {
-        "1" => true,
-        "0" => false,
-        other => panic!("unexpected assertion probe output: {other:?}"),
-    }
 }

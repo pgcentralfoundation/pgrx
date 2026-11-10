@@ -253,10 +253,11 @@ fn ordinary_character_literals_match_original_c_types_values_and_occurrences() {
                 .unwrap();
         }
     }
+    // An unused argument is checked in dead code, so it must name a value, but it is never
+    // evaluated in either language.
     for name in CONSTANTS {
-        writeln!(c, "RECORD(\"{name}\", {name}(undefined_unused_binding));").unwrap();
-        writeln!(rust, "record(\"{name}\", {name}!(undefined_unused_binding), evaluations.get());")
-            .unwrap();
+        writeln!(c, "RECORD(\"{name}\", {name}(argument()));").unwrap();
+        writeln!(rust, "record(\"{name}\", {name}!(argument()), evaluations.get());").unwrap();
     }
     let samples = [-200_i32, -1, 0, 47, 48, 49, 65, 127, 255];
     for name in OPERATORS {

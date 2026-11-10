@@ -34,6 +34,10 @@ mod bitfields;
 pub use arguments::split_recorded_cflags;
 /// Prove supported compiler operations by prototype and bounded LLVM effect witnesses.
 mod builtins;
+/// Give assert-enabled and release PostgreSQL one set of generated macros.
+mod flavors;
+pub(crate) use flavors::ASSERTION_REPORT;
+pub use flavors::Flavors;
 /// Reparse original inline bodies to prove local definitions match the declaration-only catalog.
 mod definitions;
 /// Recheck complete input bytes with a host-appropriate SHA-256 backend and per-pass alias sharing.
@@ -318,10 +322,14 @@ fn inspect_selected(
     let live = tokenize_snapshot(scanner, &preprocessing.stdout, &arguments)?;
     let dependencies = preprocess(&compiler, &header, &arguments, &["-M", "-MT", "pgrx_c_macros"])?;
     let driver_files = parse_dependencies(&dependencies.stdout)?;
-    let (inventory, declarations, target, included) =
+    let directory = std::env::current_dir().map_err(|error| {
+        FrontendError::Environment(format!("could not resolve the working directory: {error}"))
+    })?;
+    let (inventory, declarations, target, included, skipped) =
         scanner.with_translation_unit(&header, &arguments, None, |unit, inventory| {
             let (declarations, included) = collect_declarations(unit);
-            Ok((inventory, declarations, unit.get_target(), included))
+            let skipped = flavors::skipped(unit, &directory);
+            Ok((inventory, declarations, unit.get_target(), included, skipped))
         })?;
     let triple = compiler_triple(&preprocessing.stderr)?;
     if triple != target.triple {
@@ -383,6 +391,7 @@ fn inspect_selected(
         environment,
         declarations,
         inventory,
+        flavors: Flavors { skipped, ..Flavors::default() },
         dependencies: macro_dependencies,
     })
 }
@@ -486,6 +495,9 @@ fn prove_snapshot_facts(
         info.definition_available = true;
         info.definition = definition;
     }
+    // The proof above compares inline bodies with the headers' own final macros. The passes
+    // below, and every later one, see the macros both build flavors generate.
+    flavors::reconcile(scanner, frontend)?;
     frontend.declarations.bitfields = bitfields::probe(scanner, frontend)?;
     let builtins = builtins::prove(scanner, frontend)?;
     frontend.declarations.builtins = builtins.supported;

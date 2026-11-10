@@ -44,6 +44,8 @@ const SUPPORTED: &[&str] = &[
     "STRING_SELECT",
     "STRING_REPEAT",
     "STRING_CHECK",
+    // A root's own stringification, admitted as diagnostic text like a dependency's.
+    "STRING_ASSERT",
     "STRING_LOCATION",
     "STRING_LOCATION_NESTED",
     "STRING_LINE",
@@ -59,7 +61,6 @@ const SUPPORTED: &[&str] = &[
 /// Unsupported preprocessing/encoding contracts that must retain explicit refusals.
 const REJECTED: &[(&str, SkipReasonCode)] = &[
     ("STRINGIFY_OPERAND", SkipReasonCode::Stringification),
-    ("STRING_ASSERT", SkipReasonCode::Stringification),
     ("STRING_OPEN", SkipReasonCode::Stringification),
     ("STRING_CONTEXT", SkipReasonCode::Stringification),
     ("STRING_OPEN_SIZE", SkipReasonCode::Stringification),
@@ -322,7 +323,9 @@ fn main() {{
 }
 
 /// Verify each configured installation's real varlena macros match the original C, including
-/// the native failing branch under assertion-enabled headers.
+/// the failing branch under assertion-enabled headers. C reports that failure through
+/// `ExceptionalCondition`; the translation stops the process with the same condition, error
+/// type and invocation site in PostgreSQL's `TRAP:` line.
 ///
 /// `-DUSE_ASSERT_CHECKING` enables assertions in installations configured without them, because
 /// configure leaves the setting commented out in `pg_config.h`. Meson writes an active
@@ -419,8 +422,12 @@ fn postgres_varlena_assertions_match_original_headers() {
 static const char *expected_file;
 static int expected_line;
 static unsigned evaluations;
+/* Whether each operand evaluation is also written to stdout at once, so that the count
+ * survives a failed assertion that aborts the process. */
+static int tracing;
+void assertion_trace(void) {{ tracing = 1; }}
 void assertion_site(const char *file, int line) {{ expected_file = file; expected_line = line; evaluations = 0; }}
-int assertion_argument(int value) {{ ++evaluations; return value; }}
+int assertion_argument(int value) {{ ++evaluations; if (tracing) {{ fputs("evaluation\n", stdout); fflush(stdout); }} return value; }}
 unsigned assertion_evaluations(void) {{ return evaluations; }}
 {condition}
 "#
@@ -450,20 +457,24 @@ unsafe extern "C" {{
     fn assertion_argument(value: core::ffi::c_int) -> core::ffi::c_int;
     /// Read only the native fixture counter updated by the preceding argument calls.
     fn assertion_evaluations() -> core::ffi::c_uint;
+    /// Make each later argument call also write a line to stdout.
+    fn assertion_trace();
 }}
 fn main() {{
     // SAFETY: The fixture functions have these exact fixed C prototypes and
     // only borrow static filename storage or increment a process-local counter.
-    // Valid tags produce sizes. With assertions, the final invalid tag exits in
-    // native C, so no Rust destructor or unwinding state is required across
-    // that failure.
+    // Valid tags produce sizes. With assertions, the final invalid tag aborts the
+    // process after reporting its site, which is printed first, and each operand
+    // evaluation of that call is traced because the process cannot report a count.
     unsafe {{
         for tag in [1_i32, 2, 3, 18] {{
             assertion_site(core::ptr::null(), 0);
             let size = VARTAG_SIZE!(assertion_argument(tag));
             println!("size\t{{}}\t{{}}", size.get(), assertion_evaluations());
         }}
-        assertion_site(concat!(file!(), "\0").as_ptr().cast(), (line!() + 1) as i32);
+        assertion_site(core::ptr::null(), 0);
+        assertion_trace();
+        println!("site\t{{}}\t{{}}", file!(), line!() + 1);
         let invalid = VARTAG_SIZE!(assertion_argument(0_i32));
         println!("unasserted\t{{}}\t{{}}", invalid.get(), assertion_evaluations());
     }}
@@ -473,7 +484,7 @@ fn main() {{
         let profile = frontend.profile();
         let arguments = profile.arguments.iter().map(String::as_str).collect::<Vec<_>>();
         let original = oracle::run_c(&profile.compiler.executable, header, &c, &arguments, true);
-        let generated = rust_oracle::run_rust_linked(
+        let (status, stdout, stderr) = rust_oracle::run_rust_linked_status(
             &rust,
             &profile.compiler.executable,
             header,
@@ -481,14 +492,56 @@ fn main() {{
             &arguments,
         );
         assert_eq!(original.lines().count(), 5, "PG{major} assertion corpus completeness");
+        let (sizes, failure) = original.trim_end().rsplit_once('\n').unwrap_or_default();
+        let sizes = format!("{sizes}\n");
         assert_eq!(
-            original.lines().last().is_some_and(|line| line.starts_with("failure\t")),
+            failure.starts_with("failure\t"),
             asserted,
             "PG{major} invalid tag must fail exactly when assertions are active"
         );
+        assert_eq!(status.success(), !asserted, "PG{major} stops exactly when C fails:\n{stderr}");
+        let mut lines = stdout.lines();
+        let rust_sizes = lines.by_ref().take(4).map(|line| format!("{line}\n")).collect::<String>();
+        assert_eq!(rust_sizes, sizes, "PG{major} valid tags must match the original C");
+        let (file, line) = lines
+            .next()
+            .and_then(|site| site.strip_prefix("site\t")?.split_once('\t'))
+            .expect("the Rust oracle reports its assertion site");
+        // Each operand evaluation of the invalid call wrote one line before any failure.
+        let mut lines = lines.peekable();
+        let mut evaluations = 0_u32;
+        while lines.next_if_eq(&"evaluation").is_some() {
+            evaluations += 1;
+        }
+        if !asserted {
+            assert_eq!(lines.next().map(|line| format!("{line}\n")), Some(format!("{failure}\n")));
+            continue;
+        }
+        let report = stderr
+            .lines()
+            .find_map(|line| line.strip_prefix("TRAP: "))
+            .unwrap_or_else(|| panic!("PG{major} must report the failed assertion:\n{stderr}"));
+        let (condition, error_type, rest) = match report.strip_prefix("failed Assert(\"") {
+            Some(rest) => {
+                let (condition, rest) = rest.split_once("\"), File: \"").expect("TRAP site");
+                (condition, "no error-type parameter", rest)
+            }
+            None => {
+                let (error_type, rest) = report.split_once("(\"").expect("TRAP condition");
+                let (condition, rest) = rest.split_once("\", File: \"").expect("TRAP site");
+                (condition, error_type, rest)
+            }
+        };
+        let (trap_file, rest) = rest.split_once("\", Line: ").expect("TRAP line");
+        let trap_line = rest.split_once(", PID: ").expect("TRAP process").0;
+        let generated = format!(
+            "failure\t{condition}\t{error_type}\t{}\t{}\t{evaluations}",
+            u8::from(trap_file == file),
+            u8::from(trap_line == line)
+        );
         assert_eq!(
-            generated, original,
-            "PG{major} native assertion must preserve condition, source site and operand counts"
+            generated, failure,
+            "PG{major} assertion must preserve condition, error type, invocation site and operand counts"
         );
     }
 }

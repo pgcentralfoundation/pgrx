@@ -123,6 +123,21 @@ pub(super) fn render_safety_checks(analysis: &MacroAnalysis, shell: bool) -> Str
     rust
 }
 
+/// Check the caller's operands for `parameters` in dead code, without evaluating them.
+pub(super) fn render_operand_checks(analysis: &MacroAnalysis, parameters: &[usize]) -> String {
+    let mut rust = String::from("{ if false { ");
+    for &index in parameters {
+        write!(
+            rust,
+            "$crate::__pgrx_c_operand!(@check_safety; {});",
+            descriptor(analysis, index, false)
+        )
+        .expect("String output");
+    }
+    rust.push_str(" } }");
+    rust
+}
+
 /// Generate linear stages for this macro's compiler-established parameter list.
 pub(super) fn generate(analysis: &MacroAnalysis) -> Result<Option<ArgumentAdapter>, SkipReason> {
     if analysis.parameters.is_empty() {
@@ -167,16 +182,8 @@ pub(super) fn generate(analysis: &MacroAnalysis) -> Result<Option<ArgumentAdapte
     for (index, parameter) in analysis.parameters.iter().enumerate() {
         let next = index + 1;
         let last = next == analysis.parameters.len();
-        if parameter.roles == [ParameterRole::Unused] {
-            writeln!(rust, "(@p{index} $mode:ident [$($done:tt)*]; $($raw:tt)*) => {{ $crate::{normalizer}!(@ignore{index} $mode [$($done)*] [{}]; $($raw)*) }};", "@ ".repeat(TOKEN_BUDGET)).expect("String output");
-            writeln!(rust, "(@ignore{index} $mode:ident [$($done:tt)*] $budget:tt; , $($rest:tt)*) => {{ $crate::{normalizer}!(@p{next} $mode [$($done)* (@unused),]; $($rest)*) }};").expect("String output");
-            if last {
-                writeln!(rust, "(@ignore{index} $mode:ident [$($done:tt)*] $budget:tt;) => {{ $crate::{normalizer}!(@p{next} $mode [$($done)* (@unused),];) }};").expect("String output");
-            }
-            writeln!(rust, "(@ignore{index} $mode:ident [$($done:tt)*] [@ $($budget:tt)*]; $token:tt $($rest:tt)*) => {{ $crate::{normalizer}!(@ignore{index} $mode [$($done)*] [$($budget)*]; $($rest)*) }};").expect("String output");
-            writeln!(rust, "(@ignore{index} $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {{ ::core::compile_error!(\"unused C macro argument exceeds the 64-token normalization bound\") }};").expect("String output");
-            continue;
-        }
+        // An unused operand is classified like an evaluated one, so dead code can check
+        // that an operand which needs `unsafe` has it, whether or not C evaluates it.
         if parameter.roles.contains(&ParameterRole::Type)
             && parameter.roles != [ParameterRole::Type]
         {

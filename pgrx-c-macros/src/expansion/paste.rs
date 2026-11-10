@@ -441,9 +441,12 @@ fn source(
     }
     append(b"#pragma clang diagnostic push\n#pragma clang diagnostic ignored \"-Weverything\"\n")?;
     append(format!("#define {prefix}paste_forbidden()\n").as_bytes())?;
-    for builtin in BUILTINS {
-        // A pasted helper can contain an ordinary exempt builtin token. Trap
-        // every use before effects such as _Pragma or __COUNTER__ can occur.
+    // A pasted helper can contain an ordinary exempt builtin token. Trap every
+    // use before effects such as _Pragma or __COUNTER__ can occur. `__FILE__`
+    // and `__LINE__` have no effects and name the Rust invocation, so an
+    // assertion's report can share an expansion with a paste; poison still
+    // refuses a paste that forms either name.
+    for builtin in BUILTINS.iter().filter(|name| !super::invocation_diagnostic(name)) {
         append(
             format!(
                 "#undef {builtin}\n#define {builtin} {prefix}paste_forbidden({prefix}paste_forbidden)\n"

@@ -19,7 +19,7 @@ use crate::syntax::{
     UnaryOperator,
 };
 use crate::{FrontendOutput, SignedOverflow, TypeCategory, TypeInfo, TypeShapeKind};
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::BTreeMap;
 use std::fmt::Write;
 
 /// The C use-site contract requested for one occurrence of an expression-arena node.
@@ -96,8 +96,8 @@ pub(super) struct Renderer<'a> {
     /// Single-macro emission has none.
     adapters: Option<&'a super::GeneratedAdapters>,
     /// Translated inline functions whose calls expand their translation, with their
-    /// panic conditions. Only batch rendering has any.
-    translations: &'a BTreeMap<String, BTreeSet<&'static str>>,
+    /// panic conditions and caller safety. Only batch rendering has any.
+    translations: &'a BTreeMap<String, super::assertions::Translation>,
     /// Arena-indexed compiler constant facts, preserving names where bindings permit.
     constants: &'a [Option<&'a ResolvedConstant>],
     /// Shared C identity/native-storage reconciliation for the catalog and generated types.
@@ -118,6 +118,8 @@ pub(super) struct Renderer<'a> {
     expectations: Vec<super::expectation::Decision>,
     /// Whether this renders the macro or a documentation shell's type witness.
     mode: RenderMode,
+    /// Whether this rendering needs the caller's `unsafe`.
+    caller_unsafe: bool,
 }
 
 /// Lower each expression occurrence under its own C context with shared trusted object facts.
@@ -209,6 +211,8 @@ impl<'a> Renderer<'a> {
             &locals.iter().map(|(name, local)| (name.clone(), local.ty.clone())).collect(),
         );
         let expectations = super::expectation::plan(frontend, analysis);
+        let caller_unsafe =
+            super::assertions::caller_unsafe(frontend, bindings, analysis, generated.translations);
         Self {
             frontend,
             analysis,
@@ -225,7 +229,25 @@ impl<'a> Renderer<'a> {
             locals,
             expectations,
             mode: RenderMode::Macro,
+            caller_unsafe,
         }
+    }
+
+    /// Whether this rendering needs the caller's `unsafe`.
+    pub(super) fn caller_unsafe(&self) -> bool {
+        self.caller_unsafe
+    }
+
+    /// Parameters whose operands this rendering never names as values.
+    pub(super) fn unevaluated_parameters(&self) -> Vec<usize> {
+        super::assertions::unevaluated_parameters(self.frontend, self.analysis)
+    }
+
+    /// Whether the branch of an `if` statement only reports a failed assertion, so the
+    /// statement runs only against an installation that enables assertions.
+    pub(super) fn reports(&self, branch: &crate::syntax::Statement) -> bool {
+        let expression = self.analysis.expression.as_ref().expect("candidate expression");
+        super::assertions::reports(self.frontend.declarations(), &expression.syntax.nodes, branch)
     }
 
     /// Render documentation-shell type witnesses instead of macro arms.
@@ -722,7 +744,24 @@ impl<'a> Renderer<'a> {
                                     .resolve_with_storage(declaration, &binding.ty)
                                     .map_err(failure)?;
                                 let path = rust_path(&binding.path).map_err(failure)?;
-                                if matches!(context, Context::Value) {
+                                // A global that `checked_global` admits is read after a thread
+                                // check, so the read needs no `unsafe` from the caller.
+                                let check = match &self.bindings.thread_check {
+                                    Some(check)
+                                        if matches!(context, Context::Value)
+                                            && super::checked_global(
+                                                frontend.declarations(),
+                                                self.bindings,
+                                                name,
+                                            ) =>
+                                    {
+                                        Some(rust_path(check).map_err(failure)?)
+                                    }
+                                    _ => None,
+                                };
+                                if let Some(check) = &check {
+                                    write!(rust, "{{ {check}(); /* SAFETY: the place is this global, and this runs after pgrx's active-thread check, as load_global requires. */ #[allow(unused_unsafe)] unsafe {{ {EXPRESSION}::load_global(").expect("String output");
+                                } else if matches!(context, Context::Value) {
                                     write!(rust, "{EXPRESSION}::load(").expect("String output");
                                 }
                                 write!(
@@ -741,7 +780,9 @@ impl<'a> Renderer<'a> {
                                     }
                                 )
                                 .expect("String output");
-                                if matches!(context, Context::Value) {
+                                if check.is_some() {
+                                    rust.push_str(") } }");
+                                } else if matches!(context, Context::Value) {
                                     rust.push(')');
                                 }
                             } else {
@@ -796,6 +837,16 @@ impl<'a> Renderer<'a> {
                                 }
                             }
                             write!(rust, "\"\\0\"); const __PGRX_C_BYTES: [u8; __PGRX_C_DIAGNOSTIC.len()] = {{ ::core::assert!(__PGRX_C_DIAGNOSTIC.is_ascii(), \"C diagnostic operand spelling requires ASCII tokens\"); {EXPRESSION}::invocation_file_bytes(__PGRX_C_DIAGNOSTIC) }}; {EXPRESSION}::decay({EXPRESSION}::string_literal(&__PGRX_C_BYTES)) }}").expect("String output");
+                        }
+                        ExpressionKind::InvocationFile | ExpressionKind::InvocationLine
+                            if self.inline_body =>
+                        {
+                            // In a function body they name the header, not the Rust invocation.
+                            // Only an assertion's report, which renders neither node, may use
+                            // the invocation's location instead.
+                            return Err(failure(
+                                "__FILE__ and __LINE__ in an inline function name its header, so only an assertion report may use the Rust invocation's location".into(),
+                            ));
                         }
                         ExpressionKind::InvocationFile => {
                             if matches!(context, Context::Value) {
@@ -935,7 +986,18 @@ impl<'a> Renderer<'a> {
                                 operator,
                                 BinaryOperator::LogicalAnd | BinaryOperator::LogicalOr
                             ) {
-                                write!(rust, "{SUPPORT}::CValue::<{SUPPORT}::CInt>::new(if {EXPRESSION}::truth(").expect("String output");
+                                // `holds || (report, 0)` is true, without evaluating
+                                // `holds`, against an installation without assertions.
+                                let unchecked = if super::assertions::assertion_alternative(
+                                    frontend.declarations(),
+                                    &expression.syntax.nodes,
+                                    index,
+                                ) {
+                                    format!("!{} || ", super::assertions::CHECKING)
+                                } else {
+                                    String::new()
+                                };
+                                write!(rust, "{SUPPORT}::CValue::<{SUPPORT}::CInt>::new(if {unchecked}{EXPRESSION}::truth(").expect("String output");
                                 tasks.extend([
                                     text(") { 1 } else { 0 })"),
                                     value(*right),
@@ -1139,6 +1201,23 @@ impl<'a> Renderer<'a> {
                             tasks.extend([Task::Text(format!(", {SUPPORT}::CValue::<{SUPPORT}::CInt>::new(1i32), |__pgrx_old, __pgrx_rhs| {EXPRESSION}::{}::<{SUPPORT}::{policy}, _, _>(__pgrx_old, __pgrx_rhs))", if *increment { "add" } else { "sub" })), place(*operand)]);
                         }
                         ExpressionKind::Call { callee, arguments } => {
+                            if let Some(stop) = super::assertions::stop(
+                                frontend.declarations(),
+                                &expression.syntax.nodes,
+                                index,
+                            ) {
+                                if self.collapses(context) {
+                                    rust.push_str("()");
+                                } else {
+                                    super::assertions::render_stop(
+                                        &expression.syntax.nodes,
+                                        stop,
+                                        |parameter| self.operand(parameter),
+                                        rust,
+                                    );
+                                }
+                                continue;
+                            }
                             let mut ungrouped = *callee;
                             while let ExpressionKind::Group { operand } =
                                 expression.syntax.nodes[ungrouped].kind
@@ -1150,6 +1229,31 @@ impl<'a> Renderer<'a> {
                                 && let Some(builtin) = frontend.declarations().builtins.get(name)
                             {
                                 match builtin.kind {
+                                    crate::BuiltinKind::Unreachable => {
+                                        return Err(failure(format!(
+                                            "{name}: unreachable code takes no operands"
+                                        )));
+                                    }
+                                    crate::BuiltinKind::Assume => {
+                                        let [holds] = arguments.as_slice() else {
+                                            return Err(failure(format!(
+                                                "{name}: an assumption requires one operand"
+                                            )));
+                                        };
+                                        if self.collapses(context) {
+                                            rust.push_str("()");
+                                            continue;
+                                        }
+                                        // A false assumption is undefined, so stop there.
+                                        write!(rust, "if !{EXPRESSION}::truth(")
+                                            .expect("String output");
+                                        tasks.extend([
+                                            Task::Text(format!(
+                                                ") {{ {EXPRESSION}::assertion::unreachable_reached() }}"
+                                            )),
+                                            value(*holds),
+                                        ]);
+                                    }
                                     crate::BuiltinKind::ByteSwap { .. } => {
                                         let [argument] = arguments.as_slice() else {
                                             return Err(failure(format!(
@@ -1384,17 +1488,43 @@ impl<'a> Renderer<'a> {
                                 );
                                 continue;
                             }
-                            if let Some(result) = &result {
-                                write!(
-                                    rust,
-                                    "<{} as {EXPRESSION}::CType>::from_storage(",
-                                    result.marker
-                                )
-                                .expect("String output");
+                            // A function that only an assert-enabled build defines is
+                            // called, and its arguments evaluated, only against one.
+                            if result.is_none() && frontend.flavors.assert_functions.contains(name)
+                            {
+                                write!(rust, "if {} {{ ", super::assertions::CHECKING)
+                                    .expect("String output");
+                                tasks.push(text("; }"));
+                            }
+                            let safe = super::assertions::safe_call(
+                                frontend.declarations(),
+                                self.bindings,
+                                name,
+                            )
+                            .filter(|_| result.is_none());
+                            if let Some(reason) = safe {
+                                // The arguments are evaluated outside the generated
+                                // `unsafe`, which must cover only the call.
+                                let names = (0..arguments.len())
+                                    .map(|index| format!("__pgrx_c_argument{index}, "))
+                                    .collect::<String>();
+                                rust.push_str("match (");
+                                tasks.push(Task::Text(format!(
+                                    ") {{ ({names}) => {{ /* SAFETY: {name} needs no more than pgrx's safe wrappers assume of a backend: {reason}. The guarded binding checks pgrx's active thread before it calls PostgreSQL. */ #[allow(unused_unsafe)] unsafe {{ {path}({names}) }} }} }}"
+                                )));
+                            } else {
+                                if let Some(result) = &result {
+                                    write!(
+                                        rust,
+                                        "<{} as {EXPRESSION}::CType>::from_storage(",
+                                        result.marker
+                                    )
+                                    .expect("String output");
+                                    tasks.push(text(")"));
+                                }
+                                write!(rust, "{path}(").expect("String output");
                                 tasks.push(text(")"));
                             }
-                            write!(rust, "{path}(").expect("String output");
-                            tasks.push(text(")"));
                             for (argument, lowered) in arguments {
                                 tasks.push(text(", "));
                                 tasks.push(text("))"));

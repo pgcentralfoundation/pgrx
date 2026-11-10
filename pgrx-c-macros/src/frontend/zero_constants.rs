@@ -98,12 +98,15 @@ pub(crate) fn probe(
                     }
                     let arity = match &expression.syntax.nodes[callee].kind {
                         ExpressionKind::Identifier { name } => {
-                            session.frontend().declarations().builtins.get(name).map(|builtin| {
-                                match builtin.kind {
-                                    crate::BuiltinKind::ByteSwap { .. } => 1,
-                                    crate::BuiltinKind::Expect => 2,
-                                }
-                            })
+                            session.frontend().declarations().builtins.get(name).and_then(
+                                |builtin| match builtin.kind {
+                                    crate::BuiltinKind::ByteSwap { .. } => Some(1),
+                                    crate::BuiltinKind::Expect => Some(2),
+                                    // These stop the process instead of computing a value.
+                                    crate::BuiltinKind::Unreachable
+                                    | crate::BuiltinKind::Assume => None,
+                                },
+                            )
                         }
                         _ => None,
                     };

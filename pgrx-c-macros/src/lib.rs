@@ -63,8 +63,8 @@ mod frontend;
 /// Index directed edges in both directions and find strongly connected components in a fixed order.
 mod graph;
 pub use frontend::{
-    FrontendError, SystemIncludeDirectory, SystemIncludes, c_header_path, compile_native_support,
-    inspect, sha256_hex, split_recorded_cflags,
+    Flavors, FrontendError, SystemIncludeDirectory, SystemIncludes, c_header_path,
+    compile_native_support, inspect, sha256_hex, split_recorded_cflags,
 };
 /// Parse bounded source syntax while preserving formal holes, grouping, and structural operands.
 mod syntax;
@@ -454,12 +454,26 @@ impl MacroScanner {
         contents: Option<&str>,
         callback: impl FnOnce(&clang::TranslationUnit<'_>, MacroInventory) -> Result<R, Error>,
     ) -> Result<R, Error> {
+        let replaced = contents.map(|contents| (header, contents));
+        self.with_replaced_files(header, clang_args, replaced.as_slice(), false, callback)
+    }
+
+    /// Parse a C input as [`Self::with_translation_unit`] does, with each listed file's
+    /// contents replaced in memory, and with function bodies when `bodies` is set.
+    pub(crate) fn with_replaced_files<R>(
+        &self,
+        header: &Path,
+        clang_args: &[String],
+        replaced: &[(&Path, &str)],
+        bodies: bool,
+        callback: impl FnOnce(&clang::TranslationUnit<'_>, MacroInventory) -> Result<R, Error>,
+    ) -> Result<R, Error> {
         self.with_parsed_translation_unit(
             header,
             clang_args,
-            contents,
+            replaced,
             |parser| {
-                parser.detailed_preprocessing_record(true);
+                parser.detailed_preprocessing_record(true).skip_function_bodies(!bodies);
             },
             |unit, directory, diagnostics| {
                 callback(unit, collect_macro_inventory(unit, directory, diagnostics)?)
@@ -475,10 +489,11 @@ impl MacroScanner {
         contents: Option<&str>,
         callback: impl FnOnce(&clang::TranslationUnit<'_>) -> Result<R, Error>,
     ) -> Result<R, Error> {
+        let replaced = contents.map(|contents| (header, contents));
         self.with_parsed_translation_unit(
             header,
             clang_args,
-            contents,
+            replaced.as_slice(),
             |_| {},
             |unit, _, _| callback(unit),
         )
@@ -490,7 +505,7 @@ impl MacroScanner {
         &self,
         header: &Path,
         clang_args: &[String],
-        contents: Option<&str>,
+        replaced: &[(&Path, &str)],
         configure: impl FnOnce(&mut clang::Parser<'_>),
         callback: impl FnOnce(&clang::TranslationUnit<'_>, &Path, Vec<Diagnostic>) -> Result<R, Error>,
     ) -> Result<R, Error> {
@@ -525,8 +540,12 @@ impl MacroScanner {
         let mut parser = index.parser(header);
         parser.arguments(&arguments).skip_function_bodies(true);
         configure(&mut parser);
-        if let Some(contents) = contents {
-            parser.unsaved(&[clang::Unsaved::new(header, contents)]);
+        if !replaced.is_empty() {
+            let unsaved = replaced
+                .iter()
+                .map(|(path, contents)| clang::Unsaved::new(path, contents))
+                .collect::<Vec<_>>();
+            parser.unsaved(&unsaved);
         }
         let translation_unit =
             parser.parse().map_err(|source| Error::Parse { header: header.into(), source })?;
@@ -567,66 +586,75 @@ fn collect_macro_inventory(
         if entity.get_kind() != EntityKind::MacroDefinition {
             return EntityVisitResult::Continue;
         }
-        let Some(name) = entity.get_name() else {
-            error = Some(Error::InvalidDefinition("macro name is missing".into()));
-            return EntityVisitResult::Break;
-        };
-        let Some(range) = entity.get_range() else {
-            error = Some(Error::InvalidDefinition(format!("source range for {name} is missing")));
-            return EntityVisitResult::Break;
-        };
-        let provenance = match SourceSpan::from_range(range, directory) {
-            Ok(provenance) => provenance,
-            Err(cause) => {
-                error = Some(Error::InvalidDefinition(format!("{name}: {cause}")));
-                return EntityVisitResult::Break;
+        match macro_definition(entity, directory) {
+            Ok(definition) => {
+                macros.push(definition);
+                EntityVisitResult::Continue
             }
-        };
-        let tokens = range
-            .tokenize()
-            .into_iter()
-            .map(|token| {
-                // Some Clang token spellings retain physical line continuations, including
-                // a continuation between a macro name and its opening parenthesis.
-                let spelling = unspliced(token.get_spelling());
-                Token {
-                    kind: match token.get_kind() {
-                        clang::token::TokenKind::Comment => TokenKind::Comment,
-                        clang::token::TokenKind::Identifier => TokenKind::Identifier,
-                        clang::token::TokenKind::Keyword => TokenKind::Keyword,
-                        clang::token::TokenKind::Literal => TokenKind::Literal,
-                        clang::token::TokenKind::Punctuation => TokenKind::Punctuation,
-                    },
-                    spelling,
-                }
-            })
-            .collect::<Vec<_>>();
-        // Clang distinguishes dynamic builtin macros from ordinary compiler predefines.
-        // The latter originate in its synthetic buffer, which has no physical file.
-        let builtin = entity.is_builtin_macro()
-            || entity.get_location().is_some_and(|location| {
-                location.get_file_location().file.is_none()
-                    && location.get_presumed_location().0 == "<built-in>"
-            });
-        macros.push(MacroDefinition {
-            name,
-            kind: if entity.is_function_like_macro() {
-                MacroKind::FunctionLike
-            } else {
-                MacroKind::ObjectLike
-            },
-            location: entity.get_location().and_then(source_location),
-            provenance,
-            tokens,
-            builtin,
-            main_file: entity.is_in_main_file(),
-        });
-        EntityVisitResult::Continue
+            Err(cause) => {
+                error = Some(cause);
+                EntityVisitResult::Break
+            }
+        }
     });
     if let Some(error) = error {
         return Err(error);
     }
     Ok(MacroInventory { macros, diagnostics })
+}
+
+/// Copy one macro definition's name, kind, tokens and physical source out of its entity.
+pub(crate) fn macro_definition(
+    entity: clang::Entity<'_>,
+    directory: &Path,
+) -> Result<MacroDefinition, Error> {
+    let name = entity
+        .get_name()
+        .ok_or_else(|| Error::InvalidDefinition("macro name is missing".into()))?;
+    let range = entity
+        .get_range()
+        .ok_or_else(|| Error::InvalidDefinition(format!("source range for {name} is missing")))?;
+    let provenance = SourceSpan::from_range(range, directory)
+        .map_err(|cause| Error::InvalidDefinition(format!("{name}: {cause}")))?;
+    let tokens = range
+        .tokenize()
+        .into_iter()
+        .map(|token| {
+            // Some Clang token spellings retain physical line continuations, including
+            // a continuation between a macro name and its opening parenthesis.
+            let spelling = unspliced(token.get_spelling());
+            Token {
+                kind: match token.get_kind() {
+                    clang::token::TokenKind::Comment => TokenKind::Comment,
+                    clang::token::TokenKind::Identifier => TokenKind::Identifier,
+                    clang::token::TokenKind::Keyword => TokenKind::Keyword,
+                    clang::token::TokenKind::Literal => TokenKind::Literal,
+                    clang::token::TokenKind::Punctuation => TokenKind::Punctuation,
+                },
+                spelling,
+            }
+        })
+        .collect::<Vec<_>>();
+    // Clang distinguishes dynamic builtin macros from ordinary compiler predefines.
+    // The latter originate in its synthetic buffer, which has no physical file.
+    let builtin = entity.is_builtin_macro()
+        || entity.get_location().is_some_and(|location| {
+            location.get_file_location().file.is_none()
+                && location.get_presumed_location().0 == "<built-in>"
+        });
+    Ok(MacroDefinition {
+        name,
+        kind: if entity.is_function_like_macro() {
+            MacroKind::FunctionLike
+        } else {
+            MacroKind::ObjectLike
+        },
+        location: entity.get_location().and_then(source_location),
+        provenance,
+        tokens,
+        builtin,
+        main_file: entity.is_in_main_file(),
+    })
 }
 
 /// A token's spelling without line splices.

@@ -24,8 +24,7 @@ mod tests {
     use pgrx::pg_sys as pg;
     use pgrx::prelude::*;
 
-    // Assertion-enabled C profiles skip this macro's stringification dependency.
-    // Test its generated API only when that API exists in the inspected profile.
+    // Test this macro's generated API only when that API exists in the inspected profile.
     pg::__pgrx_c_classify! { @if_available PageSetPrunable {
     /// Check that the generated page macro short-circuits before a backend comparison.
     #[pg_test]
@@ -202,19 +201,60 @@ mod tests {
     }
     } }
 
+    /// Checks that `BufferIsValid`, whose assert-enabled checks read `NBuffers` and
+    /// `NLocBuffer`, needs no `unsafe` in either build, nor does `BufferGetPageSize`, whose
+    /// check calls it.
+    #[pg_test]
+    fn generated_buffer_checks_read_globals_without_unsafe() {
+        assert!(!pg::BufferIsValid!(0_i32).is_true());
+        assert!(pg::BufferIsValid!(1_i32).is_true());
+        assert_eq!(pg::BufferGetPageSize!(1_i32).get(), u64::from(pg::BLCKSZ));
+    }
+
+    /// `Assert` is a statement in C, so the macro yields `()` in either build.
+    fn generated_assert_statement(value: i32) {
+        pg::Assert!(value)
+    }
+
+    /// Checks that PostgreSQL's assertion functions are macros that safe code calls in either
+    /// build. An assert-enabled PostgreSQL runs the functions, whose checks hold here; a
+    /// release build has no such functions and evaluates nothing.
+    #[pg_test]
+    fn generated_assertion_functions_run_in_a_backend() {
+        generated_assert_statement(1);
+        // SAFETY: a `#[pg_test]` runs in a transaction on the backend thread, which is all
+        // this function requires.
+        let xid = unsafe { pg::GetTopTransactionId() };
+        let () = pg::AssertTransactionIdInAllowableRange!(xid).get();
+        let () = pg::AssertTransactionIdInAllowableRange!(pg::FrozenTransactionId).get();
+        let () = pg::AssertCouldGetRelation!().get();
+        let () = pg::AssertPendingSyncs_RelationCache!().get();
+    }
+
+    /// Checks that `intVal` reads an integer node in either build. An assert-enabled
+    /// PostgreSQL first checks the node's tag in `castNodeImpl`, which only it defines; a
+    /// release build compiles that function without the check.
+    #[pg_test]
+    fn generated_node_value_checks_its_tag() {
+        // SAFETY: makeInteger returns a valid Integer node allocated in the current memory
+        // context, which outlives this read of its value.
+        let value = unsafe { pg::intVal!(pg::makeInteger(42)).get() };
+        assert_eq!(value, 42);
+    }
+
     pg::__pgrx_c_classify! { @if_available INTERRUPTS_PENDING_CONDITION {
-    #[allow(dead_code)] // Compile the real backend-global expansion; never execute it here.
-    /// Keep the generated interrupt predicate typechecked where its backend globals exist.
-    ///
-    /// # Safety
-    /// Requires PostgreSQL's initialized backend thread and signal/interrupt state.
-    unsafe fn generated_interrupt_condition_requires_backend() -> bool {
-        // SAFETY: the caller establishes the backend and signal-global access contract.
-        unsafe {
-            pg::__pgrx_c_macros::expression::truth(
-                pg::INTERRUPTS_PENDING_CONDITION!().into_value()
-            )
-        }
+    /// Checks that the interrupt predicate reads `InterruptPending` from safe code on the
+    /// backend thread, and panics before reading it on any other thread.
+    #[pg_test]
+    fn generated_interrupt_condition_checks_the_thread() {
+        let pending = || {
+            pg::__pgrx_c_macros::expression::truth(pg::INTERRUPTS_PENDING_CONDITION!().into_value())
+        };
+        // The first checked call claims its thread as the one allowed to read PostgreSQL's
+        // globals, so this one must come before the read on another thread.
+        pending();
+        let off_thread = std::thread::scope(|scope| scope.spawn(pending).join());
+        assert!(off_thread.is_err(), "INTERRUPTS_PENDING_CONDITION read a global off the backend thread");
     }
     } }
     pg::__pgrx_c_classify! { @if_available CHECK_FOR_INTERRUPTS {

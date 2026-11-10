@@ -789,6 +789,7 @@ mod tests {
                         "// C macro {name}\n// ```text\n// #define {name}(x) (x)\n// ```\n#[macro_export]\nmacro_rules! {name} {{ ($x:expr) => {{ /* PGRX: retained */ $x }}; }}\n"
                     ),
                     const_capability: ConstCapability::RuntimeOnly,
+                    caller_unsafe: false,
                     documentation: Box::new(documentation(name)),
                 },
                 fallback: None,
@@ -928,6 +929,7 @@ mod tests {
         emission.status = EmissionStatus::Emitted {
             rust: rust.into(),
             const_capability: ConstCapability::RuntimeOnly,
+            caller_unsafe: false,
             documentation: Box::new(documentation("__pgrx_c_macro_73656c66")),
         };
         let files = MacroFiles::new(String::new(), &[emission], &fixture.0).unwrap();

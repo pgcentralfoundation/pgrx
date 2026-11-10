@@ -508,6 +508,7 @@ mod tests {
             environment,
             declarations: DeclarationCatalog::default(),
             inventory: MacroInventory { macros: Vec::new(), diagnostics: Vec::new() },
+            flavors: Default::default(),
             dependencies,
         };
         for name in ["Oid", "TransactionId", "_", "type"] {
@@ -708,6 +709,7 @@ mod tests {
             environment,
             declarations: DeclarationCatalog::default(),
             inventory: MacroInventory { macros: Vec::new(), diagnostics: Vec::new() },
+            flavors: Default::default(),
             dependencies,
         };
         for (name, kind, size) in [

@@ -240,7 +240,12 @@ int main(void) {
         ("DELEGATE_ZERO_ARGUMENT", "", ""),
         ("DELEGATE_KEYWORD", "(unsigned long)3", "CValue::<CUnsignedLong>::new(3)"),
         ("DELEGATE_GROUPING_FIXED", "3 + 4", "3_i32 + 4_i32"),
-        ("DELEGATE_UNUSED_WRAPPER", "not_a_binding", "not_a_binding"),
+        // C never compiles an unused argument; Rust checks it in dead code without evaluating it.
+        (
+            "DELEGATE_UNUSED_WRAPPER",
+            "not_a_binding",
+            "panic!(\"an unused operand is not evaluated\")",
+        ),
     ] {
         writeln!(c, "RECORD(\"{name}\", {name}({c_arguments}));").unwrap();
         writeln!(rust, "record(\"{name}\", {name}!({rust_arguments}));").unwrap();

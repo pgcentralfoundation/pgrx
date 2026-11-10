@@ -297,7 +297,7 @@ fn main() {
         let a = NAME_PRIVS!(parameter_record(15)).get();
         let b = NAME_PAIR!(3_u32, 4_u32).get();
         let c = NAME_REPEAT!(parameter_record(29)).get();
-        let d = NAME_UNUSED!(7_u32, unknown_identifier).get();
+        let d = NAME_UNUSED!(7_u32, panic!("an unused operand is not evaluated")).get();
         let e = NAME_CAST_PROVEN!(u8, parameter_record(257)).get();
         let f = NAME_FIELD!(pointer, state).get();
         let g = NAME_KEYWORDS!(1_u32, 2_u32).get();

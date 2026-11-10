@@ -23,6 +23,8 @@
 use super::{CInteger, CValue, IntoCValue, OverflowPolicy, PromotedInteger, sealed};
 use core::marker::PhantomData;
 
+/// Stop the process for failed C assertions and reached unreachable code without a native call.
+pub mod assertion;
 /// Preserve caller literal zero facts until expression/storage boundaries remove source-only metadata.
 /// This supplies contextual null conversions without mistaking runtime zero for a C constant expression.
 pub mod literal;
@@ -2052,6 +2054,56 @@ where
 /// The place must satisfy the initialized read contract of ReadPlace::load.
 pub unsafe fn load<P: ReadPlace>(place: P) -> <P::Type as CType>::Value {
     // SAFETY: The caller establishes this place's complete load contract.
+    unsafe { place.load() }
+}
+
+/// A C object type whose storage loads as a valid Rust value whenever C wrote it through
+/// that type: integers, data pointers, enums, which load their compatible integer, and
+/// `_Bool`, in which C stores only 0 or 1.
+///
+/// Floating objects and function pointers are not included, so generated code cannot read
+/// such a global without its caller's `unsafe`.
+///
+/// # Safety
+/// Loading storage of this type that C initialized and wrote only through this type must
+/// produce a valid Rust value.
+pub unsafe trait GlobalObject: CType {}
+// SAFETY: Every bit pattern is a valid Rust integer. A `_Bool` object that C wrote as
+// `_Bool` holds 0 or 1, the two values of a Rust `bool`, because C converts what it stores.
+unsafe impl<K: CInteger> GlobalObject for K {}
+// SAFETY: As for the integer kind this stores.
+unsafe impl<K: CInteger> GlobalObject for CStoredInteger<K> {}
+// SAFETY: A binding's integer storage is proved to hold every value of its C kind.
+unsafe impl<K: CInteger, R: IntegerStorage<K>> GlobalObject for CIntegerStorage<K, R> {}
+// SAFETY: Every bit pattern is a valid raw pointer, and loading one dereferences nothing.
+unsafe impl<M: CType, Q: Qualifier> GlobalObject for CPointer<M, Q> {}
+// SAFETY: Volatility changes only how the object is read.
+unsafe impl<M: GlobalObject + ScalarObject> GlobalObject for CVolatile<M> {}
+// SAFETY: An enum object loads its compatible integer and never materializes the Rust enum.
+unsafe impl<I: EnumIdentity, K: CInteger, R: EnumStorage<I, K>> GlobalObject
+    for CEnumObject<I, K, R>
+{
+}
+// SAFETY: As for the unqualified enum object; volatility changes only how it is read.
+unsafe impl<I: EnumIdentity, K: CInteger, R: EnumStorage<I, K>> GlobalObject
+    for CVolatile<CEnumObject<I, K, R>>
+{
+}
+
+/// Read a PostgreSQL global variable. Generated macros do so after pgrx's active-thread
+/// check, so their callers need no `unsafe` for the read.
+///
+/// # Safety
+/// `place` must address a C global variable as its declared type, and the caller must have
+/// passed pgrx's active-thread check, on which pgrx relies for every call into PostgreSQL.
+/// PostgreSQL reads and writes its globals on that thread. A global it also sets
+/// asynchronously is `volatile` in C, and the place's declared access reads it as `volatile`.
+pub unsafe fn load_global<P: ReadPlace<Object: GlobalObject>>(
+    place: P,
+) -> <P::Type as CType>::Value {
+    // SAFETY: A global's storage is live, aligned and initialized for the whole process. The
+    // caller runs on the thread that writes it, and `GlobalObject` storage that C wrote is a
+    // valid value. The place's declared access honors a `volatile` global.
     unsafe { place.load() }
 }
 

@@ -44,13 +44,14 @@ fn main() {
     };
 
     reset();
-    EXPR_EMPTY!(undeclared_argument, invalid_function(other_undeclared_argument));
+    // C never compiles these arguments; Rust checks them in dead code without evaluating them.
+    EXPR_EMPTY!(panic!("an unused operand is not evaluated"), panic!("nor this one"));
     EXPR_EMPTY_ZERO!();
     EXPR_EMPTY!(tick(9, 3), tick(8, 2));
     record("empty", CValue::<__pgrx_c_macros::CInt>::new(11), trace.get(), calls.get());
 
     reset();
-    let value = EXPR_DROP_CONSTANT!(undeclared_argument);
+    let value = EXPR_DROP_CONSTANT!(panic!("an unused operand is not evaluated"));
     record_void("void_constant", value, trace.get(), calls.get());
     reset();
     let value = EXPR_DROP!(tick(1, -7));

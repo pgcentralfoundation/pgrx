@@ -369,10 +369,12 @@ pub(super) fn prepare<'a>(
         let by_value_record = std::iter::once(&function.signature.result)
             .chain(parameters)
             .any(|ty| ty.category == crate::TypeCategory::Record);
+        // A definition that differs between assert-enabled and release PostgreSQL is
+        // called in both, so both builds give the function one form.
         let body = source
             .body
             .as_ref()
-            .filter(|_| !by_value_record)
+            .filter(|_| !by_value_record && !frontend.flavors.native_only.contains(name))
             .and_then(|statements| {
                 body_tokens(frontend, name, &holes, source, parameters, statements)
             })

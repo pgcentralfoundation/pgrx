@@ -161,6 +161,9 @@ pub enum SkipReasonCode {
     BindingValueMismatch,
     /// An immediate dependency was refused, so its callers cannot be emitted reliably.
     DependencySkipped,
+    /// Assert-enabled and release PostgreSQL define the macro, or one it expands, in ways no
+    /// single definition serves, so neither build flavor generates it.
+    BuildFlavor,
 }
 
 /// Describe one formal or explicit caller capture and the syntactic capabilities required by all its
@@ -2352,6 +2355,7 @@ mod tests {
                 unsupported_options: Vec::new(),
                 inputs: BuildInputs::default(),
             },
+            flavors: Default::default(),
             dependencies: crate::MacroDependencyGraph::from_environment(&environment),
             environment,
             declarations: DeclarationCatalog::default(),

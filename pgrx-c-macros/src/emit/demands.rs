@@ -120,9 +120,17 @@ pub(super) fn plan<'s>(
         let objects = typed::declared_objects(frontend, analysis, &lowering, &locals);
         let constraints = Constraints::new(frontend, analysis, &objects, &records, &compatibility);
         let mut callees = BTreeSet::new();
-        for node in &expression.syntax.nodes {
+        // A stopping call lowers to safe support, so its callee needs no native capability.
+        let mut stops = BTreeSet::new();
+        for (index, node) in expression.syntax.nodes.iter().enumerate() {
             if let ExpressionKind::Call { callee, .. } = node.kind {
-                callees.insert(constraints.representative[callee]);
+                if super::assertions::stop(frontend.declarations(), &expression.syntax.nodes, index)
+                    .is_some()
+                {
+                    stops.insert(constraints.representative[callee]);
+                } else {
+                    callees.insert(constraints.representative[callee]);
+                }
             }
         }
         for (index, node) in expression.syntax.nodes.iter().enumerate() {
@@ -223,6 +231,8 @@ pub(super) fn plan<'s>(
                             .insert(shape.ty.canonical_spelling.clone(), shape.ty.clone());
                     }
                 }
+                ExpressionKind::Identifier { .. }
+                    if stops.contains(&constraints.representative[index]) => {}
                 ExpressionKind::Identifier { name } => {
                     if let Some(ty) = frontend.declarations().variables.get(name) {
                         requests.types.insert(ty.canonical_spelling.clone(), ty.clone());

@@ -33,6 +33,8 @@ pub struct FrontendOutput {
     /// augmentation.
     #[serde(skip)]
     pub(crate) dependencies: MacroDependencyGraph,
+    /// What comparing the assert-enabled and release flavors of these headers decided.
+    pub(crate) flavors: crate::frontend::Flavors,
 }
 
 /// Expose the inspection bundle without allowing its compiler facts to be assembled independently.
@@ -61,6 +63,56 @@ impl FrontendOutput {
     /// Conservative lexical macro references in the final active environment.
     pub fn dependencies(&self) -> &MacroDependencyGraph {
         &self.dependencies
+    }
+
+    /// What comparing the assert-enabled and release flavors of these headers decided,
+    /// for a report.
+    pub fn flavors(&self) -> &crate::Flavors {
+        &self.flavors
+    }
+
+    /// Whether these headers enable PostgreSQL's assertions, by defining
+    /// `USE_ASSERT_CHECKING`. Generated macros run their assertions only then.
+    pub fn assert_enabled(&self) -> bool {
+        self.flavors.assert_enabled
+    }
+
+    /// Names a binding generator must leave out so that an assert-enabled and a release
+    /// build of the same PostgreSQL version expose the same items.
+    ///
+    /// These are the functions, variables, types, enumerators and macros that only the
+    /// inspected build flavor declares, and the functions that only an assert-enabled
+    /// build defines where a release build defines a macro, such as
+    /// `AssertTransactionIdInAllowableRange`. Generated macros reach the latter through
+    /// their own adapters.
+    pub fn flavor_specific_names(&self) -> impl Iterator<Item = &str> {
+        self.flavors
+            .flavor_specific
+            .iter()
+            .chain(self.flavors.assert_functions.iter().filter(|_| self.flavors.assert_enabled))
+            .map(String::as_str)
+    }
+
+    /// The main file as every pass that expands macros reads it: the inspected file, then
+    /// the definitions both build flavors share. `None` when it exceeds `limit` bytes.
+    pub(crate) fn main_source(
+        &self,
+        limit: usize,
+    ) -> Result<Option<Vec<u8>>, crate::FrontendError> {
+        use std::io::Read as _;
+        let header = &self.profile.header;
+        let error = |source| crate::FrontendError::FileIo { path: header.clone(), source };
+        let mut source = Vec::new();
+        std::fs::File::open(header)
+            .map_err(error)?
+            .take(u64::try_from(limit).unwrap_or(u64::MAX).saturating_add(1))
+            .read_to_end(&mut source)
+            .map_err(error)?;
+        if !self.flavors.definitions.is_empty() {
+            source.push(b'\n');
+            source.extend_from_slice(self.flavors.definitions.as_bytes());
+        }
+        Ok((source.len() <= limit).then_some(source))
     }
 }
 
@@ -825,6 +877,11 @@ pub enum BuiltinKind {
     /// The compiler’s first-operand-preserving branch hint operation proved by signature and LLVM
     /// witnesses.
     Expect,
+    /// `__builtin_unreachable()`. Reaching it is undefined, so a translation stops the process.
+    Unreachable,
+    /// MSVC's `__assume(condition)`. A false condition is undefined, so a translation stops the
+    /// process when the condition is false.
+    Assume,
 }
 
 /// A direct builtin call has this verified C prototype and pure operation.

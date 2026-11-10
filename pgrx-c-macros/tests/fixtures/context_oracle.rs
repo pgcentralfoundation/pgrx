@@ -129,7 +129,8 @@ fn main() {
         CTX_IGNORE!(context_base(pointer));
         record("unused", 0_i32);
         context_reset();
-        CTX_IGNORE!();
+        // C accepts an empty argument; Rust checks an unused operand, so it must be one.
+        CTX_IGNORE!(0_i32);
         record("unused_empty", 0_i32);
         let mut partial = core::mem::MaybeUninit::<ContextRecord>::uninit();
         let partial = partial.as_mut_ptr();
@@ -160,7 +161,6 @@ fn main() {
         record_type("type_cast", CTX_TYPE_PROVEN!(u16, 65537_u32));
         context_reset();
         record_type("type_size", CTX_SIZE!(CTX_FIELD!(context_base(pointer))));
-        CTX_IGNORE!(these tokens are not a Rust expression);
         assert_eq!(CTX_IDENTITY!((@__pgrx_c_native [native::CTX_FIELD!(7_i32)])).get(), 7);
     }
 }

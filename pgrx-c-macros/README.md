@@ -191,10 +191,10 @@ call. Generated calls to a translated function expand its translation. `.get()`
 extracts native storage, including `()` for a void return. When a macro becomes
 an inline function, its return rank or evaluation rules can therefore change with
 PostgreSQL, and so can whether a call needs `unsafe`. Whether a body is translated
-also depends on the build and on the libclang that inspects it. An
-`--enable-cassert` build's `Assert` reports its file and line, which keeps a body
-that uses it native. Some libclang releases locate a statement that starts with a
-macro at the macro's definition, which also keeps the body native. Predicate
+also depends on the libclang that inspects it: some libclang releases locate a
+statement that starts with a macro at the macro's definition, which keeps the body
+native. An assert-enabled build and a release build translate the same bodies; see
+[Assertions and build flavors](#assertions-and-build-flavors). Predicate
 callers can use `.is_true()` for either C `int` or C `bool`; this explicitly
 converts truth without changing `.get()` or the original C identity. Native calls
 retain generated FFI guards and require the original function's unsafe caller
@@ -385,9 +385,13 @@ Operand-dependent dependency stringification is narrower: it must feed a direct
 The C text template is retained, while holes stringify the outer Rust invocation
 tokens without evaluating them. Non-ASCII token spelling, returned strings,
 unknown array extents, address-taking, pointer arithmetic, and concatenation of
-such holes are refused. Root `#` stringification remains unsupported.
-`__FILE__` and `__LINE__` use the Rust invocation's `file!()` and `line!()`, rather
-than freezing the generator's source location. Stringification of those location
+such holes are refused. A root's own `#` stringification is admitted on the same
+terms, as `Assert`'s condition text is. A translated inline body may reach a macro
+that stringifies only the condition it passes to `ExceptionalCondition`; that text
+can differ from C's in spacing, because the body's tokens are replayed with spaces
+between them. `__FILE__` and `__LINE__` use the Rust invocation's `file!()` and
+`line!()`, in macros and translated inline bodies alike, rather than freezing the
+generator's or the header's source location. Stringification of those location
 markers and other dynamic builtins remain unsupported. Literal writes acquire
 no mutation capability; wide, UTF-prefixed and unproved encodings are skipped.
 The typed expression support also covers:
@@ -397,7 +401,9 @@ The typed expression support also covers:
 - Record and union fields, packed fields, compiler-described bitfields, volatile
   accesses, assignment, compound assignment, and prefix and postfix mutation.
 - Unevaluated `sizeof` and alignment expressions, comma expressions, type and
-  field-name parameters, unused arguments, and empty replacements.
+  field-name parameters, unused arguments, and empty replacements. An unused
+  argument must be a Rust expression, and is checked in dead code like any operand
+  the expansion does not evaluate.
 - Calls through complete C prototypes, including static inline functions and
   nullable function pointers, and addresses of original C functions.
 - Compiler byte-swap intrinsics whose direct-call prototypes and LLVM value
@@ -419,6 +425,9 @@ The typed expression support also covers:
   values use stable Rust's `core::hint::cold_path()` to preserve branch direction;
   enclosing expectations take precedence over nested hints through groups or casts.
   Dynamic expectations remain unhinted, with a generated comment explaining why.
+- `ExceptionalCondition`, `abort()`, `__builtin_unreachable()` and MSVC's
+  `__assume`, which stop the process; see
+  [Assertions and build flavors](#assertions-and-build-flavors).
 - Closed token pastes resolved by Clang, including literal suffixes and fixed
   type, field, function, enum and helper names. Separate compiler probes reject
   pastes that depend on caller operands and discover synthesized dependencies
@@ -446,6 +455,18 @@ outside C's defined domain is rejected by the safe scalar support. Pointer and
 storage operations require the caller's `unsafe` context; the generated macro does
 not discharge allocation bounds, initialization, aliasing, provenance or backend
 thread requirements. PostgreSQL calls retain pgrx's FFI error and panic guard.
+
+Reading a global is the exception when the binding catalog names a thread check, as
+pgrx-pg-sys's does. A macro reads an integer, `_Bool`, enum or data pointer global
+after pgrx's active-thread check, so the read needs no `unsafe`. That check is the
+one pgrx relies on for every call into PostgreSQL, which reads and writes its
+globals on the thread that passes it; it panics on another thread. A global that
+PostgreSQL also sets asynchronously is `volatile` in C and is read as `volatile`.
+An object of one of those types loads a valid Rust value from anything C stores in
+it through that type. Enum globals load their compatible integer, never the Rust
+enum. Writes, dereferences, and reads of floating, aggregate or function pointer
+globals still need the caller's `unsafe`. Each read runs the check, including in
+release builds.
 Native adapters convert arguments and check nullable function pointers before
 entering that guard, and decode results after leaving it.
 
@@ -463,6 +484,87 @@ accepts expression operands there.
 Compatible function pointer types
 with distinct generated signature markers are conservatively rejected in
 operations that would require a proof relating those signatures.
+
+### Assertions and build flavors
+
+A program that uses the generated macros compiles against a PostgreSQL configured
+with `--enable-cassert` and against one configured without, when both are the same
+version. A macro has the same name, operands, result and need for `unsafe` against
+both, and the same Rust source apart from layout facts. No macro leaves out a check
+that the assert-enabled headers make. `USE_ASSERT_CHECKING` otherwise changes which
+names the headers declare, how `Assert` and its relatives are defined, and what some
+static inline functions contain.
+
+Inspection therefore parses the headers a second time, in memory, as the other build
+flavor: with `USE_ASSERT_CHECKING` defined on the command line, or with its
+definitions blanked. Both flavors then hold the same two views and decide the same
+things from them:
+
+- A function-like macro that the flavors define differently, such as `Assert`,
+  `AssertMacro` and `pg_unreachable`, is translated from its assert-enabled
+  definition in both. Macros and static inline functions that use it follow. The
+  generated documentation shows that definition and its location.
+- Whether an assertion runs is a constant of the installation,
+  `__pgrx_c_assert_checking!()`, which the generated support defines. Against a
+  release build an `if` statement that only reports a failed assertion, and the
+  `holds || (report, 0)` of `AssertMacro`, are compiled and never evaluated, as in
+  release C. Their operands are still type-checked and still need `unsafe` where
+  they read through a pointer, so `PageValidateSpecialPointer` needs `unsafe`
+  against both builds.
+- A function that only an assert-enabled build declares, where a release build
+  defines a macro that does nothing, becomes a macro that calls the function:
+  `AssertTransactionIdInAllowableRange`, `AssertPendingSyncs_RelationCache` and
+  `SlruPagePrecedesUnitTests`. Against a release build the call is not made and its
+  arguments are not evaluated. The binding generator leaves the function out, and
+  the macro reaches it through a generated adapter, which does nothing in a release
+  build. So does a function that one flavor defines `static inline` and the other
+  only declares, such as `AssertCouldGetRelation`, which both builds bind.
+- A static inline function whose definition differs between the flavors, such as
+  `TupleDescCompactAttr`, is called, not translated, in both.
+- A name that only one flavor declares is generated and bound by neither:
+  `castNodeImpl`, `MemoryContextCheck` and `USE_ASSERT_CHECKING` itself, for example.
+  So is a function whose prototype differs. `FrontendOutput::flavor_specific_names`
+  lists them for the binding generator.
+- A static inline function that only an assert-enabled build defines, such as
+  `castNodeImpl`, is still called by the macros that use it, through a generated
+  adapter. A release build compiles the function's own definition into its native
+  support, where its assertions do nothing. So `intVal` and its relatives, which
+  expand `castNode`, check the node's tag against an assert-enabled build and are
+  the same macros against a release build. `castNode` itself and `lfirst_node`
+  paste `T_` onto a type operand, which no build can translate; see closed token
+  pastes above.
+- A macro whose assert-enabled definition needs any other name that a release build
+  lacks is generated by neither flavor, and neither is a macro that expands it.
+  Their skip code is `build_flavor`. Emitting the release definition instead would
+  leave out a check.
+
+Calls that stop the process lower to safe Rust in pgrx-pg-sys's support, without a
+native call. `ExceptionalCondition`, which `Assert` and its relatives call, writes
+PostgreSQL's `TRAP:` line and a backtrace to stderr and aborts. Its condition text
+is the C text, or the Rust invocation's tokens for a macro operand, and its file and
+line are those of the Rust code that used the macro. `abort()` aborts. Reaching
+`__builtin_unreachable()`, or a false MSVC `__assume`, is undefined in C, so it
+writes a `TRAP:` line and aborts. A failed check never unwinds, so it cannot become
+a recoverable PostgreSQL `ERROR`. Only a report through `ExceptionalCondition`
+depends on the installation; any other stop, and the condition that guards it, runs
+in every build.
+
+A macro that calls an assertion function needs the caller's `unsafe`, as any native
+call does, unless the function is one that generated code may call from safe code.
+Those are listed by name in `emit/assertions.rs`, each with the reason: they take no
+pointer and need only the backend state that pgrx's safe wrappers already assume,
+and the guarded call checks pgrx's active thread. `SlruPagePrecedesUnitTests` takes a
+pointer and needs `unsafe` against both builds.
+
+A macro operand that the expansion never names as a value, because the argument is
+unused or appears only in a stop's text, is checked in dead code, so an operand that
+needs `unsafe` needs it although no build's C evaluates it.
+
+Differences that are not names stay: a structure member or enumerator that only one
+flavor has, such as `JumbleState.total_jumble_len`, and the value of an object-like
+macro. The emission report records `caller_unsafe` for each emitted macro, and
+pgrx-pg-sys's macro report records these decisions under `build_flavors`, so that
+builds can be compared.
 
 ## Calling generated macros
 
@@ -730,8 +832,8 @@ is missing.
 Tests wrapped in `if_c_macro!` or the classifier's availability arm disappear
 when their macro is not emitted. The `pgrx-pg-sys` `macro_availability` test
 therefore requires each name gated in `pgrx-pg-sys/tests` and
-`pgrx-unit-tests/src/tests` to be emitted, apart from the version and
-assertion-profile differences it lists. It skips a gate that the build compiles
+`pgrx-unit-tests/src/tests` to be emitted, apart from the version differences it
+lists. It skips a gate that the build compiles
 out through a file-level `#![cfg]` or a single-line `#[cfg]` written directly
 on the gate, so put a platform or version cfg there rather than inside the
 gate. The guard evaluates only `target_os = "..."`, `feature = "pgNN"`, `docsrs`
