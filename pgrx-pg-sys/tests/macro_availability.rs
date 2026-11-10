@@ -105,6 +105,8 @@ const ALLOWANCES: &[Allowance] = &[
     Allowance { name: "__PGRX_REVIEW_MACRO_THAT_DOES_NOT_EXIST", majors: 0..=u16::MAX, skip: None },
     // PostgreSQL 16 introduced soft error contexts.
     Allowance { name: "SOFT_ERROR_OCCURRED", majors: 15..=15, skip: None },
+    // PostgreSQL 18 introduced compact attributes.
+    Allowance { name: "TupleDescCompactAttr", majors: 15..=17, skip: None },
     // PostgreSQL 15's timespec conversions use floating-point literals.
     Allowance { name: "INSTR_TIME_GET_DOUBLE", majors: 15..=15, skip: Some("unsupported_literal") },
     Allowance {
