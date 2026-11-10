@@ -760,15 +760,47 @@ implements the trait when all of these hold:
   flavors declare both names.
 - The bindings hold the structure and the enumerator, with the value Clang reports.
 - No other C name of the same structure has an enumerator of its own, even one
-  that a macro hides or the bindings lack. PostgreSQL names one structure `OpExpr`, `DistinctExpr` and `NullIfExpr`, with a node tag
-  for each. Rust sees one type, so none of the three names selects a tag; compare
-  `nodeTag!` with the enumerator instead.
+  that a macro hides or the bindings lack.
 
 Any other type fails to compile with an error that names the prefix and the enum,
-as the pasted name fails to resolve in C. Any Rust path or alias of a bound type
-names that type. C also accepts a name that is no type, as in
+as the pasted name fails to resolve in C. Any Rust path or alias of a type that
+implements the trait names that type. C also accepts a name that is no type, as in
 `IsA(list, IntList)`; a Rust type operand cannot say that, so compare `nodeTag!`
 with `T_IntList`.
+
+PostgreSQL names one structure `OpExpr`, `DistinctExpr` and `NullIfExpr`, with a
+node tag for each. Rust sees one type, which cannot say which tag is meant, so the
+structure implements nothing and the operand's spelling selects the name, as in C:
+
+```rust,ignore
+// SAFETY: `node` points to a node, and a backend allocates the new one.
+unsafe {
+    assert!(pg_sys::IsA!(node, pg_sys::DistinctExpr).is_true()); // T_DistinctExpr
+    let null_if: *mut pg_sys::OpExpr = pg_sys::makeNode!(pg_sys::NullIfExpr).get(); // T_NullIfExpr
+}
+```
+
+A macro whose type operand is pasted onto one prefix hands that operand's tokens
+to an exported macro of the prefix, `__pgrx_c_type_name_<prefix>!`, before any
+`ty` fragment parses them. It reads a plain path, with or without a leading `::`,
+one token tree at a time. When the last segment is a C name of a shared structure
+and ends the operand, it wraps the path in that name's carrier type,
+`__pgrx_c_generated::type_names_<prefix>::<Name><path>`. The carrier implements
+the trait for the shared structure only, with that name's enumerator, so another
+type whose path ends in the same name fails to compile. The trait's `Type` is the
+structure, which the macro's casts and `sizeof` of that operand name. Every other
+operand reaches the `ty` fragment as written. These therefore still fail to
+compile, and the error lists the names:
+
+- An alias of the shared structure, such as `type Distinct = pg_sys::DistinctExpr;`.
+  It spells none of the C names, and choosing one would change what the others mean.
+- A type that the caller's own macro captured as a `ty` fragment, which hides its
+  spelling. Capture token trees instead.
+- A name whose enumerator a macro hides or the bindings lack. It gets no carrier.
+
+Only a prefix with such a structure has the exported macro, and only its macros
+call it. A macro that pastes two prefixes onto one operand takes that operand as
+written.
 
 The lookup itself is a constant. `IsA!` reads the node through the caller's
 pointer, `castNode!` and the list macros call `castNodeImpl`, and `makeNode!` calls
@@ -779,7 +811,8 @@ comma expression that keeps the node in the global `newNodeMacroHolder`, a write
 that needs the caller's `unsafe` like any other. PostgreSQL 17 made `newNode` an
 inline function.
 Each form gives the same `makeNode!`. The size check of the two macro forms
-stringifies the type operand, so a failed check names the Rust type.
+stringifies the type operand, so a failed check names the Rust type, inside its
+carrier when the operand named a shared structure.
 
 A macro is still skipped when a paste puts the operand first or between two
 pasted parts, when the expansion erases, stringifies or pastes the result again,

@@ -126,6 +126,38 @@ pub(super) struct Renderer<'a> {
     /// Whether the rendered arm declares [`super::THREAD`], the one thread check its
     /// global reads and translated calls share.
     shares_thread: bool,
+    /// The type parameters a fixed prefix is pasted onto.
+    pasted: BTreeMap<usize, Pasted<'a>>,
+}
+
+/// A type parameter that C pastes a fixed prefix onto to name an enumerator.
+///
+/// Its operand is a type that implements the prefix's lookup: a structure type, or the
+/// carrier of a C name that shares its structure. Every other use of the parameter
+/// therefore names the lookup's `Type`, which is the structure in both cases.
+pub(super) struct Pasted<'a> {
+    /// The prefix of the first paste, whose lookup gives the structure type.
+    pub prefix: &'a str,
+    /// The node of that paste, where a refused lookup is reported.
+    node: NodeId,
+    /// Whether every paste onto the parameter uses that one prefix. Carriers belong to one
+    /// prefix, so only then can the operand's spelling select one.
+    pub single: bool,
+}
+
+/// Each type parameter of `analysis` that a fixed prefix is pasted onto.
+pub(super) fn pasted_parameters(analysis: &MacroAnalysis) -> BTreeMap<usize, Pasted<'_>> {
+    let mut pasted = BTreeMap::<usize, Pasted<'_>>::new();
+    let nodes = analysis.expression.as_ref().map_or(&[][..], |expression| &expression.syntax.nodes);
+    for (node, expression) in nodes.iter().enumerate() {
+        if let ExpressionKind::TypeParameterPaste { prefix, parameter } = &expression.kind {
+            pasted
+                .entry(*parameter)
+                .and_modify(|first| first.single &= first.prefix == prefix)
+                .or_insert(Pasted { prefix, node, single: true });
+        }
+    }
+    pasted
 }
 
 /// Lower each expression occurrence under its own C context with shared trusted object facts.
@@ -244,6 +276,50 @@ impl<'a> Renderer<'a> {
             mode: RenderMode::Macro,
             caller_unsafe,
             shares_thread,
+            pasted: pasted_parameters(analysis),
+        }
+    }
+
+    /// The lookup of the enumerators that `prefix` pastes into, for the paste at `node`.
+    fn type_enumerator_lookup(
+        &self,
+        prefix: &str,
+        node: NodeId,
+    ) -> Result<&'a super::type_enumerators::Lookup, SkipReason> {
+        use super::type_enumerators::Refusal;
+        let expression = self.analysis.expression.as_ref().expect("candidate expression");
+        let tokens = Some(expression.syntax.nodes[node].tokens);
+        match self.adapters.and_then(|adapters| adapters.type_enumerators.lookups.get(prefix)) {
+            Some(Ok(lookup)) => Ok(lookup),
+            Some(Err(Refusal::ValueMismatch { name, bindgen, clang })) => {
+                Err(super::mismatch_reason(self.analysis, name, *bindgen, *clang))
+            }
+            Some(Err(Refusal::Unavailable(reason))) => {
+                Err(skip(self.analysis, SkipReasonCode::TokenPaste, reason.clone(), tokens))
+            }
+            None => Err(skip(
+                self.analysis,
+                SkipReasonCode::TokenPaste,
+                format!("no lookup of the enumerators that `{prefix}` pastes into was generated"),
+                tokens,
+            )),
+        }
+    }
+
+    /// The Rust type a type parameter's operand names, for a cast, `sizeof`, `_Alignof` or
+    /// `offsetof`.
+    ///
+    /// The operand of a parameter that a prefix is pasted onto may be a carrier, so the
+    /// structure is the lookup's `Type`. A documentation shell has no argument normalizer
+    /// and so never receives a carrier: its operand is the structure itself.
+    fn type_operand(&self, parameter: usize) -> Result<String, SkipReason> {
+        let name = arguments::name(self.analysis, parameter);
+        match self.pasted.get(&parameter).filter(|_| self.mode == RenderMode::Macro) {
+            Some(pasted) => {
+                let lookup = self.type_enumerator_lookup(pasted.prefix, pasted.node)?;
+                Ok(format!("<${name} as {}>::Type", lookup.path))
+            }
+            None => Ok(format!("${name}")),
         }
     }
 
@@ -1706,8 +1782,8 @@ impl<'a> Renderer<'a> {
                             let (marker, mut canonical) = match record {
                                 OffsetRecord::Parameter { index } => (
                                     format!(
-                                        "<${} as {EXPRESSION}::NativeType>::Marker",
-                                        arguments::name(analysis, *index)
+                                        "<{} as {EXPRESSION}::NativeType>::Marker",
+                                        self.type_operand(*index)?
                                     ),
                                     None,
                                 ),
@@ -1774,8 +1850,8 @@ impl<'a> Renderer<'a> {
                             operand,
                         } => {
                             let mut marker = format!(
-                                "<${} as {EXPRESSION}::NativeType>::Marker",
-                                arguments::name(analysis, *parameter)
+                                "<{} as {EXPRESSION}::NativeType>::Marker",
+                                self.type_operand(*parameter)?
                             );
                             for depth in 0..*pointers {
                                 marker = format!(
@@ -1792,50 +1868,30 @@ impl<'a> Renderer<'a> {
                             tasks.extend([text(")"), value(*operand)]);
                         }
                         ExpressionKind::TypeParameterPaste { prefix, parameter } => {
-                            use super::type_enumerators::Refusal;
                             // The lookup is an associated constant of the operand's type: a
                             // type whose name pastes into no enumerator does not implement
-                            // it. A witness names it too, so a shell keeps that bound.
-                            let lookup = self
-                                .adapters
-                                .and_then(|adapters| adapters.type_enumerators.lookups.get(prefix));
-                            match lookup {
-                                Some(Ok(lookup)) => write!(
-                                    rust,
-                                    "<${} as {lookup}>::VALUE",
-                                    arguments::name(analysis, *parameter)
-                                )
-                                .expect("String output"),
-                                Some(Err(Refusal::ValueMismatch { name, bindgen, clang })) => {
-                                    return Err(super::mismatch_reason(
-                                        analysis, name, *bindgen, *clang,
-                                    ));
-                                }
-                                Some(Err(Refusal::Unavailable(reason))) => {
-                                    return Err(skip(
-                                        analysis,
-                                        SkipReasonCode::TokenPaste,
-                                        reason.clone(),
-                                        Some(node.tokens),
-                                    ));
-                                }
-                                None => {
-                                    return Err(skip(
-                                        analysis,
-                                        SkipReasonCode::TokenPaste,
-                                        format!(
-                                            "no lookup of the enumerators that `{prefix}` pastes into was generated"
-                                        ),
-                                        Some(node.tokens),
-                                    ));
-                                }
+                            // it. A witness names it too, so a shell keeps that bound. A
+                            // shell cannot read its operand's spelling, though, so where a
+                            // C name selects its enumerator by spelling the witness gives
+                            // only the enumerators' one C type.
+                            let lookup = self.type_enumerator_lookup(prefix, index)?;
+                            if self.collapses(context) && lookup.names.is_some() {
+                                write_witness(rust, &format!("{SUPPORT}::{}", lookup.marker));
+                                continue;
                             }
+                            write!(
+                                rust,
+                                "<${} as {}>::VALUE",
+                                arguments::name(analysis, *parameter),
+                                lookup.path
+                            )
+                            .expect("String output");
                         }
                         ExpressionKind::SizeOfTypeParameter { parameter, pointers, is_const }
                         | ExpressionKind::AlignOfTypeParameter { parameter, pointers, is_const } => {
                             let mut marker = format!(
-                                "<${} as {EXPRESSION}::NativeType>::Marker",
-                                arguments::name(analysis, *parameter)
+                                "<{} as {EXPRESSION}::NativeType>::Marker",
+                                self.type_operand(*parameter)?
                             );
                             for depth in 0..*pointers {
                                 marker = format!(

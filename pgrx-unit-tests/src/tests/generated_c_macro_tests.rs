@@ -262,6 +262,50 @@ mod tests {
         }
     }
 
+    /// Checks that each C name of the structure that `OpExpr`, `DistinctExpr` and
+    /// `NullIfExpr` share selects its own tag. Rust sees one type, so `makeNode`, `IsA`,
+    /// `castNode` and the list macros read the name from the operand's spelling.
+    #[pg_test]
+    fn generated_node_macros_tell_the_names_of_a_shared_structure_apart() {
+        // SAFETY: a `#[pg_test]` runs on the backend thread with a current memory context,
+        // in which `makeNode` allocates three zeroed nodes of the shared structure and
+        // stores a tag in each. Every pointer below addresses one of them or the list that
+        // holds them, and `list_free_deep` frees the nodes and the list once.
+        unsafe {
+            let op: *mut pg::OpExpr = pg::makeNode!(pg::OpExpr).get();
+            let distinct: *mut pg::DistinctExpr = pg::makeNode!(pg::DistinctExpr).get();
+            let null_if: *mut pg::OpExpr = pg::makeNode!(::pgrx::pg_sys::NullIfExpr).get();
+            let tags = [op, distinct, null_if].map(|node| pg::nodeTag!(node).get());
+            assert_eq!(
+                tags,
+                [pg::NodeTag::T_OpExpr, pg::NodeTag::T_DistinctExpr, pg::NodeTag::T_NullIfExpr]
+                    .map(|tag| tag as u32)
+            );
+            for (index, node) in [op, distinct, null_if].into_iter().enumerate() {
+                let is = [
+                    pg::IsA!(node, pg::OpExpr).is_true(),
+                    pg::IsA!(node, pg::DistinctExpr).is_true(),
+                    pg::IsA!(node, pg::NullIfExpr).is_true(),
+                ];
+                assert_eq!(is, [index == 0, index == 1, index == 2]);
+            }
+            // An assert-enabled PostgreSQL checks each of these tags in `castNodeImpl`.
+            let cast: *mut pg::OpExpr =
+                pg::castNode!(pg::DistinctExpr, distinct.cast::<pg::Node>()).get();
+            assert_eq!(cast, distinct);
+            let mut list = core::ptr::null_mut();
+            for node in [op, distinct, null_if] {
+                list = pg::lappend(list, node.cast());
+            }
+            assert_eq!(pg::linitial_node!(pg::OpExpr, list).get(), op);
+            assert_eq!(pg::lsecond_node!(pg::DistinctExpr, list).get(), distinct);
+            assert_eq!(pg::llast_node!(pg::NullIfExpr, list).get(), null_if);
+            let cell = pg::list_nth_cell(list, 1);
+            assert_eq!(pg::lfirst_node!(pg::DistinctExpr, cell).get(), distinct);
+            pg::list_free_deep(list);
+        }
+    }
+
     /// Checks that the list macros cast a cell's node to their type operand. An
     /// assert-enabled PostgreSQL checks each node's tag in `castNodeImpl` first, and every
     /// tag here is the one its macro names, so both builds return the nodes.

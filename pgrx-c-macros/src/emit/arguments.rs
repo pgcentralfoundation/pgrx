@@ -15,7 +15,7 @@
 use super::{MAX_EMISSION_BYTES, macro_identifier, skip};
 use crate::{MacroAnalysis, ParameterOrigin, ParameterRole, SkipReason, SkipReasonCode};
 use std::borrow::Cow;
-use std::collections::BTreeSet;
+use std::collections::{BTreeMap, BTreeSet};
 use std::fmt::Write;
 
 /// Cap per-macro normalization stages so pathological parameter lists fail predictably.
@@ -161,7 +161,16 @@ pub(super) fn render_operand_checks(analysis: &MacroAnalysis, parameters: &[usiz
 }
 
 /// Generate linear stages for this macro's compiler-established parameter list.
-pub(super) fn generate(analysis: &MacroAnalysis) -> Result<Option<ArgumentAdapter>, SkipReason> {
+///
+/// `type_names` gives, for a type parameter whose C name selects an enumerator, the
+/// exported macro that finds the C names sharing a structure in the operand's spelling.
+/// That parameter's stage hands its tokens to the macro first. The macro continues with
+/// the next stage and a carrier type when the operand is a plain path ending in such a
+/// name, and otherwise returns the tokens to this parameter's own type stage.
+pub(super) fn generate(
+    analysis: &MacroAnalysis,
+    type_names: &BTreeMap<usize, &str>,
+) -> Result<Option<ArgumentAdapter>, SkipReason> {
     if analysis.parameters.is_empty() {
         return Ok(None);
     }
@@ -292,11 +301,20 @@ pub(super) fn generate(analysis: &MacroAnalysis) -> Result<Option<ArgumentAdapte
             )
             .expect("String output");
         }
+        // A failed `ty` parse is fatal too, so the name macro reads the raw tokens first
+        // and the type fragment parses them only when it returns them.
+        let type_stage = match type_names.get(&index).filter(|_| parameter.is_type()) {
+            Some(names) => {
+                writeln!(rust, "(@p{index} $mode:ident [$($done:tt)*]; $($raw:tt)*) => {{ $crate::{names}!(@type [{normalizer}] [p{next} t{index} $mode [$($done)*]]; $($raw)*) }};").expect("String output");
+                format!("t{index}")
+            }
+            None => format!("p{index}"),
+        };
         for ending in endings {
             let rest = if ending.is_empty() { "" } else { "$($rest)*" };
             let state = format!("[p{next} $mode [$($done)*] [{rest}]]");
             if parameter.is_type() {
-                writeln!(rust, "(@p{index} $mode:ident [$($done:tt)*]; $argument:ty{ending}) => {{ $crate::{normalizer}!(@p{next} $mode [$($done)* $argument,]; {rest}) }};").expect("String output");
+                writeln!(rust, "(@{type_stage} $mode:ident [$($done:tt)*]; $argument:ty{ending}) => {{ $crate::{normalizer}!(@p{next} $mode [$($done)* $argument,]; {rest}) }};").expect("String output");
                 continue;
             }
             if parameter.roles.contains(&ParameterRole::Identifier) {

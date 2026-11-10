@@ -1662,7 +1662,8 @@ constructor does not call the pointer or discharge the unsafe invocation contrac
 
 For each requested prefix, `type_enumerators::generate` writes a trait,
 `TypeEnumerator_<prefix>`, whose one constant is an enumerator as a `CValue` of
-its C type. A macro reads it as `<$type as TypeEnumerator_<prefix>>::VALUE`,
+its C type, and whose `Type` is the structure the operand names. A macro reads
+the constant as `<$type as TypeEnumerator_<prefix>>::VALUE`,
 where C pastes the prefix onto the type's name. Each type of the prefix's family
 (section 8) implements the trait when the bindings hold both its record and its
 enumerator:
@@ -1675,22 +1676,60 @@ enumerator:
   compile, as a pasted name that is no enumerator fails in C.
   `#[diagnostic::on_unimplemented]` names the prefix and the enum.
 - A record that several C names share, each with its own enumerator, implements
-  nothing. PostgreSQL's `OpExpr`, `DistinctExpr` and `NullIfExpr` name one
+  nothing itself. PostgreSQL's `OpExpr`, `DistinctExpr` and `NullIfExpr` name one
   structure, which Rust sees as one type. Choosing `T_OpExpr` for it would change
   what `IsA(node, DistinctExpr)` tests without any sign at the call. A name whose
   enumerator a macro hides or the bindings lack still counts, since Rust can
-  spell that name as the same type. The diagnostic lists these names.
-- A Rust alias or other path of a bound record names the same type and selects the
-  same enumerator. An enumerator that C names for something other than a type,
+  spell that name as the same type.
+- Each name of such a record that has a bound enumerator, and is a plain Rust
+  identifier, gets a carrier type, `type_names_<prefix>::<Name><T>`. Only the
+  carrier of the record itself implements the trait, as
+  `impl TypeEnumerator_T_ for type_names_T_::DistinctExpr<crate::OpExpr>`, with
+  that name's enumerator. The trait's `Type` is the record there and `Self` for
+  every other implementation.
+- A Rust alias or other path of a bound record with one name is the same type
+  and selects the same enumerator. An alias of a shared record spells none of its
+  names and fails to compile; the diagnostic lists the names that have a carrier.
+  An enumerator that C names for something other than a type,
   as `T_IntList` is, has no Rust operand: compare `nodeTag!` with it instead.
 - The trait has a supertrait in a private module of the generated support, so no
   other crate can implement it and claim an enumerator for a type of its own.
 - No implementation at all refuses the lookup, and its macros are skipped with
   `token_paste`.
 
+A prefix with carriers also gets an exported macro, `__pgrx_c_type_name_<prefix>!`,
+which is the only code that creates a carrier. The argument normalizer of a macro
+whose type parameter is pasted onto that one prefix gives the parameter's stage,
+`@pN`, a single arm that passes the remaining tokens to it, with the names of two
+stages to continue at. The macro walks a plain path one token tree at a time,
+within 64 segments: an optional leading `::`, then `segment ::` pairs. Its first
+arms match each carried name followed by the end of the input or by a comma.
+They continue at the next stage, `@pN+1`, with the carrier wrapped around the
+path read so far and the name. Every other input continues at the parameter's
+type stage, `@tN`, with the original tokens, where the `ty` fragment parses them
+as it would have. Matching one token tree at a time matters: `$($segment:ident
+::)* Name` is ambiguous to `macro_rules!`, and a failed `ty` parse is a hard
+error, not a fall-through.
+
+Inside a macro, a paste renders as `<$type as TypeEnumerator_<prefix>>::VALUE`,
+and every other use of that parameter, in a cast, `sizeof`, `_Alignof` or
+`offsetof`, as `<$type as TypeEnumerator_<prefix>>::Type`, so a carrier works
+wherever the structure did. A type parameter that is never pasted is rendered as
+before. A recovered call (section 11) never forwards a type operand: recovery
+takes arguments only from the callee's value holes, and a type parameter has
+none, so `lfirst_node` expands `castNode` and each macro normalizes its own
+operand once. A parameter pasted onto two prefixes gets no name stage, since a
+carrier belongs to one prefix.
+
+A documentation shell has no normalizer, so its `ty` operand is never a carrier.
+Its witness names the operand itself in casts and sizes, which is the same
+structure. Where a prefix has carriers, a witness that reaches the pasted name
+gives only the enumerators' C type and does not require the lookup of the
+operand, because the shell cannot read the spelling that selects a carrier.
+
 The trait and its implementations name bindings and no values. The family leaves
 out names that only one build flavor declares, and the bindings never hold them,
-so both flavors generate the same lookups.
+so both flavors generate the same lookups, carriers and name macros.
 
 ## 13. Generated C and native safety
 
@@ -2160,7 +2199,8 @@ like every evaluated or unused operand, it is an `expr`. Every arm expands to th
   macro's `CExpression<V>` type.
   A name pasted onto a type operand renders its lookup, so a shell requires the
   same trait of that type as the real macro unless an enclosing collapsed node,
-  such as a cast or comparison, closes over it.
+  such as a cast or comparison, closes over it, or the prefix has C names that
+  share a structure (section 12).
 - A translated inline function body passes `type_witness::<M>()` for its result
   marker `M`, or `()` for a void function, in a block that borrows every
   argument, which the real body evaluates once before it runs.
@@ -2725,6 +2765,7 @@ positions, or the build environment:
 | Callback signature | `Signature_<encoded C function type>` |
 | Enum identity | `EnumIdentity_<encoded C enum type>` |
 | Type enumerator lookup | `TypeEnumerator_<prefix>`, sealed by `type_enumerator_seals::Seal_<prefix>` |
+| Shared C type name | carrier `type_names_<prefix>::<name>`, exported macro `__pgrx_c_type_name_<prefix>` |
 
 Native helper names put their role before the C names (`__pgrx_inline__arg0__f`),
 and multi-part names join plain C identifiers with `__`. A part that is not a

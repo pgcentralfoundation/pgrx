@@ -459,9 +459,16 @@ node tag does not compile, and the error says that no enumerator of `enum NodeTa
 is `T_` followed by that type's name.
 
 `OpExpr`, `DistinctExpr` and `NullIfExpr` are one structure in C, each with its
-own tag, and one type in Rust. None of the three names is accepted, since a Rust
-type cannot say which tag is meant. Use `PgNode::is_a_ptr` with the tag there, and
-for a tag that names no structure, such as `T_IntList`.
+own tag, and one type in Rust. The name you write selects the tag, as it does in
+C: `pgrx::IsA!(node, pg_sys::DistinctExpr)` tests for `T_DistinctExpr`, and
+`pgrx::makeNode!(pg_sys::NullIfExpr)` tags its node `T_NullIfExpr`. Write the name
+as the last segment of a plain path, such as `DistinctExpr`,
+`pg_sys::DistinctExpr` or `::pgrx::pg_sys::DistinctExpr`. An alias of your own,
+such as `type Distinct = pg_sys::DistinctExpr;`, spells none of the three names
+and does not compile. Neither does a type that your own macro captured as a `ty`
+fragment before passing it on; capture it as token trees instead. The error lists
+the names. Use `PgNode::is_a_ptr` for a tag that names no structure, such as
+`T_IntList`.
 
 Each of these macros needs `unsafe` against an assert-enabled and a release
 PostgreSQL alike. `IsA!` reads the node through your pointer. `castNode!` and the
