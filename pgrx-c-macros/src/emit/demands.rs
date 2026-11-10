@@ -46,6 +46,8 @@ pub(super) struct Requests {
     pub callbacks: callbacks::CallbackRequests,
     /// Enum identities and raw native operands that require checked representation bridges.
     pub enums: enumerations::EnumRequests,
+    /// Fixed prefixes that a root pastes onto a type operand's name to name an enumerator.
+    pub type_enumerators: BTreeSet<String>,
 }
 
 /// Derive the capability union for admitted roots using declarations and conservative type constraints.
@@ -230,6 +232,9 @@ pub(super) fn plan<'s>(
                             .types
                             .insert(shape.ty.canonical_spelling.clone(), shape.ty.clone());
                     }
+                }
+                ExpressionKind::TypeParameterPaste { prefix, .. } => {
+                    requests.type_enumerators.insert(prefix.clone());
                 }
                 ExpressionKind::Identifier { .. }
                     if stops.contains(&constraints.representative[index]) => {}
@@ -823,6 +828,7 @@ impl<'a> Constraints<'a> {
                 | ExpressionKind::AlignOfType { .. }
                 | ExpressionKind::SizeOfTypeParameter { .. }
                 | ExpressionKind::AlignOfTypeParameter { .. }
+                | ExpressionKind::TypeParameterPaste { .. }
                 | ExpressionKind::OffsetOf { .. } => masks[root] &= INTEGER,
                 ExpressionKind::AddressOf { .. } => masks[root] &= POINTER,
                 ExpressionKind::Member { field, field_parameter: None, .. } => {

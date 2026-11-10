@@ -419,18 +419,22 @@ pub(crate) fn analyze_active(
     name: &str,
     active: Option<&ActiveMacro>,
 ) -> MacroAnalysis {
-    analyze_active_with_constants(frontend, name, active, &BTreeMap::new(), false)
+    analyze_active_with_constants(frontend, name, active, &BTreeMap::new(), None)
 }
 
 /// Build symbolic syntax, operand roles, type expressions, and invocation contracts from one resolved
 /// active definition.
+///
+/// `expansion` is `Some` when the definition's replacement is a compiler expansion, and then
+/// holds the identifiers its paste proof showed pasted onto a formal.
 pub(crate) fn analyze_active_with_constants(
     frontend: &FrontendOutput,
     name: &str,
     active: Option<&ActiveMacro>,
     object_constants: &BTreeMap<String, IntegerConstant>,
-    compiler_expanded: bool,
+    expansion: Option<&BTreeMap<String, crate::ParameterPaste>>,
 ) -> MacroAnalysis {
+    let compiler_expanded = expansion.is_some();
     let profile = frontend.profile();
     let mut result = MacroAnalysis {
         name: name.into(),
@@ -581,10 +585,9 @@ pub(crate) fn analyze_active_with_constants(
     }
     let catalog = frontend.declarations();
     let is_type = |name: &str| recognized_type(name, catalog, &profile.target);
-    let parsed = if compiler_expanded {
-        parse_expanded_replacement(body, &parameters, is_type)
-    } else {
-        parse_replacement(body, &parameters, is_type)
+    let parsed = match expansion {
+        Some(pastes) => parse_expanded_replacement(body, &parameters, pastes, is_type),
+        None => parse_replacement(body, &parameters, is_type),
     };
     let mut syntax = match parsed {
         Ok(syntax) => syntax,
@@ -776,6 +779,20 @@ pub(crate) fn analyze_active_with_constants(
             }
         }
     }
+    for node in &syntax.nodes {
+        if let ExpressionKind::TypeParameterPaste { parameter, .. } = &node.kind {
+            // The pasted identifier is no formal's own spelling, so the lexical scan above
+            // recorded no use for it.
+            let parameter = &mut result.parameters[*parameter];
+            parameter
+                .roles
+                .retain(|role| !matches!(role, ParameterRole::Unknown | ParameterRole::Unused));
+            if !parameter.roles.contains(&ParameterRole::Type) {
+                parameter.roles.push(ParameterRole::Type);
+            }
+            parameter.uses.push(ParameterUse { tokens: node.tokens, grouped: true });
+        }
+    }
     for parameter in &mut result.parameters {
         parameter.uses.sort_by_key(|usage| usage.tokens.start);
     }
@@ -784,7 +801,7 @@ pub(crate) fn analyze_active_with_constants(
     }
     let atomic_arguments =
         result.parameters.iter().flat_map(|parameter| &parameter.uses).any(|usage| !usage.grouped);
-    match analyze_types(&syntax, catalog, &profile.target, object_constants) {
+    match analyze_types(&syntax, frontend, object_constants) {
         Ok((types, constants, mut helpers)) => {
             let root = &syntax.nodes[syntax.root];
             let statements = syntax.statement_body.is_some();
@@ -806,6 +823,7 @@ pub(crate) fn analyze_active_with_constants(
                         | ExpressionKind::InvocationFile
                         | ExpressionKind::InvocationLine
                         | ExpressionKind::Identifier { .. }
+                        | ExpressionKind::TypeParameterPaste { .. }
                         | ExpressionKind::Empty
                         | ExpressionKind::Parameter { .. }
                         | ExpressionKind::Call { .. }
@@ -914,6 +932,7 @@ impl MacroAnalysis {
             SyntaxErrorKind::Call => SkipReasonCode::Call,
             SyntaxErrorKind::UnevaluatedExpression => SkipReasonCode::UnevaluatedExpression,
             SyntaxErrorKind::TypeParameter => SkipReasonCode::TypeParameter,
+            SyntaxErrorKind::TokenPaste => SkipReasonCode::TokenPaste,
             SyntaxErrorKind::CommaExpression => SkipReasonCode::CommaExpression,
             SyntaxErrorKind::BudgetExceeded => SkipReasonCode::BudgetExceeded,
         };
@@ -1057,7 +1076,7 @@ pub(crate) fn validate_constant_expression(
     let target = &frontend.profile().target;
     let expression = parse_expression(tokens, &[], |name| recognized_type(name, catalog, target))
         .map_err(|error| error.message)?;
-    let (types, _, _) = analyze_types(&expression, catalog, target, &BTreeMap::new())
+    let (types, _, _) = analyze_types(&expression, frontend, &BTreeMap::new())
         .map_err(|(_, message, _)| message)?;
     for (index, node) in expression.nodes.iter().enumerate() {
         if !matches!(
@@ -1140,10 +1159,11 @@ pub(crate) fn validate_constant_expression(
 /// choosing sample argument types.
 fn analyze_types(
     expression: &Expression,
-    catalog: &DeclarationCatalog,
-    target: &TargetFacts,
+    frontend: &FrontendOutput,
     object_constants: &BTreeMap<String, IntegerConstant>,
 ) -> Result<TypeAnalysis, TypeFailure> {
+    let catalog = frontend.declarations();
+    let target = &frontend.profile().target;
     let mut locals = HashMap::new();
     for statement in expression.statement_body.iter().flat_map(|body| body.walk()) {
         let Statement::Declaration { name, type_name, tokens, .. } = statement else {
@@ -1546,6 +1566,14 @@ fn analyze_types(
                 TypeExpression::Concrete { ty: target.integers[&target.size_type] }
             }
             ExpressionKind::TypeParameterCast { .. } => TypeExpression::Deferred,
+            ExpressionKind::TypeParameterPaste { prefix, .. } => {
+                // Every enumerator the paste can name has this one C type, whichever
+                // type the caller supplies.
+                let enumerators = frontend
+                    .type_enumerators(prefix)
+                    .map_err(|reason| (SkipReasonCode::TokenPaste, reason, node.tokens))?;
+                TypeExpression::Concrete { ty: enumerators.ty }
+            }
         };
         types.push(ty);
     }
@@ -2641,7 +2669,7 @@ mod tests {
             "F",
             input.environment.active.get("F"),
             &BTreeMap::new(),
-            true,
+            Some(&BTreeMap::new()),
         );
         assert!(matches!(analysis.status, AnalysisStatus::Candidate));
         assert_eq!(analysis.invocation, InvocationContract::ReturningStatements);
@@ -2718,7 +2746,7 @@ mod tests {
             "F",
             input.environment.active.get("F"),
             &BTreeMap::new(),
-            true,
+            Some(&BTreeMap::new()),
         );
         assert!(matches!(analysis.status, AnalysisStatus::Candidate));
         let captures = analysis

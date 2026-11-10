@@ -93,6 +93,59 @@ impl FrontendOutput {
             .map(String::as_str)
     }
 
+    /// The enumerators that C names by pasting `prefix` onto the name of a structure type.
+    ///
+    /// A type takes part when its name is a typedef of a structure or union and `prefix`
+    /// followed by that name is an enumerator. An active macro of either name would expand
+    /// in its place, and a name that only one build flavor declares has no binding, so both
+    /// leave a type out. The enumerators must belong to one enum and share one C type, so
+    /// that one lookup serves every type.
+    pub(crate) fn type_enumerators(&self, prefix: &str) -> Result<TypeEnumerators<'_>, String> {
+        let hidden = |name: &str| {
+            self.environment.active.contains_key(name)
+                || self.flavors.flavor_specific.contains(name)
+        };
+        let mut families =
+            self.declarations.enumerations.iter().filter_map(|(enumeration, names)| {
+                let members = names
+                    .iter()
+                    .filter_map(|enumerator| {
+                        let (type_name, _) = self
+                            .declarations
+                            .types
+                            .get_key_value(enumerator.strip_prefix(prefix)?)
+                            .filter(|(_, ty)| ty.category == TypeCategory::Record)?;
+                        (!hidden(type_name) && !hidden(enumerator))
+                            .then_some((type_name.as_str(), enumerator.as_str()))
+                    })
+                    .collect::<BTreeMap<_, _>>();
+                (!members.is_empty()).then_some((enumeration.as_str(), members))
+            });
+        let (enumeration, members) = families.next().ok_or_else(|| {
+            format!("no structure type has a name that `{prefix}` pastes into an enumerator")
+        })?;
+        if let Some((other, _)) = families.next() {
+            return Err(format!(
+                "`{prefix}` pasted onto structure type names forms enumerators of both `{enumeration}` and `{other}`"
+            ));
+        }
+        let mut types =
+            members.values().map(|enumerator| &self.declarations.integer_constants[*enumerator].ty);
+        let first = types.next().expect("a family has a member");
+        let ty = match first.category {
+            TypeCategory::Integer(kind) if types.all(|other| other.category == first.category) => {
+                self.profile.target.integers.get(&kind).copied()
+            }
+            _ => None,
+        };
+        let ty = ty.ok_or_else(|| {
+            format!(
+                "the enumerators of `{enumeration}` that `{prefix}` pastes into do not share one modeled C integer type"
+            )
+        })?;
+        Ok(TypeEnumerators { enumeration, ty, members })
+    }
+
     /// The main file as every pass that expands macros reads it: the inspected file, then
     /// the definitions both build flavors share. `None` when it exceeds `limit` bytes.
     pub(crate) fn main_source(
@@ -114,6 +167,17 @@ impl FrontendOutput {
         }
         Ok((source.len() <= limit).then_some(source))
     }
+}
+
+/// The enumerators that C names by pasting one fixed prefix onto structure type names, as
+/// PostgreSQL's `T_` names a node tag for each node type.
+pub(crate) struct TypeEnumerators<'a> {
+    /// The canonical spelling of the enum that declares every one of them.
+    pub enumeration: &'a str,
+    /// The C integer type they share.
+    pub ty: IntegerType,
+    /// Each structure type's typedef name with the name of its enumerator.
+    pub members: BTreeMap<&'a str, &'a str>,
 }
 
 /// Effective C compiler inputs and the target facts verified during inspection.
@@ -696,6 +760,9 @@ pub struct DeclarationCatalog {
     pub types: BTreeMap<String, TypeInfo>,
     /// Compiler-owned integer constants, such as enum constants; never mutable variables.
     pub integer_constants: BTreeMap<String, IntegerConstant>,
+    /// The enumerators each enum declares among [`Self::integer_constants`], in declaration
+    /// order, keyed by the enum's canonical spelling.
+    pub enumerations: BTreeMap<String, Vec<String>>,
     /// Original C variable types used to establish native access identity.
     pub variables: BTreeMap<String, TypeInfo>,
     /// Function declaration type facts used for name resolution before complete prototype checks.

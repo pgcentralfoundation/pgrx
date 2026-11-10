@@ -1655,6 +1655,46 @@ impl<'a> Renderer<'a> {
                                 .expect("String output");
                             tasks.extend([text(")"), value(*operand)]);
                         }
+                        ExpressionKind::TypeParameterPaste { prefix, parameter } => {
+                            use super::type_enumerators::Refusal;
+                            // The lookup is an associated constant of the operand's type: a
+                            // type whose name pastes into no enumerator does not implement
+                            // it. A witness names it too, so a shell keeps that bound.
+                            let lookup = self
+                                .adapters
+                                .and_then(|adapters| adapters.type_enumerators.lookups.get(prefix));
+                            match lookup {
+                                Some(Ok(lookup)) => write!(
+                                    rust,
+                                    "<${} as {lookup}>::VALUE",
+                                    arguments::name(analysis, *parameter)
+                                )
+                                .expect("String output"),
+                                Some(Err(Refusal::ValueMismatch { name, bindgen, clang })) => {
+                                    return Err(super::mismatch_reason(
+                                        analysis, name, *bindgen, *clang,
+                                    ));
+                                }
+                                Some(Err(Refusal::Unavailable(reason))) => {
+                                    return Err(skip(
+                                        analysis,
+                                        SkipReasonCode::TokenPaste,
+                                        reason.clone(),
+                                        Some(node.tokens),
+                                    ));
+                                }
+                                None => {
+                                    return Err(skip(
+                                        analysis,
+                                        SkipReasonCode::TokenPaste,
+                                        format!(
+                                            "no lookup of the enumerators that `{prefix}` pastes into was generated"
+                                        ),
+                                        Some(node.tokens),
+                                    ));
+                                }
+                            }
+                        }
                         ExpressionKind::SizeOfTypeParameter { parameter, pointers, is_const }
                         | ExpressionKind::AlignOfTypeParameter { parameter, pointers, is_const } => {
                             let mut marker = format!(
@@ -2045,6 +2085,7 @@ pub(super) fn null_pointer_access(
             | ExpressionKind::AlignOfType { .. }
             | ExpressionKind::SizeOfTypeParameter { .. }
             | ExpressionKind::AlignOfTypeParameter { .. }
+            | ExpressionKind::TypeParameterPaste { .. }
             | ExpressionKind::OffsetOf { .. } => {}
         }
         if hidden {

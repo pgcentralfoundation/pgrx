@@ -130,7 +130,7 @@ fn push_hex(output: &mut String, text: &str) {
 /// include directory and an included name, so either separator ends a directory and
 /// the kept path is written with `/`. The location ends at the first `)` after a
 /// `:LINE:COLUMN`, since a directory such as `Program Files (x86)` can contain one.
-fn strip_location_directories(spelling: &str) -> String {
+pub(super) fn strip_location_directories(spelling: &str) -> String {
     let mut output = String::with_capacity(spelling.len());
     let mut rest = spelling;
     while let Some(at) = rest.find(" at ") {

@@ -1006,7 +1006,7 @@ fn join_active(live: Vec<MacroDefinition>, inventory: &MacroInventory) -> MacroE
 fn collect_declarations(unit: &TranslationUnit<'_>) -> (DeclarationCatalog, BTreeSet<PathBuf>) {
     let mut catalog = DeclarationCatalog::default();
     let mut included = BTreeSet::new();
-    unit.get_entity().visit_children(|entity, _| {
+    unit.get_entity().visit_children(|entity, parent| {
         if entity.get_kind() == EntityKind::InclusionDirective {
             if let Some(file) = entity.get_file() {
                 included.insert(file.get_path());
@@ -1051,6 +1051,13 @@ fn collect_declarations(unit: &TranslationUnit<'_>) -> (DeclarationCatalog, BTre
                         } else {
                             IntegerValue::Signed(signed)
                         };
+                        if let Some(enumeration) = parent.get_type() {
+                            catalog
+                                .enumerations
+                                .entry(type_info(enumeration).canonical_spelling)
+                                .or_default()
+                                .push(name.clone());
+                        }
                         catalog.integer_constants.insert(
                             name,
                             IntegerConstant { ty: type_info(ty), value, literal: None },

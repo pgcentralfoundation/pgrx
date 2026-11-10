@@ -14,9 +14,9 @@
 //! expression tree. Structured statement parsing shares that arena and tracks scopes, returns,
 //! and invocation boundaries needed by later analysis and emission.
 
-use crate::{Token, TokenKind};
+use crate::{ParameterPaste, Token, TokenKind};
 use serde::{Deserialize, Serialize};
-use std::collections::{HashMap, HashSet};
+use std::collections::{BTreeMap, HashMap, HashSet};
 
 /// Parse ordered blocks, conditionals, locals, and returns within the shared bounded expression
 /// arena.
@@ -380,6 +380,14 @@ pub enum ExpressionKind {
         /// remains visible.
         operand: NodeId,
     },
+    /// A name that `##` forms by pasting fixed text onto the name of a formal type operand,
+    /// as PostgreSQL's `T_##_type_` names a node type's tag.
+    TypeParameterPaste {
+        /// The identifier text pasted before the type's name.
+        prefix: String,
+        /// Formal index supplying the type whose C name completes the pasted name.
+        parameter: usize,
+    },
     /// A non-evaluated record/member path preserving structural type and field holes.
     OffsetOf {
         /// Non-evaluated record designator for an offsetof computation.
@@ -603,6 +611,8 @@ pub(crate) enum SyntaxErrorKind {
     UnevaluatedExpression,
     /// A formal type role is ambiguous or exceeds the supported declarator grammar.
     TypeParameter,
+    /// A name pasted from a formal is used where it cannot name an enumerator.
+    TokenPaste,
     /// Comma sequencing cannot be admitted under the selected invocation contract.
     CommaExpression,
     /// Source, token, dependency, depth, or compiler-pass work exceeded a finite configured limit.
@@ -625,8 +635,10 @@ struct Parser<'a, F> {
     position: usize,
     /// Formal-name to index lookup so every occurrence refers to the same operand hole.
     parameters: HashMap<&'a str, usize>,
-    /// Only a prepared compiler expansion can contain fresh formal markers in strings.
-    formal_strings: bool,
+    /// For a prepared compiler expansion, the identifiers its paste proof showed pasted from
+    /// a fixed identifier and a formal. Only such an expansion names its formals with fresh
+    /// markers, which a string can then contain.
+    pastes: Option<&'a BTreeMap<String, ParameterPaste>>,
     /// Formals independently established as type operands before ambiguous expressions are reparsed.
     type_parameters: HashSet<usize>,
     /// Formals under bare GNU alignment, which admit `sizeof(T)` type operands but prove no cast.
@@ -647,7 +659,7 @@ pub(crate) fn parse_expression(
     parameters: &[String],
     is_type: impl Fn(&str) -> bool,
 ) -> Result<Expression, SyntaxError> {
-    parse(tokens, parameters, is_type, false, false)
+    parse(tokens, parameters, is_type, false, None)
 }
 
 /// Parse an expression or a complete structured statement replacement.
@@ -656,16 +668,18 @@ pub(crate) fn parse_replacement(
     parameters: &[String],
     is_type: impl Fn(&str) -> bool,
 ) -> Result<Expression, SyntaxError> {
-    parse(tokens, parameters, is_type, true, false)
+    parse(tokens, parameters, is_type, true, None)
 }
 
-/// Parse compiler-expanded strings with fresh formal markers and preserved C templates.
+/// Parse a compiler expansion: strings with fresh formal markers and preserved C templates,
+/// and the identifiers in `pastes`, which its paste proof showed pasted onto a formal.
 pub(crate) fn parse_expanded_replacement(
     tokens: &[Token],
     parameters: &[String],
+    pastes: &BTreeMap<String, ParameterPaste>,
     is_type: impl Fn(&str) -> bool,
 ) -> Result<Expression, SyntaxError> {
-    parse(tokens, parameters, is_type, true, true)
+    parse(tokens, parameters, is_type, true, Some(pastes))
 }
 
 /// Initialize the bounded parser, resolve supported type holes, and require a complete expression or
@@ -675,7 +689,7 @@ fn parse(
     parameters: &[String],
     is_type: impl Fn(&str) -> bool,
     allow_statements: bool,
-    formal_strings: bool,
+    pastes: Option<&BTreeMap<String, ParameterPaste>>,
 ) -> Result<Expression, SyntaxError> {
     if tokens.len() > MAX_TOKENS {
         return Err(SyntaxError {
@@ -693,7 +707,7 @@ fn parse(
             .collect(),
         position: 0,
         parameters: parameters.iter().enumerate().map(|(i, name)| (name.as_str(), i)).collect(),
-        formal_strings,
+        pastes,
         type_parameters: HashSet::new(),
         aligned_parameters: HashSet::new(),
         ambiguous_casts: HashSet::new(),
@@ -735,6 +749,9 @@ fn parse(
             ExpressionKind::OffsetOf { record: OffsetRecord::Parameter { index }, .. } => {
                 Some(index)
             }
+            // The Rust form resolves the pasted name through the operand's type, so it
+            // admits only invocations that pass a type there.
+            ExpressionKind::TypeParameterPaste { parameter, .. } => Some(parameter),
             _ => None,
         })
         .collect();
@@ -766,6 +783,7 @@ fn parse(
         // arena to the same first-pass evidence.
         parser.refuse_unproven_casts()?;
     }
+    parser.refuse_unparsed_pastes()?;
     Ok(Expression { nodes: parser.nodes, root, statement_body })
 }
 
@@ -925,6 +943,14 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
             return Ok(self
                 .push(ExpressionKind::Parameter { index }, TokenRange { start, end: start + 1 }));
         }
+        if let Some(paste) = self.paste(lexeme.token) {
+            let (prefix, parameter) = (paste.prefix.clone(), paste.parameter);
+            self.position += 1;
+            return Ok(self.push(
+                ExpressionKind::TypeParameterPaste { prefix, parameter },
+                TokenRange { start, end: start + 1 },
+            ));
+        }
         if let Some(operator) = match spelling {
             "+" => Some(UnaryOperator::Plus),
             "-" => Some(UnaryOperator::Negate),
@@ -1064,7 +1090,7 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
                     self.position += 1;
                 }
                 let end = self.tokens[self.position - 1].index + 1;
-                if self.formal_strings {
+                if self.pastes.is_some() {
                     let parts = string_parts(&bytes, &self.parameters);
                     if parts.iter().any(|part| matches!(part, StringPart::Parameter { .. })) {
                         if self.position != literal_start + 1 {
@@ -1344,6 +1370,34 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
             _ => (SyntaxErrorKind::InvalidExpression, "not a complete supported C expression"),
         };
         self.error(kind, format!("{message}: {spelling:?}"))
+    }
+
+    /// The proven paste that formed `token`, when it is such an identifier.
+    fn paste(&self, token: &Token) -> Option<&ParameterPaste> {
+        self.pastes?.get(&token.spelling).filter(|_| token.kind == TokenKind::Identifier)
+    }
+
+    /// Refuse a pasted name that the grammar read as anything but an expression of its own,
+    /// such as a member or a local's name. Only an expression can name an enumerator.
+    fn refuse_unparsed_pastes(&self) -> Result<(), SyntaxError> {
+        let parsed = self
+            .nodes
+            .iter()
+            .filter(|node| matches!(node.kind, ExpressionKind::TypeParameterPaste { .. }))
+            .map(|node| node.tokens.start)
+            .collect::<HashSet<_>>();
+        let unparsed = self
+            .tokens
+            .iter()
+            .find(|lexeme| self.paste(lexeme.token).is_some() && !parsed.contains(&lexeme.index));
+        match unparsed {
+            Some(lexeme) => Err(SyntaxError {
+                kind: SyntaxErrorKind::TokenPaste,
+                tokens: TokenRange { start: lexeme.index, end: lexeme.index + 1 },
+                message: "a name pasted from a macro parameter is supported only as an expression that names an enumerator".into(),
+            }),
+            None => Ok(()),
+        }
     }
 
     /// Refuse the first provisional formal cast whose formal lacks independent type evidence.
@@ -1741,6 +1795,7 @@ mod tests {
         let expanded = parse_expanded_replacement(
             &[literal(&format!("\"(({marker}) != 0) and {marker}\""))],
             &[marker.into()],
+            &BTreeMap::new(),
             |_| false,
         )
         .unwrap();
@@ -1758,6 +1813,7 @@ mod tests {
         let boundary = parse_expanded_replacement(
             &[literal(&format!("\"x{marker} {marker}suffix\""))],
             &[marker.into()],
+            &BTreeMap::new(),
             |_| false,
         )
         .unwrap();
@@ -1765,10 +1821,58 @@ mod tests {
         let adjacent = parse_expanded_replacement(
             &[literal(&format!("\"{marker}\"")), literal("\" suffix\"")],
             &[marker.into()],
+            &BTreeMap::new(),
             |_| false,
         )
         .unwrap_err();
         assert_eq!(adjacent.kind, SyntaxErrorKind::Stringification);
+    }
+
+    /// An identifier that the paste proof showed pasted onto a formal is a pasted name, only
+    /// as an expression of its own. It makes its formal a type operand.
+    #[test]
+    fn proven_pastes_are_expressions_that_make_their_formal_a_type() {
+        let pastes = BTreeMap::from([(
+            "T_marker".to_owned(),
+            ParameterPaste { prefix: "T_".into(), parameter: 0 },
+        )]);
+        let paste = ExpressionKind::TypeParameterPaste { prefix: "T_".into(), parameter: 0 };
+        let parameters = ["marker".to_owned(), "other".to_owned()];
+        let parse = |spellings: &[&str]| {
+            parse_expanded_replacement(&tokens(spellings), &parameters, &pastes, |_| false)
+        };
+        let expanded = parse(&["(", "T_marker", ")"]).unwrap();
+        let ExpressionKind::Group { operand } = expanded.nodes[expanded.root].kind else {
+            panic!("the group must be the root")
+        };
+        assert_eq!(expanded.nodes[operand].kind, paste);
+        // The paste makes a bare `sizeof` operand a type, before or after it.
+        for spellings in [
+            ["sizeof", "(", "marker", ")", "+", "T_marker"],
+            ["T_marker", "+", "sizeof", "(", "marker", ")"],
+        ] {
+            let sized = parse(&spellings).unwrap();
+            assert!(sized.nodes.iter().any(|node| matches!(
+                node.kind,
+                ExpressionKind::SizeOfTypeParameter { parameter: 0, pointers: 0, is_const: false }
+            )));
+            assert!(sized.nodes.iter().any(|node| node.kind == paste));
+        }
+        // Without the proof, an identifier that ends with a formal's name is only itself.
+        for unproven in [
+            parse_replacement(&tokens(&["T_marker"]), &parameters, |_| false),
+            parse_expanded_replacement(&tokens(&["T_other"]), &parameters, &pastes, |_| false),
+        ] {
+            let unproven = unproven.unwrap();
+            assert!(matches!(
+                unproven.nodes[unproven.root].kind,
+                ExpressionKind::Identifier { .. }
+            ));
+        }
+        // A pasted member name names no enumerator.
+        let member = parse(&["(", "other", ")", "->", "T_marker"]).unwrap_err();
+        assert_eq!(member.kind, SyntaxErrorKind::TokenPaste);
+        assert_eq!(member.tokens, TokenRange { start: 4, end: 5 });
     }
 
     /// Checks precedence and left associativity.

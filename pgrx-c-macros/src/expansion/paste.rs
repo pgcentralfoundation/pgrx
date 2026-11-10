@@ -2,23 +2,32 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
-//! Compiler validation for token pastes that do not depend on invocation operands.
+//! Compiler validation for token pastes: those that do not depend on invocation operands,
+//! and those that paste a fixed identifier onto the start of one.
 //!
 //! Clang exempts tokens in earlier macro definitions from `GCC poison`, but checks
 //! identifiers produced by `##` before rescan. Poisoning the final active names
 //! therefore exposes even generated helpers whose eventual expansion is empty.
-//! A separate braced-operand pass rejects a live paste involving an operand,
+//! A separate braced-operand pass finds every live paste involving an operand,
 //! including a pasted name that argument prescan subsequently erases. A paste
 //! that forms `//` is refused through Clang's error for it, so a canary paste
 //! must show that the compiler options leave that error in place.
+//!
+//! A probe whose operand pastes all put a fixed identifier before an operand, as
+//! PostgreSQL's `T_##_type_` does, is not refused there. The braced pass names each such
+//! identifier, and the poison pass then poisons it followed by each of the probe's markers,
+//! so Clang reports every identifier such a paste really forms. The caller keeps the probe
+//! only when exactly those identifiers survive in its expansion.
 
-//! Token pasting is admitted only for closed expansions whose resulting names can be traced
-//! to the inspected environment. Poison instrumentation discovers synthesized dependencies,
-//! and boundary guards verify complete, owned probe output. Diagnostic ownership prevents
-//! one failed invocation from validating another. Run/source budgets and bounded summaries
-//! keep this proof finite and make rejected constructs explicit.
+//! Token pasting is otherwise admitted only for closed expansions whose resulting names can
+//! be traced to the inspected environment. Poison instrumentation discovers synthesized
+//! dependencies, and boundary guards verify complete, owned probe output. Diagnostic
+//! ownership prevents one failed invocation from validating another. Run/source budgets and
+//! bounded summaries keep this proof finite and make rejected constructs explicit.
 
-use super::{ExpansionLimits, ExpansionSkipCode, PROBE_PRAGMAS, Prepared, overlay, probe_tag};
+use super::{
+    ExpansionLimits, ExpansionSkipCode, PROBE_PRAGMAS, ParameterPaste, Prepared, overlay, probe_tag,
+};
 use crate::{FrontendError, FrontendOutput, MacroKind};
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::Path;
@@ -87,6 +96,10 @@ pub(super) struct Proof {
     pub(super) rejected: BTreeMap<usize, (ExpansionSkipCode, String)>,
     /// Preprocessing passes already consumed by the bounded paste proof.
     pub(super) runs: usize,
+    /// For each probe whose operand pastes all put a fixed identifier before an operand, the
+    /// identifiers those pastes form from its markers, with their parts. Clang reported each
+    /// one where the paste formed it.
+    pub(super) operand_pastes: BTreeMap<usize, BTreeMap<String, ParameterPaste>>,
 }
 
 /// Establish bounded token-paste closure and synthesized dependencies using owned poison and boundary
@@ -134,17 +147,41 @@ pub(super) fn prove(
     poisoned.extend(
         (0..frontend.environment().active.len()).map(|index| super::constant_marker(prefix, index)),
     );
+    // Probes whose operand pastes each put a fixed identifier before an operand, with those
+    // identifiers. They leave the braced pass, which can never expand them cleanly.
+    let mut candidates = BTreeMap::<usize, BTreeSet<String>>::new();
+    // The identifiers such pastes can form from each candidate's own markers.
+    let mut expected = BTreeMap::<usize, BTreeMap<String, ParameterPaste>>::new();
     let mut poison = Vec::new();
-    if let Err(message) = append_poison_pragmas(&poisoned, |chunk| {
-        poison.extend_from_slice(chunk);
-        Ok(())
-    }) {
-        reject_all(&mut proof, &selected, ExpansionSkipCode::BudgetExceeded, &message);
-        return Ok(proof);
-    }
 
     'modes: for braced in [true, false] {
         let mode = if braced { "braced" } else { "plain" };
+        if !braced {
+            for (&index, identifiers) in &candidates {
+                let names = identifiers
+                    .iter()
+                    .flat_map(|identifier| {
+                        prepared[index].markers.iter().enumerate().map(
+                            move |(parameter, marker)| {
+                                let paste =
+                                    ParameterPaste { prefix: identifier.clone(), parameter };
+                                (format!("{identifier}{marker}"), paste)
+                            },
+                        )
+                    })
+                    .collect::<BTreeMap<_, _>>();
+                poisoned.extend(names.keys().cloned());
+                expected.insert(index, names);
+                selected.insert(index);
+            }
+            if let Err(message) = append_poison_pragmas(&poisoned, |chunk| {
+                poison.extend_from_slice(chunk);
+                Ok(())
+            }) {
+                reject_all(&mut proof, &selected, ExpansionSkipCode::BudgetExceeded, &message);
+                break 'modes;
+            }
+        }
         let completion = format!("{prefix}paste_complete_{mode}");
         let completion_path = directory.join(format!("paste-complete-{mode}"));
         let completion_path = completion_path
@@ -152,7 +189,7 @@ pub(super) fn prove(
             .ok_or_else(|| FrontendError::Arguments("probe path is not UTF-8".into()))?;
         loop {
             if selected.is_empty() {
-                break 'modes;
+                break;
             }
             // Reserve one run for the parent's authoritative clean expansion.
             if proof.runs >= MAX_CPP_RUNS - 1 {
@@ -250,7 +287,13 @@ pub(super) fn prove(
                 match failed_probes(&diagnostics, &locations) {
                     Ok(failed) => {
                         let commented = commented_probes(&diagnostics, &locations);
+                        let mut pasted = identifiers_before_operands(&diagnostics, &locations);
                         for index in failed {
+                            selected.remove(&index);
+                            if let Some(identifiers) = pasted.remove(&index) {
+                                candidates.insert(index, identifiers);
+                                continue;
+                            }
                             let rejection = if trapped.contains(&index) {
                                 (
                                     ExpansionSkipCode::DynamicBuiltin,
@@ -264,11 +307,9 @@ pub(super) fn prove(
                                         .into(),
                                 )
                             } else {
-                                (ExpansionSkipCode::TokenPaste,
-                                    "Clang rejected a braced operand; token pasting depends on invocation operands or the expansion is malformed".into())
+                                (ExpansionSkipCode::TokenPaste, OPERAND_PASTE.into())
                             };
                             proof.rejected.insert(index, rejection);
-                            selected.remove(&index);
                         }
                         continue;
                     }
@@ -301,8 +342,11 @@ pub(super) fn prove(
                     break 'modes;
                 }
             };
+            let operand_paste = |index: usize, name: &String| {
+                expected.get(&index).is_some_and(|names| names.contains_key(name))
+            };
             for (&index, events) in &pass.pasted {
-                for name in events {
+                for name in events.iter().filter(|name| !operand_paste(index, name)) {
                     let rejection = if BUILTINS.contains(&name.as_str()) {
                         Some((
                             ExpansionSkipCode::DynamicBuiltin,
@@ -353,15 +397,40 @@ pub(super) fn prove(
                 continue;
             }
             for &index in &selected {
-                proof
-                    .dependencies
-                    .insert(index, pass.pasted.get(&index).cloned().unwrap_or_default());
+                let mut dependencies = pass.pasted.get(&index).cloned().unwrap_or_default();
+                if let Some(mut pastes) = expected.remove(&index) {
+                    // Whatever Clang reported of these is a paste onto an operand, not a
+                    // reference to an active macro.
+                    pastes.retain(|name, _| dependencies.remove(name));
+                    proof.operand_pastes.insert(index, pastes);
+                }
+                proof.dependencies.insert(index, dependencies);
             }
             break;
         }
     }
+    // A candidate is admitted only by a completed poison pass that reported a paste for
+    // each identifier the braced pass named.
+    for (&index, identifiers) in &candidates {
+        let proven = proof.operand_pastes.get(&index).is_some_and(|pastes| {
+            identifiers
+                .iter()
+                .all(|identifier| pastes.values().any(|paste| paste.prefix == *identifier))
+        });
+        if !proven {
+            proof.operand_pastes.remove(&index);
+            proof.dependencies.remove(&index);
+            proof
+                .rejected
+                .entry(index)
+                .or_insert_with(|| (ExpansionSkipCode::TokenPaste, OPERAND_PASTE.into()));
+        }
+    }
     Ok(proof)
 }
+
+/// Why a probe whose pastes depend on its operands is refused.
+const OPERAND_PASTE: &str = "Clang rejected a braced operand; token pasting depends on invocation operands or the expansion is malformed";
 
 /// Admit only compilers whose preprocessor builtins are all in [`BUILTINS`].
 ///
@@ -391,9 +460,11 @@ fn reject_all(
 /// shapes.
 ///
 /// `limit` bounds everything except the poison table. The table names every active macro, a
-/// constant marker for each, and each prepared probe's markers, boundaries and wrapper.
+/// constant marker for each, each prepared probe's markers, boundaries and wrapper, and the
+/// identifiers that a probe's operand pastes can form from its markers.
 /// Inspection already bounded the active macros, mostly from system headers. The probe names are
-/// bounded by `limits.macros` and by the invocation budget that preparation charged for them.
+/// bounded by `limits.macros` and by the invocation budget that preparation charged for them,
+/// and the pasted identifiers by the braced pass's diagnostics, which named each of them.
 #[allow(clippy::too_many_arguments)]
 fn source(
     original: &[u8],
@@ -648,6 +719,35 @@ fn commented_probes(diagnostics: &str, locations: &BTreeMap<String, usize>) -> B
         .filter(|error| message_text(error.message) == MICROSOFT_COMMENT_PASTE)
         .filter_map(|error| locations.get(error.location).copied())
         .collect()
+}
+
+/// The fixed identifiers that each probe pastes onto the start of a braced operand, for the
+/// probes that own no other error.
+///
+/// A braced operand starts with `{`, so Clang reports such a paste as forming the identifier
+/// followed by `{`. A paste onto the end of an operand, of two operands, or of anything but
+/// an identifier forms other text, and the probe is left out.
+///
+/// Classification only, like [`trapped_probes`]: [`failed_probes`] still validates every error.
+fn identifiers_before_operands(
+    diagnostics: &str,
+    locations: &BTreeMap<String, usize>,
+) -> BTreeMap<usize, BTreeSet<String>> {
+    let mut probes = BTreeMap::<usize, Option<BTreeSet<String>>>::new();
+    for line in diagnostics.lines() {
+        let Ok(Some((index, message))) = owned_error(line, locations) else { continue };
+        let pasted = message_text(message)
+            .strip_prefix("pasting formed '")
+            .and_then(|formed| formed.strip_suffix("{', an invalid preprocessing token"))
+            .filter(|pasted| identifier(pasted));
+        match (probes.entry(index).or_insert_with(|| Some(BTreeSet::new())), pasted) {
+            (Some(identifiers), Some(pasted)) => {
+                identifiers.insert(pasted.to_owned());
+            }
+            (identifiers, _) => *identifiers = None,
+        }
+    }
+    probes.into_iter().filter_map(|(index, identifiers)| Some((index, identifiers?))).collect()
 }
 
 /// Attribute ordinary errors to their probes and reject global, fatal, or unowned failures.
@@ -1084,6 +1184,55 @@ mod tests {
         ] {
             assert!(!commented_probes(&text, &locations()).contains(&1), "{text}");
         }
+    }
+
+    /// Only a probe whose every error pastes an identifier onto the start of a braced operand
+    /// names those identifiers. Any other paste or error leaves the probe to be refused.
+    #[test]
+    fn only_identifiers_pasted_before_braced_operands_are_named() {
+        let error = |index: usize, message: &str| {
+            format!(
+                "/tmp/probe-{index}:1:1: error: {message}\n/header.h:2:1: note: expanded from macro 'CAT'\n"
+            )
+        };
+        let paste = |index: usize, formed: &str| {
+            error(index, &format!("pasting formed '{formed}', an invalid preprocessing token"))
+        };
+        let text = format!(
+            "{}{}{}{}",
+            paste(0, "T_{"),
+            paste(0, "KIND_{"),
+            paste(1, "T_{"),
+            paste(1, "}_suffix")
+        );
+        assert_eq!(
+            identifiers_before_operands(&text, &locations()),
+            BTreeMap::from([(0, BTreeSet::from(["KIND_".into(), "T_".into()]))])
+        );
+        // Microsoft extensions append the option that makes the paste an error.
+        let annotated = error(
+            1,
+            "pasting formed 'T_{', an invalid preprocessing token [-Werror,-Winvalid-token-paste]",
+        );
+        assert_eq!(
+            identifiers_before_operands(&annotated, &locations()),
+            BTreeMap::from([(1, BTreeSet::from(["T_".into()]))])
+        );
+        for formed in ["1{", "}{", "{", ".{", "T_+", "T_{{", "}T_"] {
+            assert!(
+                identifiers_before_operands(&paste(0, formed), &locations()).is_empty(),
+                "{formed}"
+            );
+        }
+        let trapped = format!(
+            "{}{}",
+            paste(0, "T_{"),
+            error(0, "too many arguments provided to function-like macro invocation")
+        );
+        assert!(identifiers_before_operands(&trapped, &locations()).is_empty());
+        // An error no probe owns names nothing; `failed_probes` refuses the pass.
+        let unowned = paste(0, "T_{").replace("/tmp/probe-0", "/unowned/header.h");
+        assert!(identifiers_before_operands(&unowned, &locations()).is_empty());
     }
 
     /// Checks failure summaries keep only one bounded unicode reason per probe.
