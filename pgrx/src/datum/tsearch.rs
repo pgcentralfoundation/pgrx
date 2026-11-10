@@ -14,6 +14,7 @@
     unused_unsafe,
     reason = "docs.rs builds replace generated C macros with shells, some of which need no unsafe"
 )]
+mod lexeme;
 
 use crate::callconv::{Arg, ArgAbi};
 use crate::datum::{FromDatum, IntoDatum};
@@ -31,6 +32,8 @@ use core::str::FromStr;
 use serde::{Deserialize, Deserializer, Serialize, Serializer, de};
 use std::ffi::{CStr, CString};
 use std::panic::UnwindSafe;
+
+pub use lexeme::{InvalidWeight, Lexeme, Lexemes, Position, Weight};
 
 /// Size of the varlena header and the `size` field that precede the entries of both types.
 const HEADER_SIZE: usize = 8;
@@ -652,5 +655,23 @@ impl core::ops::Not for TsQueryBuf {
 
     fn not(self) -> TsQueryBuf {
         !&*self
+    }
+}
+
+#[cfg(test)]
+mod test_support {
+    pub(super) struct XorShift(pub u64);
+
+    impl XorShift {
+        pub fn next(&mut self) -> u64 {
+            self.0 ^= self.0 << 13;
+            self.0 ^= self.0 >> 7;
+            self.0 ^= self.0 << 17;
+            self.0
+        }
+
+        pub fn below(&mut self, n: usize) -> usize {
+            (self.next() % n as u64) as usize
+        }
     }
 }

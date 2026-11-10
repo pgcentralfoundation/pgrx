@@ -7,6 +7,7 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgrx_unit_tests;
 
+    use pgrx::datum::tsearch::Weight;
     use pgrx::prelude::*;
 
     #[pg_extern]
@@ -307,6 +308,129 @@ mod tests {
         }
     }
 
+    type Unnested = Vec<(String, Option<Vec<i16>>, Option<Vec<String>>)>;
+
+    fn unnest(v: &TsVectorBuf) -> Unnested {
+        Spi::connect(|client| {
+            let rows = client.select(
+                "SELECT lexeme, positions, weights FROM unnest($1)",
+                None,
+                &[v.clone().into()],
+            )?;
+            let mut out = Vec::new();
+            for row in rows {
+                out.push((
+                    row.get::<String>(1)?.unwrap(),
+                    row.get::<Vec<i16>>(2)?,
+                    row.get::<Vec<String>>(3)?,
+                ));
+            }
+            Ok::<_, spi::Error>(out)
+        })
+        .unwrap()
+    }
+
+    #[pg_test]
+    fn tsvector_lexemes_match_unnest() {
+        let texts = [
+            "a:1,3B b:2C",
+            "a b",
+            "",
+            "h\u{e9}llo:1A \u{65e5}\u{672c}\u{8a9e}:2,16383D",
+            "a:1,2,3,4 b:5D c:6A,7B,8C,9",
+        ];
+        for text in texts {
+            let v: TsVectorBuf = text.parse().unwrap();
+            let expected = unnest(&v);
+            assert_eq!(v.lexemes().len(), v.len());
+            assert_eq!(v.len(), expected.len());
+
+            let actual: Unnested = v
+                .lexemes()
+                .map(|lexeme| {
+                    let positions: Vec<_> = lexeme.positions().collect();
+                    let weights = positions.iter().map(|p| char::from(p.weight).to_string());
+                    (
+                        lexeme.to_str().unwrap().to_owned(),
+                        (!positions.is_empty())
+                            .then(|| positions.iter().map(|p| p.pos as i16).collect()),
+                        (!positions.is_empty()).then(|| weights.collect()),
+                    )
+                })
+                .collect();
+            assert_eq!(actual, expected, "{text:?}");
+        }
+    }
+
+    fn image(lexemes: &[(&str, &[(u16, Weight)])]) -> TsVectorBuf {
+        let mut strings = Vec::new();
+        let mut entries = Vec::new();
+        for (text, positions) in lexemes {
+            let pos = strings.len() as u32;
+            strings.extend_from_slice(text.as_bytes());
+            if !positions.is_empty() {
+                if strings.len() % 2 == 1 {
+                    strings.push(0);
+                }
+                strings.extend_from_slice(&(positions.len() as u16).to_ne_bytes());
+                for &(p, w) in *positions {
+                    strings.extend_from_slice(&(((w as u16) << 14) | p).to_ne_bytes());
+                }
+            }
+            let bits = pg_sys::WordEntry::new_bitfield_1(
+                !positions.is_empty() as u32,
+                text.len() as u32,
+                pos,
+            );
+            let entry = pg_sys::WordEntry { _bindgen_align: [], _bitfield_1: bits };
+            // SAFETY: `WordEntry` is four initialized bytes.
+            entries.extend_from_slice(unsafe {
+                std::slice::from_raw_parts(std::ptr::addr_of!(entry).cast::<u8>(), 4)
+            });
+        }
+        let mut bytes = vec![0; 8];
+        bytes[4..8].copy_from_slice(&(lexemes.len() as i32).to_ne_bytes());
+        bytes.extend_from_slice(&entries);
+        bytes.extend_from_slice(&strings);
+        // SAFETY: `ptr` is a fresh allocation of `bytes.len()` bytes with a 4-byte header.
+        unsafe {
+            let ptr = pg_sys::palloc0(bytes.len()).cast::<u8>();
+            std::ptr::copy_nonoverlapping(bytes.as_ptr(), ptr, bytes.len());
+            pg_sys::SET_VARSIZE_4B!(ptr.cast::<pg_sys::varlena>(), bytes.len() as i32).get();
+            let datum = pg_sys::Datum::from(ptr);
+            let buf = TsVectorBuf::from_datum(datum, false).unwrap();
+            pg_sys::pfree(ptr.cast());
+            buf
+        }
+    }
+
+    #[pg_test]
+    fn tsvector_image_matches_unnest() {
+        use Weight::*;
+        let cases: [&[(&str, &[(u16, Weight)])]; 4] = [
+            &[],
+            &[("a", &[(1, D), (3, B)]), ("b", &[(2, C)])],
+            &[("abc", &[]), ("d", &[(16383, A)])],
+            &[("h\u{e9}llo", &[(1, A)]), ("\u{65e5}\u{672c}", &[(2, D), (9, C)])],
+        ];
+        for case in cases {
+            let expected: Unnested = case
+                .iter()
+                .map(|&(text, positions)| {
+                    (
+                        text.to_owned(),
+                        (!positions.is_empty())
+                            .then(|| positions.iter().map(|p| p.0 as i16).collect()),
+                        (!positions.is_empty()).then(|| {
+                            positions.iter().map(|p| char::from(p.1).to_string()).collect()
+                        }),
+                    )
+                })
+                .collect();
+            assert_eq!(unnest(&image(case)), expected);
+        }
+    }
+
     #[pg_test]
     fn operators_match_methods() {
         let a: TsVectorBuf = "a:1 b:2".parse().unwrap();
@@ -324,5 +448,15 @@ mod tests {
         assert_eq!(x.clone() & y.clone(), x.and(&y));
         assert_eq!(x.clone() | y.clone(), x.or(&y));
         assert_eq!(!x.clone(), x.not());
+    }
+
+    #[pg_test]
+    fn weight_labels() {
+        assert_eq!(Weight::try_from('a'), Ok(Weight::A));
+        assert_eq!(Weight::try_from('D'), Ok(Weight::D));
+        assert!(Weight::try_from('E').is_err());
+        assert!(Weight::D < Weight::C && Weight::C < Weight::B && Weight::B < Weight::A);
+        assert_eq!(char::from(Weight::B), 'B');
+        assert_eq!(Weight::default(), Weight::D);
     }
 }
