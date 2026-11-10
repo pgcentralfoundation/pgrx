@@ -17,11 +17,11 @@ use std::collections::BTreeMap;
 const VERSIONS_URL: &str = "https://www.postgresql.org/versions.json";
 
 pub(crate) fn pgrx_default() -> eyre::Result<Pgrx> {
-    let body = crate::command::http_agent()
-        .get(VERSIONS_URL)
-        .call()
-        .and_then(|mut response| response.body_mut().read_to_vec())
-        .wrap_err_with(|| format!("unable to retrieve {VERSIONS_URL}"))?;
+    let http_client = crate::command::http_agent();
+    let body = crate::command::download_with_retries(VERSIONS_URL, || {
+        Ok(http_client.get(VERSIONS_URL).call()?.body_mut().read_to_vec()?)
+    })
+    .wrap_err_with(|| format!("unable to retrieve {VERSIONS_URL}"))?;
     let releases: Vec<Release> = serde_json::from_slice(&body)
         .wrap_err_with(|| format!("unable to parse {VERSIONS_URL}"))?;
     let versions = with_latest_releases(&SUPPORTED_VERSIONS(), &releases);

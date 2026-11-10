@@ -108,7 +108,8 @@ configures them for debugging, compiles them with assertions, and installs them 
 These include all [`contrib`] extensions and tools included with Postgres.
 Other `cargo pgrx` commands such as `run` and `test` will manage and use these installations on
 your behalf. On Linux and macOS, `cargo pgrx init` unpacks the Postgres sources with the `tar`
-program on your `PATH`.
+program on your `PATH`. It tries each download, the list of releases and each source archive, up
+to four times.
 
 [`contrib`]: https://www.postgresql.org/docs/current/contrib.html
 
