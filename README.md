@@ -400,6 +400,26 @@ error[E0080]: evaluation of constant value failed
     |
 ```
 
+### "no_thread_check_in_release": Skip the backend thread check in release builds
+
+Postgres may only be called from the backend's own thread.  pgrx remembers the first thread that
+calls into Postgres and panics when another one does.  That check runs on every call through
+pgrx's FFI guard, and several safe pgrx functions rely on it for their soundness.
+
+With the `no_thread_check_in_release` feature, a build without `debug_assertions`, which is what
+`cargo pgrx install --release` and `cargo pgrx package` make by default, compiles the check as a
+`const fn` that does nothing.  Calling Postgres from another thread is then undefined behavior that
+nothing reports, including through pgrx's safe functions.  A build with `debug_assertions`, such as
+the one `cargo pgrx test` makes by default, keeps the check.
+
+Cargo unifies features, so one crate that sets this one removes the check from every crate of the
+build that uses pgrx.  Only set it in an extension whose every dependency keeps Postgres calls on
+the backend thread.
+
+`pgrx::assert_active_thread()` is the same check as a function you can call yourself.  It runs in
+every build, whatever this feature says.  A build without pgrx's own checks has no active thread
+until the first call, so make that call on the backend thread.
+
 
 ## Contributing
 

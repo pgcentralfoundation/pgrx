@@ -131,6 +131,7 @@ pub use pg_sys::errcodes::PgSqlErrorCode;
 pub use pg_sys::oids::PgOid;
 pub use pg_sys::panic::pgrx_extern_c_guard;
 pub use pg_sys::pg_try::PgTryBuilder;
+pub use pg_sys::thread_check::assert_active_thread;
 pub use pg_sys::utils::name_data_to_str;
 pub use pg_sys::{
     CHECK_FOR_INTERRUPTS, FATAL, PANIC, debug1, debug2, debug3, debug4, debug5, ereport,

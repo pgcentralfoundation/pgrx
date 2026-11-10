@@ -30,6 +30,8 @@ pg17 = []
 pg18 = []
 pg19 = []
 cshim = []
+# Builds without `debug_assertions` skip pgrx's check that PostgreSQL is only called from the backend thread.
+no_thread_check_in_release = []
 
 [package.metadata.docs.rs]
 features = ["pg15", "cshim"]

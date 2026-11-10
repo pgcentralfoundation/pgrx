@@ -20,13 +20,62 @@
 //!
 //! This is somewhat heavyhanded, and should be called from fewer places in the
 //! future...
+//!
+//! # The `no_thread_check_in_release` feature
+//!
+//! pgrx itself calls [`check_active_thread`]. With the `no_thread_check_in_release`
+//! feature, a build without `debug_assertions` compiles that function as a `const fn`
+//! that does nothing. Every pgrx interface that relies on the check, safe ones included,
+//! then has undefined behavior when called from any thread but the backend's, and
+//! nothing reports it. A build with `debug_assertions` keeps the check whether or not
+//! the feature is set.
+//!
+//! Cargo unifies features, so one crate that sets this one removes the check from
+//! every crate of the build that uses pgrx.
+//!
+//! [`assert_active_thread`] is the same check, and it runs in every build.
 
 use std::num::NonZeroUsize;
 use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
 static ACTIVE_THREAD: AtomicUsize = AtomicUsize::new(0);
+
+/// The check pgrx runs before it touches PostgreSQL: [`assert_active_thread`], unless
+/// the `no_thread_check_in_release` feature removes it from this build.
+#[cfg(not(all(feature = "no_thread_check_in_release", not(debug_assertions))))]
+pub use self::assert_active_thread as check_active_thread;
+
+/// Does nothing: this build sets the `no_thread_check_in_release` feature and has no
+/// `debug_assertions`. The caller alone keeps PostgreSQL to its backend thread.
+/// [`assert_active_thread`] still checks.
+#[cfg(all(feature = "no_thread_check_in_release", not(debug_assertions)))]
+#[inline(always)]
+pub const fn check_active_thread() {}
+
+/// Panic unless the calling thread is the one pgrx lets call into PostgreSQL.
+///
+/// PostgreSQL may only be called from a backend's own thread. This function runs in
+/// every build, including one where the `no_thread_check_in_release` feature removes
+/// the checks pgrx makes for itself. Call it from code that is about to rely on running
+/// on that thread.
+///
+/// pgrx does not know which thread is the backend's. The first thread to call this
+/// function in a process becomes the active thread, and later calls compare against
+/// it. pgrx forgets the active thread when it raises an `ERROR` and when a
+/// `#[pg_guard(unsafe_entry_thread)]` function is entered or returns, and the next
+/// thread to call becomes the active one.
+///
+/// A build with pgrx's own checks makes that first call wherever pgrx first guards a
+/// call into PostgreSQL, which is on the backend thread unless the extension already
+/// broke the rule. A build without them leaves the first call to the extension: make it
+/// on the backend thread, before starting any other thread that might call this
+/// function.
+///
+/// # Panics
+///
+/// Panics when called from any thread other than the active one.
 #[track_caller]
-pub fn check_active_thread() {
+pub fn assert_active_thread() {
     let current_thread = nonzero_thread_id();
     // Relaxed is sufficient as we're only interested in the effects on a single
     // atomic variable, and don't need synchronization beyond that.

@@ -116,7 +116,8 @@ own.
 
 Furthermore, Postgres is a single-threaded runtime.  As such, [`pg_guard_ffi_boundary`] should
 **only** be called from the main thread.  In fact, [`pg_guard_ffi_boundary`] will detect this
-and immediately panic.
+and immediately panic.  A build that sets pgrx's `no_thread_check_in_release` feature and has no
+`debug_assertions` detects nothing, and a call from any other thread is undefined behavior.
 
 More generally, Rust cannot guarantee destructors are always run, PGRX is written in Rust code, and
 the implementation of `pg_guard_ffi_boundary` relies on help from Postgres, the OS, and the C runtime;
