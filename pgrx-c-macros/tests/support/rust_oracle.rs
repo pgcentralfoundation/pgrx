@@ -142,8 +142,11 @@ fn compile_rust_linked(
         .args(arguments)
         // An installed PostgreSQL's flags can ask for link-time optimization, as Ubuntu's
         // packages do. Clang then writes LLVM bitcode, which the system linker that rustc
-        // runs cannot read; only Clang 18 and newer honor `-ffat-lto-objects`.
-        .arg("-fno-lto")
+        // runs cannot read; only Clang 18 and newer honor `-ffat-lto-objects`. They also ask
+        // for stack protectors. On AArch64 Linux the guard those read is a symbol of the
+        // dynamic loader, which rustc's link line does not name, so an object that keeps a
+        // protected function fails to link, as Clang 14 and 15's objects do.
+        .args(["-fno-lto", "-fno-stack-protector"])
         .arg("-include")
         .arg(header)
         .arg("-c")
