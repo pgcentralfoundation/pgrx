@@ -401,14 +401,26 @@ impl PgConfig {
         Ok(path)
     }
 
+    /// Where this installation keeps `pg_regress`.
+    ///
+    /// A build made with PostgreSQL's makefiles or with Meson installs it beside the PGXS
+    /// makefiles. A Windows build of PostgreSQL 16 or earlier, made with the MSVC scripts,
+    /// has no PGXS directory and installs it in the bin directory.
     pub fn pg_regress_path(&self) -> eyre::Result<PathBuf> {
+        let name = format!("pg_regress{EXE_SUFFIX}");
         let mut pgxs_path = self.pgxs_path()?;
         pgxs_path.pop(); // pop the `pgxs.mk` file at the end
         pgxs_path.pop(); // pop the `makefiles` directory in which it lives
         let mut pgregress_path = pgxs_path;
         pgregress_path.push("test");
         pgregress_path.push("regress");
-        pgregress_path.push("pg_regress");
+        pgregress_path.push(&name);
+        if !pgregress_path.is_file() {
+            let in_bin_dir = self.bin_dir()?.join(&name);
+            if in_bin_dir.is_file() {
+                return Ok(in_bin_dir);
+            }
+        }
         Ok(pgregress_path)
     }
 
@@ -810,6 +822,35 @@ pub fn SUPPORTED_VERSIONS() -> Vec<PgVersion> {
 
 pub fn is_supported_major_version(v: u16) -> bool {
     SUPPORTED_VERSIONS().into_iter().any(|pgver| pgver.major == v)
+}
+/// The name of the operating-system account running this process, which is the role and
+/// superuser name PostgreSQL's own tools use by default.
+///
+/// PostgreSQL role names are case-sensitive, so this is the account name as the operating
+/// system records it. On Windows the `USERNAME` environment variable can differ from it in
+/// case: an SSH session has `administrator` where the account is `Administrator`, so a
+/// client that trusts the variable cannot connect to a cluster that `initdb` created.
+pub fn os_user_name() -> eyre::Result<String> {
+    #[cfg(target_os = "windows")]
+    {
+        use winapi::um::winbase::GetUserNameW;
+        // UNLEN, the longest user name, is 256 characters; the buffer also holds the NUL.
+        let mut name = [0_u16; 257];
+        let mut length = name.len() as u32;
+        // SAFETY: `name` is writable for `length` UTF-16 units and `length` is a valid,
+        // initialized count that the call updates to the units written, including the NUL.
+        let succeeded = unsafe { GetUserNameW(name.as_mut_ptr(), &mut length) } != 0;
+        if !succeeded {
+            return Err(std::io::Error::last_os_error())
+                .wrap_err("could not read the operating-system user name");
+        }
+        let name = name.get(..(length as usize).saturating_sub(1)).unwrap_or_default();
+        String::from_utf16(name).wrap_err("the operating-system user name is not valid UTF-16")
+    }
+    #[cfg(not(target_os = "windows"))]
+    {
+        std::env::var("USER").wrap_err("the `USER` environment variable is unset or not UTF-8")
+    }
 }
 
 pub fn createdb(

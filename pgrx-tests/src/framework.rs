@@ -988,13 +988,9 @@ pub fn get_pg_dbname() -> &'static str {
 }
 
 pub fn get_pg_user() -> String {
-    #[cfg(target_family = "unix")]
-    let varname = "USER";
-    #[cfg(target_os = "windows")]
-    let varname = "USERNAME";
     get_runas().unwrap_or_else(|| {
-        std::env::var(varname)
-            .unwrap_or_else(|_| panic!("USER environment var is unset or invalid UTF-8"))
+        pgrx_pg_config::os_user_name()
+            .unwrap_or_else(|error| panic!("could not determine the PostgreSQL user: {error:?}"))
     })
 }
 
@@ -1078,10 +1074,13 @@ fn get_cargo_args() -> eyre::Result<Vec<String>> {
     //
     // we're interested in the first arguments the **user** gave to cargo, so `framework.rs`
     // can later figure out which set of features to pass to `cargo pgrx`
-    let mut pid = Pid::from(std::process::id() as usize);
-    while let Some(process) = system.process(pid) {
+    let this = Pid::from(std::process::id() as usize);
+    let ancestry = ancestry(this, |pid| {
+        system.process(pid).map(|process| (process.parent(), process.start_time()))
+    });
+    for process in ancestry.into_iter().filter_map(|pid| system.process(pid)) {
         // only if it's "cargo"... (This works for now, but just because `cargo`
-        // is at the end of the path. How *should* this handle `CARGO`?)
+        // is at the end of the path. How *should* this handle `CARGO`?)
         if process.exe().is_some_and(|p| p.ends_with("cargo") || p.ends_with("cargo.exe")) {
             // ... and only if it's "cargo test"...
             if process.cmd().iter().any(|arg| arg == "test")
@@ -1095,15 +1094,33 @@ fn get_cargo_args() -> eyre::Result<Vec<String>> {
                     .collect());
             }
         }
-
-        // and we want to keep going to find the top-most "cargo" process in our tree
-        match process.parent() {
-            Some(parent_pid) => pid = parent_pid,
-            None => break,
-        }
     }
 
     Ok(Vec::new())
+}
+
+/// The process `pid` and its ancestors, nearest first, as far as they can be trusted.
+///
+/// `lookup` gives a running process's recorded parent and its start time in seconds. A
+/// process keeps its parent's id after the parent exits, and Windows soon gives that id to a
+/// new process, which can be one of this process's own descendants. Following recorded
+/// parents can therefore lead to an unrelated process, or around a cycle that never ends. An
+/// ancestor cannot have started after its descendant, and no process is its own ancestor, so
+/// the walk stops at the first process that breaks either rule.
+fn ancestry(pid: Pid, lookup: impl Fn(Pid) -> Option<(Option<Pid>, u64)>) -> Vec<Pid> {
+    let mut ancestry = Vec::new();
+    let mut next = Some(pid);
+    let mut descendant_started = u64::MAX;
+    while let Some(pid) = next
+        && let Some((parent, started)) = lookup(pid)
+        && started <= descendant_started
+        && !ancestry.contains(&pid)
+    {
+        ancestry.push(pid);
+        descendant_started = started;
+        next = parent;
+    }
+    ancestry
 }
 
 fn cargo_pgrx() -> eyre::Result<Command> {
@@ -1178,6 +1195,41 @@ mod tests {
     use std::ffi::OsString;
     use std::sync::{Mutex, MutexGuard};
     use tempfile::tempdir;
+
+    /// A process table for [`ancestry`]: each process's id, recorded parent and start time.
+    fn processes(
+        table: &[(usize, Option<usize>, u64)],
+    ) -> impl Fn(Pid) -> Option<(Option<Pid>, u64)> {
+        move |pid| {
+            table
+                .iter()
+                .find(|(id, ..)| Pid::from(*id) == pid)
+                .map(|(_, parent, started)| (parent.map(Pid::from), *started))
+        }
+    }
+
+    #[test]
+    fn ancestry_follows_live_parents_to_the_root() {
+        let table = [(40, Some(30), 300), (30, Some(20), 200), (20, None, 100)];
+        assert_eq!(ancestry(Pid::from(40), processes(&table)), [40, 30, 20].map(Pid::from));
+        // A recorded parent that has exited ends the walk.
+        let orphan = [(40, Some(30), 300)];
+        assert_eq!(ancestry(Pid::from(40), processes(&orphan)), [Pid::from(40)]);
+    }
+
+    #[test]
+    fn ancestry_stops_at_a_reused_parent_id() {
+        // Process 20's parent exited, and its id, 40, now belongs to 20's own grandchild. The
+        // recorded parents form a cycle, which would otherwise never end.
+        let cycle = [(40, Some(30), 300), (30, Some(20), 200), (20, Some(40), 100)];
+        assert_eq!(ancestry(Pid::from(40), processes(&cycle)), [40, 30, 20].map(Pid::from));
+        // The same within one second, where start times cannot tell the processes apart.
+        let simultaneous = [(40, Some(30), 100), (30, Some(40), 100)];
+        assert_eq!(ancestry(Pid::from(40), processes(&simultaneous)), [40, 30].map(Pid::from));
+        // A reused id that belongs to a younger, unrelated process is not an ancestor.
+        let unrelated = [(40, Some(30), 300), (30, Some(99), 200), (99, None, 400)];
+        assert_eq!(ancestry(Pid::from(40), processes(&unrelated)), [40, 30].map(Pid::from));
+    }
 
     // The process environment is global, so tests that mutate it must not run
     // concurrently or they'll clobber each other's variables mid-test.

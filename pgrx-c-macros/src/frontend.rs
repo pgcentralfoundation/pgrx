@@ -2979,6 +2979,7 @@ pub(crate) fn validate_driver_configuration(verbose: &str) -> Result<(), Fronten
 /// Normalize protected option operands first, then fold CRT selectors across the complete argv.
 /// Explicit target options override the native target environment; other option operands cannot
 /// masquerade as a target or runtime selector. Compiler witnesses establish the final ABI later.
+/// An MSVC target also keeps incompatible pointer types a warning, as its own compiler does.
 pub(crate) fn prepare_arguments(arguments: &[String]) -> Result<Vec<String>, FrontendError> {
     let normalized = normalize_arguments(arguments)?;
     let mut msvc = cfg!(target_env = "msvc");
@@ -2998,8 +2999,19 @@ pub(crate) fn prepare_arguments(arguments: &[String]) -> Result<Vec<String>, Fro
             msvc = crate::model::is_msvc_triple(triple);
         }
     }
-    crate::lower_msvc_runtime_flags(&normalized, msvc)
+    let mut prepared = crate::lower_msvc_runtime_flags(&normalized, msvc)?;
+    if msvc && !prepared.iter().any(|argument| argument == MSVC_POINTER_TYPE_WARNING) {
+        // First, so an explicit warning option later in the profile still decides.
+        prepared.insert(0, MSVC_POINTER_TYPE_WARNING.into());
+    }
+    Ok(prepared)
 }
+
+/// Keeps an incompatible pointer type a warning for an MSVC target, as Microsoft's C compiler
+/// reports it (C4133). PostgreSQL's MSVC atomics depend on that: `generic-msvc.h` passes
+/// `volatile uint32 *` where the `Interlocked*` functions take `volatile long *`. Clang 22
+/// reports it as an error unless told otherwise, which refuses every PostgreSQL header set.
+pub const MSVC_POINTER_TYPE_WARNING: &str = "-Wno-error=incompatible-pointer-types";
 
 /// Normalize the narrowly supported preprocessor forwarding forms used by packaged PostgreSQL.
 /// Raw CL switches on a Windows profile use the reviewed recorded-flag translation. Every forwarded
@@ -3363,6 +3375,14 @@ mod tests {
         ]
         .map(str::to_owned);
         assert_eq!(prepare_arguments(&overridden).unwrap(), overridden);
+        // Only an MSVC target keeps incompatible pointer types a warning, once, ahead of any
+        // explicit warning option.
+        let msvc = ["--target=x86_64-pc-windows-msvc", "-Werror=incompatible-pointer-types"]
+            .map(str::to_owned);
+        let prepared = prepare_arguments(&msvc).unwrap();
+        assert_eq!(prepared[0], MSVC_POINTER_TYPE_WARNING);
+        assert_eq!(prepared[1..], msvc);
+        assert_eq!(prepare_arguments(&prepared).unwrap(), prepared);
         let opaque = ["--target=x86_64-pc-windows-msvc", "-Xclang", "/MD"].map(str::to_owned);
         assert_eq!(normalize_arguments(&opaque).unwrap(), opaque);
         assert!(validate_arguments(&opaque).is_err());
