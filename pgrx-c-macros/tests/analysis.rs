@@ -674,11 +674,20 @@ fn binary_literals_require_c23_and_compile_under_the_original_c23_profile() {
         Err(error) => panic!("inspect original definitions under strict C23: {error}"),
     };
     assert!(matches!(analyze(&c23, "ANALYSIS_BINARY").status, AnalysisStatus::Candidate));
+    // Clang 18 accepts `-std=c23` but still reports an expanded binary literal as a GNU
+    // extension, which `-pedantic-errors` makes an error. Later releases do not report it.
+    let arguments = c23
+        .profile()
+        .arguments
+        .iter()
+        .map(String::as_str)
+        .chain(["-Wno-gnu-binary-literal"])
+        .collect::<Vec<_>>();
     let checked = oracle::run_c(
         &c23.profile().compiler.executable,
         &header,
         "_Static_assert(ANALYSIS_BINARY(1) == 2, \"binary literals are valid in C23\");\n",
-        &c23.profile().arguments.iter().map(String::as_str).collect::<Vec<_>>(),
+        &arguments,
         false,
     );
     assert!(checked.is_empty());

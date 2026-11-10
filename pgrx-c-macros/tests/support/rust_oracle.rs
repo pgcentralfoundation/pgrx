@@ -140,6 +140,10 @@ fn compile_rust_linked(
     compiler
         .args(["-x", "c"])
         .args(arguments)
+        // An installed PostgreSQL's flags can ask for link-time optimization, as Ubuntu's
+        // packages do. Clang then writes LLVM bitcode, which the system linker that rustc
+        // runs cannot read; only Clang 18 and newer honor `-ffat-lto-objects`.
+        .arg("-fno-lto")
         .arg("-include")
         .arg(header)
         .arg("-c")
