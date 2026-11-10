@@ -354,7 +354,7 @@ fn host_target() -> String {
 /// A library using generated macros the way extensions do. Each `let` annotation
 /// must hold for the real macros and for the documentation snapshot alike.
 const DEPENDENT: &str = r#"
-use pg::__pgrx_c_macros::{CInt, CUnsignedInt, CUnsignedLong, CValue};
+use pg::__pgrx_c_macros::{CUnsignedInt, CUnsignedLong, CValue};
 use shipped_macro_consumer as pg;
 
 unsafe extern "C-unwind" fn callback(value: i32) -> i32 {
@@ -368,9 +368,10 @@ unsafe extern "C-unwind" fn callback(value: i32) -> i32 {
 /// `record` and `node` must point to live, aligned, initialized records.
 pub unsafe fn annotated(record: *mut pg::SnapshotRecord, node: *mut pg::SnapshotNode) {
     let size = CValue::<pg::__pgrx_c_types::Oid>::new(17);
-    let valid: CValue<CInt> = pg::SNAPSHOT_SMALL_VALID!(size).into_value();
-    let native: core::ffi::c_int = pg::SNAPSHOT_SMALL_VALID!(CValue::<CUnsignedLong>::new(17)).get();
-    let truth: bool = pg::SNAPSHOT_SMALL_VALID_WRAPPER!(CValue::<CUnsignedLong>::new(18)).is_true();
+    // A comparison is a truth value, which a macro and its wrapper return as `bool`.
+    let valid: bool = pg::SNAPSHOT_SMALL_VALID!(size);
+    let native: bool = pg::SNAPSHOT_SMALL_VALID!(CValue::<CUnsignedLong>::new(17));
+    let truth: bool = pg::SNAPSHOT_SMALL_VALID_WRAPPER!(CValue::<CUnsignedLong>::new(18));
     let aligned: core::ffi::c_ulong = pg::SNAPSHOT_BUFFERALIGN!(33_i32).get();
     let sum: CValue<CUnsignedInt> =
         pg::SNAPSHOT_ADD!(pg::Oid(10), pg::TransactionId(2)).into_value();
@@ -749,8 +750,8 @@ fn main() {
     use renamed::__pgrx_c_macros::{CValue, CUnsignedLong};
     let untouched: u32 = renamed::SNAPSHOT_HUGE;
     assert_eq!(untouched, 0);
-    assert_eq!(renamed::SNAPSHOT_SMALL_VALID!(CValue::<CUnsignedLong>::new(17)).get(), 1);
-    assert_eq!(renamed::SNAPSHOT_SMALL_VALID_WRAPPER!(CValue::<CUnsignedLong>::new(18)).get(), 0);
+    assert!(renamed::SNAPSHOT_SMALL_VALID!(CValue::<CUnsignedLong>::new(17)));
+    assert!(!renamed::SNAPSHOT_SMALL_VALID_WRAPPER!(CValue::<CUnsignedLong>::new(18)));
     assert_eq!(renamed::SNAPSHOT_BUFFERALIGN!(33_i32).get(), 64);
     assert_eq!(renamed::SNAPSHOT_GROUPING!(5_i32).get(), 7);
     let mut record = renamed::SnapshotRecord { value: 19 };

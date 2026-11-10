@@ -83,10 +83,10 @@ impl<T: PGRXSharedMemory> PgSpinLock<T> {
         // through a raw pointer without creating a reference. The thread check above keeps
         // it on the backend thread, which also makes this process's lock and unlock calls;
         // other backends change a shared lock from their own processes, as PostgreSQL's own
-        // unlocked `S_LOCK_FREE` reads expect. `S_LOCK_FREE` is C `int` with native
-        // spinlocks and the `bool` result of `s_lock_free_sema` without them, so test it with
-        // C's zero rule.
-        unsafe { !pg_sys::SpinLockFree!(lock).is_true() }
+        // unlocked `S_LOCK_FREE` reads expect. `S_LOCK_FREE` is a comparison with native
+        // spinlocks and the `bool` result of `s_lock_free_sema` without them, so the macro
+        // returns a Rust `bool` either way.
+        unsafe { !pg_sys::SpinLockFree!(lock) }
     }
 
     /// Returns a lock guard for the spinlock. See the [`PgSpinLockGuard`]

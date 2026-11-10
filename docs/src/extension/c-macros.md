@@ -17,7 +17,7 @@ with its original PostgreSQL name and extract the result at the Rust boundary:
 
 | Previous call | Generated call |
 | --- | --- |
-| `pg_sys::TransactionIdIsNormal(xid)` | `pgrx::TransactionIdIsNormal!(xid).get() != 0` |
+| `pg_sys::TransactionIdIsNormal(xid)` | `pgrx::TransactionIdIsNormal!(xid)` |
 | `pgrx::varsize_any(ptr)` | `pgrx::VARSIZE_ANY!(ptr).get() as usize` |
 | `pgrx::vardata_any(ptr)` | `pgrx::VARDATA_ANY!(ptr).get()` |
 | `pgrx::set_varsize(ptr, len)` | `pgrx::SET_VARSIZE!(ptr, len)` |
@@ -104,10 +104,11 @@ for an `int` result. `.get_as::<T>()` converts any integer result to the Rust
 integer type `T` and panics if the value does not fit. Use it where the result
 type differs between versions, as `PageGetMaxOffsetNumber!`'s does: `size_t` on
 PG15 and `OffsetNumber` later. Clippy reports `.get() as T` as an unnecessary
-cast where the types already match. For predicates that change from C `int` to `bool`,
-use `.is_true()` to obtain a Rust condition with C's zero/null semantics. A
-function adapter evaluates each argument once, while a C macro keeps its
-original argument repetition. Generated docs distinguish the two and show the
+cast where the types already match. A predicate that is a comparison in one
+version and a function returning C `bool` in another returns Rust `bool` in both.
+For any other scalar result, `.is_true()` gives a Rust condition with C's
+zero/null semantics. A function adapter evaluates each argument once, while a C
+macro keeps its original argument repetition. Generated docs distinguish the two and show the
 original definition. Genuine signature changes can still require caller changes.
 
 Generated macros are runtime code. In place of the removed `const fn` ports
@@ -129,7 +130,7 @@ yourself where the input is not already known to be valid.
 | `pgrx::pg_arg_is_null`, `pg_getarg_datum`, `pg_getarg_datum_raw` | `PG_ARGISNULL!(n, fcinfo)`, `PG_GETARG_DATUM!(n, fcinfo)`, or the checked `pgrx::fcinfo::pg_get_nullable_datum(fcinfo, n)` | Non-NULL `fcinfo` and `n < nargs` |
 | `pgrx::pg_get_collation`, `pg_return_null`, `pg_return_void` | `PG_GET_COLLATION!`, `PG_RETURN_NULL!`, `PG_RETURN_VOID!` | `pg_get_collation` and `pg_return_null` required a non-NULL `fcinfo` |
 | `pgrx::srf_is_first_call`, `srf_first_call_init`, `srf_per_call_setup`, `srf_return_next`, `srf_return_done` | `SRF_IS_FIRSTCALL!`, `SRF_FIRSTCALL_INIT!`, `SRF_PERCALL_SETUP!`, `SRF_RETURN_NEXT!`, `SRF_RETURN_DONE!` | None. The removed `srf_return_next` and `srf_return_done` only updated the call state; `SRF_RETURN_NEXT!(funcctx, result, fcinfo)` and `SRF_RETURN_DONE!` also return from the calling function |
-| `FcInfo::srf_is_initialized`, `init_multi_func_call`, `srf_return_next`, `srf_return_done` | The same macros, given `FcInfo::as_mut_ptr()`. `srf_is_initialized` is the negation of `SRF_IS_FIRSTCALL!`, so replace `fcinfo.srf_is_initialized()` with `!SRF_IS_FIRSTCALL!(fcinfo.as_mut_ptr()).is_true()` | None; the return macros return as in the row above |
+| `FcInfo::srf_is_initialized`, `init_multi_func_call`, `srf_return_next`, `srf_return_done` | The same macros, given `FcInfo::as_mut_ptr()`. `srf_is_initialized` is the negation of `SRF_IS_FIRSTCALL!`, so replace `fcinfo.srf_is_initialized()` with `!SRF_IS_FIRSTCALL!(fcinfo.as_mut_ptr())` | None; the return macros return as in the row above |
 | `RetAbi::finish_call_fcinfo` | None. pgrx never called it; remove overrides | — |
 | `pgrx::htup::heap_tuple_header_get_datum_length`, `heap_tuple_get_datum`, `heap_tuple_header_get_type_id`, `heap_tuple_header_get_typmod` | `HeapTupleHeaderGetDatumLength!`, `HeapTupleGetDatum!` or the guarded `pg_sys::HeapTupleHeaderGetDatum((*tuple).t_data)`, which returns a `pg_sys::Datum`, `HeapTupleHeaderGetTypeId!`, `HeapTupleHeaderGetTypMod!` | Non-NULL header, except `heap_tuple_get_datum`, which checked nothing |
 | `pgrx::itemptr::item_pointer_get_block_number`, `item_pointer_get_offset_number` | `ItemPointerGetBlockNumber!`, `ItemPointerGetOffsetNumber!` | Asserted a valid item pointer in every build |
@@ -213,20 +214,28 @@ a transaction ID is outside PostgreSQL's special transaction ID range:
 use pgrx::pg_sys;
 
 let xid = pg_sys::TransactionId::from_inner(3);
-let is_normal = pgrx::TransactionIdIsNormal!(xid).get() != 0;
+let is_normal: bool = pgrx::TransactionIdIsNormal!(xid);
 assert!(is_normal);
 ```
 
 `TransactionId` already has a verified C identity, so it can be passed directly.
-The comparison produces C `int` zero or one. Extract that integer with `.get()`
-and compare it with zero, or use `.is_true()` when you need a Rust `bool`:
+The macro is a comparison, which C defines as the `int` zero or one, so it
+returns a Rust `bool`. A macro returns `bool` whenever its C result is provably a
+truth value:
 
-```rust
-let is_normal = pgrx::TransactionIdIsNormal!(xid).is_true();
-```
+- Its C type is `bool`, as for a cast to `bool` or a function that returns it.
+- It is a comparison, `&&`, `||` or `!`.
+- It is a comma expression that ends in one of these, or a conditional whose
+  results both are. `0` or `1` may stand for one of the two results.
 
-Expression macros return an already evaluated C expression wrapper. `.get()`
-extracts its native Rust storage; `.into_value()` keeps the tagged C value:
+Each macro's documentation says when it returns `bool`. Any other expression
+macro returns an already evaluated C expression wrapper, also where the value
+happens to be zero or one, as in `(flags) & 1`, or where its type depends on your
+operand. The result follows the definition in the PostgreSQL version you build
+against: `PageIsFull!` tests a flag bit on PG15 and returns the wrapper, and is a
+function returning `bool` from PG16 on. `.is_true()` tests a wrapped scalar against
+zero, `.get()` extracts the wrapper's native Rust storage, and `.into_value()`
+keeps the tagged C value:
 
 ```rust
 use pgrx::{cmacros::c::CValue, pg_sys};
@@ -447,9 +456,7 @@ unsafe fn as_query(node: *mut pg_sys::Node) -> Option<*mut pg_sys::Query> {
     // SAFETY: the caller provides a valid node. `IsA!` reads its tag, and
     // `castNode!` runs only for a `Query`.
     unsafe {
-        pgrx::IsA!(node, pg_sys::Query)
-            .is_true()
-            .then(|| pgrx::castNode!(pg_sys::Query, node).get())
+        pgrx::IsA!(node, pg_sys::Query).then(|| pgrx::castNode!(pg_sys::Query, node).get())
     }
 }
 ```

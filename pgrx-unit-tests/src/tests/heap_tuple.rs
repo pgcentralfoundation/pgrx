@@ -971,7 +971,7 @@ mod tests {
             let datum = row.get_datum_by_ordinal(1)?.expect("stored dog is not NULL");
             // SAFETY: the SPI tuple holding this datum stays live inside the closure.
             let short_header =
-                unsafe { pg_sys::VARATT_IS_1B!(datum.cast_mut_ptr::<pg_sys::varlena>()).is_true() };
+                unsafe { pg_sys::VARATT_IS_1B!(datum.cast_mut_ptr::<pg_sys::varlena>()) };
             // A composite this small is stored with a one-byte varlena header.
             assert!(short_header, "the stored composite should be packed");
 

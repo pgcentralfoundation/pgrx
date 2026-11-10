@@ -178,14 +178,14 @@ fn migrated_primitives_match_each_original_postgres_version() {
                 .push_str(&format!("for (index, event) in {events}.into_iter().enumerate() {{\n"));
             for name in TRIGGERS {
                 triggers.push_str(&format!(
-                    "record(\"{name}_{kind}\", index as u32, {name}!(event), 0, 0);\n"
+                    "record(\"{name}_{kind}\", index as u32, {name}!(@__pgrx_c_value; event), 0, 0);\n"
                 ));
             }
             triggers.push_str("}\n");
         }
         triggers.push_str("let event_argument = || { first.set(first.get() + 1); 0x1C_u32 };\n");
         for name in TRIGGERS {
-            triggers.push_str(&format!("first.set(0); second.set(0);\nlet value = {name}!(event_argument());\nrecord(\"{name}_EVAL\", 0, value, first.get(), second.get());\n"));
+            triggers.push_str(&format!("first.set(0); second.set(0);\nlet value = {name}!(@__pgrx_c_value; event_argument());\nrecord(\"{name}_EVAL\", 0, value, first.get(), second.get());\n"));
         }
         let (vartag_metadata, vartag_cases) = if major < 19 {
             let kind = original
@@ -231,15 +231,15 @@ fn migrated_primitives_match_each_original_postgres_version() {
                 r#"
 first.set(0); second.set(0);
 for tag in 0_u32..256 {{
-    record("VARTAG_IS_EXPANDED_ENUM", tag, VARTAG_IS_EXPANDED!(CValue::<__pgrx_c_macros::{kind}>::new(tag as {repr})), 0, 0);
+    record("VARTAG_IS_EXPANDED_ENUM", tag, VARTAG_IS_EXPANDED!(@__pgrx_c_value; CValue::<__pgrx_c_macros::{kind}>::new(tag as {repr})), 0, 0);
 }}
 for (index, tag) in [0x80000000_u32, 0xFFFFFFFE, 0xFFFFFFFF, 0x7FFFFFFF].into_iter().enumerate() {{
-    record("VARTAG_IS_EXPANDED_HIGH", index as u32, VARTAG_IS_EXPANDED!(CValue::<__pgrx_c_macros::{kind}>::new(tag as {repr})), 0, 0);
+    record("VARTAG_IS_EXPANDED_HIGH", index as u32, VARTAG_IS_EXPANDED!(@__pgrx_c_value; CValue::<__pgrx_c_macros::{kind}>::new(tag as {repr})), 0, 0);
 }}
-record("VARTAG_IS_EXPANDED_SIGNED", 0, VARTAG_IS_EXPANDED!(-1_i32), 0, 0);
-record("VARTAG_IS_EXPANDED_BYTE", 0, VARTAG_IS_EXPANDED!(3_u8), 0, 0);
+record("VARTAG_IS_EXPANDED_SIGNED", 0, VARTAG_IS_EXPANDED!(@__pgrx_c_value; -1_i32), 0, 0);
+record("VARTAG_IS_EXPANDED_BYTE", 0, VARTAG_IS_EXPANDED!(@__pgrx_c_value; 3_u8), 0, 0);
 let vartag_argument = || {{ first.set(first.get() + 1); CValue::<__pgrx_c_macros::{kind}>::new(2 as {repr}) }};
-let value = VARTAG_IS_EXPANDED!(vartag_argument());
+let value = VARTAG_IS_EXPANDED!(@__pgrx_c_value; vartag_argument());
 record("VARTAG_IS_EXPANDED_EVAL", 0, value, first.get(), second.get());
 "#
             );
@@ -255,12 +255,12 @@ record("VARTAG_IS_EXPANDED_EVAL", 0, value, first.get(), second.get());
         let page_cases = if major == 15 {
             r#"
 first.set(0); second.set(0);
-record("PageSizeIsValid_BELOW", 0, PageSizeIsValid!(CValue::<CSize>::new((u64::from(block_size) - 1) as _)), 0, 0);
-record("PageSizeIsValid_EXACT", 0, PageSizeIsValid!(CValue::<CSize>::new(u64::from(block_size) as _)), 0, 0);
-record("PageSizeIsValid_ABOVE", 0, PageSizeIsValid!(CValue::<CSize>::new((u64::from(block_size) + 1) as _)), 0, 0);
-record("PageSizeIsValid_UNSIGNED_LITERAL", 0, PageSizeIsValid!(block_size), 0, 0);
+record("PageSizeIsValid_BELOW", 0, PageSizeIsValid!(@__pgrx_c_value; CValue::<CSize>::new((u64::from(block_size) - 1) as _)), 0, 0);
+record("PageSizeIsValid_EXACT", 0, PageSizeIsValid!(@__pgrx_c_value; CValue::<CSize>::new(u64::from(block_size) as _)), 0, 0);
+record("PageSizeIsValid_ABOVE", 0, PageSizeIsValid!(@__pgrx_c_value; CValue::<CSize>::new((u64::from(block_size) + 1) as _)), 0, 0);
+record("PageSizeIsValid_UNSIGNED_LITERAL", 0, PageSizeIsValid!(@__pgrx_c_value; block_size), 0, 0);
 let page_size_argument = || { first.set(first.get() + 1); CValue::<CSize>::new(u64::from(block_size) as _) };
-let value = PageSizeIsValid!(page_size_argument());
+let value = PageSizeIsValid!(@__pgrx_c_value; page_size_argument());
 record("PageSizeIsValid_EVAL", 0, value, first.get(), second.get());
 "#
         } else {
@@ -270,12 +270,12 @@ record("PageSizeIsValid_EVAL", 0, value, first.get(), second.get());
         // after PG15, so it is no longer part of macro discovery there.
         let page_valid_cases = if major == 15 {
             r#"
-record("PageIsValid_NULL_MUTABLE", 0, PageIsValid!(core::ptr::null_mut::<u8>()), 0, 0);
-record("PageIsValid_NULL_CONST", 0, PageIsValid!(core::ptr::null::<u8>()), 0, 0);
-record("PageIsValid_MUTABLE", 0, PageIsValid!(pointer.cast_mut()), 0, 0);
-record("PageIsValid_CONST", 0, PageIsValid!(pointer), 0, 0);
+record("PageIsValid_NULL_MUTABLE", 0, PageIsValid!(@__pgrx_c_value; core::ptr::null_mut::<u8>()), 0, 0);
+record("PageIsValid_NULL_CONST", 0, PageIsValid!(@__pgrx_c_value; core::ptr::null::<u8>()), 0, 0);
+record("PageIsValid_MUTABLE", 0, PageIsValid!(@__pgrx_c_value; pointer.cast_mut()), 0, 0);
+record("PageIsValid_CONST", 0, PageIsValid!(@__pgrx_c_value; pointer), 0, 0);
 let page_argument = || { first.set(first.get() + 1); pointer.cast_mut() };
-let value = PageIsValid!(page_argument());
+let value = PageIsValid!(@__pgrx_c_value; page_argument());
 record("PageIsValid_EVAL", 0, value, first.get(), second.get());
 "#
         } else {

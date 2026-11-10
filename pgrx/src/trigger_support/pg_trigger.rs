@@ -66,11 +66,9 @@ impl<'a> PgTrigger<'a> {
         fcinfo: &'a pg_sys::FunctionCallInfoBaseData,
     ) -> Result<Self, PgTriggerError> {
         // SAFETY: the caller establishes valid call storage and any non-null context node.
-        if unsafe {
+        if !unsafe {
             pg_sys::CALLED_AS_TRIGGER!(fcinfo as *const _ as *mut pg_sys::FunctionCallInfoBaseData)
-                .get()
-        } == 0
-        {
+        } {
             return Err(PgTriggerError::NotTrigger);
         }
 

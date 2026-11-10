@@ -59,14 +59,17 @@ fn main() {
         println!("primitivename\t{}", ENUM_PRIMITIVE_NAME!(keyword).get());
         println!("constant\t{}", ENUM_CONSTANT!(2).get() as u64);
         println!("constantuse\t{}", ENUM_CONSTANT_USE!(2).get() as i64);
-        println!("constantzero\t{}", ENUM_CONSTANT_ZERO!(core::ptr::null_mut::<EnumSmall>()).get());
+        // A comparison returns a Rust `bool`, which C prints as the `int` zero or one.
+        println!(
+            "constantzero\t{}",
+            i32::from(ENUM_CONSTANT_ZERO!(core::ptr::null_mut::<EnumSmall>()))
+        );
         println!(
             "compare\t{}",
-            ENUM_COMPARE!(
+            i32::from(ENUM_COMPARE!(
                 pointer,
                 core::ptr::addr_of_mut!((*pointer).small).cast::<EnumSmallStorage>()
-            )
-            .get()
+            ))
         );
         // Only addresses are compared/subtracted. All pointers retain one array's
         // provenance, including its one-past endpoint; enum fields are never read.

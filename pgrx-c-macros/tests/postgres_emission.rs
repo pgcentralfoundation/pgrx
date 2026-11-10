@@ -212,17 +212,17 @@ fn generated_installed_postgres_macros_match_original_c_types_values_and_occurre
             (
                 "TransactionIdEquals",
                 "ORACLE_TRANSACTION_EQUALS",
-                "TransactionIdEquals!(first_transaction(), second_transaction())",
+                "TransactionIdEquals!(@__pgrx_c_value; first_transaction(), second_transaction())",
             ),
             (
                 "TransactionIdIsValid",
                 "ORACLE_TRANSACTION_VALID",
-                "TransactionIdIsValid!(first_transaction())",
+                "TransactionIdIsValid!(@__pgrx_c_value; first_transaction())",
             ),
             (
                 "TransactionIdIsNormal",
                 "ORACLE_TRANSACTION_NORMAL",
-                "TransactionIdIsNormal!(first_transaction())",
+                "TransactionIdIsNormal!(@__pgrx_c_value; first_transaction())",
             ),
         ] {
             let emission = emit(&session, name);

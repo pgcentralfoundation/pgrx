@@ -290,7 +290,7 @@ impl FromDatum for bool {
             // Where this conversion is a guarded native call, the guard panics off the
             // backend thread.
             #[allow(unused_unsafe, reason = "pure where it is a macro or translated")]
-            let value = unsafe { pg_sys::DatumGetBool!(datum).get() };
+            let value = unsafe { pg_sys::DatumGetBool!(datum) };
             Some(value)
         }
     }
@@ -540,8 +540,8 @@ impl FromDatum for String {
             // If the datum is EXTERNAL or COMPRESSED, then detoasting creates a pfree-able chunk
             // that needs to be freed. We can free it because `to_owned` above creates a Rust copy
             // of the string.
-            if pg_sys::VARATT_IS_1B_E!(datum.cast_mut_ptr::<pg_sys::varlena>()).get() != 0
-                || pg_sys::VARATT_IS_4B_C!(datum.cast_mut_ptr::<pg_sys::varlena>()).get() != 0
+            if pg_sys::VARATT_IS_1B_E!(datum.cast_mut_ptr::<pg_sys::varlena>())
+                || pg_sys::VARATT_IS_4B_C!(datum.cast_mut_ptr::<pg_sys::varlena>())
             {
                 pg_sys::pfree(varlena.cast());
             }

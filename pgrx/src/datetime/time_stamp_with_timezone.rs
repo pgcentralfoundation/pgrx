@@ -38,9 +38,7 @@ impl TryFrom<pg_sys::TimestampTz> for TimestampWithTimeZone {
         // Its infinity sentinels are valid independently of that finite range.
         let value =
             pg_sys::__pgrx_c_macros::CValue::<pg_sys::__pgrx_c_types::TimestampTz>::new(value as _);
-        if pg_sys::TIMESTAMP_NOT_FINITE!(value).get() != 0
-            || pg_sys::IS_VALID_TIMESTAMP!(value).get() != 0
-        {
+        if pg_sys::TIMESTAMP_NOT_FINITE!(value) || pg_sys::IS_VALID_TIMESTAMP!(value) {
             Ok(TimestampWithTimeZone(value.get() as _))
         } else {
             Err(FromTimeError::MicrosOutOfBounds)
@@ -269,8 +267,6 @@ impl TimestampWithTimeZone {
         pg_sys::TIMESTAMP_IS_NOEND!(pg_sys::__pgrx_c_macros::CValue::<
             pg_sys::__pgrx_c_types::TimestampTz,
         >::new(self.0 as _))
-        .get()
-            != 0
     }
 
     /// Does this [`TimestampWithTimeZone`] represent negative infinity?
@@ -279,8 +275,6 @@ impl TimestampWithTimeZone {
         pg_sys::TIMESTAMP_IS_NOBEGIN!(pg_sys::__pgrx_c_macros::CValue::<
             pg_sys::__pgrx_c_types::TimestampTz,
         >::new(self.0 as _))
-        .get()
-            != 0
     }
 
     /// Extract the `month`
@@ -360,11 +354,9 @@ impl TimestampWithTimeZone {
     }
 
     pub fn is_finite(&self) -> bool {
-        pg_sys::TIMESTAMP_NOT_FINITE!(pg_sys::__pgrx_c_macros::CValue::<
+        !pg_sys::TIMESTAMP_NOT_FINITE!(pg_sys::__pgrx_c_macros::CValue::<
             pg_sys::__pgrx_c_types::TimestampTz,
         >::new(self.0 as _))
-        .get()
-            == 0
     }
 
     /// Truncate [`TimestampWithTimeZone`] to specified units

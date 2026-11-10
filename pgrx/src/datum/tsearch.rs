@@ -126,7 +126,7 @@ macro_rules! tsearch_type {
             /// `ptr` must satisfy the invariants documented on the type and stay valid and
             /// unmodified for `'a`.
             pub(crate) unsafe fn from_varlena<'a>(ptr: NonNull<pg_sys::varlena>) -> &'a Self {
-                debug_assert!(unsafe { pg_sys::VARATT_IS_4B_U!(ptr.as_ptr()).get() } != 0);
+                debug_assert!(unsafe { pg_sys::VARATT_IS_4B_U!(ptr.as_ptr()) });
                 let len = unsafe { pg_sys::VARSIZE_4B!(ptr.as_ptr()).get() } as usize;
                 let bytes = ptr::slice_from_raw_parts(ptr.as_ptr().cast::<u8>(), len);
                 // SAFETY: `Self` is `repr(transparent)` over `[u8]`; the caller guarantees `len`

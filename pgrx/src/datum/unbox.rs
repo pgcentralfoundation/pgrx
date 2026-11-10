@@ -170,7 +170,7 @@ unsafe impl UnboxDatum for bool {
         // Where this conversion is a guarded native call, the guard panics off the
         // backend thread.
         #[allow(unused_unsafe, reason = "pure where it is a macro or translated")]
-        let value = unsafe { pg_sys::DatumGetBool!(datum.0).get() };
+        let value = unsafe { pg_sys::DatumGetBool!(datum.0) };
         value
     }
 }

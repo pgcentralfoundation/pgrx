@@ -225,7 +225,7 @@ where
 
     unsafe fn check_fcinfo_and_prepare(fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
         unsafe {
-            if pg_sys::SRF_IS_FIRSTCALL!(fcinfo).get() != 0 {
+            if pg_sys::SRF_IS_FIRSTCALL!(fcinfo) {
                 let fn_call_cx = pg_sys::SRF_FIRSTCALL_INIT!(fcinfo).get();
                 CallCx::WrappedFn((*fn_call_cx).multi_call_memory_ctx)
             } else {

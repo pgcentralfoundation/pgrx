@@ -32,23 +32,28 @@ fn record<T: __pgrx_c_macros::IntoCValue>(
 
 /// Exercise the generated definitions and print observations for the paired original-C oracle;
 /// assertions cover cases with no scalar output.
+///
+/// A predicate's public result is a Rust `bool`, in the versions that define it as a
+/// comparison and in those that define it as a function returning `bool`. Its value arm,
+/// entered with `@__pgrx_c_value;`, keeps the C type of each definition, which the records
+/// compare with the original.
 fn main() {
     let block_size = /* @BLOCK_SIZE@ */;
     println!("BLOCK_SIZE\t{block_size}");
     // @VARTAG_METADATA@
     let buffers = [i32::MIN, i32::MIN + 1, -4096, -2, -1, 0, 1, 2, 4096, i32::MAX - 1, i32::MAX];
     for (index, buffer) in buffers.into_iter().enumerate() {
-        record("BufferIsLocal_BOUNDARY", index as u32, BufferIsLocal!(buffer), 0, 0);
+        record("BufferIsLocal_BOUNDARY", index as u32, BufferIsLocal!(@__pgrx_c_value; buffer), 0, 0);
     }
     let transactions = [0_u32, 1, 2, 3, 4, 0x7FFFFFFF, 0x80000000, 0xFFFFFFFE, 0xFFFFFFFF];
     for (index, xid) in transactions.into_iter().enumerate() {
-        record("TransactionIdIsNormal_BOUNDARY", index as u32, TransactionIdIsNormal!(xid), 0, 0);
+        record("TransactionIdIsNormal_BOUNDARY", index as u32, TransactionIdIsNormal!(@__pgrx_c_value; xid), 0, 0);
     }
     let mut seed = 0xDECAFBAD_u32;
     for index in 0..4096 {
         seed = seed.wrapping_mul(1664525).wrapping_add(1013904223);
-        record("BufferIsLocal_SAMPLE", index, BufferIsLocal!(seed as i32), 0, 0);
-        record("TransactionIdIsNormal_SAMPLE", index, TransactionIdIsNormal!(seed), 0, 0);
+        record("BufferIsLocal_SAMPLE", index, BufferIsLocal!(@__pgrx_c_value; seed as i32), 0, 0);
+        record("TransactionIdIsNormal_SAMPLE", index, TransactionIdIsNormal!(@__pgrx_c_value; seed), 0, 0);
     }
     for (index, alignment) in [1_i32, 2, 4, 8, 16, 32, 64].into_iter().enumerate() {
         for length in 0_u32..1024 {
@@ -98,19 +103,19 @@ fn main() {
     record("TYPEALIGN_UNSIGNED_BOUNDARY_ALIGNMENT", 0, TYPEALIGN!(u32::MAX, 13_i32), 0, 0);
     record("MAXALIGN_MAX", 0, MAXALIGN!(maximum), 0, 0);
     record("MAXALIGN_NEGATIVE", 0, MAXALIGN!(-1_i32), 0, 0);
-    record("BufferIsLocal_UNSIGNED_LITERAL", 0, BufferIsLocal!(0x80000000_u32), 0, 0);
-    record("TransactionIdIsNormal_SIGNED_LITERAL", 0, TransactionIdIsNormal!(-1_i32), 0, 0);
+    record("BufferIsLocal_UNSIGNED_LITERAL", 0, BufferIsLocal!(@__pgrx_c_value; 0x80000000_u32), 0, 0);
+    record("TransactionIdIsNormal_SIGNED_LITERAL", 0, TransactionIdIsNormal!(@__pgrx_c_value; -1_i32), 0, 0);
     record(
         "TransactionIdIsNormal_LONG_LITERAL",
         0,
-        TransactionIdIsNormal!(CValue::<CLong>::new(-1)),
+        TransactionIdIsNormal!(@__pgrx_c_value; CValue::<CLong>::new(-1)),
         0,
         0,
     );
     record(
         "TransactionIdIsNormal_LONG_LONG_LITERAL",
         0,
-        TransactionIdIsNormal!(CValue::<CLongLong>::new(-1)),
+        TransactionIdIsNormal!(@__pgrx_c_value; CValue::<CLongLong>::new(-1)),
         0,
         0,
     );
@@ -142,11 +147,11 @@ fn main() {
     record("MAXALIGN_EVAL", 0, value, first.get(), second.get());
     first.set(0);
     second.set(0);
-    let value = BufferIsLocal!(buffer_argument());
+    let value = BufferIsLocal!(@__pgrx_c_value; buffer_argument());
     record("BufferIsLocal_EVAL", 0, value, first.get(), second.get());
     first.set(0);
     second.set(0);
-    let value = TransactionIdIsNormal!(transaction_argument());
+    let value = TransactionIdIsNormal!(@__pgrx_c_value; transaction_argument());
     record("TransactionIdIsNormal_EVAL", 0, value, first.get(), second.get());
     // @PAGE_SIZE_CASES@
     // @TRIGGER_CASES@
@@ -264,7 +269,7 @@ fn main() {
             record(
                 "VARATT_NOT_PAD_BYTE_EXHAUSTIVE",
                 byte,
-                VARATT_NOT_PAD_BYTE!(core::ptr::addr_of_mut!(input)),
+                VARATT_NOT_PAD_BYTE!(@__pgrx_c_value; core::ptr::addr_of_mut!(input)),
                 0,
                 0,
             );
@@ -273,7 +278,7 @@ fn main() {
         record(
             "VARATT_NOT_PAD_BYTE_CONST",
             0,
-            VARATT_NOT_PAD_BYTE!(core::ptr::addr_of!(constant_input)),
+            VARATT_NOT_PAD_BYTE!(@__pgrx_c_value; core::ptr::addr_of!(constant_input)),
             0,
             0,
         );
@@ -281,28 +286,28 @@ fn main() {
             first.set(first.get() + 1);
             pointer
         };
-        let value = VARATT_NOT_PAD_BYTE!(byte_argument());
+        let value = VARATT_NOT_PAD_BYTE!(@__pgrx_c_value; byte_argument());
         record("VARATT_NOT_PAD_BYTE_EVAL", 0, value, first.get(), second.get());
 
         for (index, input) in [0_u32, 1, 2, 3, u32::MAX].into_iter().enumerate() {
             handport_reset_backend_calls();
-            let value = type_is_array!(input);
+            let value = type_is_array!(@__pgrx_c_value; input);
             record("type_is_array_BOUNDARY", index as u32, value, 0, handport_backend_calls());
         }
         handport_reset_backend_calls();
-        let value = type_is_array!(-1_i32);
+        let value = type_is_array!(@__pgrx_c_value; -1_i32);
         record("type_is_array_SIGNED", 0, value, 0, handport_backend_calls());
         handport_reset_backend_calls();
-        let value = type_is_array!(CValue::<CLong>::new(-1));
+        let value = type_is_array!(@__pgrx_c_value; CValue::<CLong>::new(-1));
         record("type_is_array_LONG", 0, value, 0, handport_backend_calls());
         handport_reset_backend_calls();
-        let value = type_is_array!(CValue::<CLongLong>::new(-1));
+        let value = type_is_array!(@__pgrx_c_value; CValue::<CLongLong>::new(-1));
         record("type_is_array_LONG_LONG", 0, value, 0, handport_backend_calls());
         handport_reset_backend_calls();
-        let value = type_is_array!(u16::MAX);
+        let value = type_is_array!(@__pgrx_c_value; u16::MAX);
         record("type_is_array_SHORT", 0, value, 0, handport_backend_calls());
         handport_reset_backend_calls();
-        let value = type_is_array!(true);
+        let value = type_is_array!(@__pgrx_c_value; true);
         record("type_is_array_BOOL", 0, value, 0, handport_backend_calls());
         handport_reset_backend_calls();
         first.set(0);
@@ -310,7 +315,7 @@ fn main() {
             first.set(first.get() + 1);
             3_u32
         };
-        let value = type_is_array!(type_argument());
+        let value = type_is_array!(@__pgrx_c_value; type_argument());
         record("type_is_array_EVAL", 0, value, first.get(), handport_backend_calls());
     }
 }

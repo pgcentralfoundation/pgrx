@@ -200,10 +200,8 @@ where
     pub unsafe fn from_datum(datum: pg_sys::Datum) -> Self {
         let ptr = datum.cast_mut_ptr::<pg_sys::varlena>();
         // SAFETY: the caller supplies a live varlena, whose header these macros read.
-        let toasted = unsafe {
-            pg_sys::VARATT_IS_COMPRESSED!(ptr).is_true()
-                || pg_sys::VARATT_IS_EXTERNAL!(ptr).is_true()
-        };
+        let toasted =
+            unsafe { pg_sys::VARATT_IS_COMPRESSED!(ptr) || pg_sys::VARATT_IS_EXTERNAL!(ptr) };
         if !toasted {
             // SAFETY: a varlena that is neither compressed nor external holds its whole payload
             // inline, and the caller promises that payload starts with a valid T.

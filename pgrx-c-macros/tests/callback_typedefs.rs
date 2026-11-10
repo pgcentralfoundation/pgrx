@@ -121,7 +121,7 @@ fn main() {
         println!("{result} {evaluations}");
         let lazy = EXPLICIT_LAZY!({ evaluations += 1; __pgrx_c_callbacks::ExplicitCallback::new(callback) }, 6_i32, 0_i32).get();
         println!("{lazy} {evaluations}");
-        println!("{} {}", EXPLICIT_PRESENT!(__pgrx_c_callbacks::ExplicitCallback::new(callback)).get() as u8, EXPLICIT_PRESENT!(__pgrx_c_callbacks::ExplicitCallback::new(None)).get() as u8);
+        println!("{} {}", EXPLICIT_PRESENT!(__pgrx_c_callbacks::ExplicitCallback::new(callback)) as u8, EXPLICIT_PRESENT!(__pgrx_c_callbacks::ExplicitCallback::new(None)) as u8);
         let long: ExplicitLongCallback = Some(long_target);
         let wide: ExplicitWideCallback = Some(wide_target);
         println!("{} {}", EXPLICIT_LONG!(__pgrx_c_callbacks::ExplicitLongCallback::new(long), 11_i32).get(), EXPLICIT_WIDE!(__pgrx_c_callbacks::ExplicitWideCallback::new(wide), 11_i32).get());
@@ -250,8 +250,8 @@ assert_eq!(root_shadow, 37);
 // neither unwinds nor touches backend state. The absent callback is only compared to null.
 unsafe {
     let result = EXPLICIT_APPLY!(typed, 41_i32).get();
-    let present = EXPLICIT_PRESENT!(typed).get() as u8;
-    let absent = EXPLICIT_PRESENT!(__pgrx_c_callbacks::ExplicitCallback::new(None)).get() as u8;
+    let present = EXPLICIT_PRESENT!(typed) as u8;
+    let absent = EXPLICIT_PRESENT!(__pgrx_c_callbacks::ExplicitCallback::new(None)) as u8;
     println!("{result} {present} {absent}");
 }
 }

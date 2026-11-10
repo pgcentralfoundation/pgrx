@@ -13,25 +13,26 @@
 use pg::__pgrx_c_macros::{CInt, CUnsignedInt, CValue};
 use pgrx_pg_sys as pg;
 
-/// Extract the C int storage used by assertions on public generated predicates.
+/// Extract the C int storage of a predicate used as an operand of another generated macro.
 fn c_int(value: CValue<CInt>) -> i32 {
     value.get()
 }
 
 /// Checks C wrapping alignment and integer predicates through downstream public macro exports.
+/// A predicate is a comparison, so its macro returns a Rust `bool`. As an operand of another
+/// generated macro it is still the C `int` zero or one.
 #[test]
 fn generated_handports_preserve_c_results_through_the_public_bindings() {
     let size = CValue::<pg::__pgrx_c_types::uintptr_t>::new(usize::MAX as _);
     assert_eq!(pg::TYPEALIGN!(8_i32, size).get(), 0);
     assert_eq!(pg::MAXALIGN!(size).get(), 0);
-    assert_eq!(c_int(pg::BufferIsLocal!(-1).into_value()), 1);
-    assert_eq!(c_int(pg::BufferIsLocal!(0).into_value()), 0);
-    assert_eq!(c_int(pg::BufferIsLocal!(i32::MIN).into_value()), 1);
-    for (xid, normal) in [(0, 0), (1, 0), (2, 0), (3, 1), (u32::MAX, 1)] {
-        assert_eq!(
-            c_int(pg::TransactionIdIsNormal!(pg::TransactionId::from_inner(xid)).into_value()),
-            normal
-        );
+    let local: [bool; 3] =
+        [pg::BufferIsLocal!(-1), pg::BufferIsLocal!(0), pg::BufferIsLocal!(i32::MIN)];
+    assert_eq!(local, [true, false, true]);
+    assert_eq!(c_int(pg::Max!(pg::BufferIsLocal!(-1), 0_i32).into_value()), 1);
+    assert_eq!(c_int(pg::Max!(pg::BufferIsLocal!(0), -5_i32).into_value()), 0);
+    for (xid, normal) in [(0, false), (1, false), (2, false), (3, true), (u32::MAX, true)] {
+        assert_eq!(pg::TransactionIdIsNormal!(pg::TransactionId::from_inner(xid)), normal);
     }
 }
 
@@ -53,8 +54,8 @@ fn checked_newtype_inputs_keep_their_c_integer_identity() {
 fn wrapper_typed_constants_keep_their_types() {
     let invalid: pg::Oid = pg::InvalidOid;
     assert_eq!(invalid, pg::Oid::INVALID);
-    assert!(!pg::OidIsValid!(pg::InvalidOid).is_true());
-    assert!(pg::OidIsValid!(pg::BOOLOID).is_true());
+    assert!(!pg::OidIsValid!(pg::InvalidOid));
+    assert!(pg::OidIsValid!(pg::BOOLOID));
     #[cfg(not(feature = "pg15"))]
     {
         let invalid: pg::RelFileNumber = pg::InvalidRelFileNumber;
@@ -68,8 +69,8 @@ fn wrapper_typed_constants_keep_their_types() {
         pg::MaxTransactionId,
     ];
     assert_eq!(xids.map(pg::TransactionId::into_inner), [0, 1, 2, 3, u32::MAX]);
-    assert!(!pg::TransactionIdIsNormal!(pg::FrozenTransactionId).is_true());
-    assert!(pg::TransactionIdIsNormal!(pg::FirstNormalTransactionId).is_true());
+    assert!(!pg::TransactionIdIsNormal!(pg::FrozenTransactionId));
+    assert!(pg::TransactionIdIsNormal!(pg::FirstNormalTransactionId));
     let multis: [pg::MultiXactId; 3] =
         [pg::InvalidMultiXactId, pg::FirstMultiXactId, pg::MaxMultiXactId];
     assert_eq!(multis.map(pg::MultiXactId::into_inner), [0, 1, u32::MAX]);

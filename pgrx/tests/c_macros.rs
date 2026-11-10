@@ -71,9 +71,6 @@ fn root_macro_reexports_preserve_oid_and_transaction_id_capabilities() {
         let from_import: CValue<CUnsignedInt> = c_min!(xid, 42_u32).into_value();
         assert_eq!(from_root.get(), expected.get());
         assert_eq!(from_import.get(), expected.get());
-        assert_eq!(
-            extension::TransactionIdIsNormal!(xid).get(),
-            pg_sys::TransactionIdIsNormal!(xid).get(),
-        );
+        assert_eq!(extension::TransactionIdIsNormal!(xid), pg_sys::TransactionIdIsNormal!(xid));
     }
 }

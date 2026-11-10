@@ -123,7 +123,7 @@ fn qualified_void_native_casts_and_validity_match_original_c() {
                 "count=0; int result_{name}={name}(tick()); printf(\"%d %d %d %d %u\\n\", {name}((char *)0), {name}((const char *)0), {name}(&byte), result_{name}, count);\n"
             ));
             consumer.push_str(&format!(
-                "count.set(0); let result={name}!(tick()); println!(\"{{}} {{}} {{}} {{}} {{}}\", {name}!(core::ptr::null_mut::<u8>()).get(), {name}!(core::ptr::null::<u8>()).get(), {name}!(pointer).get(), result.get(), count.get());\n"
+                "count.set(0); let result={name}!(tick()); println!(\"{{}} {{}} {{}} {{}} {{}}\", i32::from({name}!(core::ptr::null_mut::<u8>())), i32::from({name}!(core::ptr::null::<u8>())), i32::from({name}!(pointer)), i32::from(result), count.get());\n"
             ));
         }
         c.push_str("return 0; }\n");

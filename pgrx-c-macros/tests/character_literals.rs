@@ -261,10 +261,13 @@ fn ordinary_character_literals_match_original_c_types_values_and_occurrences() {
     }
     let samples = [-200_i32, -1, 0, 47, 48, 49, 65, 127, 255];
     for name in OPERATORS {
+        // A comparison's public result is a Rust `bool`. Its value arm keeps the C `int`
+        // that this suite compares with the original.
+        let entry = if *name == "CHARACTER_COMPARE" { "@__pgrx_c_value; " } else { "" };
         for (index, value) in samples.into_iter().enumerate() {
             let label = format!("{name}_{index}");
             writeln!(c, "RECORD(\"{label}\", {name}({value}));").unwrap();
-            writeln!(rust, "record(\"{label}\", {name}!({value}_i32), evaluations.get());")
+            writeln!(rust, "record(\"{label}\", {name}!({entry}{value}_i32), evaluations.get());")
                 .unwrap();
         }
         for (label, c_value, rust_value) in [
@@ -274,11 +277,14 @@ fn ordinary_character_literals_match_original_c_types_values_and_occurrences() {
             ("ULONG", "0UL", "CValue::<CUnsignedLong>::new(0)"),
         ] {
             writeln!(c, "RECORD(\"{name}_{label}\", {name}({c_value}));").unwrap();
-            writeln!(rust, "record(\"{name}_{label}\", {name}!({rust_value}), evaluations.get());")
-                .unwrap();
+            writeln!(
+                rust,
+                "record(\"{name}_{label}\", {name}!({entry}{rust_value}), evaluations.get());"
+            )
+            .unwrap();
         }
         writeln!(c, "evaluations = 0; RECORD(\"{name}_EVAL\", {name}(argument()));").unwrap();
-        writeln!(rust, "evaluations.set(0); let value = {name}!(argument()); record(\"{name}_EVAL\", value, evaluations.get());")
+        writeln!(rust, "evaluations.set(0); let value = {name}!({entry}argument()); record(\"{name}_EVAL\", value, evaluations.get());")
             .unwrap();
     }
     c.push_str("return 0; }\n");

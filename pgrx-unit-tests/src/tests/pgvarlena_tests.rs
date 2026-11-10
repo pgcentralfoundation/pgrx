@@ -101,11 +101,11 @@ fn pgvarlena_argument_form(value: AnyElement) -> String {
     // SAFETY: a non-NULL argument of a varlena type points to a live varlena, whose first bytes
     // these macros read.
     let form = unsafe {
-        if pg_sys::VARATT_IS_EXTERNAL_ONDISK!(varlena).is_true() {
+        if pg_sys::VARATT_IS_EXTERNAL_ONDISK!(varlena) {
             "external"
-        } else if pg_sys::VARATT_IS_COMPRESSED!(varlena).is_true() {
+        } else if pg_sys::VARATT_IS_COMPRESSED!(varlena) {
             "compressed"
-        } else if pg_sys::VARATT_IS_1B!(varlena).is_true() {
+        } else if pg_sys::VARATT_IS_1B!(varlena) {
             "1b"
         } else {
             "4b"
@@ -236,7 +236,7 @@ mod tests {
         let varlena = short.into_pg();
         // SAFETY: into_pg returned the live varlena allocated by new().
         unsafe {
-            assert!(pg_sys::VARATT_IS_1B!(varlena).is_true());
+            assert!(pg_sys::VARATT_IS_1B!(varlena));
             assert_eq!(payload::<Align8>(varlena), Align8 { a: 0.0, b: 2.5, c: 0 });
         }
 
@@ -245,7 +245,7 @@ mod tests {
         let varlena = large.into_pg();
         // SAFETY: into_pg returned the live varlena allocated by new().
         unsafe {
-            assert!(pg_sys::VARATT_IS_4B_U!(varlena).is_true());
+            assert!(pg_sys::VARATT_IS_4B_U!(varlena));
             assert_eq!(payload::<Large>(varlena).words[0], 11);
         }
     }
@@ -257,7 +257,7 @@ mod tests {
         let datum = short.into_datum().unwrap();
         // SAFETY: datum is the packed varlena that new() allocated for an Align8.
         let read = unsafe {
-            assert!(pg_sys::VARATT_IS_1B!(datum.cast_mut_ptr::<pg_sys::varlena>()).is_true());
+            assert!(pg_sys::VARATT_IS_1B!(datum.cast_mut_ptr::<pg_sys::varlena>()));
             PgVarlena::<Align8>::from_datum(datum)
         };
         assert_aligned::<Align8>(&read);
@@ -275,10 +275,7 @@ mod tests {
         assert!(!compressed.is_null(), "a repeating payload should compress");
         // SAFETY: compressed is a live compressed varlena holding a Large.
         let read = unsafe {
-            assert!(
-                pg_sys::VARATT_IS_COMPRESSED!(compressed.cast_mut_ptr::<pg_sys::varlena>())
-                    .is_true()
-            );
+            assert!(pg_sys::VARATT_IS_COMPRESSED!(compressed.cast_mut_ptr::<pg_sys::varlena>()));
             PgVarlena::<Large>::from_datum(compressed)
         };
         assert_aligned::<Large>(&read);
@@ -313,7 +310,7 @@ mod tests {
         // SAFETY: each indirect pointer points at a live varlena that into_pg allocated.
         unsafe {
             let indirect = indirect_pointer(short);
-            assert!(pg_sys::VARATT_IS_EXTERNAL_INDIRECT!(indirect).is_true());
+            assert!(pg_sys::VARATT_IS_EXTERNAL_INDIRECT!(indirect));
             let read = PgVarlena::<Align8>::from_datum(indirect.into());
             assert_eq!(*read, Align8 { a: 1.0, b: 2.0, c: 3 });
 
@@ -331,7 +328,7 @@ mod tests {
         let varlena = PgVarlena::from([7_u8; 125]).into_pg();
         // SAFETY: into_pg returned a live varlena, whose header gives its size.
         unsafe {
-            assert!(pg_sys::VARATT_IS_1B!(varlena).is_true());
+            assert!(pg_sys::VARATT_IS_1B!(varlena));
             let size = pg_sys::VARSIZE_ANY!(varlena).get() as usize;
             assert_eq!(size, 126);
             let same_size = pg_sys::palloc(size);

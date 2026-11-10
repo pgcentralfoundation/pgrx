@@ -10,8 +10,13 @@
 //! extraction is explicit and never repeats operand evaluation. Return helpers
 //! apply C assignment conversion before extraction, including pointer qualifier
 //! and source-proved null-constant rules.
+//!
+//! A macro whose C result the generator proved to be a truth value, `_Bool` or the
+//! `int` zero or one of a comparison or logical operator, returns a Rust `bool`
+//! instead, through [`finish_truth`]. Only its public result changes: as an operand
+//! of another generated macro it still contributes its C type.
 
-use super::{CInteger, CSize, CValue, IntoCValue, expression::*, sealed};
+use super::{CBool, CInt, CInteger, CSize, CValue, IntoCValue, expression::*, sealed};
 
 /// Native result extraction, including C void, for the sealed value families.
 pub trait NativeResult: CExprValue {
@@ -206,6 +211,34 @@ pub fn finish_checked<T: IntoExpression>(_checks: (), value: T) -> CExpression<T
     finish(value)
 }
 
+/// The C types of a truth value: `_Bool`, and the `int` that C's relational, equality and
+/// logical operators yield.
+///
+/// The generator returns a Rust `bool` only for a result it proved to be zero or one. This
+/// bound keeps a result of any other C type, such as a pointer or a wider integer, from
+/// reaching [`finish_truth`] if that proof were ever wrong. [`Truth`] seals it.
+pub trait TruthValue: Truth {}
+/// A C `int` result of a comparison or logical operator.
+impl TruthValue for CValue<CInt> {}
+/// A C `_Bool` result.
+impl TruthValue for CValue<CBool> {}
+
+/// Return an evaluated C truth value at the public macro boundary as a Rust `bool`, which
+/// is `true` when the C value is nonzero.
+///
+/// Generated macros call this in place of [`finish`] when their C result is `_Bool` or
+/// the `int` zero or one of a comparison or logical operator, so no C identity is lost
+/// that a caller could use.
+pub fn finish_truth<T: IntoExpression<Value: TruthValue>>(value: T) -> bool {
+    value.into_expression().truth()
+}
+
+/// Like [`finish_truth`], for a macro whose dead `checks` borrow caller operands it never
+/// evaluates, so an operand that needs `unsafe` still needs it.
+pub fn finish_truth_checked<T: IntoExpression<Value: TruthValue>>(_checks: (), value: T) -> bool {
+    finish_truth(value)
+}
+
 /// Apply C return assignment conversion to an unambiguous native result type.
 ///
 /// Generated return statements use Rust's enclosing result type to select its
@@ -248,6 +281,33 @@ mod tests {
         assert!(!finish(input(0_i32)).is_true());
         assert!(finish(input(true)).is_true());
         assert!(!finish(input(false)).is_true());
+    }
+
+    /// A proved truth value becomes a Rust `bool` without repeating its evaluation: a
+    /// comparison's `int`, a `_Bool`, and a conditional or zero constant of those types.
+    #[test]
+    fn truth_values_finish_as_rust_bool() {
+        let evaluations = core::cell::Cell::new(0);
+        let result: bool = finish_truth(gt(
+            input({
+                evaluations.set(evaluations.get() + 1);
+                7_i32
+            }),
+            input(4_i32),
+        ));
+        assert!(result);
+        assert_eq!(evaluations.get(), 1);
+        assert!(!finish_truth(gt(input(4), input(7))));
+        assert!(finish_truth(input(true)));
+        assert!(!finish_truth(input(false)));
+        assert!(finish_truth_checked((), CValue::<CInt>::new(1)));
+        assert!(!finish_truth(null_constant(CValue::<CInt>::new(0))));
+        let selected = select(if truth(input(true)) {
+            Either::Left(gt(input(7), input(4)))
+        } else {
+            Either::Right(CValue::<CInt>::new(0))
+        });
+        assert!(finish_truth(selected));
     }
 
     /// C truth treats both signed floating zeros and null pointers as false,

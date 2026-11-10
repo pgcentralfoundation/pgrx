@@ -182,7 +182,7 @@ pub unsafe fn heap_getattr_raw(
             return (!isnull).then_some(datum);
         }
 
-        if pg_sys::HeapTupleNoNulls!(tuple).is_true() {
+        if pg_sys::HeapTupleNoNulls!(tuple) {
             let (cacheoff, attbyval, attlen) = attribute_fetch_info(tupdesc, index);
             if cacheoff >= 0 {
                 let value = t_data.cast::<u8>().add((*t_data).t_hoff as usize + cacheoff as usize);
@@ -190,7 +190,7 @@ pub unsafe fn heap_getattr_raw(
             }
         } else {
             let bits = ptr::addr_of!((*t_data).t_bits).cast::<pg_sys::bits8>();
-            if pg_sys::att_isnull!(attnum - 1, bits).is_true() {
+            if pg_sys::att_isnull!(attnum - 1, bits) {
                 return None;
             }
         }

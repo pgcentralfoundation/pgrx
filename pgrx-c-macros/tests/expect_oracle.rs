@@ -305,7 +305,7 @@ fn observations(result:i64) {
 fn main() {
     for value in [-2147483647_i64,-2,-1,0,1,7,2147483647] {
         let value=long(value);
-        println!("{} {} {} {} {} {} {} {} {} {} {}",EXPECT_RAW!(value,-9).get(),EXPECT_GROUPED!(value,1).get(),EXPECT_NESTED!(value).get(),EXPECT_LIKELY!(value).get(),EXPECT_UNLIKELY!(value).get(),EXPECT_RAW_SEVEN!(value).get(),EXPECT_NESTED_SEVEN!(value).get(),EXPECT_AND_ONE!(1,value).get(),EXPECT_LAZY_ZERO!(1,value).get(),EXPECT_DELEGATED_SEVEN!(value).get(),EXPECT_DELEGATED_NESTED!(value).get());
+        println!("{} {} {} {} {} {} {} {} {} {} {}",EXPECT_RAW!(value,-9).get(),EXPECT_GROUPED!(value,1).get(),EXPECT_NESTED!(value).get(),EXPECT_LIKELY!(value).get(),EXPECT_UNLIKELY!(value).get(),EXPECT_RAW_SEVEN!(value).get(),EXPECT_NESTED_SEVEN!(value).get(),i32::from(EXPECT_AND_ONE!(1,value)),EXPECT_LAZY_ZERO!(1,value).get(),EXPECT_DELEGATED_SEVEN!(value).get(),EXPECT_DELEGATED_NESTED!(value).get());
     }
     for value in [0_i64,7,-1,0x100000000,i64::MIN,i64::MAX] {
         let value=long(value);
@@ -361,9 +361,9 @@ fn main() {
         assert_eq!((value_calls,hint_calls),(0,0),"sizeof must suppress both operands");
         observations(EXPECT_UNUSED!(expect_record_value(31)).get());
         observations(EXPECT_LAZY!(0,long(expect_record_value(13)),long(expect_record_hint(1))).get());
-        observations(EXPECT_AND!(0,long(expect_record_value(13)),long(expect_record_hint(1))).get().into());
+        observations(i32::from(EXPECT_AND!(0,long(expect_record_value(13)),long(expect_record_hint(1)))).into());
         observations(EXPECT_LAZY!(1,long(expect_record_value(13)),long(expect_record_hint(1))).get());
-        observations(EXPECT_AND!(1,long(expect_record_value(13)),long(expect_record_hint(1))).get().into());
+        observations(i32::from(EXPECT_AND!(1,long(expect_record_value(13)),long(expect_record_hint(1)))).into());
         println!("{} {}",EXPECT_PROFILE!(7).get(),EXPECT_ZERO!().get());
         let mut object=31_i32; let pointer=&raw mut object;
         let absent:*mut i32=EXPECT_NULL_SELECT!(1,pointer).get();
@@ -579,7 +579,7 @@ pub unsafe extern "C" fn expect_codegen_interrupts() {
 pub unsafe extern "C" fn expect_codegen_and(guard:core::ffi::c_int) {
     // SAFETY: the caller guarantees all opaque callees' scalar-only C contracts.
     unsafe {
-        if EXPECT_AND_ONE!(guard,__pgrx_c_macros::CValue::<__pgrx_c_macros::CLong>::new(expect_branch_gate())).get()!=0 {
+        if EXPECT_AND_ONE!(guard,__pgrx_c_macros::CValue::<__pgrx_c_macros::CLong>::new(expect_branch_gate())) {
             expect_branch_yes(6);
         } else {
             expect_branch_no(6);

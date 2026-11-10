@@ -790,6 +790,7 @@ mod tests {
                     ),
                     const_capability: ConstCapability::RuntimeOnly,
                     caller_unsafe: false,
+                    returns_bool: false,
                     documentation: Box::new(documentation(name)),
                 },
                 fallback: None,
@@ -930,6 +931,7 @@ mod tests {
             rust: rust.into(),
             const_capability: ConstCapability::RuntimeOnly,
             caller_unsafe: false,
+            returns_bool: false,
             documentation: Box::new(documentation("__pgrx_c_macro_73656c66")),
         };
         let files = MacroFiles::new(String::new(), &[emission], &fixture.0).unwrap();

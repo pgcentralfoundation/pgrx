@@ -90,18 +90,19 @@ impl SnapshotVersion {
     ///
     /// Untyped shells keep the `!` placeholder; up to 20 of them are named.
     pub(super) fn report(&self) -> String {
-        let (mut value, mut unit, mut diverges) = (0, 0, 0);
+        let (mut value, mut truth, mut unit, mut diverges) = (0, 0, 0, 0);
         let mut untyped = Vec::new();
         for documentation in self.macros.values() {
             match &documentation.result {
                 DocumentedResult::Value { .. } => value += 1,
+                DocumentedResult::Truth { .. } => truth += 1,
                 DocumentedResult::Unit { .. } => unit += 1,
                 DocumentedResult::Diverges => diverges += 1,
                 DocumentedResult::Untyped { .. } => untyped.push(documentation.identifier.as_str()),
             }
         }
         let mut report = format!(
-            "pg{} documentation shells: {value} value, {unit} unit, {diverges} diverging, {} untyped",
+            "pg{} documentation shells: {value} value, {truth} bool, {unit} unit, {diverges} diverging, {} untyped",
             self.major,
             untyped.len()
         );
@@ -458,7 +459,7 @@ impl Definitions {
 fn shell_source(result: &DocumentedResult) -> &str {
     match result {
         DocumentedResult::Unit { body } => body,
-        DocumentedResult::Value { witness } => witness,
+        DocumentedResult::Value { witness } | DocumentedResult::Truth { witness } => witness,
         DocumentedResult::Diverges | DocumentedResult::Untyped { .. } => "",
     }
 }
@@ -1058,7 +1059,7 @@ mod tests {
         }
         for major in [15, 17] {
             assert!(index.contains(&format!(
-                "\n// pg{major} documentation shells: 0 value, 0 unit, 0 diverging, 0 untyped\n"
+                "\n// pg{major} documentation shells: 0 value, 0 bool, 0 unit, 0 diverging, 0 untyped\n"
             )));
         }
         assert_eq!(index.matches("compile_error!").count(), 2);
@@ -1147,7 +1148,7 @@ mod tests {
         let report = version(18, &macros, String::new()).report();
         assert!(
             report.starts_with(
-                "pg18 documentation shells: 1 value, 0 unit, 0 diverging, 22 untyped (UNTYPED_00, "
+                "pg18 documentation shells: 1 value, 0 bool, 0 unit, 0 diverging, 22 untyped (UNTYPED_00, "
             ),
             "{report}"
         );

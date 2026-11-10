@@ -231,7 +231,7 @@ fn main() {
     unsafe {
         let circle: *mut Circle = makeShape!(Circle).get();
         println!("made\t{}\t{}", shapeKind!(circle).get(), (*circle).radius);
-        println!("is\t{}\t{}", IsShape!(circle, Circle).get(), IsShape!(circle, Square).get());
+        println!("is\t{}\t{}", IsShape!(circle, Circle), IsShape!(circle, Square));
         let same: *mut Circle = castShape!(Circle, circle).get();
         println!("cast\t{}", same == circle);
         let null: *mut Square = castShape!(Square, core::ptr::null_mut::<Shape>()).get();
@@ -246,10 +246,10 @@ fn main() {
         println!("twins\t{}\t{}", shapeKind!(twin).get(), shapeKind!(alias).get());
         println!(
             "is twin\t{}\t{}\t{}\t{}",
-            IsShape!(twin, Twin).get(),
-            IsShape!(twin, TwinAlias).get(),
-            IsShape!(alias, crate::Twin,).get(),
-            IsShape!(alias, names::TwinAlias).get()
+            IsShape!(twin, Twin),
+            IsShape!(twin, TwinAlias),
+            IsShape!(alias, crate::Twin,),
+            IsShape!(alias, names::TwinAlias)
         );
         let same: *mut TwinAlias = castShape!(TwinAlias, alias).get();
         let list = ShapeList { first: alias.cast() };
@@ -357,9 +357,18 @@ fn a_prefix_pasted_onto_a_type_operand_names_that_types_enumerator() {
         let EmissionStatus::Emitted { documentation, .. } = &asserted.emission(name).status else {
             unreachable!("emitted above");
         };
-        let pgrx_c_macros::DocumentedResult::Value { witness } = &documentation.result else {
+        // `IsShape` is a comparison, which returns a Rust `bool`.
+        use pgrx_c_macros::DocumentedResult;
+        let (DocumentedResult::Value { witness } | DocumentedResult::Truth { witness }) =
+            &documentation.result
+        else {
             panic!("{name}: {:?}", documentation.result);
         };
+        assert_eq!(
+            matches!(documentation.result, DocumentedResult::Truth { .. }),
+            *name == "IsShape",
+            "{name}"
+        );
         assert_eq!(witness.contains(lookup), *witnessed, "{name}: {witness}");
         assert!(documentation.forms.iter().all(|form| form.contains("$_type_:ty")), "{name}");
     }
@@ -459,7 +468,7 @@ fn a_prefix_pasted_onto_a_type_operand_names_that_types_enumerator() {
     // the process. Without them the same program casts.
     let (status, stdout, stderr) = asserted.run(MAIN);
     assert!(!status.success(), "{stdout}\n{stderr}");
-    let before = "named\t6\t7\t9\t7\npaths\t6\t7\t6\t7\ntwin size\t10\t11\nkind\t3\t4\t2\nalias\t3\t3\nincomplete\t5\t4\nthrough\t4\npaint\t10\t20\nsized\t11\nmade\t3\t0\nis\t1\t0\ncast\ttrue\nnull\ttrue\nfirst\ttrue\ntwins\t6\t7\nis twin\t1\t0\t0\t1\ntwin cast\ttrue\ttrue\nbefore\n";
+    let before = "named\t6\t7\t9\t7\npaths\t6\t7\t6\t7\ntwin size\t10\t11\nkind\t3\t4\t2\nalias\t3\t3\nincomplete\t5\t4\nthrough\t4\npaint\t10\t20\nsized\t11\nmade\t3\t0\nis\ttrue\tfalse\ncast\ttrue\nnull\ttrue\nfirst\ttrue\ntwins\t6\t7\nis twin\ttrue\tfalse\tfalse\ttrue\ntwin cast\ttrue\ttrue\nbefore\n";
     assert_eq!(stdout, before);
     assert!(
         stderr.contains("TRAP: failed Assert(\"shape == 0 || shapeKind(shape) == kind\")"),

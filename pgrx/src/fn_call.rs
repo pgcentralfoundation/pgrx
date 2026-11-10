@@ -530,7 +530,7 @@ fn check_argument_types(params: &[pg_sys::Oid], args: &[PassedArg]) -> Result<()
 }
 
 fn is_polymorphic(oid: pg_sys::Oid) -> bool {
-    pg_sys::IsPolymorphicType!(oid).is_true()
+    pg_sys::IsPolymorphicType!(oid)
 }
 
 /// Whether `oid` names a type.  IsBinaryCoercible and check_generic_type_consistency raise an

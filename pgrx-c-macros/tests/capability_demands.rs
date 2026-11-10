@@ -355,7 +355,7 @@ fn selected_callback_operations_and_open_enum_operands_match_original_c() {
             vec!["DEMAND_OPEN_SCALAR"],
             0,
             None,
-            "let alias: AliasDemandEnum = 7; println!(\"{}\\n{}\", DEMAND_OPEN_SCALAR!(alias).get(), DEMAND_OPEN_SCALAR!(DemandEnum::DemandOne).get());",
+            "let alias: AliasDemandEnum = 7; println!(\"{}\\n{}\", i32::from(DEMAND_OPEN_SCALAR!(alias)), i32::from(DEMAND_OPEN_SCALAR!(DemandEnum::DemandOne)));",
             "AliasDemandEnum alias = AliasDemandSeven; printf(\"%d\\n%d\\n\", DEMAND_OPEN_SCALAR(alias), DEMAND_OPEN_SCALAR(DemandOne));",
         ),
         (

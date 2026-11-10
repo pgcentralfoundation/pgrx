@@ -121,7 +121,7 @@ impl<'mcx> PgHeapTuple<'mcx, AllocatedByPostgres> {
         trigger_data: &'mcx pg_sys::TriggerData,
         which_tuple: TriggerTuple,
     ) -> Option<PgHeapTuple<'mcx, AllocatedByPostgres>> {
-        if pg_sys::TRIGGER_FIRED_FOR_STATEMENT!(trigger_data.tg_event).get() != 0 {
+        if pg_sys::TRIGGER_FIRED_FOR_STATEMENT!(trigger_data.tg_event) {
             // there is no HeapTuple for a statement-level trigger as such triggers aren't run
             // per-row
             return None;
@@ -129,17 +129,17 @@ impl<'mcx> PgHeapTuple<'mcx, AllocatedByPostgres> {
 
         let tuple = match which_tuple {
             TriggerTuple::New => {
-                if pg_sys::TRIGGER_FIRED_BY_INSERT!(trigger_data.tg_event).get() != 0 {
+                if pg_sys::TRIGGER_FIRED_BY_INSERT!(trigger_data.tg_event) {
                     trigger_data.tg_trigtuple
-                } else if pg_sys::TRIGGER_FIRED_BY_UPDATE!(trigger_data.tg_event).get() != 0 {
+                } else if pg_sys::TRIGGER_FIRED_BY_UPDATE!(trigger_data.tg_event) {
                     trigger_data.tg_newtuple
                 } else {
                     return None;
                 }
             }
             TriggerTuple::Old => {
-                if pg_sys::TRIGGER_FIRED_BY_UPDATE!(trigger_data.tg_event).get() != 0
-                    || pg_sys::TRIGGER_FIRED_BY_DELETE!(trigger_data.tg_event).get() != 0
+                if pg_sys::TRIGGER_FIRED_BY_UPDATE!(trigger_data.tg_event)
+                    || pg_sys::TRIGGER_FIRED_BY_DELETE!(trigger_data.tg_event)
                 {
                     trigger_data.tg_trigtuple
                 } else {
@@ -359,8 +359,7 @@ impl<'mcx> PgHeapTuple<'mcx, AllocatedByRust> {
                     // if the attribute's type is an array and our incoming value is a composite
                     // then we need to ensure that the `att.atttypid` is the same as the array type
                     // of `value`'s type
-                    if pg_sys::type_is_array!(att.atttypid).get() != 0
-                        && value.composite_type_oid().is_some()
+                    if pg_sys::type_is_array!(att.atttypid) && value.composite_type_oid().is_some()
                     {
                         let array_of_composite_type_oid = value.composite_type_oid().unwrap();
 

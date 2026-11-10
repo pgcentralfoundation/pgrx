@@ -87,9 +87,11 @@ fn main() {
         println!("int\t{}", ROOT_INT!(Input(-2)).get());
         println!(
             "truth\t{}\t{}\t{}",
-            u8::from(ROOT_PRED!(-2_i32).is_true()),
-            u8::from(ROOT_PRED!(0_i32).is_true()),
-            kind(&ROOT_PRED!(0_i32).get())
+            // The macro form compares and the inline form returns `_Bool`, so both
+            // return a Rust `bool`. The value arm keeps the C type of each form.
+            u8::from(ROOT_PRED!(-2_i32)),
+            u8::from(ROOT_PRED!(0_i32)),
+            kind(&ROOT_PRED!(@__pgrx_c_value; 0_i32).get())
         );
         println!("word\t{}\t{}", ROOT_WORD!(7_u32).get(), kind(&ROOT_WORD!(7_u32).get()));
         println!(
