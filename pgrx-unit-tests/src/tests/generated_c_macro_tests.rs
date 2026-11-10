@@ -320,6 +320,36 @@ mod tests {
         }
     }
 
+    // PostgreSQL 18 introduced the compact attributes.
+    pg::__pgrx_c_classify! { @if_available TupleDescCompactAttr {
+    /// Checks the translation of `TupleDescCompactAttr`, a static inline function whose
+    /// definition holds a call that only a PostgreSQL built with assertions compiles. Both
+    /// builds translate one body, and each returns the address C computes.
+    #[pg_test]
+    fn generated_compact_attribute_accessor_addresses_the_descriptor() {
+        // SAFETY: a `#[pg_test]` runs in a transaction on the backend thread. The relation
+        // cache keeps `pg_class` and its descriptor valid while the relation is open with
+        // a lock, both attribute numbers are below its attribute count, and the relation
+        // is closed once.
+        unsafe {
+            let relation =
+                pg::relation_open(pg::RelationRelationId, pg::AccessShareLock as pg::LOCKMODE);
+            let tupdesc = (*relation).rd_att;
+            assert!((*tupdesc).natts >= 2);
+            let attributes =
+                addr_of_mut!((*tupdesc).compact_attrs).cast::<pg::CompactAttribute>();
+            for index in 0..2_usize {
+                let attribute: *mut pg::CompactAttribute =
+                    pg::TupleDescCompactAttr!(tupdesc, index as i32).get();
+                assert_eq!(attribute, attributes.add(index));
+            }
+            // The first column of pg_class is its four-byte `oid`.
+            assert_eq!((*pg::TupleDescCompactAttr!(tupdesc, 0_i32).get()).attlen, 4);
+            pg::relation_close(relation, pg::AccessShareLock as pg::LOCKMODE);
+        }
+    }
+    }}
+
     pg::__pgrx_c_classify! { @if_available INTERRUPTS_PENDING_CONDITION {
     /// Checks that the interrupt predicate reads `InterruptPending` from safe code on the
     /// backend thread, and panics before reading it on any other thread.
