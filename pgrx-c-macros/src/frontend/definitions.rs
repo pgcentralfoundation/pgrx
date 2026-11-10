@@ -195,12 +195,12 @@ pub(super) fn prove(
         EntityVisitResult::Continue
     });
     history.popped = popped_names(files.iter().map(|file| file.get_path()), &profile.arguments);
-    // Only a macro defined again after a body needs to know where it was undefined.
-    if history
-        .definitions
-        .values()
-        .any(|definitions| definitions.first != definitions.last.position)
-    {
+    // Only a macro defined again at one location asks where it was undefined; see
+    // `MacroHistory::unchanged`. Clang 16 and older define `__LP64__` twice among an
+    // AArch64 target's predefined macros, which have no location and so never ask.
+    if history.definitions.values().any(|definitions| {
+        definitions.one_location && definitions.first != definitions.last.position
+    }) {
         let directives = super::preprocess(
             &profile.compiler.executable,
             &profile.header,
@@ -597,7 +597,7 @@ struct MacroHistory<'tu, 'a> {
     /// Names a `pop_macro` pragma can restore, or `None` for every name.
     popped: Option<HashSet<String>>,
     /// Names that an `#undef` left undefined while the preprocessor read something else.
-    /// Empty when no macro was defined twice, since nothing then asks.
+    /// Empty when no macro was defined twice at one location, since nothing then asks.
     undefined: HashSet<String>,
 }
 

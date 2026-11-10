@@ -238,8 +238,12 @@ fn binary_literals_keep_digits_and_c_types_under_c23() {
 
 /// Inspect the Microsoft-suffix fixture for an MSVC target, which enables Microsoft extensions.
 /// Inspecting this target needs no Windows SDK.
+///
+/// Clang 23 and newer make signed overflow wrap for an MSVC target, and the analyzer then
+/// folds a signed constant expression to its value. `-fno-wrapv` keeps each Clang on the
+/// policy the older ones have, so the literals these tests look for are emitted as written.
 fn inspect_msvc(scanner: &MacroScanner) -> FrontendOutput {
-    let arguments = ["--target=x86_64-pc-windows-msvc".to_owned()];
+    let arguments = ["--target=x86_64-pc-windows-msvc".to_owned(), "-fno-wrapv".to_owned()];
     inspect(scanner, &microsoft_header(), &arguments, None).unwrap()
 }
 

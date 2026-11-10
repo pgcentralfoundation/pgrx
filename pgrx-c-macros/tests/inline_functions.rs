@@ -164,7 +164,9 @@ fn assert_atomics(generated: &MacroGeneration) {
 fn translated_inline_functions_replace_their_bindings() {
     let scanner = MacroScanner::new().expect("libclang must be available");
     let mut arguments = oracle::native_arguments();
-    arguments.push("-std=c17".into());
+    // The fixture's MSVC-style atomics pass incompatible pointers, which Clang 22 and newer
+    // reject unless told otherwise, as inspection tells them for an MSVC target.
+    arguments.extend(["-std=c17".into(), pgrx_c_macros::MSVC_POINTER_TYPE_WARNING.into()]);
     let frontend = inspect(&scanner, &header(), &arguments, None).expect("inspect definitions");
     let session = prepare(&scanner, &frontend);
     let bindings = bind(&frontend);

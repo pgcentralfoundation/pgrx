@@ -897,6 +897,16 @@ cargo test -p pgrx-bindgen --test macro_build -- --ignored
 cargo test -p pgrx-bindgen --test shipped_macros -- --ignored
 ```
 
+Which macros a build generates depends on its libclang, and a test cannot see a
+macro that was skipped. On Linux x86_64 and aarch64, CI therefore runs this
+crate's tests and builds `pgrx-pg-sys` for every supported PostgreSQL version
+with each Clang major from 14 through 23. `pgrx-ci macro-compare` then fails
+when, for one architecture and PostgreSQL version, a macro is emitted under one
+Clang major and skipped under another, or is emitted with a different
+`caller_unsafe`, invocation contract or fallback to the original C function.
+The comparison's list of accepted differences is `EXPECTED` in
+`tools/ci/src/macros.rs`.
+
 The `macro_build` harness also cross-compiles for a target chosen from the
 host: `x86_64-apple-darwin` on Apple silicon, `aarch64-apple-darwin` on x86_64
 macOS, `aarch64-unknown-linux-gnu` on x86_64 Linux and
