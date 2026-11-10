@@ -89,7 +89,13 @@ impl FrontendOutput {
         self.flavors
             .flavor_specific
             .iter()
-            .chain(self.flavors.assert_functions.iter().filter(|_| self.flavors.assert_enabled))
+            .chain(
+                self.flavors
+                    .assert_functions
+                    .iter()
+                    .chain(&self.flavors.unbound_functions)
+                    .filter(|_| self.flavors.assert_enabled),
+            )
             .map(String::as_str)
     }
 

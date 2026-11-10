@@ -79,6 +79,9 @@ pub struct Flavors {
     /// nothing. Generated code calls one through its own adapter, which does nothing in a
     /// release build, and no build binds one.
     pub(crate) assert_functions: BTreeSet<String>,
+    /// Functions that an assert-enabled build declares where a release build defines a
+    /// macro no call can stand for. The macro is a conflict, and no build binds the function.
+    pub(crate) unbound_functions: BTreeSet<String>,
     /// Static inline functions that only an assert-enabled build defines and that shared
     /// definitions may call, with their C definitions. A release build compiles them with
     /// its own macros, so their assertions do nothing there.
@@ -291,7 +294,7 @@ pub(super) fn reconcile(
                     ),
                 );
                 // A release build has no function of this name to bind.
-                flavors.flavor_specific.insert(name.clone());
+                flavors.unbound_functions.insert(name.clone());
             }
         }
     }
