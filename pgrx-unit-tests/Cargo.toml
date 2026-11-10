@@ -57,11 +57,11 @@ rand = "0.10.3"
 [dependencies.pgrx]
 path = "../pgrx"
 default-features = false
-version = "=0.20.0-beta.0"
+version = "=0.20.0-beta.1"
 
 [dependencies.pgrx-tests]
 path = "../pgrx-tests"
-version = "=0.20.0-beta.0"
+version = "=0.20.0-beta.1"
 features = ["client"]
 
 [dev-dependencies]

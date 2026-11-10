@@ -260,6 +260,8 @@ pub mod __pgrx_c_types {
     pub type r#__kernel_uid_t = crate::__pgrx_c_macros::CUnsignedInt;
     /// Preserve the compiler-established rank and width of C `__kernel_ulong_t`.
     pub type r#__kernel_ulong_t = crate::__pgrx_c_macros::CUnsignedLong;
+    /// Preserve the compiler-established rank and width of C `__kernel_uoff_t`.
+    pub type r#__kernel_uoff_t = crate::__pgrx_c_macros::CUnsignedLongLong;
     /// Preserve the compiler-established rank and width of C `__key_t`.
     pub type r#__key_t = crate::__pgrx_c_macros::CInt;
     /// Preserve the compiler-established rank and width of C `__le16`.
@@ -601,6 +603,15 @@ pub mod __pgrx_c_types {
     #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
     /// Preserve the compiler-established rank and width of C `UChar32`.
     pub type r#UChar32 = crate::__pgrx_c_macros::CInt;
+    #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
+    /// Preserve the compiler-established rank and width of C `char16_t`.
+    pub type r#char16_t = crate::__pgrx_c_macros::CUnsignedShort;
+    #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
+    /// Preserve the compiler-established rank and width of C `char32_t`.
+    pub type r#char32_t = crate::__pgrx_c_macros::CUnsignedInt;
+    #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
+    /// Preserve the compiler-established rank and width of C `char8_t`.
+    pub type r#char8_t = crate::__pgrx_c_macros::CUnsignedChar;
     #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
     /// Preserve the compiler-established rank and width of C `ParseLoc`.
     pub type r#ParseLoc = crate::__pgrx_c_macros::CInt;
@@ -628,12 +639,6 @@ pub mod __pgrx_c_types {
     #[cfg(feature = "pg19")]
     /// Preserve the compiler-established rank and width of C `ReplOriginId`.
     pub type r#ReplOriginId = crate::__pgrx_c_macros::CUnsignedShort;
-    #[cfg(feature = "pg19")]
-    /// Preserve the compiler-established rank and width of C `char16_t`.
-    pub type r#char16_t = crate::__pgrx_c_macros::CUnsignedShort;
-    #[cfg(feature = "pg19")]
-    /// Preserve the compiler-established rank and width of C `char32_t`.
-    pub type r#char32_t = crate::__pgrx_c_macros::CUnsignedInt;
     #[cfg(feature = "pg19")]
     /// Preserve the compiler-established rank and width of C `pgoff_t`.
     pub type r#pgoff_t = crate::__pgrx_c_macros::CLong;

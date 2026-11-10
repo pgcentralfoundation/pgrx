@@ -563,7 +563,7 @@ pub const PG_MINORVERSION_NUM: u32 = 15;
 pub const PG_USE_STDBOOL: u32 = 1;
 pub const PG_VERSION: &::core::ffi::CStr = c"16.15";
 pub const PG_VERSION_NUM: u32 = 160015;
-pub const PG_VERSION_STR : & :: core :: ffi :: CStr = c"PostgreSQL 16.15 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 11.4.0-1ubuntu1~22.04.3) 11.4.0, 64-bit" ;
+pub const PG_VERSION_STR : & :: core :: ffi :: CStr = c"PostgreSQL 16.15 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0, 64-bit" ;
 pub const RELSEG_SIZE: u32 = 131072;
 pub const SIZEOF_BOOL: u32 = 1;
 pub const SIZEOF_LONG: u32 = 8;
@@ -7104,7 +7104,10 @@ pub const DEFAULT_UNK_SEL: f64 = 0.005;
 pub const DEFAULT_NOT_UNK_SEL: f64 = 0.995;
 pub const SELFLAG_USED_DEFAULT: u32 = 1;
 pub type pg_int64 = ::core::ffi::c_long;
-pub type va_list = __builtin_va_list;
+pub type __gnuc_va_list = __builtin_va_list;
+pub type __uint16_t = ::core::ffi::c_ushort;
+pub type __uint64_t = ::core::ffi::c_ulong;
+pub type __uint_least16_t = __uint16_t;
 pub type __dev_t = ::core::ffi::c_ulong;
 pub type __uid_t = ::core::ffi::c_uint;
 pub type __gid_t = ::core::ffi::c_uint;
@@ -7150,7 +7153,8 @@ pub struct _IO_FILE {
     pub _markers: *mut _IO_marker,
     pub _chain: *mut _IO_FILE,
     pub _fileno: ::core::ffi::c_int,
-    pub _flags2: ::core::ffi::c_int,
+    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 3usize]>,
+    pub _short_backupbuf: [::core::ffi::c_char; 1usize],
     pub _old_offset: __off_t,
     pub _cur_column: ::core::ffi::c_ushort,
     pub _vtable_offset: ::core::ffi::c_schar,
@@ -7161,9 +7165,11 @@ pub struct _IO_FILE {
     pub _wide_data: *mut _IO_wide_data,
     pub _freeres_list: *mut _IO_FILE,
     pub _freeres_buf: *mut ::core::ffi::c_void,
-    pub __pad5: usize,
+    pub _prevchain: *mut *mut _IO_FILE,
     pub _mode: ::core::ffi::c_int,
-    pub _unused2: [::core::ffi::c_char; 20usize],
+    pub _unused3: ::core::ffi::c_int,
+    pub _total_written: __uint64_t,
+    pub _unused2: [::core::ffi::c_char; 8usize],
 }
 impl Default for _IO_FILE {
     fn default() -> Self {
@@ -7174,6 +7180,53 @@ impl Default for _IO_FILE {
         }
     }
 }
+impl _IO_FILE {
+    #[inline]
+    #[allow(unnecessary_transmutes)]
+    pub fn _flags2(&self) -> ::core::ffi::c_int {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get_const::<0usize, 24u8>() as u32) }
+    }
+    #[inline]
+    #[allow(unnecessary_transmutes)]
+    pub fn set__flags2(&mut self, val: ::core::ffi::c_int) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_1.set_const::<0usize, 24u8>(val as u64)
+        }
+    }
+    #[inline]
+    #[allow(unnecessary_transmutes)]
+    pub unsafe fn _flags2_raw(this: *const Self) -> ::core::ffi::c_int {
+        unsafe {
+            ::core::mem::transmute(<__BindgenBitfieldUnit<[u8; 3usize]>>::raw_get_const::<
+                0usize,
+                24u8,
+            >(::core::ptr::addr_of!((*this)._bitfield_1)) as u32)
+        }
+    }
+    #[inline]
+    #[allow(unnecessary_transmutes)]
+    pub unsafe fn set__flags2_raw(this: *mut Self, val: ::core::ffi::c_int) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            <__BindgenBitfieldUnit<[u8; 3usize]>>::raw_set_const::<0usize, 24u8>(
+                ::core::ptr::addr_of_mut!((*this)._bitfield_1),
+                val as u64,
+            )
+        }
+    }
+    #[inline]
+    #[allow(unnecessary_transmutes)]
+    pub fn new_bitfield_1(_flags2: ::core::ffi::c_int) -> __BindgenBitfieldUnit<[u8; 3usize]> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 3usize]> = Default::default();
+        __bindgen_bitfield_unit.set_const::<0usize, 24u8>({
+            let _flags2: u32 = unsafe { ::core::mem::transmute(_flags2) };
+            _flags2 as u64
+        });
+        __bindgen_bitfield_unit
+    }
+}
+pub type va_list = __gnuc_va_list;
 pub type off_t = __off_t;
 pub type wchar_t = ::core::ffi::c_int;
 #[repr(C)]
@@ -21703,7 +21756,7 @@ impl Default for SysScanDescData {
     }
 }
 pub type sig_atomic_t = __sig_atomic_t;
-pub mod _bindgen_ty_13 {
+pub mod _bindgen_ty_14 {
     #[allow(unused_imports)]
     use super::*;
     pub type Type = ::core::ffi::c_uint;
@@ -34727,7 +34780,7 @@ pub mod PLpgSQL_stmt_type {
     pub const PLPGSQL_STMT_COMMIT: Type = 25;
     pub const PLPGSQL_STMT_ROLLBACK: Type = 26;
 }
-pub mod _bindgen_ty_31 {
+pub mod _bindgen_ty_32 {
     #[allow(unused_imports)]
     use super::*;
     pub type Type = ::core::ffi::c_uint;
@@ -38361,7 +38414,8 @@ impl Default for TSConfigCacheEntry {
         }
     }
 }
-pub type UChar = u16;
+pub type char16_t = __uint_least16_t;
+pub type UChar = char16_t;
 #[repr(C)]
 #[derive(Debug)]
 pub struct UCollator {
@@ -40391,16 +40445,6 @@ unsafe extern "C-unwind" {
         uid: *mut uid_t,
         gid: *mut gid_t,
     ) -> ::core::ffi::c_int;
-    pub fn strlcat(
-        dst: *mut ::core::ffi::c_char,
-        src: *const ::core::ffi::c_char,
-        siz: usize,
-    ) -> usize;
-    pub fn strlcpy(
-        dst: *mut ::core::ffi::c_char,
-        src: *const ::core::ffi::c_char,
-        siz: usize,
-    ) -> usize;
     pub fn pg_get_user_name(
         user_id: uid_t,
         buffer: *mut ::core::ffi::c_char,
@@ -62832,6 +62876,12 @@ unsafe extern "C-unwind" {
 pub const ACLITEM_ALL_GOPTION_BITS: usize = 18446744069414584320;
 #[doc = " Compiler-verified C object macro `ACLITEM_ALL_PRIV_BITS`, omitted by bindgen."]
 pub const ACLITEM_ALL_PRIV_BITS: usize = 4294967295;
+#[doc = " Compiler-verified C object macro `ALLOCSET_DEFAULT_SIZES`, omitted by bindgen."]
+pub const ALLOCSET_DEFAULT_SIZES: i32 = 8388608;
+#[doc = " Compiler-verified C object macro `ALLOCSET_SMALL_SIZES`, omitted by bindgen."]
+pub const ALLOCSET_SMALL_SIZES: i32 = 8192;
+#[doc = " Compiler-verified C object macro `ALLOCSET_START_SMALL_SIZES`, omitted by bindgen."]
+pub const ALLOCSET_START_SMALL_SIZES: i32 = 8388608;
 #[doc = " Compiler-verified C object macro `ALL_SET`, omitted by bindgen."]
 pub const ALL_SET: u32 = 4294967295;
 #[doc = " Compiler-verified C object macro `ATTRIBUTE_FIXED_PART_SIZE`, omitted by bindgen."]
@@ -63483,9 +63533,9 @@ pub const HAVE_DECL_PWRITEV: i32 = 1;
 #[doc = " Compiler-verified C object macro `HAVE_DECL_STRCHRNUL`, omitted by bindgen."]
 pub const HAVE_DECL_STRCHRNUL: i32 = 1;
 #[doc = " Compiler-verified C object macro `HAVE_DECL_STRLCAT`, omitted by bindgen."]
-pub const HAVE_DECL_STRLCAT: i32 = 0;
+pub const HAVE_DECL_STRLCAT: i32 = 1;
 #[doc = " Compiler-verified C object macro `HAVE_DECL_STRLCPY`, omitted by bindgen."]
-pub const HAVE_DECL_STRLCPY: i32 = 0;
+pub const HAVE_DECL_STRLCPY: i32 = 1;
 #[doc = " Compiler-verified C object macro `HAVE_DECL_STRNLEN`, omitted by bindgen."]
 pub const HAVE_DECL_STRNLEN: i32 = 1;
 #[doc = " Compiler-verified C object macro `HAVE_DECL_TIMINGSAFE_BCMP`, omitted by bindgen."]
@@ -63614,6 +63664,10 @@ pub const HAVE_STRERROR_R: i32 = 1;
 pub const HAVE_STRINGS_H: i32 = 1;
 #[doc = " Compiler-verified C object macro `HAVE_STRING_H`, omitted by bindgen."]
 pub const HAVE_STRING_H: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_STRLCAT`, omitted by bindgen."]
+pub const HAVE_STRLCAT: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_STRLCPY`, omitted by bindgen."]
+pub const HAVE_STRLCPY: i32 = 1;
 #[doc = " Compiler-verified C object macro `HAVE_STRNLEN`, omitted by bindgen."]
 pub const HAVE_STRNLEN: i32 = 1;
 #[doc = " Compiler-verified C object macro `HAVE_STRSIGNAL`, omitted by bindgen."]
@@ -68415,4 +68469,4 @@ impl ::core::fmt::Display for XmlSerialize {
 #[doc = r" The release generation of these bindings, checked by the documentation snapshot."]
 #[doc(hidden)]
 pub const __PGRX_GENERATION: &str =
-    "8c09a833369df5b90ac584777f92b89f53640aaf626307a69df2e0173ba84a87";
+    "e62d692d9ef342799640fc7de840265044a6c2c896226afadc6cf3d1626553ff";

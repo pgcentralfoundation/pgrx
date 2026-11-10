@@ -1,5 +1,51 @@
 // Shared generated C macro support.
 
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::xl_hash_update_meta_page>() == 8);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::xl_hash_update_meta_page>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::xl_hash_update_meta_page {}
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::varatt_indirect>() == 8);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::varatt_indirect>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::varatt_indirect {}
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::varatt_expanded>() == 8);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::varatt_expanded>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::varatt_expanded {}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::tzEntry {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::tzEntry {
+    type Marker = c::expression::COpaque<Self>;
+}
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::slist_iter>() == 8);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::slist_iter>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::slist_iter {}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::shm_toc {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::shm_toc {
+    type Marker = c::expression::COpaque<Self>;
+}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::shm_mq_handle {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::shm_mq_handle {
+    type Marker = c::expression::COpaque<Self>;
+}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::shm_mq {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::shm_mq {
+    type Marker = c::expression::COpaque<Self>;
+}
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::relopt_real>() == 56);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::relopt_real>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::relopt_real {}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::pg_tzenum {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::pg_tzenum {
+    type Marker = c::expression::COpaque<Self>;
+}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::pg_tz {}
 impl c::expression::NativeType for crate::__pgrx_c_bindings::pg_tz {
     type Marker = c::expression::COpaque<Self>;
 }
@@ -4552,44 +4598,3 @@ impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::HashJoinState {
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_HashJoinState as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::HashPath {}
-impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::HashPath {
-    const VALUE: c::CValue<c::CInt> =
-        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_HashPath as i32);
-}
-impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::HashState {}
-impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::HashState {
-    const VALUE: c::CValue<c::CInt> =
-        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_HashState as i32);
-}
-impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::IdentifySystemCmd {}
-impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::IdentifySystemCmd {
-    const VALUE: c::CValue<c::CInt> =
-        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_IdentifySystemCmd as i32);
-}
-impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::ImportForeignSchemaStmt {}
-impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::ImportForeignSchemaStmt {
-    const VALUE: c::CValue<c::CInt> = c::CValue::<c::CInt>::new(
-        crate::__pgrx_c_bindings::NodeTag::T_ImportForeignSchemaStmt as i32,
-    );
-}
-impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::IncrementalSort {}
-impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::IncrementalSort {
-    const VALUE: c::CValue<c::CInt> =
-        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_IncrementalSort as i32);
-}
-impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::IncrementalSortPath {}
-impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::IncrementalSortPath {
-    const VALUE: c::CValue<c::CInt> =
-        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_IncrementalSortPath as i32);
-}
-impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::IncrementalSortState {}
-impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::IncrementalSortState {
-    const VALUE: c::CValue<c::CInt> =
-        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_IncrementalSortState as i32);
-}
-impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::IndexAmRoutine {}
-impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::IndexAmRoutine {
-    const VALUE: c::CValue<c::CInt> =
-        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_IndexAmRoutine as i32);
-}
-impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::IndexClause {}
