@@ -11,7 +11,8 @@
 //!
 //! The same parse records the preprocessing history used to retain a definition's body for
 //! translation: the body's active tokens, and proof that every macro it names expands at the
-//! end of the translation unit exactly as it did inside the definition.
+//! end of the translation unit exactly as it did inside the definition. libclang records no
+//! `#undef`, so one driver preprocessing pass reports them.
 
 use super::{FrontendError, type_info};
 use crate::{
@@ -87,9 +88,10 @@ pub(super) fn prove(
     }
     let mut history = MacroHistory {
         active: &frontend.environment().active,
-        last_definition: HashMap::new(),
+        definitions: HashMap::new(),
         expansions: HashMap::new(),
         popped: None,
+        undefined: HashSet::new(),
     };
     let mut files = HashSet::new();
     files.extend(unit.get_file(&profile.header));
@@ -111,7 +113,19 @@ pub(super) fn prove(
                         let location = at.get_file_location();
                         Some((location.file?, location.offset))
                     });
-                    history.last_definition.insert(name, Recorded { position, location });
+                    let last = Recorded { position, location };
+                    history
+                        .definitions
+                        .entry(name)
+                        .and_modify(|definitions| {
+                            definitions.one_location &= definitions.last.location == location;
+                            definitions.last = Recorded { position, location };
+                        })
+                        .or_insert(Definitions {
+                            first: position,
+                            one_location: location.is_some(),
+                            last,
+                        });
                 }
                 return EntityVisitResult::Continue;
             }
@@ -181,6 +195,20 @@ pub(super) fn prove(
         EntityVisitResult::Continue
     });
     history.popped = popped_names(files.iter().map(|file| file.get_path()), &profile.arguments);
+    // Only a macro defined again after a body needs to know where it was undefined.
+    if history
+        .definitions
+        .values()
+        .any(|definitions| definitions.first != definitions.last.position)
+    {
+        let directives = super::preprocess(
+            &profile.compiler.executable,
+            &profile.header,
+            &profile.arguments,
+            &["-E", "-dD"],
+        )?;
+        history.undefined = undefined_names(&directives.stdout);
+    }
     let mut definitions = BTreeMap::new();
     let mut sources = HashMap::new();
     let mut remaining = MAX_SOURCE_BYTES;
@@ -257,6 +285,38 @@ fn popped_names(
         }
     }
     Some(names)
+}
+
+/// The macros that some `#undef` in `output` leaves undefined: those whose `#undef` line is
+/// not followed, before anything else the preprocessor wrote, by a `#define` of the same
+/// name. `output` is the driver's preprocessing output with `-dD`, which writes each
+/// executed `#define` and `#undef` on a line of its own, in order, among the unit's tokens.
+///
+/// Only blank lines and line markers may separate the two directives, so no token, other
+/// macro directive or pragma was read while the name was undefined. Clang writes a space
+/// before a `#` token that would start a line, so only a directive starts with `#`.
+fn undefined_names(output: &str) -> HashSet<String> {
+    let marker = |line: &str| {
+        line.is_empty()
+            || line.strip_prefix("#line ").or_else(|| line.strip_prefix("# ")).is_some_and(|rest| {
+                rest.trim_ascii_start().starts_with(|digit: char| digit.is_ascii_digit())
+            })
+    };
+    let mut names = HashSet::new();
+    let mut lines = output.lines().map(str::trim_ascii_end).peekable();
+    while let Some(line) = lines.next() {
+        let Some(name) = line.strip_prefix("#undef ").map(str::trim_ascii) else { continue };
+        while lines.next_if(|line| marker(line)).is_some() {}
+        let redefined = lines
+            .peek()
+            .and_then(|line| line.strip_prefix("#define "))
+            .and_then(|definition| definition.strip_prefix(name))
+            .is_some_and(|rest| rest.is_empty() || rest.starts_with([' ', '(']));
+        if !redefined {
+            names.insert(name.to_owned());
+        }
+    }
+    names
 }
 
 /// Read physical original source once per header and retain only bounded definition text.
@@ -529,13 +589,27 @@ fn logical_line_end(contents: &[u8], start: usize) -> Option<usize> {
 struct MacroHistory<'tu, 'a> {
     /// Final active definitions, which later expansion of a retained body uses.
     active: &'a BTreeMap<String, ActiveMacro>,
-    /// The last definition of each macro name, at its own location.
-    last_definition: HashMap<String, Recorded<'tu>>,
+    /// The recorded definitions of each macro name.
+    definitions: HashMap<String, Definitions<'tu>>,
     /// Each top-level macro expansion in the first entry of its file, by file and offset of
     /// its name, with the location of the definition it used.
     expansions: HashMap<File<'tu>, HashMap<u32, Recorded<'tu>>>,
     /// Names a `pop_macro` pragma can restore, or `None` for every name.
     popped: Option<HashSet<String>>,
+    /// Names that an `#undef` left undefined while the preprocessor read something else.
+    /// Empty when no macro was defined twice, since nothing then asks.
+    undefined: HashSet<String>,
+}
+
+/// The definitions the preprocessor recorded for one macro name.
+struct Definitions<'tu> {
+    /// The position of the first.
+    first: usize,
+    /// The last, at its own location.
+    last: Recorded<'tu>,
+    /// Whether every one is at the same physical location, and so has the same parameters
+    /// and replacement list.
+    one_location: bool,
 }
 
 /// A preprocessing record's position in the translation unit and a macro definition's
@@ -602,7 +676,7 @@ impl<'tu> MacroHistory<'tu, '_> {
                     // token pasting could otherwise make differ.
                     if !self.unchanged(name, position, &mut HashSet::new())
                         || expansion.location.is_none()
-                        || expansion.location != self.last_definition[name].location
+                        || expansion.location != self.definitions[name].last.location
                     {
                         return false;
                     }
@@ -618,7 +692,7 @@ impl<'tu> MacroHistory<'tu, '_> {
                 }
                 // Nested expansions are not recorded, so a name that was ever a macro
                 // could have been expanded when a macro's result was rescanned.
-                None if self.last_definition.contains_key(name) => return false,
+                None if self.definitions.contains_key(name) => return false,
                 None => {}
             }
         }
@@ -635,6 +709,12 @@ impl<'tu> MacroHistory<'tu, '_> {
     /// a pop can restore is refused. Push and pop pragmas are not recorded, so the active
     /// definition must also be that last definition by location. Token pasting can form
     /// names this check cannot see.
+    ///
+    /// A header that a system header includes again can define a macro again after
+    /// `position`, as Clang's `<stddef.h>` defines `NULL` each time glibc asks for it. Such a
+    /// macro also had its active definition at `position` when it was first defined before
+    /// `position`, every definition of it is the one at that location, and no `#undef` left
+    /// it undefined while the preprocessor read anything else.
     fn unchanged(&self, name: &str, position: usize, visited: &mut HashSet<String>) -> bool {
         if !visited.insert(name.to_owned()) {
             return true;
@@ -642,16 +722,21 @@ impl<'tu> MacroHistory<'tu, '_> {
         if self.popped.as_ref().is_none_or(|popped| popped.contains(name)) {
             return false;
         }
-        let (Some(last), Some(active)) = (self.last_definition.get(name), self.active.get(name))
+        let (Some(definitions), Some(active)) = (self.definitions.get(name), self.active.get(name))
         else {
             return false;
         };
+        let last = &definitions.last;
         let defined_last = last.location.is_some_and(|(file, offset)| {
             active.definition.location.as_ref().is_some_and(|location| {
                 location.offset == offset && location.file == file.get_path()
             })
         });
-        if last.position >= position || active.definition.builtin || !defined_last {
+        let defined_before = last.position < position
+            || (definitions.first < position
+                && definitions.one_location
+                && !self.undefined.contains(name));
+        if !defined_before || active.definition.builtin || !defined_last {
             return false;
         }
         let tokens = &active.definition.tokens;
@@ -690,7 +775,7 @@ impl<'tu> MacroHistory<'tu, '_> {
             if crate::expansion::dynamic_builtin(spelling) {
                 return false;
             }
-            !(self.last_definition.contains_key(spelling) || self.active.contains_key(spelling))
+            !(self.definitions.contains_key(spelling) || self.active.contains_key(spelling))
                 || self.unchanged(spelling, position, visited)
         })
     }
@@ -699,7 +784,42 @@ impl<'tu> MacroHistory<'tu, '_> {
 /// Check the pop pragma search on raw source text.
 #[cfg(test)]
 mod tests {
-    use super::popped_names;
+    use super::{popped_names, undefined_names};
+
+    /// An `#undef` leaves its name undefined unless the next directive or token the
+    /// preprocessor wrote defines that name again. Blank lines and line markers are neither.
+    #[test]
+    fn undefinitions_followed_by_their_definition_leave_no_name() {
+        let output = "\
+# 1 \"a.h\" 1 3
+#undef A
+
+# 89 \"a.h\" 3
+#define A ((void*)0)
+#undef B
+#line 4 \"b.h\"
+#define B(x) x
+#undef C
+#define C
+#undef D
+#define DD 1
+#define D 1
+#undef E
+int e;
+#define E 1
+#undef F
+#pragma pack(1)
+#define F 1
+#undef G
+#undef G
+#define G 1
+#undef H
+ # 1
+#define H 1
+#undef I";
+        let names = undefined_names(output);
+        assert_eq!(names, ["D", "E", "F", "G", "H", "I"].map(String::from).into());
+    }
 
     /// Pop pragmas name what they restore, also inside `_Pragma` and in a `-D` definition;
     /// any other mention of the pragma name leaves every name unproved.

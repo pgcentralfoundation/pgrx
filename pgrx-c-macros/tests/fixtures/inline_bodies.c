@@ -52,6 +52,8 @@ int main(void)
     printf("template\t%d\t%d\t%d\t%d\n", BODY_FIRST_VALUE(), BODY_SECOND_VALUE(),
            BODY_FIRST_BRANCH(10), BODY_SECOND_BRANCH(10));
     printf("guarded\t%d\t%d\n", BODY_GUARDED_FIRST(), BODY_GUARDED_SECOND());
+    printf("again\t%d\t%d\t%d\t%d\n", BODY_AGAIN_USE(1), BODY_AGAIN_REACHED(1),
+           BODY_AGAIN_GAP_USE(1), BODY_AGAIN_SEEN_USE(1));
     printf("spliced\t%d\t%d\t%d\t%d\n", BODY_BRACE_SPLICE(1), BODY_SPLICED_HASH(10),
            BODY_SPLICED_DIGRAPH(10), BODY_TRIGRAPH_HASH(10));
 }

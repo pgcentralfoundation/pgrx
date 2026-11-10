@@ -180,9 +180,12 @@ only original macro definitions.
 
 An inline adapter evaluates each argument once and preserves C conversions,
 pointer qualifiers and the actual return type. When the analyzer supports every
-statement of the definition's body, and no macro the body reaches is defined
-again after the definition, even identically, the adapter translates that body;
-otherwise it calls the original function through its verified prototype. When the
+statement of the definition's body, and every macro the body reaches has at the end
+of the headers the definition it had in the body, the adapter translates that body;
+otherwise it calls the original function through its verified prototype. A macro
+defined again after the function keeps the body native, unless a header entered
+again repeats the one definition, as Clang's `<stddef.h>` repeats `NULL` for each
+glibc header that asks for it. When the
 preprocessor enters a header more than once, as for a template included twice,
 only functions its first entry defines are translated. A translation evaluates
 every argument before its
@@ -193,7 +196,11 @@ an inline function, its return rank or evaluation rules can therefore change wit
 PostgreSQL, and so can whether a call needs `unsafe`. Whether a body is translated
 also depends on the libclang that inspects it: some libclang releases locate a
 statement that starts with a macro at the macro's definition, which keeps the body
-native. An assert-enabled build and a release build translate the same bodies; see
+native. It depends on the target's C library and architecture too, where a body
+reaches their macros or is itself conditional: glibc defines `INT64_MIN` with a
+token paste, which keeps `pg_abs_s64` native on Linux, and macOS defines `memcpy`
+as a macro over a compiler builtin, which keeps `pq_writeint32` native there. An
+assert-enabled build and a release build translate the same bodies; see
 [Assertions and build flavors](#assertions-and-build-flavors). Predicate
 callers can use `.is_true()` for either C `int` or C `bool`; this explicitly
 converts truth without changing `.get()` or the original C identity. Native calls

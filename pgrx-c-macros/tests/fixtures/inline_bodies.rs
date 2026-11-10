@@ -156,6 +156,13 @@ fn main() {
         );
         println!("guarded\t{}\t{}", BODY_GUARDED_FIRST!().get(), BODY_GUARDED_SECOND!().get());
         println!(
+            "again\t{}\t{}\t{}\t{}",
+            BODY_AGAIN_USE!(1_i32).get(),
+            BODY_AGAIN_REACHED!(1_i32).get(),
+            BODY_AGAIN_GAP_USE!(1_i32).get(),
+            BODY_AGAIN_SEEN_USE!(1_i32).get()
+        );
+        println!(
             "spliced\t{}\t{}\t{}\t{}",
             BODY_BRACE_SPLICE!(1_i32).get(),
             BODY_SPLICED_HASH!(10_i32).get(),
