@@ -176,6 +176,8 @@ macro_rules! EOHPGetRODatum {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -241,6 +243,8 @@ macro_rules! EOHPGetRWDatum {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -326,6 +330,8 @@ macro_rules! MakeExpandedObjectReadOnly {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -337,7 +343,7 @@ macro_rules! MakeExpandedObjectReadOnly {
 macro_rules! VARATT_IS_EXPANDED_HEADER {
     ($PTR:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$PTR;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(

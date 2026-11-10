@@ -2341,6 +2341,8 @@ macro_rules! PG_FREE_IF_COPY {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
 ///
 /// # Safety
@@ -2354,7 +2356,7 @@ macro_rules! PG_FREE_IF_COPY {
 macro_rules! PG_GETARG_BOOL {
     ($n:expr, $fcinfo:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$n;
                 let _ = &$fcinfo;
                 (
@@ -2376,6 +2378,8 @@ macro_rules! PG_GETARG_BOOL {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
 ///
 /// # Safety
@@ -2385,7 +2389,7 @@ macro_rules! PG_GETARG_BOOL {
 macro_rules! PG_GETARG_BOOL {
     ($n:expr, $fcinfo:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$n;
                 let _ = &$fcinfo;
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -4294,6 +4298,8 @@ macro_rules! PG_GET_OPCLASS_OPTIONS {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// Rust callers supply 1 argument: the 0 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
 ///
 /// # Safety
@@ -4307,7 +4313,7 @@ macro_rules! PG_GET_OPCLASS_OPTIONS {
 macro_rules! PG_HAS_OPCLASS_OPTIONS {
     ($fcinfo:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$fcinfo;
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::type_witness::<

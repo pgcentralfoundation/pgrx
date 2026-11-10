@@ -47,6 +47,8 @@ macro_rules! TOUCHAR {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -58,7 +60,7 @@ macro_rules! TOUCHAR {
 macro_rules! t_iseq {
     ($x:expr, $c:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$x;
                 let _ = &$c;
                 (
@@ -84,6 +86,8 @@ macro_rules! t_iseq {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -117,6 +121,8 @@ macro_rules! ts_copychar_cstr {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///

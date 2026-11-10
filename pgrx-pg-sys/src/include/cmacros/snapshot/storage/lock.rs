@@ -590,6 +590,8 @@ macro_rules! LOCK_LOCKTAG {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -597,7 +599,7 @@ macro_rules! LOCK_LOCKTAG {
 macro_rules! LocalTransactionIdIsValid {
     ($lxid:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$lxid;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1798,6 +1800,8 @@ macro_rules! SetInvalidVirtualTransactionId {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1805,7 +1809,7 @@ macro_rules! SetInvalidVirtualTransactionId {
 macro_rules! VirtualTransactionIdEquals {
     ($vxid1:expr, $vxid2:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$vxid1;
                 let _ = &$vxid2;
                 (
@@ -1827,6 +1831,8 @@ macro_rules! VirtualTransactionIdEquals {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1834,7 +1840,7 @@ macro_rules! VirtualTransactionIdEquals {
 macro_rules! VirtualTransactionIdEquals {
     ($vxid1:expr, $vxid2:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$vxid1;
                 let _ = &$vxid2;
                 (
@@ -1856,6 +1862,8 @@ macro_rules! VirtualTransactionIdEquals {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1863,7 +1871,7 @@ macro_rules! VirtualTransactionIdEquals {
 macro_rules! VirtualTransactionIdIsRecoveredPreparedXact {
     ($vxid:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$vxid;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1884,6 +1892,8 @@ macro_rules! VirtualTransactionIdIsRecoveredPreparedXact {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1891,7 +1901,7 @@ macro_rules! VirtualTransactionIdIsRecoveredPreparedXact {
 macro_rules! VirtualTransactionIdIsRecoveredPreparedXact {
     ($vxid:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$vxid;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1911,6 +1921,8 @@ macro_rules! VirtualTransactionIdIsRecoveredPreparedXact {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1918,7 +1930,7 @@ macro_rules! VirtualTransactionIdIsRecoveredPreparedXact {
 macro_rules! VirtualTransactionIdIsValid {
     ($vxid:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$vxid;
                 (
                     (

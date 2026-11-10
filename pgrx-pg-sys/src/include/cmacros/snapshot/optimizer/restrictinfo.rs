@@ -30,6 +30,8 @@
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -41,7 +43,7 @@
 macro_rules! clause_sides_match_join {
     ($rinfo:expr, $outerrelids:expr, $innerrelids:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$rinfo;
                 let _ = &$outerrelids;
                 let _ = &$innerrelids;

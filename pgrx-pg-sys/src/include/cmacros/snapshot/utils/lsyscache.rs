@@ -8,6 +8,8 @@
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -19,7 +21,7 @@
 macro_rules! TypeIsToastable {
     ($typid:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$typid;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -39,6 +41,8 @@ macro_rules! TypeIsToastable {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -50,7 +54,7 @@ macro_rules! TypeIsToastable {
 macro_rules! type_is_array {
     ($typid:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$typid;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -70,6 +74,8 @@ macro_rules! type_is_array {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -81,7 +87,7 @@ macro_rules! type_is_array {
 macro_rules! type_is_array_domain {
     ($typid:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$typid;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(

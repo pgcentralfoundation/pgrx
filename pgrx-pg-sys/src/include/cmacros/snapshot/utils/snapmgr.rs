@@ -9,6 +9,8 @@
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -20,7 +22,7 @@
 macro_rules! EarlyPruningEnabled {
     ($rel:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$rel;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -177,6 +179,8 @@ macro_rules! InitToastSnapshot {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -184,7 +188,7 @@ macro_rules! InitToastSnapshot {
 macro_rules! IsHistoricMVCCSnapshot {
     ($snapshot:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$snapshot;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -205,6 +209,8 @@ macro_rules! IsHistoricMVCCSnapshot {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -212,7 +218,7 @@ macro_rules! IsHistoricMVCCSnapshot {
 macro_rules! IsMVCCLikeSnapshot {
     ($snapshot:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$snapshot;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -233,6 +239,8 @@ macro_rules! IsMVCCLikeSnapshot {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -240,7 +248,7 @@ macro_rules! IsMVCCLikeSnapshot {
 macro_rules! IsMVCCSnapshot {
     ($snapshot:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$snapshot;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -261,6 +269,8 @@ macro_rules! IsMVCCSnapshot {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -268,7 +278,7 @@ macro_rules! IsMVCCSnapshot {
 macro_rules! IsMVCCSnapshot {
     ($snapshot:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$snapshot;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -351,6 +361,8 @@ macro_rules! OLD_SNAPSHOT_TIME_MAP_ENTRIES {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -358,7 +370,7 @@ macro_rules! OLD_SNAPSHOT_TIME_MAP_ENTRIES {
 macro_rules! OldSnapshotThresholdActive {
     () => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
@@ -372,6 +384,8 @@ macro_rules! OldSnapshotThresholdActive {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -383,7 +397,7 @@ macro_rules! OldSnapshotThresholdActive {
 macro_rules! RelationAllowsEarlyPruning {
     ($rel:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$rel;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(

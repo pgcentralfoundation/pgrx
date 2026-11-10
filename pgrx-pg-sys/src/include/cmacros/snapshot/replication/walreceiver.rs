@@ -8,6 +8,8 @@
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -15,7 +17,7 @@
 macro_rules! AllowCascadeReplication {
     () => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::type_witness::<
@@ -348,6 +350,8 @@ macro_rules! walrcv_check_conninfo {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///

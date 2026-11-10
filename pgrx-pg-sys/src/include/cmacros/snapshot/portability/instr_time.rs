@@ -645,6 +645,8 @@ macro_rules! INSTR_TIME_GET_NANOSEC {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -652,7 +654,7 @@ macro_rules! INSTR_TIME_GET_NANOSEC {
 macro_rules! INSTR_TIME_GT {
     ($x:expr, $y:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$x;
                 let _ = &$y;
                 (
@@ -674,6 +676,8 @@ macro_rules! INSTR_TIME_GT {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -681,7 +685,7 @@ macro_rules! INSTR_TIME_GT {
 macro_rules! INSTR_TIME_IS_ZERO {
     ($t:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$t;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -702,6 +706,8 @@ macro_rules! INSTR_TIME_IS_ZERO {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -709,7 +715,7 @@ macro_rules! INSTR_TIME_IS_ZERO {
 macro_rules! INSTR_TIME_IS_ZERO {
     ($t:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$t;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1221,6 +1227,8 @@ macro_rules! INSTR_TIME_SUBTRACT {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1261,6 +1269,8 @@ macro_rules! pg_clock_gettime_ns {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1300,6 +1310,8 @@ macro_rules! pg_current_timing_clock_source {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -1345,6 +1357,8 @@ macro_rules! pg_get_ticks {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1388,6 +1402,8 @@ macro_rules! pg_get_ticks_fast {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -1455,6 +1471,8 @@ macro_rules! pg_get_ticks_system {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1494,6 +1512,8 @@ macro_rules! pg_ns_to_ticks {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -1535,6 +1555,8 @@ macro_rules! pg_rdtsc {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -1608,6 +1630,8 @@ macro_rules! pg_rdtscp {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///

@@ -8,6 +8,8 @@
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -15,7 +17,7 @@
 macro_rules! DATE_IS_NOBEGIN {
     ($j:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$j;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -35,6 +37,8 @@ macro_rules! DATE_IS_NOBEGIN {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -42,7 +46,7 @@ macro_rules! DATE_IS_NOBEGIN {
 macro_rules! DATE_IS_NOEND {
     ($j:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$j;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -124,6 +128,8 @@ macro_rules! DATE_NOEND {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -131,7 +137,7 @@ macro_rules! DATE_NOEND {
 macro_rules! DATE_NOT_FINITE {
     ($j:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$j;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -191,6 +197,8 @@ macro_rules! DateADTGetDatum {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -256,6 +264,8 @@ macro_rules! DatumGetDateADT {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -319,6 +329,8 @@ macro_rules! DatumGetTimeADT {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -387,6 +399,8 @@ macro_rules! DatumGetTimeTzADTP {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -747,6 +761,8 @@ macro_rules! TimeADTGetDatum {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -812,6 +828,8 @@ macro_rules! TimeTzADTPGetDatum {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///

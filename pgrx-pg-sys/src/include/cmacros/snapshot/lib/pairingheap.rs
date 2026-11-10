@@ -8,6 +8,8 @@
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -19,7 +21,7 @@
 macro_rules! pairingheap_is_empty {
     ($h:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$h;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -39,6 +41,8 @@ macro_rules! pairingheap_is_empty {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -50,7 +54,7 @@ macro_rules! pairingheap_is_empty {
 macro_rules! pairingheap_is_singular {
     ($h:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$h;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(

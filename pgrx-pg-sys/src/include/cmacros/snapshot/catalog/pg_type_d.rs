@@ -8,6 +8,8 @@
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -15,7 +17,7 @@
 macro_rules! IsPolymorphicType {
     ($typid:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$typid;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -35,6 +37,8 @@ macro_rules! IsPolymorphicType {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -42,7 +46,7 @@ macro_rules! IsPolymorphicType {
 macro_rules! IsPolymorphicTypeFamily1 {
     ($typid:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$typid;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -62,6 +66,8 @@ macro_rules! IsPolymorphicTypeFamily1 {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -69,7 +75,7 @@ macro_rules! IsPolymorphicTypeFamily1 {
 macro_rules! IsPolymorphicTypeFamily2 {
     ($typid:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$typid;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -89,6 +95,8 @@ macro_rules! IsPolymorphicTypeFamily2 {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -100,7 +108,7 @@ macro_rules! IsPolymorphicTypeFamily2 {
 macro_rules! IsTrueArrayType {
     ($typeForm:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$typeForm;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(

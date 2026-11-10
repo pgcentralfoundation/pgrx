@@ -549,6 +549,8 @@ macro_rules! pgstat_count_index_tuples {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -560,7 +562,7 @@ macro_rules! pgstat_count_index_tuples {
 macro_rules! pgstat_is_ioop_tracked_in_bytes {
     ($io_op:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$io_op;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(

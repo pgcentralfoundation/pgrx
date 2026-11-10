@@ -8,6 +8,8 @@
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -15,7 +17,7 @@
 macro_rules! DO_AGGSPLIT_COMBINE {
     ($as:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$as;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -35,6 +37,8 @@ macro_rules! DO_AGGSPLIT_COMBINE {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -42,7 +46,7 @@ macro_rules! DO_AGGSPLIT_COMBINE {
 macro_rules! DO_AGGSPLIT_DESERIALIZE {
     ($as:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$as;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -62,6 +66,8 @@ macro_rules! DO_AGGSPLIT_DESERIALIZE {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -69,7 +75,7 @@ macro_rules! DO_AGGSPLIT_DESERIALIZE {
 macro_rules! DO_AGGSPLIT_SERIALIZE {
     ($as:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$as;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -89,6 +95,8 @@ macro_rules! DO_AGGSPLIT_SERIALIZE {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -96,7 +104,7 @@ macro_rules! DO_AGGSPLIT_SERIALIZE {
 macro_rules! DO_AGGSPLIT_SKIPFINAL {
     ($as:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$as;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -117,6 +125,8 @@ macro_rules! DO_AGGSPLIT_SKIPFINAL {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -128,7 +138,7 @@ macro_rules! DO_AGGSPLIT_SKIPFINAL {
 macro_rules! IS_OUTER_JOIN {
     ($jointype:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$jointype;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -149,6 +159,8 @@ macro_rules! IS_OUTER_JOIN {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -160,7 +172,7 @@ macro_rules! IS_OUTER_JOIN {
 macro_rules! IS_OUTER_JOIN {
     ($jointype:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$jointype;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -180,7 +192,9 @@ macro_rules! IS_OUTER_JOIN {
 /// ```
 ///
 ///
-/// `_type_` is a structure type, named by any Rust path to its binding. C pastes `T_` onto the type's C name to name an enumerator of `enum NodeTag`, so a type whose name has no such enumerator fails to compile.
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
+/// `_type_` is a structure type, named by a Rust path to its binding. C pastes `T_` onto the type's C name to name an enumerator of `enum NodeTag`, so a type whose name has no such enumerator fails to compile. C gives some structures several names, each with its own enumerator. Name such a structure by a plain path whose last segment is the C name meant. An alias of it, or a type that another macro captured as a `ty` fragment, names none of them and fails to compile.
 ///
 /// # Safety
 ///
@@ -193,7 +207,7 @@ macro_rules! IS_OUTER_JOIN {
 macro_rules! IsA {
     ($nodeptr:expr, $_type_:ty $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$nodeptr;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -270,7 +284,7 @@ macro_rules! NodeSetTag {
 /// ```
 ///
 ///
-/// `_type_` is a structure type, named by any Rust path to its binding. C pastes `T_` onto the type's C name to name an enumerator of `enum NodeTag`, so a type whose name has no such enumerator fails to compile.
+/// `_type_` is a structure type, named by a Rust path to its binding. C pastes `T_` onto the type's C name to name an enumerator of `enum NodeTag`, so a type whose name has no such enumerator fails to compile. C gives some structures several names, each with its own enumerator. Name such a structure by a plain path whose last segment is the C name meant. An alias of it, or a type that another macro captured as a `ty` fragment, names none of them and fails to compile.
 ///
 /// # Safety
 ///
@@ -297,6 +311,38 @@ macro_rules! castNode {
         )
     };
 }
+#[cfg(feature = "pg19")]
+/// C macro copyObject from nodes.h:230 (PostgreSQL 19)
+///
+/// ```text
+/// #define copyObject( obj ) copyObjectImpl ( obj )
+/// ```
+///
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! copyObject {
+    ($obj:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$obj;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CVoid,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
+    };
+}
 #[cfg(any(feature = "pg15", feature = "pg16"))]
 /// C macro makeNode from nodes.h:593 (PostgreSQL 15), nodes.h:176 (PostgreSQL 16)
 ///
@@ -313,7 +359,7 @@ macro_rules! castNode {
 ///
 /// Caller argument tokens must not mention the macro's C local names, even inside groups: those invocations are rejected because C substitution can capture locals that Rust hygiene would resolve differently. The scope check also inspects forwarded expression fragments and is bounded to 4096 stringified bytes. Matches in fields, paths or strings are conservatively rejected.
 ///
-/// `_type_` is a structure type, named by any Rust path to its binding. C pastes `T_` onto the type's C name to name an enumerator of `enum NodeTag`, so a type whose name has no such enumerator fails to compile.
+/// `_type_` is a structure type, named by a Rust path to its binding. C pastes `T_` onto the type's C name to name an enumerator of `enum NodeTag`, so a type whose name has no such enumerator fails to compile. C gives some structures several names, each with its own enumerator. Name such a structure by a plain path whose last segment is the C name meant. An alias of it, or a type that another macro captured as a `ty` fragment, names none of them and fails to compile.
 ///
 /// # Safety
 ///
@@ -347,7 +393,7 @@ macro_rules! makeNode {
 /// ```
 ///
 ///
-/// `_type_` is a structure type, named by any Rust path to its binding. C pastes `T_` onto the type's C name to name an enumerator of `enum NodeTag`, so a type whose name has no such enumerator fails to compile.
+/// `_type_` is a structure type, named by a Rust path to its binding. C pastes `T_` onto the type's C name to name an enumerator of `enum NodeTag`, so a type whose name has no such enumerator fails to compile. C gives some structures several names, each with its own enumerator. Name such a structure by a plain path whose last segment is the C name meant. An alias of it, or a type that another macro captured as a `ty` fragment, names none of them and fails to compile.
 ///
 /// # Safety
 ///
@@ -452,6 +498,8 @@ macro_rules! newNode {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
 #[doc = crate::__pgrx_c_doc_assertions!()]
@@ -541,6 +589,8 @@ pub use IS_OUTER_JOIN;
 pub use IsA;
 pub use NodeSetTag;
 pub use castNode;
+#[cfg(feature = "pg19")]
+pub use copyObject;
 pub use makeNode;
 pub use newNode;
 pub use nodeTag;

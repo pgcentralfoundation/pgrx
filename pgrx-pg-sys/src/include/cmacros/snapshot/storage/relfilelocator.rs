@@ -9,6 +9,8 @@
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -16,7 +18,7 @@
 macro_rules! RelFileLocatorBackendEquals {
     ($locator1:expr, $locator2:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$locator1;
                 let _ = &$locator2;
                 (
@@ -38,6 +40,8 @@ macro_rules! RelFileLocatorBackendEquals {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -45,7 +49,7 @@ macro_rules! RelFileLocatorBackendEquals {
 macro_rules! RelFileLocatorBackendIsTemp {
     ($rlocator:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$rlocator;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -66,6 +70,8 @@ macro_rules! RelFileLocatorBackendIsTemp {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -73,7 +79,7 @@ macro_rules! RelFileLocatorBackendIsTemp {
 macro_rules! RelFileLocatorBackendIsTemp {
     ($rlocator:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$rlocator;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -94,6 +100,8 @@ macro_rules! RelFileLocatorBackendIsTemp {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -101,7 +109,7 @@ macro_rules! RelFileLocatorBackendIsTemp {
 macro_rules! RelFileLocatorEquals {
     ($locator1:expr, $locator2:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$locator1;
                 let _ = &$locator2;
                 (

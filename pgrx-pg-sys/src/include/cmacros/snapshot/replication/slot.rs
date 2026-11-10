@@ -23,6 +23,8 @@
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -65,6 +67,8 @@ macro_rules! ReplicationSlotSetInactiveSince {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -92,6 +96,8 @@ macro_rules! ReplicationSlotSetInactiveSince {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -99,7 +105,7 @@ macro_rules! ReplicationSlotSetInactiveSince {
 macro_rules! SlotIsLogical {
     ($slot:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$slot;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -119,6 +125,8 @@ macro_rules! SlotIsLogical {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -126,7 +134,7 @@ macro_rules! SlotIsLogical {
 macro_rules! SlotIsPhysical {
     ($slot:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$slot;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(

@@ -121,6 +121,8 @@ macro_rules! TupleDescAttr {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -166,6 +168,8 @@ macro_rules! TupleDescAttr {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -194,7 +198,7 @@ macro_rules! TupleDescAttr {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function TupleDescCompactAttr from tupdesc.h:174 (PostgreSQL 18), tupdesc.h:194 (PostgreSQL 19)
+/// C inline function TupleDescCompactAttr from tupdesc.h:174 (PostgreSQL 18), tupdesc.h:194 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline CompactAttribute *
@@ -213,7 +217,9 @@ macro_rules! TupleDescAttr {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -229,15 +235,13 @@ macro_rules! TupleDescCompactAttr {
             @value {
                 let _ = &$tupdesc;
                 let _ = &$i;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CRecord<
-                                $crate::__pgrx_c_bindings::CompactAttribute
-                            >,
-                            $crate::__pgrx_c_macros::expression::ReadWrite
-                        >>()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_macros::expression::CPointer<
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::CompactAttribute
+                        >,
+                        $crate::__pgrx_c_macros::expression::ReadWrite
+                    >>()
             }
         )
     };

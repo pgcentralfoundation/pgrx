@@ -24,6 +24,8 @@
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -60,6 +62,8 @@ macro_rules! float4_div {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -71,7 +75,7 @@ macro_rules! float4_div {
 macro_rules! float4_eq {
     ($val1:expr, $val2:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$val1;
                 let _ = &$val2;
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -96,6 +100,8 @@ macro_rules! float4_eq {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -107,7 +113,7 @@ macro_rules! float4_eq {
 macro_rules! float4_ge {
     ($val1:expr, $val2:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$val1;
                 let _ = &$val2;
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -132,6 +138,8 @@ macro_rules! float4_ge {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -143,7 +151,7 @@ macro_rules! float4_ge {
 macro_rules! float4_gt {
     ($val1:expr, $val2:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$val1;
                 let _ = &$val2;
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -168,6 +176,8 @@ macro_rules! float4_gt {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -179,7 +189,7 @@ macro_rules! float4_gt {
 macro_rules! float4_le {
     ($val1:expr, $val2:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$val1;
                 let _ = &$val2;
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -204,6 +214,8 @@ macro_rules! float4_le {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -215,7 +227,7 @@ macro_rules! float4_le {
 macro_rules! float4_lt {
     ($val1:expr, $val2:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$val1;
                 let _ = &$val2;
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -239,6 +251,8 @@ macro_rules! float4_lt {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -280,6 +294,8 @@ macro_rules! float4_max {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -315,6 +331,8 @@ macro_rules! float4_mi {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -358,6 +376,8 @@ macro_rules! float4_min {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -394,6 +414,8 @@ macro_rules! float4_mul {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -405,7 +427,7 @@ macro_rules! float4_mul {
 macro_rules! float4_ne {
     ($val1:expr, $val2:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$val1;
                 let _ = &$val2;
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -435,6 +457,8 @@ macro_rules! float4_ne {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -483,6 +507,8 @@ macro_rules! float4_pl {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -519,6 +545,8 @@ macro_rules! float8_div {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -565,6 +593,8 @@ macro_rules! float8_div {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -602,6 +632,8 @@ macro_rules! float8_div_safe {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -613,7 +645,7 @@ macro_rules! float8_div_safe {
 macro_rules! float8_eq {
     ($val1:expr, $val2:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$val1;
                 let _ = &$val2;
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -638,6 +670,8 @@ macro_rules! float8_eq {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -649,7 +683,7 @@ macro_rules! float8_eq {
 macro_rules! float8_ge {
     ($val1:expr, $val2:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$val1;
                 let _ = &$val2;
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -674,6 +708,8 @@ macro_rules! float8_ge {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -685,7 +721,7 @@ macro_rules! float8_ge {
 macro_rules! float8_gt {
     ($val1:expr, $val2:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$val1;
                 let _ = &$val2;
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -710,6 +746,8 @@ macro_rules! float8_gt {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -721,7 +759,7 @@ macro_rules! float8_gt {
 macro_rules! float8_le {
     ($val1:expr, $val2:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$val1;
                 let _ = &$val2;
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -746,6 +784,8 @@ macro_rules! float8_le {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -757,7 +797,7 @@ macro_rules! float8_le {
 macro_rules! float8_lt {
     ($val1:expr, $val2:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$val1;
                 let _ = &$val2;
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -781,6 +821,8 @@ macro_rules! float8_lt {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -823,6 +865,8 @@ macro_rules! float8_max {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -859,6 +903,8 @@ macro_rules! float8_mi {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -901,6 +947,8 @@ macro_rules! float8_mi {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -937,6 +985,8 @@ macro_rules! float8_mi_safe {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -981,6 +1031,8 @@ macro_rules! float8_min {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1017,6 +1069,8 @@ macro_rules! float8_mul {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -1061,6 +1115,8 @@ macro_rules! float8_mul {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1098,6 +1154,8 @@ macro_rules! float8_mul_safe {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1109,7 +1167,7 @@ macro_rules! float8_mul_safe {
 macro_rules! float8_ne {
     ($val1:expr, $val2:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$val1;
                 let _ = &$val2;
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1140,6 +1198,8 @@ macro_rules! float8_ne {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -1177,6 +1237,8 @@ macro_rules! float8_pl {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -1218,6 +1280,8 @@ macro_rules! float8_pl {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -1271,6 +1335,8 @@ macro_rules! float8_pl_safe {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1306,6 +1372,8 @@ macro_rules! get_float4_infinity {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -1348,6 +1416,8 @@ macro_rules! get_float4_infinity {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1383,6 +1453,8 @@ macro_rules! get_float4_nan {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -1430,6 +1502,8 @@ macro_rules! get_float4_nan {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1465,6 +1539,8 @@ macro_rules! get_float8_infinity {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -1508,6 +1584,8 @@ macro_rules! get_float8_infinity {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1543,6 +1621,8 @@ macro_rules! get_float8_nan {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///

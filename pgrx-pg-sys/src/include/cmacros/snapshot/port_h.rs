@@ -8,6 +8,8 @@
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -15,7 +17,7 @@
 macro_rules! IS_DIR_SEP {
     ($ch:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$ch;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -35,6 +37,8 @@ macro_rules! IS_DIR_SEP {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -42,7 +46,7 @@ macro_rules! IS_DIR_SEP {
 macro_rules! IS_NONWINDOWS_DIR_SEP {
     ($ch:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$ch;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -62,6 +66,8 @@ macro_rules! IS_NONWINDOWS_DIR_SEP {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -69,7 +75,7 @@ macro_rules! IS_NONWINDOWS_DIR_SEP {
 macro_rules! IS_WINDOWS_DIR_SEP {
     ($ch:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$ch;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -89,6 +95,8 @@ macro_rules! IS_WINDOWS_DIR_SEP {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -96,7 +104,7 @@ macro_rules! IS_WINDOWS_DIR_SEP {
 macro_rules! is_absolute_path {
     ($filename:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$filename;
                 (
                     (
@@ -118,6 +126,8 @@ macro_rules! is_absolute_path {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -125,7 +135,7 @@ macro_rules! is_absolute_path {
 macro_rules! is_nonwindows_absolute_path {
     ($filename:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$filename;
                 (
                     (
@@ -147,6 +157,8 @@ macro_rules! is_nonwindows_absolute_path {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -158,7 +170,7 @@ macro_rules! is_nonwindows_absolute_path {
 macro_rules! is_windows_absolute_path {
     ($filename:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$filename;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -186,6 +198,8 @@ macro_rules! is_windows_absolute_path {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -222,6 +236,8 @@ macro_rules! pg_ascii_tolower {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///

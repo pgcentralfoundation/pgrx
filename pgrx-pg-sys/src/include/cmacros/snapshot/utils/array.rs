@@ -197,6 +197,8 @@ macro_rules! AARR_ELEMTYPE {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -208,7 +210,7 @@ macro_rules! AARR_ELEMTYPE {
 macro_rules! AARR_HASNULL {
     ($a:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$a;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -875,6 +877,8 @@ macro_rules! ARR_ELEMTYPE {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -882,7 +886,7 @@ macro_rules! ARR_ELEMTYPE {
 macro_rules! ARR_HASNULL {
     ($a:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$a;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(

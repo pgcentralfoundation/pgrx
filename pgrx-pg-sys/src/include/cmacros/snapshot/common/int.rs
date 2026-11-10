@@ -20,6 +20,8 @@
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -57,6 +59,8 @@ macro_rules! pg_abs_s16 {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -90,6 +94,8 @@ macro_rules! pg_abs_s32 {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -139,6 +145,8 @@ macro_rules! pg_abs_s64 {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -150,7 +158,7 @@ macro_rules! pg_abs_s64 {
 macro_rules! pg_add_s16_overflow {
     ($a:expr, $b:expr, $result:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$a;
                 let _ = &$b;
                 let _ = &$result;
@@ -189,6 +197,8 @@ macro_rules! pg_add_s16_overflow {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -200,7 +210,7 @@ macro_rules! pg_add_s16_overflow {
 macro_rules! pg_add_s32_overflow {
     ($a:expr, $b:expr, $result:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$a;
                 let _ = &$b;
                 let _ = &$result;
@@ -248,6 +258,8 @@ macro_rules! pg_add_s32_overflow {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -259,7 +271,7 @@ macro_rules! pg_add_s32_overflow {
 macro_rules! pg_add_s64_overflow {
     ($a:expr, $b:expr, $result:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$a;
                 let _ = &$b;
                 let _ = &$result;
@@ -298,6 +310,8 @@ macro_rules! pg_add_s64_overflow {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -309,7 +323,7 @@ macro_rules! pg_add_s64_overflow {
 macro_rules! pg_add_size_overflow {
     ($a:expr, $b:expr, $result:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$a;
                 let _ = &$b;
                 let _ = &$result;
@@ -348,6 +362,8 @@ macro_rules! pg_add_size_overflow {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -359,7 +375,7 @@ macro_rules! pg_add_size_overflow {
 macro_rules! pg_add_u16_overflow {
     ($a:expr, $b:expr, $result:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$a;
                 let _ = &$b;
                 let _ = &$result;
@@ -398,6 +414,8 @@ macro_rules! pg_add_u16_overflow {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -409,7 +427,7 @@ macro_rules! pg_add_u16_overflow {
 macro_rules! pg_add_u32_overflow {
     ($a:expr, $b:expr, $result:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$a;
                 let _ = &$b;
                 let _ = &$result;
@@ -448,6 +466,8 @@ macro_rules! pg_add_u32_overflow {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -459,7 +479,7 @@ macro_rules! pg_add_u32_overflow {
 macro_rules! pg_add_u64_overflow {
     ($a:expr, $b:expr, $result:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$a;
                 let _ = &$b;
                 let _ = &$result;
@@ -485,6 +505,8 @@ macro_rules! pg_add_u64_overflow {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -519,6 +541,8 @@ macro_rules! pg_cmp_s16 {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -551,6 +575,8 @@ macro_rules! pg_cmp_s32 {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -585,6 +611,8 @@ macro_rules! pg_cmp_s64 {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -617,6 +645,8 @@ macro_rules! pg_cmp_size {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -651,6 +681,8 @@ macro_rules! pg_cmp_u16 {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -683,6 +715,8 @@ macro_rules! pg_cmp_u32 {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -729,6 +763,8 @@ macro_rules! pg_cmp_u64 {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -740,7 +776,7 @@ macro_rules! pg_cmp_u64 {
 macro_rules! pg_mul_s16_overflow {
     ($a:expr, $b:expr, $result:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$a;
                 let _ = &$b;
                 let _ = &$result;
@@ -779,6 +815,8 @@ macro_rules! pg_mul_s16_overflow {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -790,7 +828,7 @@ macro_rules! pg_mul_s16_overflow {
 macro_rules! pg_mul_s32_overflow {
     ($a:expr, $b:expr, $result:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$a;
                 let _ = &$b;
                 let _ = &$result;
@@ -854,6 +892,8 @@ macro_rules! pg_mul_s32_overflow {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -865,7 +905,7 @@ macro_rules! pg_mul_s32_overflow {
 macro_rules! pg_mul_s64_overflow {
     ($a:expr, $b:expr, $result:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$a;
                 let _ = &$b;
                 let _ = &$result;
@@ -904,6 +944,8 @@ macro_rules! pg_mul_s64_overflow {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -915,7 +957,7 @@ macro_rules! pg_mul_s64_overflow {
 macro_rules! pg_mul_size_overflow {
     ($a:expr, $b:expr, $result:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$a;
                 let _ = &$b;
                 let _ = &$result;
@@ -954,6 +996,8 @@ macro_rules! pg_mul_size_overflow {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -965,7 +1009,7 @@ macro_rules! pg_mul_size_overflow {
 macro_rules! pg_mul_u16_overflow {
     ($a:expr, $b:expr, $result:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$a;
                 let _ = &$b;
                 let _ = &$result;
@@ -1004,6 +1048,8 @@ macro_rules! pg_mul_u16_overflow {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1015,7 +1061,7 @@ macro_rules! pg_mul_u16_overflow {
 macro_rules! pg_mul_u32_overflow {
     ($a:expr, $b:expr, $result:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$a;
                 let _ = &$b;
                 let _ = &$result;
@@ -1064,6 +1110,8 @@ macro_rules! pg_mul_u32_overflow {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1075,7 +1123,7 @@ macro_rules! pg_mul_u32_overflow {
 macro_rules! pg_mul_u64_overflow {
     ($a:expr, $b:expr, $result:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$a;
                 let _ = &$b;
                 let _ = &$result;
@@ -1112,6 +1160,8 @@ macro_rules! pg_mul_u64_overflow {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1123,7 +1173,7 @@ macro_rules! pg_mul_u64_overflow {
 macro_rules! pg_neg_s16_overflow {
     ($a:expr, $result:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$a;
                 let _ = &$result;
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1159,6 +1209,8 @@ macro_rules! pg_neg_s16_overflow {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1170,7 +1222,7 @@ macro_rules! pg_neg_s16_overflow {
 macro_rules! pg_neg_s32_overflow {
     ($a:expr, $result:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$a;
                 let _ = &$result;
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1206,6 +1258,8 @@ macro_rules! pg_neg_s32_overflow {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1217,7 +1271,7 @@ macro_rules! pg_neg_s32_overflow {
 macro_rules! pg_neg_s64_overflow {
     ($a:expr, $result:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$a;
                 let _ = &$result;
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1255,6 +1309,8 @@ macro_rules! pg_neg_s64_overflow {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1266,7 +1322,7 @@ macro_rules! pg_neg_s64_overflow {
 macro_rules! pg_neg_u16_overflow {
     ($a:expr, $result:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$a;
                 let _ = &$result;
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1304,6 +1360,8 @@ macro_rules! pg_neg_u16_overflow {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1315,7 +1373,7 @@ macro_rules! pg_neg_u16_overflow {
 macro_rules! pg_neg_u32_overflow {
     ($a:expr, $result:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$a;
                 let _ = &$result;
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1364,6 +1422,8 @@ macro_rules! pg_neg_u32_overflow {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1375,7 +1435,7 @@ macro_rules! pg_neg_u32_overflow {
 macro_rules! pg_neg_u64_overflow {
     ($a:expr, $result:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$a;
                 let _ = &$result;
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1413,6 +1473,8 @@ macro_rules! pg_neg_u64_overflow {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1424,7 +1486,7 @@ macro_rules! pg_neg_u64_overflow {
 macro_rules! pg_sub_s16_overflow {
     ($a:expr, $b:expr, $result:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$a;
                 let _ = &$b;
                 let _ = &$result;
@@ -1463,6 +1525,8 @@ macro_rules! pg_sub_s16_overflow {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1474,7 +1538,7 @@ macro_rules! pg_sub_s16_overflow {
 macro_rules! pg_sub_s32_overflow {
     ($a:expr, $b:expr, $result:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$a;
                 let _ = &$b;
                 let _ = &$result;
@@ -1526,6 +1590,8 @@ macro_rules! pg_sub_s32_overflow {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1537,7 +1603,7 @@ macro_rules! pg_sub_s32_overflow {
 macro_rules! pg_sub_s64_overflow {
     ($a:expr, $b:expr, $result:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$a;
                 let _ = &$b;
                 let _ = &$result;
@@ -1574,6 +1640,8 @@ macro_rules! pg_sub_s64_overflow {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1585,7 +1653,7 @@ macro_rules! pg_sub_s64_overflow {
 macro_rules! pg_sub_size_overflow {
     ($a:expr, $b:expr, $result:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$a;
                 let _ = &$b;
                 let _ = &$result;
@@ -1622,6 +1690,8 @@ macro_rules! pg_sub_size_overflow {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1633,7 +1703,7 @@ macro_rules! pg_sub_size_overflow {
 macro_rules! pg_sub_u16_overflow {
     ($a:expr, $b:expr, $result:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$a;
                 let _ = &$b;
                 let _ = &$result;
@@ -1670,6 +1740,8 @@ macro_rules! pg_sub_u16_overflow {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1681,7 +1753,7 @@ macro_rules! pg_sub_u16_overflow {
 macro_rules! pg_sub_u32_overflow {
     ($a:expr, $b:expr, $result:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$a;
                 let _ = &$b;
                 let _ = &$result;
@@ -1718,6 +1790,8 @@ macro_rules! pg_sub_u32_overflow {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1729,7 +1803,7 @@ macro_rules! pg_sub_u32_overflow {
 macro_rules! pg_sub_u64_overflow {
     ($a:expr, $b:expr, $result:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$a;
                 let _ = &$b;
                 let _ = &$result;

@@ -8,6 +8,8 @@
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -15,7 +17,7 @@
 macro_rules! IsolationIsSerializable {
     () => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::type_witness::<
@@ -34,6 +36,8 @@ macro_rules! IsolationIsSerializable {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -41,7 +45,7 @@ macro_rules! IsolationIsSerializable {
 macro_rules! IsolationUsesXactSnapshot {
     () => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::type_witness::<
@@ -60,6 +64,8 @@ macro_rules! IsolationUsesXactSnapshot {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -67,7 +73,7 @@ macro_rules! IsolationUsesXactSnapshot {
 macro_rules! XactCompletionApplyFeedback {
     ($xinfo:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$xinfo;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -87,6 +93,8 @@ macro_rules! XactCompletionApplyFeedback {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -94,7 +102,7 @@ macro_rules! XactCompletionApplyFeedback {
 macro_rules! XactCompletionForceSyncCommit {
     ($xinfo:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$xinfo;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -114,6 +122,8 @@ macro_rules! XactCompletionForceSyncCommit {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -121,7 +131,7 @@ macro_rules! XactCompletionForceSyncCommit {
 macro_rules! XactCompletionRelcacheInitFileInval {
     ($xinfo:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$xinfo;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(

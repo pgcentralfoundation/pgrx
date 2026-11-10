@@ -89,6 +89,8 @@ macro_rules! COMP_CRC32C {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -96,7 +98,7 @@ macro_rules! COMP_CRC32C {
 macro_rules! EQ_CRC32C {
     ($c1:expr, $c2:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$c1;
                 let _ = &$c2;
                 (

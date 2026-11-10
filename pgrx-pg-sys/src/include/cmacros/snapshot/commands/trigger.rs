@@ -8,6 +8,8 @@
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -19,7 +21,7 @@
 macro_rules! CALLED_AS_TRIGGER {
     ($fcinfo:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$fcinfo;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -39,6 +41,8 @@ macro_rules! CALLED_AS_TRIGGER {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -46,7 +50,7 @@ macro_rules! CALLED_AS_TRIGGER {
 macro_rules! TRIGGER_FIRED_AFTER {
     ($event:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$event;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -66,6 +70,8 @@ macro_rules! TRIGGER_FIRED_AFTER {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -73,7 +79,7 @@ macro_rules! TRIGGER_FIRED_AFTER {
 macro_rules! TRIGGER_FIRED_BEFORE {
     ($event:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$event;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -93,6 +99,8 @@ macro_rules! TRIGGER_FIRED_BEFORE {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -100,7 +108,7 @@ macro_rules! TRIGGER_FIRED_BEFORE {
 macro_rules! TRIGGER_FIRED_BY_DELETE {
     ($event:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$event;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -120,6 +128,8 @@ macro_rules! TRIGGER_FIRED_BY_DELETE {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -127,7 +137,7 @@ macro_rules! TRIGGER_FIRED_BY_DELETE {
 macro_rules! TRIGGER_FIRED_BY_INSERT {
     ($event:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$event;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -147,6 +157,8 @@ macro_rules! TRIGGER_FIRED_BY_INSERT {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -154,7 +166,7 @@ macro_rules! TRIGGER_FIRED_BY_INSERT {
 macro_rules! TRIGGER_FIRED_BY_TRUNCATE {
     ($event:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$event;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -174,6 +186,8 @@ macro_rules! TRIGGER_FIRED_BY_TRUNCATE {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -181,7 +195,7 @@ macro_rules! TRIGGER_FIRED_BY_TRUNCATE {
 macro_rules! TRIGGER_FIRED_BY_UPDATE {
     ($event:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$event;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -236,6 +250,8 @@ macro_rules! TRIGGER_FIRED_FOR_ROW {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -243,7 +259,7 @@ macro_rules! TRIGGER_FIRED_FOR_ROW {
 macro_rules! TRIGGER_FIRED_FOR_STATEMENT {
     ($event:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$event;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -263,6 +279,8 @@ macro_rules! TRIGGER_FIRED_FOR_STATEMENT {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -270,7 +288,7 @@ macro_rules! TRIGGER_FIRED_FOR_STATEMENT {
 macro_rules! TRIGGER_FIRED_INSTEAD {
     ($event:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$event;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(

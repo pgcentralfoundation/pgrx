@@ -47,6 +47,8 @@ macro_rules! GBUF_INNER_PARITY {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -54,7 +56,7 @@ macro_rules! GBUF_INNER_PARITY {
 macro_rules! GBUF_REQ_LEAF {
     ($flags:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$flags;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1990,6 +1992,8 @@ macro_rules! SizeOfSpGistSearchItem {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -2001,7 +2005,7 @@ macro_rules! SizeOfSpGistSearchItem {
 macro_rules! SpGistBlockIsFixed {
     ($blkno:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$blkno;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2021,6 +2025,8 @@ macro_rules! SpGistBlockIsFixed {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -2028,7 +2034,7 @@ macro_rules! SpGistBlockIsFixed {
 macro_rules! SpGistBlockIsRoot {
     ($blkno:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$blkno;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(

@@ -81,6 +81,8 @@ macro_rules! BlockIdCopy {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -88,7 +90,7 @@ macro_rules! BlockIdCopy {
 macro_rules! BlockIdEquals {
     ($blockId1:expr, $blockId2:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$blockId1;
                 let _ = &$blockId2;
                 (
@@ -117,6 +119,8 @@ macro_rules! BlockIdEquals {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -124,7 +128,7 @@ macro_rules! BlockIdEquals {
 macro_rules! BlockIdEquals {
     ($blockId1:expr, $blockId2:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$blockId1;
                 let _ = &$blockId2;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
@@ -212,6 +216,8 @@ macro_rules! BlockIdGetBlockNumber {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -240,6 +246,8 @@ macro_rules! BlockIdGetBlockNumber {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -251,7 +259,7 @@ macro_rules! BlockIdGetBlockNumber {
 macro_rules! BlockIdIsValid {
     ($blockId:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$blockId;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -355,6 +363,8 @@ macro_rules! BlockIdSet {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -380,6 +390,8 @@ macro_rules! BlockIdSet {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -391,7 +403,7 @@ macro_rules! BlockIdSet {
 macro_rules! BlockNumberIsValid {
     ($blockNumber:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$blockNumber;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -418,6 +430,8 @@ macro_rules! BlockNumberIsValid {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -429,7 +443,7 @@ macro_rules! BlockNumberIsValid {
 macro_rules! BlockNumberIsValid {
     ($blockNumber:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$blockNumber;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }

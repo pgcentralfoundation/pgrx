@@ -72,6 +72,8 @@ macro_rules! AttrNumberGetAttrOffset {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -83,7 +85,7 @@ macro_rules! AttrNumberGetAttrOffset {
 macro_rules! AttrNumberIsForUserDefinedAttr {
     ($attributeNumber:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$attributeNumber;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -134,6 +136,8 @@ macro_rules! AttrOffsetGetAttrNumber {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -145,7 +149,7 @@ macro_rules! AttrOffsetGetAttrNumber {
 macro_rules! AttributeNumberIsValid {
     ($attributeNumber:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$attributeNumber;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(

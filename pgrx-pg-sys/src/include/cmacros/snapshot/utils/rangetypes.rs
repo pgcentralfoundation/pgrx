@@ -51,6 +51,8 @@ macro_rules! DatumGetRangeTypeP {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -124,6 +126,8 @@ macro_rules! DatumGetRangeTypePCopy {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -333,6 +337,8 @@ macro_rules! PG_RETURN_RANGE_P {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -340,7 +346,7 @@ macro_rules! PG_RETURN_RANGE_P {
 macro_rules! RANGE_HAS_LBOUND {
     ($flags:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$flags;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -360,6 +366,8 @@ macro_rules! RANGE_HAS_LBOUND {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -367,7 +375,7 @@ macro_rules! RANGE_HAS_LBOUND {
 macro_rules! RANGE_HAS_UBOUND {
     ($flags:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$flags;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -387,6 +395,8 @@ macro_rules! RANGE_HAS_UBOUND {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -398,7 +408,7 @@ macro_rules! RANGE_HAS_UBOUND {
 macro_rules! RangeIsEmpty {
     ($r:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$r;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -418,6 +428,8 @@ macro_rules! RangeIsEmpty {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -429,7 +441,7 @@ macro_rules! RangeIsEmpty {
 macro_rules! RangeIsOrContainsEmpty {
     ($r:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$r;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -528,6 +540,8 @@ macro_rules! RangeTypePGetDatum {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///

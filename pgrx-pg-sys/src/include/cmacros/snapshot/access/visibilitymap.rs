@@ -8,6 +8,8 @@
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -19,7 +21,7 @@
 macro_rules! VM_ALL_FROZEN {
     ($r:expr, $b:expr, $v:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$r;
                 let _ = &$b;
                 let _ = &$v;
@@ -41,6 +43,8 @@ macro_rules! VM_ALL_FROZEN {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -52,7 +56,7 @@ macro_rules! VM_ALL_FROZEN {
 macro_rules! VM_ALL_VISIBLE {
     ($r:expr, $b:expr, $v:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$r;
                 let _ = &$b;
                 let _ = &$v;

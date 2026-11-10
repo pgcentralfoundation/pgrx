@@ -19,6 +19,8 @@
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -61,6 +63,8 @@ macro_rules! for_both_cell_setup {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -100,6 +104,8 @@ macro_rules! for_each_cell_setup {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -210,7 +216,7 @@ macro_rules! lfirst_int {
 /// ```
 ///
 ///
-/// `type` is a structure type, named by any Rust path to its binding. C pastes `T_` onto the type's C name to name an enumerator of `enum NodeTag`, so a type whose name has no such enumerator fails to compile.
+/// `type` is a structure type, named by a Rust path to its binding. C pastes `T_` onto the type's C name to name an enumerator of `enum NodeTag`, so a type whose name has no such enumerator fails to compile. C gives some structures several names, each with its own enumerator. Name such a structure by a plain path whose last segment is the C name meant. An alias of it, or a type that another macro captured as a `ty` fragment, names none of them and fails to compile.
 ///
 /// # Safety
 ///
@@ -427,7 +433,7 @@ macro_rules! lfourth_int {
 /// ```
 ///
 ///
-/// `type` is a structure type, named by any Rust path to its binding. C pastes `T_` onto the type's C name to name an enumerator of `enum NodeTag`, so a type whose name has no such enumerator fails to compile.
+/// `type` is a structure type, named by a Rust path to its binding. C pastes `T_` onto the type's C name to name an enumerator of `enum NodeTag`, so a type whose name has no such enumerator fails to compile. C gives some structures several names, each with its own enumerator. Name such a structure by a plain path whose last segment is the C name meant. An alias of it, or a type that another macro captured as a `ty` fragment, names none of them and fails to compile.
 ///
 /// # Safety
 ///
@@ -617,7 +623,7 @@ macro_rules! linitial_int {
 /// ```
 ///
 ///
-/// `type` is a structure type, named by any Rust path to its binding. C pastes `T_` onto the type's C name to name an enumerator of `enum NodeTag`, so a type whose name has no such enumerator fails to compile.
+/// `type` is a structure type, named by a Rust path to its binding. C pastes `T_` onto the type's C name to name an enumerator of `enum NodeTag`, so a type whose name has no such enumerator fails to compile. C gives some structures several names, each with its own enumerator. Name such a structure by a plain path whose last segment is the C name meant. An alias of it, or a type that another macro captured as a `ty` fragment, names none of them and fails to compile.
 ///
 /// # Safety
 ///
@@ -710,6 +716,8 @@ macro_rules! linitial_oid {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
 #[doc = crate::__pgrx_c_doc_assertions!()]
@@ -745,6 +753,8 @@ macro_rules! list_cell_number {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -783,6 +793,8 @@ macro_rules! list_head {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
@@ -824,6 +836,8 @@ macro_rules! list_last_cell {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -1576,6 +1590,8 @@ macro_rules! list_make5_xid {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1615,6 +1631,8 @@ macro_rules! list_make_int_cell {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -1656,6 +1674,8 @@ macro_rules! list_make_oid_cell {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1696,6 +1716,8 @@ macro_rules! list_make_ptr_cell {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1732,6 +1754,8 @@ macro_rules! list_make_xid_cell {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -1772,6 +1796,8 @@ macro_rules! list_nth {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
@@ -1816,6 +1842,8 @@ macro_rules! list_nth_cell {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1846,7 +1874,7 @@ macro_rules! list_nth_int {
 /// ```
 ///
 ///
-/// `type` is a structure type, named by any Rust path to its binding. C pastes `T_` onto the type's C name to name an enumerator of `enum NodeTag`, so a type whose name has no such enumerator fails to compile.
+/// `type` is a structure type, named by a Rust path to its binding. C pastes `T_` onto the type's C name to name an enumerator of `enum NodeTag`, so a type whose name has no such enumerator fails to compile. C gives some structures several names, each with its own enumerator. Name such a structure by a plain path whose last segment is the C name meant. An alias of it, or a type that another macro captured as a `ty` fragment, names none of them and fails to compile.
 ///
 /// # Safety
 ///
@@ -1887,6 +1915,8 @@ macro_rules! list_nth_node {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -1929,6 +1959,8 @@ macro_rules! list_nth_oid {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1965,6 +1997,8 @@ macro_rules! list_second_cell {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -2101,7 +2135,7 @@ macro_rules! llast_int {
 /// ```
 ///
 ///
-/// `type` is a structure type, named by any Rust path to its binding. C pastes `T_` onto the type's C name to name an enumerator of `enum NodeTag`, so a type whose name has no such enumerator fails to compile.
+/// `type` is a structure type, named by a Rust path to its binding. C pastes `T_` onto the type's C name to name an enumerator of `enum NodeTag`, so a type whose name has no such enumerator fails to compile. C gives some structures several names, each with its own enumerator. Name such a structure by a plain path whose last segment is the C name meant. An alias of it, or a type that another macro captured as a `ty` fragment, names none of them and fails to compile.
 ///
 /// # Safety
 ///
@@ -2251,6 +2285,8 @@ macro_rules! llast_xid {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
 #[doc = crate::__pgrx_c_doc_assertions!()]
@@ -2391,7 +2427,7 @@ macro_rules! lsecond_int {
 /// ```
 ///
 ///
-/// `type` is a structure type, named by any Rust path to its binding. C pastes `T_` onto the type's C name to name an enumerator of `enum NodeTag`, so a type whose name has no such enumerator fails to compile.
+/// `type` is a structure type, named by a Rust path to its binding. C pastes `T_` onto the type's C name to name an enumerator of `enum NodeTag`, so a type whose name has no such enumerator fails to compile. C gives some structures several names, each with its own enumerator. Name such a structure by a plain path whose last segment is the C name meant. An alias of it, or a type that another macro captured as a `ty` fragment, names none of them and fails to compile.
 ///
 /// # Safety
 ///
@@ -2581,7 +2617,7 @@ macro_rules! lthird_int {
 /// ```
 ///
 ///
-/// `type` is a structure type, named by any Rust path to its binding. C pastes `T_` onto the type's C name to name an enumerator of `enum NodeTag`, so a type whose name has no such enumerator fails to compile.
+/// `type` is a structure type, named by a Rust path to its binding. C pastes `T_` onto the type's C name to name an enumerator of `enum NodeTag`, so a type whose name has no such enumerator fails to compile. C gives some structures several names, each with its own enumerator. Name such a structure by a plain path whose last segment is the C name meant. An alias of it, or a type that another macro captured as a `ty` fragment, names none of them and fails to compile.
 ///
 /// # Safety
 ///

@@ -44,6 +44,8 @@ macro_rules! ReorderBufferTupleBufData {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -51,7 +53,7 @@ macro_rules! ReorderBufferTupleBufData {
 macro_rules! rbtxn_distr_inval_overflowed {
     ($txn:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$txn;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -150,6 +152,8 @@ macro_rules! rbtxn_get_toptxn {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -157,7 +161,7 @@ macro_rules! rbtxn_get_toptxn {
 macro_rules! rbtxn_has_catalog_changes {
     ($txn:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$txn;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -177,6 +181,8 @@ macro_rules! rbtxn_has_catalog_changes {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -184,7 +190,7 @@ macro_rules! rbtxn_has_catalog_changes {
 macro_rules! rbtxn_has_partial_change {
     ($txn:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$txn;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -205,6 +211,8 @@ macro_rules! rbtxn_has_partial_change {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -212,7 +220,7 @@ macro_rules! rbtxn_has_partial_change {
 macro_rules! rbtxn_has_streamable_change {
     ($txn:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$txn;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -233,6 +241,8 @@ macro_rules! rbtxn_has_streamable_change {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -240,7 +250,7 @@ macro_rules! rbtxn_has_streamable_change {
 macro_rules! rbtxn_is_aborted {
     ($txn:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$txn;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -261,6 +271,8 @@ macro_rules! rbtxn_is_aborted {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -268,7 +280,7 @@ macro_rules! rbtxn_is_aborted {
 macro_rules! rbtxn_is_committed {
     ($txn:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$txn;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -288,6 +300,8 @@ macro_rules! rbtxn_is_committed {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -295,7 +309,7 @@ macro_rules! rbtxn_is_committed {
 macro_rules! rbtxn_is_known_subxact {
     ($txn:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$txn;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -316,6 +330,8 @@ macro_rules! rbtxn_is_known_subxact {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -323,7 +339,7 @@ macro_rules! rbtxn_is_known_subxact {
 macro_rules! rbtxn_is_prepared {
     ($txn:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$txn;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -343,6 +359,8 @@ macro_rules! rbtxn_is_prepared {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -350,7 +368,7 @@ macro_rules! rbtxn_is_prepared {
 macro_rules! rbtxn_is_serialized {
     ($txn:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$txn;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -370,6 +388,8 @@ macro_rules! rbtxn_is_serialized {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -377,7 +397,7 @@ macro_rules! rbtxn_is_serialized {
 macro_rules! rbtxn_is_serialized_clear {
     ($txn:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$txn;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -397,6 +417,8 @@ macro_rules! rbtxn_is_serialized_clear {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -404,7 +426,7 @@ macro_rules! rbtxn_is_serialized_clear {
 macro_rules! rbtxn_is_streamed {
     ($txn:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$txn;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -425,6 +447,8 @@ macro_rules! rbtxn_is_streamed {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -436,7 +460,7 @@ macro_rules! rbtxn_is_streamed {
 macro_rules! rbtxn_is_subtxn {
     ($txn:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$txn;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -457,6 +481,8 @@ macro_rules! rbtxn_is_subtxn {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -468,7 +494,7 @@ macro_rules! rbtxn_is_subtxn {
 macro_rules! rbtxn_is_toptxn {
     ($txn:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$txn;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -489,6 +515,8 @@ macro_rules! rbtxn_is_toptxn {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -496,7 +524,7 @@ macro_rules! rbtxn_is_toptxn {
 macro_rules! rbtxn_prepared {
     ($txn:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$txn;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -517,6 +545,8 @@ macro_rules! rbtxn_prepared {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -524,7 +554,7 @@ macro_rules! rbtxn_prepared {
 macro_rules! rbtxn_sent_prepare {
     ($txn:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$txn;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -544,6 +574,8 @@ macro_rules! rbtxn_sent_prepare {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -551,7 +583,7 @@ macro_rules! rbtxn_sent_prepare {
 macro_rules! rbtxn_skip_prepared {
     ($txn:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$txn;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(

@@ -9,6 +9,8 @@
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -16,7 +18,7 @@
 macro_rules! EC_MUST_BE_REDUNDANT {
     ($eclass:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$eclass;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -81,6 +83,8 @@ macro_rules! EC_MUST_BE_REDUNDANT {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -92,7 +96,7 @@ macro_rules! EC_MUST_BE_REDUNDANT {
 macro_rules! IS_DUMMY_APPEND {
     ($p:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$p;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -112,6 +116,8 @@ macro_rules! IS_DUMMY_APPEND {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -123,7 +129,7 @@ macro_rules! IS_DUMMY_APPEND {
 macro_rules! IS_DUMMY_REL {
     ($r:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$r;
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::type_witness::<
@@ -142,6 +148,8 @@ macro_rules! IS_DUMMY_REL {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -153,7 +161,7 @@ macro_rules! IS_DUMMY_REL {
 macro_rules! IS_GROUPED_REL {
     ($rel:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$rel;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -173,6 +181,8 @@ macro_rules! IS_GROUPED_REL {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -180,7 +190,7 @@ macro_rules! IS_GROUPED_REL {
 macro_rules! IS_JOIN_REL {
     ($rel:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$rel;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -200,6 +210,8 @@ macro_rules! IS_JOIN_REL {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -207,7 +219,7 @@ macro_rules! IS_JOIN_REL {
 macro_rules! IS_OTHER_REL {
     ($rel:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$rel;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -227,6 +239,8 @@ macro_rules! IS_OTHER_REL {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -238,7 +252,7 @@ macro_rules! IS_OTHER_REL {
 macro_rules! IS_PARTITIONED_REL {
     ($rel:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$rel;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -258,6 +272,8 @@ macro_rules! IS_PARTITIONED_REL {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -265,7 +281,7 @@ macro_rules! IS_PARTITIONED_REL {
 macro_rules! IS_SIMPLE_REL {
     ($rel:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$rel;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -285,6 +301,8 @@ macro_rules! IS_SIMPLE_REL {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -292,7 +310,7 @@ macro_rules! IS_SIMPLE_REL {
 macro_rules! IS_UPPER_REL {
     ($rel:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$rel;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -420,6 +438,8 @@ macro_rules! PATH_REQ_OUTER {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -431,7 +451,7 @@ macro_rules! PATH_REQ_OUTER {
 macro_rules! RELATION_WAS_MADE_UNIQUE {
     ($rel:expr, $sjinfo:expr, $nominal_jointype:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$rel;
                 let _ = &$sjinfo;
                 let _ = &$nominal_jointype;
@@ -453,6 +473,8 @@ macro_rules! RELATION_WAS_MADE_UNIQUE {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -460,7 +482,7 @@ macro_rules! RELATION_WAS_MADE_UNIQUE {
 macro_rules! REL_HAS_ALL_PART_PROPS {
     ($rel:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$rel;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -480,6 +502,8 @@ macro_rules! REL_HAS_ALL_PART_PROPS {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -491,7 +515,7 @@ macro_rules! REL_HAS_ALL_PART_PROPS {
 macro_rules! RINFO_IS_PUSHED_DOWN {
     ($rinfo:expr, $joinrelids:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$rinfo;
                 let _ = &$joinrelids;
                 (

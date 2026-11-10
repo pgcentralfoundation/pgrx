@@ -403,6 +403,8 @@ macro_rules! CLRBIT {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -410,7 +412,7 @@ macro_rules! CLRBIT {
 macro_rules! H_BUCKET_BEING_POPULATED {
     ($opaque:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$opaque;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -430,6 +432,8 @@ macro_rules! H_BUCKET_BEING_POPULATED {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -437,7 +441,7 @@ macro_rules! H_BUCKET_BEING_POPULATED {
 macro_rules! H_BUCKET_BEING_SPLIT {
     ($opaque:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$opaque;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -457,6 +461,8 @@ macro_rules! H_BUCKET_BEING_SPLIT {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -464,7 +470,7 @@ macro_rules! H_BUCKET_BEING_SPLIT {
 macro_rules! H_HAS_DEAD_TUPLES {
     ($opaque:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$opaque;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -484,6 +490,8 @@ macro_rules! H_HAS_DEAD_TUPLES {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -491,7 +499,7 @@ macro_rules! H_HAS_DEAD_TUPLES {
 macro_rules! H_NEEDS_SPLIT_CLEANUP {
     ($opaque:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$opaque;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1415,6 +1423,8 @@ macro_rules! HashScanPosInvalidate {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 #[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
 ///
 /// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
@@ -1432,7 +1442,7 @@ macro_rules! HashScanPosInvalidate {
 macro_rules! HashScanPosIsPinned {
     ($scanpos:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$scanpos;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1466,6 +1476,8 @@ macro_rules! HashScanPosIsPinned {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 #[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
 ///
 /// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
@@ -1483,7 +1495,7 @@ macro_rules! HashScanPosIsPinned {
 macro_rules! HashScanPosIsPinned {
     ($scanpos:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$scanpos;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1508,6 +1520,8 @@ macro_rules! HashScanPosIsPinned {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 #[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
 ///
 /// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
@@ -1525,7 +1539,7 @@ macro_rules! HashScanPosIsPinned {
 macro_rules! HashScanPosIsValid {
     ($scanpos:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$scanpos;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1552,6 +1566,8 @@ macro_rules! HashScanPosIsValid {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 #[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
 ///
 /// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
@@ -1569,7 +1585,7 @@ macro_rules! HashScanPosIsValid {
 macro_rules! HashScanPosIsValid {
     ($scanpos:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$scanpos;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(

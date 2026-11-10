@@ -14,6 +14,8 @@
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -25,7 +27,7 @@
 macro_rules! RmgrIdIsBuiltin {
     ($rmid:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$rmid;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
@@ -45,6 +47,8 @@ macro_rules! RmgrIdIsBuiltin {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -52,7 +56,7 @@ macro_rules! RmgrIdIsBuiltin {
 macro_rules! RmgrIdIsCustom {
     ($rmid:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$rmid;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
@@ -66,6 +70,8 @@ macro_rules! RmgrIdIsCustom {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -77,7 +83,7 @@ macro_rules! RmgrIdIsCustom {
 macro_rules! RmgrIdIsValid {
     ($rmid:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$rmid;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
