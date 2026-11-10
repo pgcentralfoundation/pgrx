@@ -1407,14 +1407,15 @@ fn render(
     // An expression macro whose C result is a truth value returns a Rust `bool` from its
     // public arm. Its other arms keep the C value, so the macro contributes its C type as
     // an operand of another generated macro.
+    let declarations = session.frontend().declarations();
     let returns_bool = !empty
         && statement_body.is_none()
         && match &inline_body {
             Some(InlineResult::Void) => false,
             Some(InlineResult::Value { declared, .. }) => {
-                crate::analysis::truth_result(expression, Some(declared))
+                crate::analysis::truth_result(declarations, expression, Some(declared))
             }
-            None => crate::analysis::truth_result(expression, None),
+            None => crate::analysis::truth_result(declarations, expression, None),
         };
     let returning = statement_body.is_some_and(|body| body.return_tokens.is_some());
     let statement_boundary = statement_body.is_some_and(|body| body.requires_boundary);

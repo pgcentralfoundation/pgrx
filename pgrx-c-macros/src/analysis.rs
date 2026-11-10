@@ -19,8 +19,9 @@
 //! unsupported constructs carry structured reasons instead.
 
 use crate::model::{
-    ActiveMacro, ActiveProvenance, DeclarationCatalog, FrontendOutput, IntegerConstant,
-    IntegerKind, IntegerType, IntegerValue, SignedOverflow, TargetFacts, TypeCategory, TypeInfo,
+    ActiveMacro, ActiveProvenance, BuiltinKind, DeclarationCatalog, FrontendOutput,
+    IntegerConstant, IntegerKind, IntegerType, IntegerValue, SignedOverflow, TargetFacts,
+    TypeCategory, TypeInfo,
 };
 use crate::syntax::{
     BinaryOperator, Expression, ExpressionKind, IntegerLiteral, IntegerSize, NodeId,
@@ -415,15 +416,34 @@ pub enum TypeExpression {
 /// - it is a comma expression whose right operand qualifies, or a GNU statement expression
 ///   whose value does;
 /// - it is a conditional whose two result operands both qualify, where the integer constant
-///   `0` or `1` stands for one of them when the other qualifies.
+///   `0` or `1` stands for one of them when the other qualifies;
+/// - it is the compiler's branch hint, `__builtin_expect`, of a first operand that
+///   qualifies. The hint returns that operand as a `long`, so `likely` and `unlikely` are
+///   truth values where the headers define them with the hint and where they define them
+///   as the comparison alone.
 ///
 /// Nothing else does. A bare integer constant and arithmetic are numbers, and a result whose
 /// type analysis defers to the caller's operands has no established type.
-pub(crate) fn truth_result(expression: &AnalyzedExpression, declared: Option<&TypeInfo>) -> bool {
+pub(crate) fn truth_result(
+    catalog: &DeclarationCatalog,
+    expression: &AnalyzedExpression,
+    declared: Option<&TypeInfo>,
+) -> bool {
     if let Some(declared) = declared {
         return declared.category == TypeCategory::Integer(IntegerKind::Bool);
     }
     let nodes = &expression.syntax.nodes;
+    // Whether a callee, through grouping, names the branch hint.
+    let hints = |mut callee: NodeId| {
+        while let ExpressionKind::Group { operand } = nodes[callee].kind {
+            callee = operand;
+        }
+        matches!(
+            &nodes[callee].kind,
+            ExpressionKind::Identifier { name }
+                if catalog.builtins.get(name).is_some_and(|builtin| builtin.kind == BuiltinKind::Expect)
+        )
+    };
     // Children precede their parents in the arena, so one pass decides every node.
     let mut truth = Vec::with_capacity(nodes.len());
     // Whether a node is the integer constant zero or one, through grouping.
@@ -451,6 +471,9 @@ pub(crate) fn truth_result(expression: &AnalyzedExpression, declared: Option<&Ty
             } => (true, false),
             ExpressionKind::Comma { right, .. } => (truth[*right], false),
             ExpressionKind::StatementExpression { value, .. } => (truth[*value], false),
+            ExpressionKind::Call { callee, arguments } if hints(*callee) => {
+                (arguments.first().is_some_and(|first| truth[*first]), false)
+            }
             ExpressionKind::Conditional { then_value, else_value, .. } => {
                 let (then_value, else_value) = (*then_value, *else_value);
                 (
@@ -2577,7 +2600,11 @@ mod tests {
         let truth = |body: &[&str]| {
             let analysis = analyze(&frontend(body), "F");
             assert!(matches!(analysis.status, AnalysisStatus::Candidate), "{body:?}: {analysis:?}");
-            truth_result(analysis.expression.as_ref().expect("candidate expression"), None)
+            truth_result(
+                &DeclarationCatalog::default(),
+                analysis.expression.as_ref().expect("candidate expression"),
+                None,
+            )
         };
         let x = ["(", "x", ")"];
         let compare = ["(", "(", "x", ")", "<", "2", ")"];
@@ -2636,12 +2663,13 @@ mod tests {
         // A translated inline function qualifies by its declared `_Bool` result alone.
         let analysis = analyze(&frontend(&["(", "1", ")"]), "F");
         let expression = analysis.expression.as_ref().expect("candidate expression");
+        let catalog = DeclarationCatalog::default();
         let declared = |kind| TypeInfo {
             category: TypeCategory::Integer(kind),
             ..resolve_type_info("int", &DeclarationCatalog::default(), &target(64)).unwrap()
         };
-        assert!(truth_result(expression, Some(&declared(IntegerKind::Bool))));
-        assert!(!truth_result(expression, Some(&declared(IntegerKind::Int))));
+        assert!(truth_result(&catalog, expression, Some(&declared(IntegerKind::Bool))));
+        assert!(!truth_result(&catalog, expression, Some(&declared(IntegerKind::Int))));
     }
 
     /// Checks constraints occurrences and skips are explicit.

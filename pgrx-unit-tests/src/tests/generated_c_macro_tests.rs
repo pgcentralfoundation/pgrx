@@ -399,9 +399,7 @@ mod tests {
     /// backend thread, and panics before reading it on any other thread.
     #[pg_test]
     fn generated_interrupt_condition_checks_the_thread() {
-        let pending = || {
-            pg::__pgrx_c_macros::expression::truth(pg::INTERRUPTS_PENDING_CONDITION!().into_value())
-        };
+        let pending = || -> bool { pg::INTERRUPTS_PENDING_CONDITION!() };
         // The first checked call claims its thread as the one allowed to read PostgreSQL's
         // globals, so this one must come before the read on another thread.
         pending();

@@ -16,7 +16,7 @@
 //! instead, through [`finish_truth`]. Only its public result changes: as an operand
 //! of another generated macro it still contributes its C type.
 
-use super::{CBool, CInt, CInteger, CSize, CValue, IntoCValue, expression::*, sealed};
+use super::{CBool, CInt, CInteger, CLong, CSize, CValue, IntoCValue, expression::*, sealed};
 
 /// Native result extraction, including C void, for the sealed value families.
 pub trait NativeResult: CExprValue {
@@ -222,8 +222,8 @@ pub fn finish_checked<T: IntoExpression>(_checks: (), value: T) -> CExpression<T
     finish(value)
 }
 
-/// The C types of a truth value: `_Bool`, and the `int` that C's relational, equality and
-/// logical operators yield.
+/// The C types of a truth value: `_Bool`, the `int` that C's relational, equality and
+/// logical operators yield, and the `long` of a branch hint over one of those.
 ///
 /// The generator returns a Rust `bool` only for a result it proved to be zero or one. This
 /// bound keeps a result of any other C type, such as a pointer or a wider integer, from
@@ -233,6 +233,8 @@ pub trait TruthValue: Truth {}
 impl TruthValue for CValue<CInt> {}
 /// A C `_Bool` result.
 impl TruthValue for CValue<CBool> {}
+/// The C `long` that `__builtin_expect` returns for a first operand that is a truth value.
+impl TruthValue for CValue<CLong> {}
 
 /// Return an evaluated C truth value at the public macro boundary as a Rust `bool`, which
 /// is `true` when the C value is nonzero.

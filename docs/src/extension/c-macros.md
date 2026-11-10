@@ -227,6 +227,7 @@ truth value:
 - It is a comparison, `&&`, `||` or `!`.
 - It is a comma expression that ends in one of these, or a conditional whose
   results both are. `0` or `1` may stand for one of the two results.
+- It is `likely` or `unlikely` of one of these, on every platform.
 
 Each macro's documentation says when it returns `bool`. Any other expression
 macro returns an already evaluated C expression wrapper, also where the value

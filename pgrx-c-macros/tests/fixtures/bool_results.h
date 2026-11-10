@@ -47,6 +47,9 @@ number_inline(int value)
 #define B_CONDITIONAL(a, b) ((a) ? (b) > 1 : (b) < -1)
 #define B_CONDITIONAL_ZERO(a, b) ((a) ? (b) > 1 : 0)
 #define B_CONDITIONAL_ONE(a, b) ((a) ? 1 : (b) > 1)
+/* The compiler's branch hint returns its first operand, so a hint of a truth value is one. */
+#define B_LIKELY(a) __builtin_expect((a) != 0, 1)
+#define B_UNLIKELY(a) (__builtin_expect)(!!(a), 0)
 /* A wrapper keeps its callee's result. */
 #define B_WRAPPER(a, b) B_EQUAL((a), (b))
 
@@ -58,6 +61,8 @@ number_inline(int value)
 #define N_MASK(a) ((a) & 1)
 #define N_INT_CAST(a, b) ((int) ((a) == (b)))
 #define N_OPERAND(a) (a)
+/* A branch hint of a number is that number. */
+#define N_EXPECTED(a) __builtin_expect((a), 1)
 #define N_NATIVE(a) (count_native(a))
 #define N_INLINE(a) (number_inline(a))
 /* A truth-valued macro inside another macro is still the C int it was. */

@@ -646,12 +646,16 @@ qualifies when:
   expression whose value does.
 - It is a conditional whose two result operands both qualify. The integer constant
   `0` or `1` stands for one of them when the other qualifies.
+- It is the compiler's branch hint, `__builtin_expect`, of a first operand that
+  qualifies. The hint returns that operand, as a `long`. So `likely(x)` and
+  `unlikely(x)` return `bool` where the headers define them with the hint and
+  where they define them as `((x) != 0)` alone, as they do for MSVC.
 
 Nothing else does. A bare constant and arithmetic are numbers, even where the
 value is always zero or one, as in `(x) & 1` or `(c) ? 1 : 0`. A result whose type
 depends on the caller's operands, such as a member or a parameter, has no
-established type. `__builtin_expect` returns `long`, so `likely(x)` is a number
-too. Such a macro returns `CExpression<V>`, and `.is_true()` gives its truth.
+established type. Such a macro returns `CExpression<V>`, and `.is_true()` gives
+its truth.
 The emission report records the decision as `returns_bool`.
 
 Only the public result changes. A generated macro written as an operand of

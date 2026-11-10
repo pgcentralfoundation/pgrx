@@ -69,6 +69,8 @@ const ACCEPTED: &[&str] = &[
     "B_CONDITIONAL",
     "B_CONDITIONAL_ZERO",
     "B_CONDITIONAL_ONE",
+    "B_LIKELY",
+    "B_UNLIKELY",
     "B_WRAPPER",
     "truth_inline",
 ];
@@ -82,6 +84,7 @@ const REFUSED: &[&str] = &[
     "N_MASK",
     "N_INT_CAST",
     "N_OPERAND",
+    "N_EXPECTED",
     "N_NATIVE",
     "N_INLINE",
     "N_COUNT",
@@ -228,6 +231,9 @@ fn main() {
     truth("conditional zero", B_CONDITIONAL_ZERO!(0_i32, 5_i32));
     truth("conditional one", B_CONDITIONAL_ONE!(1_i32, 0_i32));
     truth("wrapper", B_WRAPPER!(5_i32, 5_i32));
+    truth("likely", B_LIKELY!(5_i32));
+    truth("unlikely", B_UNLIKELY!(0_i32));
+    println!("expected\t{}", N_EXPECTED!(5_i32).get());
     // SAFETY: the C side defines the functions and the object these read, and only this
     // thread runs.
     unsafe {
@@ -307,7 +313,7 @@ fn a_proved_truth_value_returns_rust_bool() {
 
     assert_eq!(
         generated.run(MAIN),
-        "conditions\nunequal\ttrue\nless\ttrue\nat least\tfalse\nand\tfalse\nor\ttrue\nnot\ttrue\ngrouped\ttrue\ncast\ttrue\ncomma\tfalse\nstatement\ttrue\nconditional\ttrue\nconditional zero\tfalse\nconditional one\ttrue\nwrapper\ttrue\nflag\ttrue\nnative\ttrue\ninline\ttrue\ninline function\tfalse\nnative number\t1\ninline number\t1\t1\nconstant\t1\t1\nconditional number\t2\nsum\t7\ttrue\nint cast\t1\t7\ncount\t1\noperand sum\t2\nsizes\t4\t1\n"
+        "conditions\nunequal\ttrue\nless\ttrue\nat least\tfalse\nand\tfalse\nor\ttrue\nnot\ttrue\ngrouped\ttrue\ncast\ttrue\ncomma\tfalse\nstatement\ttrue\nconditional\ttrue\nconditional zero\tfalse\nconditional one\ttrue\nwrapper\ttrue\nlikely\ttrue\nunlikely\tfalse\nexpected\t5\nflag\ttrue\nnative\ttrue\ninline\ttrue\ninline function\tfalse\nnative number\t1\ninline number\t1\t1\nconstant\t1\t1\nconditional number\t2\nsum\t7\ttrue\nint cast\t1\t7\ncount\t1\noperand sum\t2\nsizes\t4\t1\n"
     );
 
     // A `bool` has no wrapper methods, and a wrapper is no condition.
