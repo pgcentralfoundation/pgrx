@@ -242,6 +242,65 @@ mod tests {
         assert_eq!(value, 42);
     }
 
+    // PostgreSQL 15 and 16 define `newNode` as a GNU statement expression, which is not
+    // translated, so `makeNode` exists from PostgreSQL 17 on.
+    pg::__pgrx_c_classify! { @if_available makeNode {
+    /// Checks that `makeNode` allocates a zeroed node of its type operand with the tag C
+    /// names for that type, which `nodeTag`, `IsA` and `castNode` then find.
+    #[pg_test]
+    fn generated_make_node_tags_the_node_its_type_names() {
+        // SAFETY: a `#[pg_test]` runs on the backend thread with a current memory context,
+        // in which `makeNode` allocates a zeroed `Query` and stores its tag. Every pointer
+        // below addresses that node, which is freed once at the end.
+        unsafe {
+            let query: *mut pg::Query = pg::makeNode!(pg::Query).get();
+            let node = query.cast::<pg::Node>();
+            assert_eq!(pg::nodeTag!(node).get(), pg::NodeTag::T_Query as u32);
+            assert!(pg::IsA!(node, pg::Query).is_true());
+            assert!(!pg::IsA!(node, pg::List).is_true());
+            let cast: *mut pg::Query = pg::castNode!(pg::Query, node).get();
+            assert_eq!(cast, query);
+            assert!(!(*query).canSetTag && (*query).rtable.is_null());
+            pg::pfree(query.cast());
+        }
+    }
+    } }
+
+    /// Checks that the list macros cast a cell's node to their type operand. An
+    /// assert-enabled PostgreSQL checks each node's tag in `castNodeImpl` first, and every
+    /// tag here is the one its macro names, so both builds return the nodes.
+    #[pg_test]
+    fn generated_list_node_macros_cast_cells_to_their_type_operand() {
+        // SAFETY: a `#[pg_test]` runs on the backend thread with a current memory context.
+        // `makeInteger` and `makeString` return valid nodes there, the list holds exactly
+        // those five pointers, and `list_free_deep` frees the nodes and the list once.
+        unsafe {
+            let integers = [1, 2, 3, 4].map(|value| pg::makeInteger(value));
+            let string = pg::makeString(c"last".as_ptr().cast_mut());
+            let mut list = core::ptr::null_mut();
+            for integer in integers {
+                list = pg::lappend(list, integer.cast());
+            }
+            list = pg::lappend(list, string.cast());
+            let first: *mut pg::Integer = pg::linitial_node!(pg::Integer, list).get();
+            assert_eq!(first, integers[0]);
+            assert_eq!(pg::lsecond_node!(pg::Integer, list).get(), integers[1]);
+            assert_eq!(pg::lthird_node!(pg::Integer, list).get(), integers[2]);
+            assert_eq!(pg::lfourth_node!(pg::Integer, list).get(), integers[3]);
+            assert_eq!(pg::list_nth_node!(pg::Integer, list, 2_i32).get(), integers[2]);
+            let last: *mut pg::String = pg::llast_node!(pg::String, list).get();
+            assert_eq!(last, string);
+            let cell = pg::list_nth_cell(list, 1);
+            assert_eq!(pg::lfirst_node!(pg::Integer, cell).get(), integers[1]);
+            // A null pointer has no tag to check.
+            let null = core::ptr::null_mut::<pg::Node>();
+            assert!(pg::castNode!(pg::Integer, null).get().is_null());
+            assert!(pg::IsA!(last, pg::String).is_true());
+            assert!(!pg::IsA!(last, pg::Integer).is_true());
+            pg::list_free_deep(list);
+        }
+    }
+
     pg::__pgrx_c_classify! { @if_available INTERRUPTS_PENDING_CONDITION {
     /// Checks that the interrupt predicate reads `InterruptPending` from safe code on the
     /// backend thread, and panics before reading it on any other thread.
