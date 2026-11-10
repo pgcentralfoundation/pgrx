@@ -104,7 +104,7 @@ const MACROS: &[(&str, Kind, &str)] = &[
     ("DOC_TAG_SIZE", Kind::Value, "DOC_TAG_SIZE!(DocInner)"),
     ("DOC_TAGGED", Kind::Truth, "unsafe { DOC_TAGGED!(record, DocRecord) }"),
     ("DOC_SWAP16", Kind::Value, "DOC_SWAP16!(value)"),
-    ("DOC_LIKELY", Kind::Value, "DOC_LIKELY!(value)"),
+    ("DOC_LIKELY", Kind::Truth, "DOC_LIKELY!(value)"),
     ("DOC_FILE", Kind::Value, "DOC_FILE!()"),
     ("DOC_LINE", Kind::Value, "DOC_LINE!()"),
     ("DOC_STRING", Kind::Value, "DOC_STRING!()"),
