@@ -233,9 +233,10 @@ macro returns an already evaluated C expression wrapper, also where the value
 happens to be zero or one, as in `(flags) & 1`, or where its type depends on your
 operand. The result follows the definition in the PostgreSQL version you build
 against: `PageIsFull!` tests a flag bit on PG15 and returns the wrapper, and is a
-function returning `bool` from PG16 on. `.is_true()` tests a wrapped scalar against
-zero, `.get()` extracts the wrapper's native Rust storage, and `.into_value()`
-keeps the tagged C value:
+function returning `bool` from PG16 on. `bool::from(pgrx::PageIsFull!(page))`
+compiles against every version, because it converts the wrapper and accepts a
+`bool`. `.is_true()` tests a wrapped scalar against zero, `.get()` extracts the
+wrapper's native Rust storage, and `.into_value()` keeps the tagged C value:
 
 ```rust
 use pgrx::{cmacros::c::CValue, pg_sys};

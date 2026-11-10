@@ -180,6 +180,17 @@ impl<V: Truth> CExpression<V> {
         self.0.truth()
     }
 }
+/// Convert a scalar result to a Rust condition, as [`CExpression::is_true`] does.
+///
+/// `bool::from` also accepts a `bool`, so `bool::from(NAME!(..))` compiles whether a macro
+/// returns this wrapper or a Rust `bool`. A predicate can change between the two across
+/// PostgreSQL versions, as `PageIsFull` tests a flag bit on PG15 and is a function that
+/// returns `bool` from PG16 on.
+impl<V: Truth> From<CExpression<V>> for bool {
+    fn from(result: CExpression<V>) -> bool {
+        result.is_true()
+    }
+}
 /// Keep this runtime family within crate-owned C capability registration.
 impl<V: CExprValue> sealed::Sealed for CExpression<V> {}
 /// Normalize this admitted input at the public expression boundary while retaining its C family.
@@ -301,6 +312,10 @@ mod tests {
         assert!(finish_truth(input(true)));
         assert!(!finish_truth(input(false)));
         assert!(finish_truth_checked((), CValue::<CInt>::new(1)));
+        // One spelling converts a wrapped scalar and a result that is already a `bool`.
+        assert!(bool::from(finish(input(4_i32))));
+        assert!(!bool::from(finish(input(0_i32))));
+        assert!(bool::from(finish_truth(input(true))));
         assert!(!finish_truth(null_constant(CValue::<CInt>::new(0))));
         let selected = select(if truth(input(true)) {
             Either::Left(gt(input(7), input(4)))
