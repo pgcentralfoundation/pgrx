@@ -884,7 +884,16 @@ fn pg_regress(
     let test_dir = tests[0].path().parent().unwrap().parent().unwrap().to_path_buf();
     let tests = tests.iter().map(|entry| make_test_name(entry));
 
+    let bin_dir = pg_config.bin_dir()?;
     let mut command = Command::new(bin);
+    // pg_regress.exe sits in the pgxs directory, apart from libpq and the other DLLs it
+    // loads, and Windows finds those only beside the program or through PATH.
+    #[cfg(target_os = "windows")]
+    {
+        let path = std::env::var_os("PATH").unwrap_or_default();
+        let paths = std::iter::once(bin_dir.clone()).chain(std::env::split_paths(&path));
+        command.env("PATH", std::env::join_paths(paths)?);
+    }
     command
         .current_dir(test_dir)
         .env_remove("PGDATABASE")
@@ -898,6 +907,10 @@ fn pg_regress(
         .arg("--port")
         .arg(pg_config.port()?.to_string())
         .arg("--use-existing")
+        // Without this, pg_regress runs `psql` from the directory PostgreSQL was configured
+        // with, which does not exist where a relocated build such as EnterpriseDB's Windows
+        // binaries is installed.
+        .arg(format!("--bindir={}", bin_dir.display()))
         .arg(format!("--dbname={dbname}"))
         .arg(format!("--inputdir={}", input_dir.display()))
         .arg(format!("--outputdir={}", input_dir.display()))
@@ -955,6 +968,10 @@ fn pg_regress(
     let status = child.wait()?;
     let (passed_cnt, failed_cnt) =
         output_monitor.join().map_err(|_| eyre::eyre!("failed to join output monitor thread"))?;
+    if passed_cnt + failed_cnt == 0 && !status.success() {
+        // It printed no result to count, so say why the run fails.
+        eprintln!("{} pg_regress ran no tests: {status}", "       ERROR".bold().red());
+    }
     if skipped_cnt > 0 {
         println!("passed={passed_cnt} failed={failed_cnt} skipped={skipped_cnt}");
     } else {
