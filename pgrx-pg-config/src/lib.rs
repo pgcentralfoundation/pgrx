@@ -401,14 +401,26 @@ impl PgConfig {
         Ok(path)
     }
 
+    /// Where this installation keeps `pg_regress`.
+    ///
+    /// A build made with PostgreSQL's makefiles or with Meson installs it beside the PGXS
+    /// makefiles. A Windows build of PostgreSQL 16 or earlier, made with the MSVC scripts,
+    /// has no PGXS directory and installs it in the bin directory.
     pub fn pg_regress_path(&self) -> eyre::Result<PathBuf> {
+        let name = format!("pg_regress{EXE_SUFFIX}");
         let mut pgxs_path = self.pgxs_path()?;
         pgxs_path.pop(); // pop the `pgxs.mk` file at the end
         pgxs_path.pop(); // pop the `makefiles` directory in which it lives
         let mut pgregress_path = pgxs_path;
         pgregress_path.push("test");
         pgregress_path.push("regress");
-        pgregress_path.push("pg_regress");
+        pgregress_path.push(&name);
+        if !pgregress_path.is_file() {
+            let in_bin_dir = self.bin_dir()?.join(&name);
+            if in_bin_dir.is_file() {
+                return Ok(in_bin_dir);
+            }
+        }
         Ok(pgregress_path)
     }
 
