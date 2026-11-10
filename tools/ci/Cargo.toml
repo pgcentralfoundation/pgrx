@@ -17,3 +17,5 @@ publish = false
 [dependencies]
 cargo_metadata.workspace = true
 eyre.workspace = true
+serde.workspace = true
+serde_json.workspace = true

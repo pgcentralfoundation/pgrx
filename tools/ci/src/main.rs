@@ -7,10 +7,12 @@
 //! Chooses and runs the jobs of pgrx's CI workflow, `.github/workflows/tests.yml`.
 //!
 //! `plan` decides which jobs a change needs. The `test-*` commands run one job's tests and
-//! exit unsuccessfully when any test fails.
+//! exit unsuccessfully when any test fails. `macro-summaries` and `macro-compare` check that
+//! every Clang version generates the same C macros.
 
 mod args;
 mod crates;
+mod macros;
 mod pg;
 mod plan;
 mod process;
@@ -20,6 +22,8 @@ mod workspace;
 
 use std::process::ExitCode;
 
+use eyre::WrapErr;
+
 const USAGE: &str = "\
 usage:
     pgrx-ci plan --all
@@ -27,8 +31,13 @@ usage:
     pgrx-ci test-pg --pg VERSION [--run 'PACKAGE ...'] [--cli-checks]
     pgrx-ci test-variants --pg VERSION
     pgrx-ci test-crates PACKAGE...
+    pgrx-ci macro-summaries --clang MAJOR --out DIRECTORY PG_VERSION...
+    pgrx-ci macro-compare DIRECTORY
 
-test-pg and test-variants read the PostgreSQL installation from PG_CONFIG.";
+test-pg and test-variants read the PostgreSQL installation from PG_CONFIG.
+macro-summaries builds pgrx-pg-sys for each PostgreSQL version, which PGRX_HOME must
+configure, and writes what the build generated for each C macro to DIRECTORY/pgNN.json.
+macro-compare fails when the summaries under DIRECTORY differ between Clang versions.";
 
 fn main() -> ExitCode {
     match run() {
@@ -75,6 +84,27 @@ fn run() -> eyre::Result<bool> {
         "test-crates" => {
             let packages = args.rest();
             crates::run(&packages)
+        }
+        "macro-summaries" => {
+            let clang = args.required("--clang")?;
+            let clang =
+                clang.parse().wrap_err_with(|| format!("--clang {clang} is not a Clang major"))?;
+            let out = args.required("--out")?;
+            let versions = args
+                .rest()
+                .iter()
+                .map(|version| {
+                    version
+                        .parse()
+                        .wrap_err_with(|| format!("{version} is not a PostgreSQL major version"))
+                })
+                .collect::<eyre::Result<Vec<u16>>>()?;
+            macros::summarize(clang, out.as_ref(), &versions)
+        }
+        "macro-compare" => {
+            let dir = args.required_positional("DIRECTORY")?;
+            args.finish()?;
+            macros::run_compare(dir.as_ref())
         }
         "help" | "--help" | "-h" => {
             println!("{USAGE}");

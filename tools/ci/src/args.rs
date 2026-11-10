@@ -67,6 +67,11 @@ impl Args {
             .wrap_err_with(|| format!("--pg {version} is not a PostgreSQL major version"))
     }
 
+    /// Remove and return the next argument, which `name` describes in the error for none.
+    pub(crate) fn required_positional(&mut self, name: &str) -> eyre::Result<String> {
+        self.command().ok_or_else(|| eyre!("missing {name}"))
+    }
+
     /// Take every remaining argument as a positional value.
     pub(crate) fn rest(&mut self) -> Vec<String> {
         std::mem::take(&mut self.items)
