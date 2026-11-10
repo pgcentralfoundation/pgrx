@@ -63,13 +63,13 @@ arguments, such as the `CString` behind an `as_ptr()` argument, stay alive until
 the function returns, as in a call. Native wrappers are built even when the
 public `cshim` feature is disabled.
 
-Which bodies are translated depends on the PostgreSQL build and on the libclang
-that inspects it, not only on the PostgreSQL version. For example, `Assert` in
-an `--enable-cassert` build reports its file and line, so a body that uses it
-keeps the native call. A body that converts a pointer where C requires a cast
-keeps it too, as PostgreSQL's MSVC atomics do: they pass a pointer to `uint32`
-where `InterlockedExchange` takes a pointer to `LONG`. A call that needs no
-`unsafe` with one installation can therefore need it with another. When one call
+Which bodies are translated depends on the target and on the libclang that
+inspects the headers, not only on the PostgreSQL version. A PostgreSQL built
+with `--enable-cassert` and one built without translate the same bodies. A
+body that converts a pointer where C requires a cast keeps the native call, as
+PostgreSQL's MSVC atomics do: they pass a pointer to `uint32` where
+`InterlockedExchange` takes a pointer to `LONG`. A call that needs no `unsafe`
+with one installation can therefore need it with another. When one call
 must build against several installations, keep its `unsafe` block and allow
 `unused_unsafe`, as [the `DatumGetInt32`
 example](#choose-the-c-identity-of-an-input) does.
