@@ -54,6 +54,8 @@ int main(void)
     printf("guarded\t%d\t%d\n", BODY_GUARDED_FIRST(), BODY_GUARDED_SECOND());
     printf("again\t%d\t%d\t%d\t%d\n", BODY_AGAIN_USE(1), BODY_AGAIN_REACHED(1),
            BODY_AGAIN_GAP_USE(1), BODY_AGAIN_SEEN_USE(1));
+    BodyUntagged untagged = {4};
+    printf("untagged\t%d\n", BODY_UNTAGGED(&untagged));
     printf("spliced\t%d\t%d\t%d\t%d\n", BODY_BRACE_SPLICE(1), BODY_SPLICED_HASH(10),
            BODY_SPLICED_DIGRAPH(10), BODY_TRIGRAPH_HASH(10));
 }

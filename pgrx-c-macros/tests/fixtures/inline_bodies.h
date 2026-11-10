@@ -211,6 +211,9 @@ static inline int BODY_STRING_CHAR(int value) { return value + BODY_STRING_OF(1+
 #define BODY_GUARDED_NAME BODY_GUARDED_SECOND
 #define BODY_GUARDED_VALUE 2
 #include "inline_bodies_guarded.h"
+/* Only a typedef names the record, which the parameter also qualifies. */
+typedef struct { int count; } BodyUntagged;
+static inline int BODY_UNTAGGED(const BodyUntagged *value) { return value->count + 1; }
 /* A header entered again defines its macros again where it defined them before. */
 #include "inline_bodies_again.h"
 #define BODY_AGAIN_OUTER (BODY_AGAIN + 1)

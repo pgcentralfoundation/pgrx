@@ -1485,6 +1485,13 @@ it does not thereby acquire a conversion from an arbitrary initialized Rust
 value. Incomplete records retain an opaque identity and cannot acquire
 complete-object size or value operations.
 
+A C record is paired with its Rust binding through its tag, a typedef that names
+it, or a field of a record already paired. Every qualified spelling of one
+declaration, such as `const BOX`, takes the pairing of that declaration.
+libclang 15 and earlier report no tag for a record that only a typedef names, so
+without this a `const BOX *` parameter had no binding there and its macro was
+skipped.
+
 Enums retain nominal C identity separately from compatible integer kind and
 Rust storage. Check each native Rust enum discriminant before enabling its
 encoder. Primitive storage and pointer compatibility use shared tables without

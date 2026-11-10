@@ -162,6 +162,8 @@ fn main() {
             BODY_AGAIN_GAP_USE!(1_i32).get(),
             BODY_AGAIN_SEEN_USE!(1_i32).get()
         );
+        let untagged = BodyUntagged { count: 4 };
+        println!("untagged\t{}", BODY_UNTAGGED!(&raw const untagged).get());
         println!(
             "spliced\t{}\t{}\t{}\t{}",
             BODY_BRACE_SPLICE!(1_i32).get(),

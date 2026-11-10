@@ -71,6 +71,8 @@ const TRANSLATED: &[&str] = &[
     "BODY_ORDER",
     // Only the conversion of its integer result is floating.
     "BODY_RETURN_FMA",
+    // libclang 15 and earlier report no tag for a record that only a typedef names.
+    "BODY_UNTAGGED",
     // A header entered again after the function defines the macro again at the same place,
     // and nothing was read while its `#undef` left the macro undefined.
     "BODY_AGAIN_USE",
