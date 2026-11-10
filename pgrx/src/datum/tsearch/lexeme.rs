@@ -199,6 +199,19 @@ impl TsVector {
     }
 }
 
+/// Hashes what `Eq` compares: the lexemes, their positions and weights.
+impl core::hash::Hash for TsVector {
+    fn hash<H: core::hash::Hasher>(&self, state: &mut H) {
+        self.len().hash(state);
+        for lexeme in self.lexemes() {
+            lexeme.as_bytes().hash(state);
+            let positions = lexeme.positions();
+            positions.len().hash(state);
+            positions.for_each(|position| position.hash(state));
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::super::TsVectorBuf;

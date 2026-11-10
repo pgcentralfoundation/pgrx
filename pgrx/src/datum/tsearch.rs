@@ -295,6 +295,12 @@ macro_rules! tsearch_type {
 
         impl Eq for $buf {}
 
+        impl core::hash::Hash for $buf {
+            fn hash<H: core::hash::Hasher>(&self, state: &mut H) {
+                (**self).hash(state)
+            }
+        }
+
         impl PartialOrd<$dst> for $buf {
             fn partial_cmp(&self, other: &$dst) -> Option<Ordering> {
                 (**self).partial_cmp(other)

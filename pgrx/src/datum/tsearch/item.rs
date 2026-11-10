@@ -197,6 +197,20 @@ impl TsQuery {
     }
 }
 
+/// Hashes what `Eq` compares: the structure, operators, phrase distances and operand text. `Eq`
+/// ignores weights and prefix flags, so the hash does too.
+impl core::hash::Hash for TsQuery {
+    fn hash<H: core::hash::Hasher>(&self, state: &mut H) {
+        self.items().len().hash(state);
+        for item in self.items() {
+            match item {
+                Item::Operand(operand) => operand.as_bytes().hash(state),
+                Item::Operator(operator) => operator.hash(state),
+            }
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::super::TsQueryBuf;

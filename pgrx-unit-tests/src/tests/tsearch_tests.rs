@@ -474,6 +474,46 @@ mod tests {
         assert_eq!(words, ["\u{65e5}\u{672c}", "h\u{e9}llo"]);
     }
 
+    fn hash_of<T: std::hash::Hash + ?Sized>(value: &T) -> u64 {
+        use std::hash::Hasher;
+        let mut hasher = std::collections::hash_map::DefaultHasher::new();
+        value.hash(&mut hasher);
+        hasher.finish()
+    }
+
+    #[pg_test]
+    fn tsvector_hash_follows_eq() {
+        let texts = ["a:1,3B b:2C", "a:1,3 b:2C", "a b", "b a", "", "a:1", "a:1A", "h\u{e9}llo:1"];
+        let values: Vec<TsVectorBuf> = texts.iter().map(|t| t.parse().unwrap()).collect();
+        for a in &values {
+            for b in &values {
+                if a == b {
+                    assert_eq!(hash_of(a), hash_of(b));
+                }
+            }
+            assert_eq!(hash_of(a), hash_of(&**a));
+        }
+        let set: std::collections::HashSet<_> = values.iter().cloned().collect();
+        assert_eq!(set.len(), texts.len() - 1);
+    }
+
+    #[pg_test]
+    fn tsquery_hash_follows_eq() {
+        let texts = ["a", "a:A", "a:*", "a & b", "b & a", "a | b", "a <-> b", "a <2> b", "!a", ""];
+        let values: Vec<TsQueryBuf> = texts.iter().map(|t| t.parse().unwrap()).collect();
+        for a in &values {
+            for b in &values {
+                if a == b {
+                    assert_eq!(hash_of(a), hash_of(b));
+                }
+            }
+            assert_eq!(hash_of(a), hash_of(&**a));
+        }
+        assert!(values[0] == values[1] && values[1] == values[2]);
+        let set: std::collections::HashSet<_> = values.iter().cloned().collect();
+        assert_eq!(set.len(), texts.len() - 2);
+    }
+
     #[pg_test]
     fn operators_match_methods() {
         let a: TsVectorBuf = "a:1 b:2".parse().unwrap();
