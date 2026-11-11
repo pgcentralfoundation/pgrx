@@ -38,7 +38,7 @@ fn assertions_that_hold_need_no_unsafe() {
 #[test]
 fn pure_checks_need_no_unsafe() {
     let (older, newer) = (pg::TransactionId::from(3_u32), pg::TransactionId::from(4_u32));
-    assert!(pg::NormalTransactionIdPrecedes!(older, newer).is_true());
+    assert!(pg::NormalTransactionIdPrecedes!(older, newer));
     assert_eq!(pg::AttrNumberGetAttrOffset!(1_i16).get(), 0);
 }
 
@@ -68,9 +68,10 @@ unsafe fn checks_through_pointers_need_unsafe_in_every_build<Uninstantiated>(
     use pg::cmacros::c::Pointer;
     // SAFETY: the caller provides the page and control structure these checks read.
     unsafe {
-        // PostgreSQL 15's definition yields `bool` and later versions' yields nothing; the
-        // type is the same for both build flavors of one version.
-        let _ = pg::PageValidateSpecialPointer!(Pointer::from(page)).get();
+        // PostgreSQL 15's definition ends in `true`, so its macro returns `bool`. Later
+        // versions define a function that returns nothing. The type is the same for both
+        // build flavors of one version.
+        let _ = pg::PageValidateSpecialPointer!(Pointer::from(page));
         let () = pg::SlruPagePrecedesUnitTests!(control, 1_i32).get();
     }
 }

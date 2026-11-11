@@ -9,6 +9,8 @@
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -16,7 +18,7 @@
 macro_rules! SmgrIsTemp {
     ($smgr:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$smgr;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -37,6 +39,8 @@ macro_rules! SmgrIsTemp {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -44,7 +48,7 @@ macro_rules! SmgrIsTemp {
 macro_rules! SmgrIsTemp {
     ($smgr:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$smgr;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -71,6 +75,8 @@ macro_rules! SmgrIsTemp {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -107,6 +113,8 @@ macro_rules! smgrread {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///

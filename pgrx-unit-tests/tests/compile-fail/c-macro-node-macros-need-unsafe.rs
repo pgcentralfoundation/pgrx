@@ -6,7 +6,7 @@ use pgrx::pg_sys;
 
 // `IsA` reads the node's tag through the caller's pointer.
 fn is_a_reads_its_node(node: *mut pg_sys::Node) -> bool {
-    pg_sys::IsA!(node, pg_sys::Query).is_true()
+    pg_sys::IsA!(node, pg_sys::Query)
 }
 
 // `castNode` checks the tag in an assert-enabled build. A release build only casts, and

@@ -67,7 +67,7 @@ fn main() {
         inline_oracle_reset();
         println!("byte\t{}\t{}", INLINE_BYTE!(Input(-1)).get(), inline_oracle_count());
         println!("signed\t{}\t{}", INLINE_SIGNED!(12_i16).get(), inline_oracle_count());
-        println!("bool\t{}\t{}", u8::from(INLINE_BOOL!(7_i32).get()), inline_oracle_count());
+        println!("bool\t{}\t{}", u8::from(INLINE_BOOL!(7_i32)), inline_oracle_count());
         println!(
             "double\t{:016x}\t{}",
             INLINE_DOUBLE!(1.5_f32).get().to_bits(),

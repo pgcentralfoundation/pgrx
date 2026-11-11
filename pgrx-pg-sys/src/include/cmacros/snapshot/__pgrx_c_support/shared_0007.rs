@@ -120,6 +120,12 @@ macro_rules! __pgrx_c_field_marker {
     (__mask_was_saved) => {
         $crate::__pgrx_c_generated::Field___mask_was_saved
     };
+    (__pad5) => {
+        $crate::__pgrx_c_generated::Field___pad5
+    };
+    (__ss_align) => {
+        $crate::__pgrx_c_generated::Field___ss_align
+    };
     (_cur_column) => {
         $crate::__pgrx_c_generated::Field__cur_column
     };
@@ -140,12 +146,6 @@ macro_rules! __pgrx_c_field_marker {
     };
     (_old_offset) => {
         $crate::__pgrx_c_generated::Field__old_offset
-    };
-    (_total_written) => {
-        $crate::__pgrx_c_generated::Field__total_written
-    };
-    (_unused3) => {
-        $crate::__pgrx_c_generated::Field__unused3
     };
     (_vtable_offset) => {
         $crate::__pgrx_c_generated::Field__vtable_offset
@@ -10295,6 +10295,9 @@ macro_rules! __pgrx_c_field_marker {
     };
     (srvowner) => {
         $crate::__pgrx_c_generated::Field_srvowner
+    };
+    (ss_family) => {
+        $crate::__pgrx_c_generated::Field_ss_family
     };
     (ssl_bits) => {
         $crate::__pgrx_c_generated::Field_ssl_bits

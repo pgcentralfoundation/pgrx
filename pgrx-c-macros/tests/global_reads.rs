@@ -192,7 +192,7 @@ fn checked_global_reads_need_no_unsafe() {
     // is also what a sum with a `short` and a comparison yield.
     assert_eq!(
         output,
-        "count\t5\t1\npending\t1\t2\nflag\ttrue\t3\npointer\t4\nbusy\t1\t5\nin range\t1\t6\npointee\t9\nhooked\t0\ncount\t3\t8\ntotal\t5\t9\nany\t0\t9\nany\t1\t10\ncopy\t4\t11\nafter\t3\t15\nsizes\t4\t4\t4\t4\t15\nwider\t4\t4\t4\t15\nwider\t4\n"
+        "count\t5\t1\npending\ttrue\t2\nflag\ttrue\t3\npointer\t4\nbusy\ttrue\t5\nin range\ttrue\t6\npointee\t9\nhooked\tfalse\ncount\t3\t8\ntotal\t5\t9\nany\tfalse\t9\nany\ttrue\t10\ncopy\t4\t11\nafter\t3\t15\nsizes\t4\t4\t4\t4\t15\nwider\t4\t4\t4\t15\nwider\t4\n"
     );
     session.verify_inputs().expect("original profile stayed unchanged");
 }

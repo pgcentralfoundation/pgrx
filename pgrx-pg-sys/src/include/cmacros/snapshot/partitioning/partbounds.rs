@@ -8,6 +8,8 @@
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -19,7 +21,7 @@
 macro_rules! partition_bound_accepts_nulls {
     ($bi:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$bi;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -39,6 +41,8 @@ macro_rules! partition_bound_accepts_nulls {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -50,7 +54,7 @@ macro_rules! partition_bound_accepts_nulls {
 macro_rules! partition_bound_has_default {
     ($bi:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$bi;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(

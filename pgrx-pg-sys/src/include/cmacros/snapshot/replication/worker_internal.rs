@@ -16,6 +16,8 @@
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -27,7 +29,7 @@
 macro_rules! am_leader_apply_worker {
     () => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
@@ -48,6 +50,8 @@ macro_rules! am_leader_apply_worker {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
 #[doc = crate::__pgrx_c_doc_assertions!()]
@@ -59,7 +63,7 @@ macro_rules! am_leader_apply_worker {
 macro_rules! am_leader_apply_worker {
     () => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
@@ -79,6 +83,8 @@ macro_rules! am_leader_apply_worker {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -90,7 +96,7 @@ macro_rules! am_leader_apply_worker {
 macro_rules! am_parallel_apply_worker {
     () => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
@@ -111,6 +117,8 @@ macro_rules! am_parallel_apply_worker {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
 #[doc = crate::__pgrx_c_doc_assertions!()]
@@ -122,7 +130,7 @@ macro_rules! am_parallel_apply_worker {
 macro_rules! am_parallel_apply_worker {
     () => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
@@ -142,6 +150,8 @@ macro_rules! am_parallel_apply_worker {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -149,7 +159,7 @@ macro_rules! am_parallel_apply_worker {
 macro_rules! am_sequencesync_worker {
     () => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
@@ -169,6 +179,8 @@ macro_rules! am_sequencesync_worker {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -180,7 +192,7 @@ macro_rules! am_sequencesync_worker {
 macro_rules! am_tablesync_worker {
     () => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
@@ -200,6 +212,8 @@ macro_rules! am_tablesync_worker {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -207,7 +221,7 @@ macro_rules! am_tablesync_worker {
 macro_rules! am_tablesync_worker {
     () => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
@@ -227,6 +241,8 @@ macro_rules! am_tablesync_worker {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -234,7 +250,7 @@ macro_rules! am_tablesync_worker {
 macro_rules! am_tablesync_worker {
     () => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
@@ -254,6 +270,8 @@ macro_rules! am_tablesync_worker {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
@@ -285,6 +303,8 @@ macro_rules! get_logical_worker_type {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -292,7 +312,7 @@ macro_rules! get_logical_worker_type {
 macro_rules! isParallelApplyWorker {
     ($worker:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$worker;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -313,6 +333,8 @@ macro_rules! isParallelApplyWorker {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -320,7 +342,7 @@ macro_rules! isParallelApplyWorker {
 macro_rules! isParallelApplyWorker {
     ($worker:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$worker;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -341,6 +363,8 @@ macro_rules! isParallelApplyWorker {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -348,7 +372,7 @@ macro_rules! isParallelApplyWorker {
 macro_rules! isSequenceSyncWorker {
     ($worker:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$worker;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -369,6 +393,8 @@ macro_rules! isSequenceSyncWorker {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -376,7 +402,7 @@ macro_rules! isSequenceSyncWorker {
 macro_rules! isTableSyncWorker {
     ($worker:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$worker;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -397,6 +423,8 @@ macro_rules! isTableSyncWorker {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -404,7 +432,7 @@ macro_rules! isTableSyncWorker {
 macro_rules! isTablesyncWorker {
     ($worker:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$worker;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(

@@ -19,8 +19,9 @@
 //! unsupported constructs carry structured reasons instead.
 
 use crate::model::{
-    ActiveMacro, ActiveProvenance, DeclarationCatalog, FrontendOutput, IntegerConstant,
-    IntegerKind, IntegerType, IntegerValue, SignedOverflow, TargetFacts, TypeCategory, TypeInfo,
+    ActiveMacro, ActiveProvenance, BuiltinKind, DeclarationCatalog, FrontendOutput,
+    IntegerConstant, IntegerKind, IntegerType, IntegerValue, SignedOverflow, TargetFacts,
+    TypeCategory, TypeInfo,
 };
 use crate::syntax::{
     BinaryOperator, Expression, ExpressionKind, IntegerLiteral, IntegerSize, NodeId,
@@ -400,6 +401,93 @@ pub enum TypeExpression {
         /// Second operand type participating in C usual arithmetic conversions.
         right: NodeId,
     },
+}
+
+/// Whether an analyzed result is a C truth value: one that C defines as zero or one and
+/// that carries no other meaning, so a generated macro returns it as a Rust `bool`.
+///
+/// `declared` is the declared result type of a translated inline function, whose body's
+/// root expression is not its value. It qualifies when that type is `_Bool`. Any other
+/// result is the root of `expression`, which qualifies, through grouping parentheses, when:
+///
+/// - its C type is `_Bool`, as for a cast, an object, or a call through a prototype;
+/// - it is a relational or equality operator, logical `&&` or `||`, or `!`, each of which
+///   C defines as the `int` zero or one;
+/// - it is a comma expression whose right operand qualifies, or a GNU statement expression
+///   whose value does;
+/// - it is a conditional whose two result operands both qualify, where the integer constant
+///   `0` or `1` stands for one of them when the other qualifies;
+/// - it is the compiler's branch hint, `__builtin_expect`, of a first operand that
+///   qualifies. The hint returns that operand as a `long`, so `likely` and `unlikely` are
+///   truth values where the headers define them with the hint and where they define them
+///   as the comparison alone.
+///
+/// Nothing else does. A bare integer constant and arithmetic are numbers, and a result whose
+/// type analysis defers to the caller's operands has no established type.
+pub(crate) fn truth_result(
+    catalog: &DeclarationCatalog,
+    expression: &AnalyzedExpression,
+    declared: Option<&TypeInfo>,
+) -> bool {
+    if let Some(declared) = declared {
+        return declared.category == TypeCategory::Integer(IntegerKind::Bool);
+    }
+    let nodes = &expression.syntax.nodes;
+    // Whether a callee, through grouping, names the branch hint.
+    let hints = |mut callee: NodeId| {
+        while let ExpressionKind::Group { operand } = nodes[callee].kind {
+            callee = operand;
+        }
+        matches!(
+            &nodes[callee].kind,
+            ExpressionKind::Identifier { name }
+                if catalog.builtins.get(name).is_some_and(|builtin| builtin.kind == BuiltinKind::Expect)
+        )
+    };
+    // Children precede their parents in the arena, so one pass decides every node.
+    let mut truth = Vec::with_capacity(nodes.len());
+    // Whether a node is the integer constant zero or one, through grouping.
+    let mut bit = Vec::with_capacity(nodes.len());
+    for (index, node) in nodes.iter().enumerate() {
+        let typed = matches!(
+            expression.types[index],
+            TypeExpression::Concrete { ty } if ty.kind == IntegerKind::Bool
+        );
+        let (proved, constant) = match &node.kind {
+            ExpressionKind::Group { operand } => (truth[*operand], bit[*operand]),
+            ExpressionKind::IntegerLiteral { literal } => (false, literal.value <= 1),
+            ExpressionKind::Unary { operator: UnaryOperator::LogicalNot, .. } => (true, false),
+            ExpressionKind::Binary {
+                operator:
+                    BinaryOperator::Less
+                    | BinaryOperator::LessEqual
+                    | BinaryOperator::Greater
+                    | BinaryOperator::GreaterEqual
+                    | BinaryOperator::Equal
+                    | BinaryOperator::NotEqual
+                    | BinaryOperator::LogicalAnd
+                    | BinaryOperator::LogicalOr,
+                ..
+            } => (true, false),
+            ExpressionKind::Comma { right, .. } => (truth[*right], false),
+            ExpressionKind::StatementExpression { value, .. } => (truth[*value], false),
+            ExpressionKind::Call { callee, arguments } if hints(*callee) => {
+                (arguments.first().is_some_and(|first| truth[*first]), false)
+            }
+            ExpressionKind::Conditional { then_value, else_value, .. } => {
+                let (then_value, else_value) = (*then_value, *else_value);
+                (
+                    (truth[then_value] && (truth[else_value] || bit[else_value]))
+                        || (bit[then_value] && truth[else_value]),
+                    false,
+                )
+            }
+            _ => (false, false),
+        };
+        truth.push(typed || proved);
+        bit.push(constant);
+    }
+    truth[expression.syntax.root]
 }
 
 /// Attach a verified C integer identity/value to its original syntax node while retaining readable
@@ -2455,7 +2543,11 @@ mod tests {
                     || spelling.starts_with('\'')
                 {
                     TokenKind::Literal
-                } else if spelling.as_bytes().first().is_some_and(u8::is_ascii_alphabetic) {
+                } else if spelling
+                    .as_bytes()
+                    .first()
+                    .is_some_and(|byte| byte.is_ascii_alphabetic() || *byte == b'_')
+                {
                     TokenKind::Identifier
                 } else {
                     TokenKind::Punctuation
@@ -2499,6 +2591,85 @@ mod tests {
             declarations: DeclarationCatalog::default(),
             inventory: MacroInventory { macros: Vec::new(), diagnostics: Vec::new() },
         }
+    }
+
+    /// A result is a truth value by its `_Bool` type or by the operator that produces it,
+    /// through grouping, comma, statement expression and conditional. Numbers are not.
+    #[test]
+    fn truth_results_are_proved_by_type_or_operator() {
+        let truth = |body: &[&str]| {
+            let analysis = analyze(&frontend(body), "F");
+            assert!(matches!(analysis.status, AnalysisStatus::Candidate), "{body:?}: {analysis:?}");
+            truth_result(
+                &DeclarationCatalog::default(),
+                analysis.expression.as_ref().expect("candidate expression"),
+                None,
+            )
+        };
+        let x = ["(", "x", ")"];
+        let compare = ["(", "(", "x", ")", "<", "2", ")"];
+        let join = |parts: &[&[&'static str]]| parts.concat();
+        for body in [
+            // Relational, equality and logical operators.
+            join(&[&["("], &x, &["<"], &x, &[")"]]),
+            join(&[&["("], &x, &["<="], &x, &[")"]]),
+            join(&[&["("], &x, &[">"], &x, &[")"]]),
+            join(&[&["("], &x, &[">="], &x, &[")"]]),
+            join(&[&["("], &x, &["=="], &x, &[")"]]),
+            join(&[&["("], &x, &["!="], &x, &[")"]]),
+            join(&[&["("], &x, &["&&"], &x, &[")"]]),
+            join(&[&["("], &x, &["||"], &x, &[")"]]),
+            join(&[&["(", "!"], &x, &[")"]]),
+            // Grouping parentheses.
+            join(&[&["(", "("], &compare, &[")", ")"]]),
+            // The `_Bool` type, whatever produces the value.
+            join(&[&["(", "(", "_Bool", ")"], &x, &[")"]]),
+            // A comma expression takes its right operand.
+            join(&[&["("], &x, &[","], &compare, &[")"]]),
+            // A conditional whose arms both qualify, or one qualifies beside 0 or 1.
+            join(&[&["("], &x, &["?"], &compare, &[":"], &compare, &[")"]]),
+            join(&[&["("], &x, &["?"], &compare, &[":", "0", ")"]]),
+            join(&[&["("], &x, &["?", "1", ":"], &compare, &[")"]]),
+            join(&[&["("], &x, &["?", "(", "0", ")", ":", "(", "_Bool", ")"], &x, &[")"]]),
+            join(&[&["("], &x, &["?", "("], &x, &["?"], &compare, &[":", "1", ")", ":", "0", ")"]]),
+            // A statement expression takes its value.
+            join(&[&["(", "{"], &x, &[";"], &compare, &[";", "}", ")"]]),
+        ] {
+            assert!(truth(&body), "{body:?}");
+        }
+        for body in [
+            // A bare constant, even zero or one, and two of them in a conditional.
+            vec!["(", "1", ")"],
+            vec!["(", "0", ")"],
+            join(&[&["("], &x, &["?", "1", ":", "0", ")"]]),
+            // A conditional with a number in one arm.
+            join(&[&["("], &x, &["?"], &compare, &[":", "2", ")"]]),
+            join(&[&["("], &x, &["?"], &compare, &[":"], &x, &[")"]]),
+            // Arithmetic and bitwise operators, also over truth values.
+            join(&[&["("], &x, &["+", "1", ")"]]),
+            join(&[&["("], &x, &["&", "1", ")"]]),
+            join(&[&["("], &compare, &["+"], &compare, &[")"]]),
+            join(&[&["(", "~"], &compare, &[")"]]),
+            // A cast to another type.
+            join(&[&["(", "(", "int", ")"], &compare, &[")"]]),
+            // The operand itself, whose type the caller supplies.
+            x.to_vec(),
+            // A comma or statement expression whose value does not qualify.
+            join(&[&["("], &compare, &[","], &x, &[")"]]),
+            join(&[&["(", "{"], &compare, &[";"], &x, &[";", "}", ")"]]),
+        ] {
+            assert!(!truth(&body), "{body:?}");
+        }
+        // A translated inline function qualifies by its declared `_Bool` result alone.
+        let analysis = analyze(&frontend(&["(", "1", ")"]), "F");
+        let expression = analysis.expression.as_ref().expect("candidate expression");
+        let catalog = DeclarationCatalog::default();
+        let declared = |kind| TypeInfo {
+            category: TypeCategory::Integer(kind),
+            ..resolve_type_info("int", &DeclarationCatalog::default(), &target(64)).unwrap()
+        };
+        assert!(truth_result(&catalog, expression, Some(&declared(IntegerKind::Bool))));
+        assert!(!truth_result(&catalog, expression, Some(&declared(IntegerKind::Int))));
     }
 
     /// Checks constraints occurrences and skips are explicit.

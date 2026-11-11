@@ -47,6 +47,8 @@ macro_rules! HeapTupleGetDatum {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -107,6 +109,8 @@ macro_rules! SRF_FIRSTCALL_INIT {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// Rust callers supply 1 argument: the 0 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
 ///
 /// # Safety
@@ -120,7 +124,7 @@ macro_rules! SRF_FIRSTCALL_INIT {
 macro_rules! SRF_IS_FIRSTCALL {
     ($fcinfo:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$fcinfo;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(

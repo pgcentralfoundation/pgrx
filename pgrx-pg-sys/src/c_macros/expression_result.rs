@@ -10,8 +10,13 @@
 //! extraction is explicit and never repeats operand evaluation. Return helpers
 //! apply C assignment conversion before extraction, including pointer qualifier
 //! and source-proved null-constant rules.
+//!
+//! A macro whose C result the generator proved to be a truth value, `_Bool` or the
+//! `int` zero or one of a comparison or logical operator, returns a Rust `bool`
+//! instead, through [`finish_truth`]. Only its public result changes: as an operand
+//! of another generated macro it still contributes its C type.
 
-use super::{CInteger, CSize, CValue, IntoCValue, expression::*, sealed};
+use super::{CBool, CInt, CInteger, CLong, CSize, CValue, IntoCValue, expression::*, sealed};
 
 /// Native result extraction, including C void, for the sealed value families.
 pub trait NativeResult: CExprValue {
@@ -175,6 +180,17 @@ impl<V: Truth> CExpression<V> {
         self.0.truth()
     }
 }
+/// Convert a scalar result to a Rust condition, as [`CExpression::is_true`] does.
+///
+/// `bool::from` also accepts a `bool`, so `bool::from(NAME!(..))` compiles whether a macro
+/// returns this wrapper or a Rust `bool`. A predicate can change between the two across
+/// PostgreSQL versions, as `PageIsFull` tests a flag bit on PG15 and is a function that
+/// returns `bool` from PG16 on.
+impl<V: Truth> From<CExpression<V>> for bool {
+    fn from(result: CExpression<V>) -> bool {
+        result.is_true()
+    }
+}
 /// Keep this runtime family within crate-owned C capability registration.
 impl<V: CExprValue> sealed::Sealed for CExpression<V> {}
 /// Normalize this admitted input at the public expression boundary while retaining its C family.
@@ -204,6 +220,36 @@ pub fn finish<T: IntoExpression>(value: T) -> CExpression<T::Value> {
 /// evaluates, so an operand that needs `unsafe` still needs it.
 pub fn finish_checked<T: IntoExpression>(_checks: (), value: T) -> CExpression<T::Value> {
     finish(value)
+}
+
+/// The C types of a truth value: `_Bool`, the `int` that C's relational, equality and
+/// logical operators yield, and the `long` of a branch hint over one of those.
+///
+/// The generator returns a Rust `bool` only for a result it proved to be zero or one. This
+/// bound keeps a result of any other C type, such as a pointer or a wider integer, from
+/// reaching [`finish_truth`] if that proof were ever wrong. [`Truth`] seals it.
+pub trait TruthValue: Truth {}
+/// A C `int` result of a comparison or logical operator.
+impl TruthValue for CValue<CInt> {}
+/// A C `_Bool` result.
+impl TruthValue for CValue<CBool> {}
+/// The C `long` that `__builtin_expect` returns for a first operand that is a truth value.
+impl TruthValue for CValue<CLong> {}
+
+/// Return an evaluated C truth value at the public macro boundary as a Rust `bool`, which
+/// is `true` when the C value is nonzero.
+///
+/// Generated macros call this in place of [`finish`] when their C result is `_Bool` or
+/// the `int` zero or one of a comparison or logical operator, so no C identity is lost
+/// that a caller could use.
+pub fn finish_truth<T: IntoExpression<Value: TruthValue>>(value: T) -> bool {
+    value.into_expression().truth()
+}
+
+/// Like [`finish_truth`], for a macro whose dead `checks` borrow caller operands it never
+/// evaluates, so an operand that needs `unsafe` still needs it.
+pub fn finish_truth_checked<T: IntoExpression<Value: TruthValue>>(_checks: (), value: T) -> bool {
+    finish_truth(value)
 }
 
 /// Apply C return assignment conversion to an unambiguous native result type.
@@ -248,6 +294,37 @@ mod tests {
         assert!(!finish(input(0_i32)).is_true());
         assert!(finish(input(true)).is_true());
         assert!(!finish(input(false)).is_true());
+    }
+
+    /// A proved truth value becomes a Rust `bool` without repeating its evaluation: a
+    /// comparison's `int`, a `_Bool`, and a conditional or zero constant of those types.
+    #[test]
+    fn truth_values_finish_as_rust_bool() {
+        let evaluations = core::cell::Cell::new(0);
+        let result: bool = finish_truth(gt(
+            input({
+                evaluations.set(evaluations.get() + 1);
+                7_i32
+            }),
+            input(4_i32),
+        ));
+        assert!(result);
+        assert_eq!(evaluations.get(), 1);
+        assert!(!finish_truth(gt(input(4), input(7))));
+        assert!(finish_truth(input(true)));
+        assert!(!finish_truth(input(false)));
+        assert!(finish_truth_checked((), CValue::<CInt>::new(1)));
+        // One spelling converts a wrapped scalar and a result that is already a `bool`.
+        assert!(bool::from(finish(input(4_i32))));
+        assert!(!bool::from(finish(input(0_i32))));
+        assert!(bool::from(finish_truth(input(true))));
+        assert!(!finish_truth(null_constant(CValue::<CInt>::new(0))));
+        let selected = select(if truth(input(true)) {
+            Either::Left(gt(input(7), input(4)))
+        } else {
+            Either::Right(CValue::<CInt>::new(0))
+        });
+        assert!(finish_truth(selected));
     }
 
     /// C truth treats both signed floating zeros and null pointers as false,

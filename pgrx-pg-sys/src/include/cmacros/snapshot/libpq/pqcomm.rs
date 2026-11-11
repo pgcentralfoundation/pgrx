@@ -251,6 +251,8 @@ macro_rules! PG_PROTOCOL_MINOR {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -262,7 +264,7 @@ macro_rules! PG_PROTOCOL_MINOR {
 macro_rules! is_unixsock_path {
     ($path:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$path;
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::type_witness::<

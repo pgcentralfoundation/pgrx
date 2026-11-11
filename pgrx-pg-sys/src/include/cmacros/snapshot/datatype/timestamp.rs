@@ -9,6 +9,8 @@
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -16,7 +18,7 @@
 macro_rules! INTERVAL_IS_NOBEGIN {
     ($i:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$i;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -37,6 +39,8 @@ macro_rules! INTERVAL_IS_NOBEGIN {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -44,7 +48,7 @@ macro_rules! INTERVAL_IS_NOBEGIN {
 macro_rules! INTERVAL_IS_NOEND {
     ($i:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$i;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -107,6 +111,8 @@ macro_rules! INTERVAL_NOEND {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -114,7 +120,7 @@ macro_rules! INTERVAL_NOEND {
 macro_rules! INTERVAL_NOT_FINITE {
     ($i:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$i;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -134,6 +140,8 @@ macro_rules! INTERVAL_NOT_FINITE {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -145,7 +153,7 @@ macro_rules! INTERVAL_NOT_FINITE {
 macro_rules! IS_VALID_DATE {
     ($d:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$d;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -165,6 +173,8 @@ macro_rules! IS_VALID_DATE {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -172,7 +182,7 @@ macro_rules! IS_VALID_DATE {
 macro_rules! IS_VALID_JULIAN {
     ($y:expr, $m:expr, $d:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$y;
                 let _ = &$m;
                 (
@@ -194,6 +204,8 @@ macro_rules! IS_VALID_JULIAN {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -201,7 +213,7 @@ macro_rules! IS_VALID_JULIAN {
 macro_rules! IS_VALID_TIMESTAMP {
     ($t:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$t;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -222,6 +234,8 @@ macro_rules! IS_VALID_TIMESTAMP {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -233,7 +247,7 @@ macro_rules! IS_VALID_TIMESTAMP {
 macro_rules! IS_VALID_TIMESTAMP {
     ($t:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$t;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -253,6 +267,8 @@ macro_rules! IS_VALID_TIMESTAMP {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -260,7 +276,7 @@ macro_rules! IS_VALID_TIMESTAMP {
 macro_rules! TIMESTAMP_IS_NOBEGIN {
     ($j:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$j;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -280,6 +296,8 @@ macro_rules! TIMESTAMP_IS_NOBEGIN {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -287,7 +305,7 @@ macro_rules! TIMESTAMP_IS_NOBEGIN {
 macro_rules! TIMESTAMP_IS_NOEND {
     ($j:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$j;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -347,6 +365,8 @@ macro_rules! TIMESTAMP_NOEND {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -354,7 +374,7 @@ macro_rules! TIMESTAMP_NOEND {
 macro_rules! TIMESTAMP_NOT_FINITE {
     ($j:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$j;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(

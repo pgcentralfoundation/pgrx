@@ -9,6 +9,8 @@
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 #[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
 ///
 /// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
@@ -26,7 +28,7 @@
 macro_rules! BRIN_IS_META_PAGE {
     ($page:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$page;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -47,6 +49,8 @@ macro_rules! BRIN_IS_META_PAGE {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -58,7 +62,7 @@ macro_rules! BRIN_IS_META_PAGE {
 macro_rules! BRIN_IS_META_PAGE {
     ($page:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$page;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -79,6 +83,8 @@ macro_rules! BRIN_IS_META_PAGE {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 #[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
 ///
 /// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
@@ -96,7 +102,7 @@ macro_rules! BRIN_IS_META_PAGE {
 macro_rules! BRIN_IS_REGULAR_PAGE {
     ($page:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$page;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -117,6 +123,8 @@ macro_rules! BRIN_IS_REGULAR_PAGE {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -128,7 +136,7 @@ macro_rules! BRIN_IS_REGULAR_PAGE {
 macro_rules! BRIN_IS_REGULAR_PAGE {
     ($page:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$page;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -149,6 +157,8 @@ macro_rules! BRIN_IS_REGULAR_PAGE {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 #[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
 ///
 /// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
@@ -166,7 +176,7 @@ macro_rules! BRIN_IS_REGULAR_PAGE {
 macro_rules! BRIN_IS_REVMAP_PAGE {
     ($page:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$page;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -187,6 +197,8 @@ macro_rules! BRIN_IS_REVMAP_PAGE {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -198,7 +210,7 @@ macro_rules! BRIN_IS_REVMAP_PAGE {
 macro_rules! BRIN_IS_REVMAP_PAGE {
     ($page:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$page;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(

@@ -49,6 +49,8 @@ macro_rules! ExpandedRecordGetDatum {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -115,6 +117,8 @@ macro_rules! ExpandedRecordGetRODatum {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -140,6 +144,8 @@ macro_rules! ExpandedRecordGetRODatum {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -147,7 +153,7 @@ macro_rules! ExpandedRecordGetRODatum {
 macro_rules! ExpandedRecordIsDomain {
     ($erh:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$erh;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -167,6 +173,8 @@ macro_rules! ExpandedRecordIsDomain {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -174,7 +182,7 @@ macro_rules! ExpandedRecordIsDomain {
 macro_rules! ExpandedRecordIsEmpty {
     ($erh:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$erh;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -295,6 +303,8 @@ macro_rules! TransferExpandedRecord {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -330,6 +340,8 @@ macro_rules! expanded_record_get_field {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///

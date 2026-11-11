@@ -238,7 +238,7 @@ fn references_and_fallbacks_preserve_original_c_values_types_and_precedence() {
     for name in NAMES {
         rust.push_str(&source(&session, name, &bindings));
     }
-    rust.push_str("fn main() { assert_eq!(REF_HUGE_VALID!(__pgrx_c_macros::CValue::<__pgrx_c_macros::CUnsignedLong>::new(9223372036854775807)).get(), 1); assert_eq!(REF_HUGE_VALID!(__pgrx_c_macros::CValue::<__pgrx_c_macros::CUnsignedLong>::new(9223372036854775808)).get(), 0); assert_eq!(REF_ALIASES!(1_u32).get(), 35); assert_eq!(REF_PRECEDENCE!(5_i32).get(), 7); assert_eq!(REF_ENUM_ADD!(1_i32).get(), 8); assert_eq!(REF_OID_EQUAL!(42_u32).get(), 1); assert!(REF_BOOL_VALUE!().get()); assert_eq!(REF_MIN_VALUE!().get(), i64::MIN); }");
+    rust.push_str("fn main() { assert!(REF_HUGE_VALID!(__pgrx_c_macros::CValue::<__pgrx_c_macros::CUnsignedLong>::new(9223372036854775807))); assert!(!REF_HUGE_VALID!(__pgrx_c_macros::CValue::<__pgrx_c_macros::CUnsignedLong>::new(9223372036854775808))); assert_eq!(REF_ALIASES!(1_u32).get(), 35); assert_eq!(REF_PRECEDENCE!(5_i32).get(), 7); assert_eq!(REF_ENUM_ADD!(1_i32).get(), 8); assert!(REF_OID_EQUAL!(42_u32)); assert!(REF_BOOL_VALUE!()); assert_eq!(REF_MIN_VALUE!().get(), i64::MIN); }");
     rust_oracle::run_rust(&rust);
     // Compile the independently resolved fallback, with deliberately absent Rust
     // symbols, to prove that an unavailable binding cannot affect its value.
@@ -246,7 +246,7 @@ fn references_and_fallbacks_preserve_original_c_values_types_and_precedence() {
     let shared =
         shared_support(&session, &["REF_HUGE_VALID", "REF_ENUM_ADD"], &BindingCatalog::default());
     let rust = format!(
-        "#[path = {support:?}] pub mod __pgrx_c_macros;\n{shared}\n{missing_huge}\n{missing}\nfn main() {{ assert_eq!(REF_HUGE_VALID!(__pgrx_c_macros::CValue::<__pgrx_c_macros::CUnsignedLong>::new(9223372036854775807)).get(), 1); assert_eq!(REF_HUGE_VALID!(__pgrx_c_macros::CValue::<__pgrx_c_macros::CUnsignedLong>::new(9223372036854775808)).get(), 0); assert_eq!(REF_ENUM_ADD!(1_i32).get(), 8); }}"
+        "#[path = {support:?}] pub mod __pgrx_c_macros;\n{shared}\n{missing_huge}\n{missing}\nfn main() {{ assert!(REF_HUGE_VALID!(__pgrx_c_macros::CValue::<__pgrx_c_macros::CUnsignedLong>::new(9223372036854775807))); assert!(!REF_HUGE_VALID!(__pgrx_c_macros::CValue::<__pgrx_c_macros::CUnsignedLong>::new(9223372036854775808))); assert_eq!(REF_ENUM_ADD!(1_i32).get(), 8); }}"
     );
     rust_oracle::run_rust(&rust);
     oracle::run_c(

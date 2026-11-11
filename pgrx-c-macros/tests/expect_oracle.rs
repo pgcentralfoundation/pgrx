@@ -305,11 +305,11 @@ fn observations(result:i64) {
 fn main() {
     for value in [-2147483647_i64,-2,-1,0,1,7,2147483647] {
         let value=long(value);
-        println!("{} {} {} {} {} {} {} {} {} {} {}",EXPECT_RAW!(value,-9).get(),EXPECT_GROUPED!(value,1).get(),EXPECT_NESTED!(value).get(),EXPECT_LIKELY!(value).get(),EXPECT_UNLIKELY!(value).get(),EXPECT_RAW_SEVEN!(value).get(),EXPECT_NESTED_SEVEN!(value).get(),EXPECT_AND_ONE!(1,value).get(),EXPECT_LAZY_ZERO!(1,value).get(),EXPECT_DELEGATED_SEVEN!(value).get(),EXPECT_DELEGATED_NESTED!(value).get());
+        println!("{} {} {} {} {} {} {} {} {} {} {}",EXPECT_RAW!(value,-9).get(),EXPECT_GROUPED!(value,1).get(),EXPECT_NESTED!(value).get(),EXPECT_LIKELY!(@__pgrx_c_value; value).get(),EXPECT_UNLIKELY!(@__pgrx_c_value; value).get(),EXPECT_RAW_SEVEN!(value).get(),EXPECT_NESTED_SEVEN!(value).get(),i32::from(EXPECT_AND_ONE!(1,value)),EXPECT_LAZY_ZERO!(1,value).get(),EXPECT_DELEGATED_SEVEN!(value).get(),EXPECT_DELEGATED_NESTED!(value).get());
     }
     for value in [0_i64,7,-1,0x100000000,i64::MIN,i64::MAX] {
         let value=long(value);
-        println!("{} {} {} {} {} {}",EXPECT_NESTED_LONG_LONG!(value).get(),EXPECT_NESTED_UNSIGNED_LONG!(value).get(),EXPECT_NESTED_INT128!(value).get(),EXPECT_NESTED_INT!(value).get(),EXPECT_NESTED_BOOL!(value).get(),EXPECT_NESTED_DYNAMIC!(value,long(if value.get()!=0 {17} else {-3})).get());
+        println!("{} {} {} {} {} {}",EXPECT_NESTED_LONG_LONG!(value).get(),EXPECT_NESTED_UNSIGNED_LONG!(value).get(),EXPECT_NESTED_INT128!(value).get(),EXPECT_NESTED_INT!(value).get(),EXPECT_NESTED_BOOL!(@__pgrx_c_value; value).get(),EXPECT_NESTED_DYNAMIC!(value,long(if value.get()!=0 {17} else {-3})).get());
     }
     for value in [-123.75_f64,-0.0,0.0,0.75,1.75,123.75] {
         println!("{} {}",EXPECT_RAW!(value,-3.75_f64).get(),EXPECT_RAW!(value as f32,2.5_f32).get());
@@ -319,8 +319,8 @@ fn main() {
         let ull=__pgrx_c_macros::CValue::<__pgrx_c_macros::CUnsignedLongLong>::new(value);
         println!("{} {}",EXPECT_RAW!(ulong,0).get(),EXPECT_RAW!(ull,0).get());
     }
-    let raw=EXPECT_RAW!(0,1); let likely=EXPECT_LIKELY!(7);
-    println!("{} {} {} {}",rank(raw.into_value()),core::mem::size_of_val(&raw.get()),rank(likely.into_value()),core::mem::size_of_val(&likely.get()));
+    let raw=EXPECT_RAW!(0,1); let likely=EXPECT_LIKELY!(@__pgrx_c_value; 7);
+    println!("{} {} {} {}",rank(raw.into_value()),core::mem::size_of_val(&raw.get()),rank(likely),core::mem::size_of_val(&likely.get()));
     // SAFETY: native callbacks access only initialized scalar state owned by
     // this single-threaded executable. Their complete C function executions
     // are sequenced, so tracing their order does not introduce unsequenced C
@@ -361,9 +361,9 @@ fn main() {
         assert_eq!((value_calls,hint_calls),(0,0),"sizeof must suppress both operands");
         observations(EXPECT_UNUSED!(expect_record_value(31)).get());
         observations(EXPECT_LAZY!(0,long(expect_record_value(13)),long(expect_record_hint(1))).get());
-        observations(EXPECT_AND!(0,long(expect_record_value(13)),long(expect_record_hint(1))).get().into());
+        observations(i32::from(EXPECT_AND!(0,long(expect_record_value(13)),long(expect_record_hint(1)))).into());
         observations(EXPECT_LAZY!(1,long(expect_record_value(13)),long(expect_record_hint(1))).get());
-        observations(EXPECT_AND!(1,long(expect_record_value(13)),long(expect_record_hint(1))).get().into());
+        observations(i32::from(EXPECT_AND!(1,long(expect_record_value(13)),long(expect_record_hint(1)))).into());
         println!("{} {}",EXPECT_PROFILE!(7).get(),EXPECT_ZERO!().get());
         let mut object=31_i32; let pointer=&raw mut object;
         let absent:*mut i32=EXPECT_NULL_SELECT!(1,pointer).get();
@@ -528,7 +528,7 @@ const RUST_CODEGEN: &str = r#"
 pub unsafe extern "C" fn expect_codegen_likely(value:core::ffi::c_int) {
     // SAFETY: the caller guarantees the opaque sinks' scalar-only C contracts.
     unsafe {
-        if EXPECT_LIKELY!(value).get()!=0 { expect_branch_yes(1); } else { expect_branch_no(1); }
+        if EXPECT_LIKELY!(value) { expect_branch_yes(1); } else { expect_branch_no(1); }
     }
 }
 /// # Safety
@@ -538,7 +538,7 @@ pub unsafe extern "C" fn expect_codegen_likely(value:core::ffi::c_int) {
 pub unsafe extern "C" fn expect_codegen_unlikely(value:core::ffi::c_int) {
     // SAFETY: the caller guarantees the opaque sinks' scalar-only C contracts.
     unsafe {
-        if EXPECT_UNLIKELY!(value).get()!=0 { expect_branch_yes(2); } else { expect_branch_no(2); }
+        if EXPECT_UNLIKELY!(value) { expect_branch_yes(2); } else { expect_branch_no(2); }
     }
 }
 /// # Safety
@@ -559,7 +559,7 @@ pub unsafe extern "C" fn expect_codegen_raw(value:core::ffi::c_long) {
 pub unsafe extern "C" fn expect_codegen_negated(value:core::ffi::c_int) {
     // SAFETY: the caller guarantees the opaque sinks' scalar-only C contracts.
     unsafe {
-        if EXPECT_LIKELY!(value).get()==0 { expect_branch_yes(4); } else { expect_branch_no(4); }
+        if !EXPECT_LIKELY!(value) { expect_branch_yes(4); } else { expect_branch_no(4); }
     }
 }
 /// # Safety
@@ -579,7 +579,7 @@ pub unsafe extern "C" fn expect_codegen_interrupts() {
 pub unsafe extern "C" fn expect_codegen_and(guard:core::ffi::c_int) {
     // SAFETY: the caller guarantees all opaque callees' scalar-only C contracts.
     unsafe {
-        if EXPECT_AND_ONE!(guard,__pgrx_c_macros::CValue::<__pgrx_c_macros::CLong>::new(expect_branch_gate())).get()!=0 {
+        if EXPECT_AND_ONE!(guard,__pgrx_c_macros::CValue::<__pgrx_c_macros::CLong>::new(expect_branch_gate())) {
             expect_branch_yes(6);
         } else {
             expect_branch_no(6);
@@ -720,7 +720,7 @@ pub unsafe extern "C" fn expect_codegen_nested_bool(value:core::ffi::c_long) {
     let value=__pgrx_c_macros::CValue::<__pgrx_c_macros::CLong>::new(value);
     // SAFETY: the caller guarantees the opaque sinks' scalar-only C contracts.
     unsafe {
-        if EXPECT_NESTED_BOOL!(value).get()==0 { expect_branch_yes(18); } else { expect_branch_no(18); }
+        if !EXPECT_NESTED_BOOL!(value) { expect_branch_yes(18); } else { expect_branch_no(18); }
     }
 }
 /// # Safety

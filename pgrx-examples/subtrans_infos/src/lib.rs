@@ -85,7 +85,7 @@ unsafe fn get_top_parent_xid(xid: TransactionId) -> (Option<TransactionId>, Opti
     let mut sub_level: i32 = -1;
 
     // Traverse the subtransaction hierarchy
-    while pg_sys::TransactionIdIsValid!(parent_xid).get() != 0 {
+    while pg_sys::TransactionIdIsValid!(parent_xid) {
         previous_xid = parent_xid;
 
         // Safety check: don't call SubTransGetParent on transactions older than TransactionXmin
@@ -99,7 +99,7 @@ unsafe fn get_top_parent_xid(xid: TransactionId) -> (Option<TransactionId>, Opti
         parent_xid = unsafe { pg_sys::SubTransGetParent(parent_xid) };
         sub_level += 1;
 
-        if pg_sys::TransactionIdIsValid!(parent_xid).get() == 0 {
+        if !pg_sys::TransactionIdIsValid!(parent_xid) {
             break;
         }
 
@@ -145,12 +145,12 @@ unsafe fn transaction_id_in_recent_past(
     };
 
     // Basic validation - invalid transaction IDs are not accessible
-    if pg_sys::TransactionIdIsValid!(xid).get() == 0 {
+    if !pg_sys::TransactionIdIsValid!(xid) {
         return Err("invalid transaction ID");
     }
 
     // Special transaction IDs (bootstrap, frozen) are always accessible but don't need CLOG
-    if pg_sys::TransactionIdIsNormal!(xid).get() == 0 {
+    if !pg_sys::TransactionIdIsNormal!(xid) {
         return Ok(xid);
     }
 
@@ -181,7 +181,7 @@ unsafe fn transaction_id_in_recent_past(
     // Check if the transaction ID is in the future - this is an error
     // For PostgreSQL 14+, we can compare FullTransactionId values directly
     // SAFETY: both owned records contain initialized value fields.
-    if unsafe { pg_sys::FullTransactionIdFollowsOrEquals!(full_xid, now_fullxid).get() } != 0 {
+    if unsafe { pg_sys::FullTransactionIdFollowsOrEquals!(full_xid, now_fullxid) } {
         return Err("transaction ID is in the future");
     }
 
@@ -310,7 +310,7 @@ unsafe fn subtrans_infos(
     // SAFETY: validation established accessible status data under our lock.
     let (status, commit_timestamp) = unsafe { get_transaction_status(xid) };
 
-    let parent_xid_result = if pg_sys::TransactionIdIsValid!(parent_xid).get() != 0 {
+    let parent_xid_result = if pg_sys::TransactionIdIsValid!(parent_xid) {
         Some(transaction_id_to_i32(parent_xid))
     } else {
         None
@@ -368,7 +368,7 @@ mod unit_tests {
     fn generated_transaction_ids_reject_only_the_invalid_id() {
         for (bits, valid) in [(0_u32, false), (1, true), (2, true), (3, true), (u32::MAX, true)] {
             let xid = pg_sys::TransactionId::from(bits);
-            assert_eq!(pg_sys::TransactionIdIsValid!(xid).get() != 0, valid);
+            assert_eq!(pg_sys::TransactionIdIsValid!(xid), valid);
         }
     }
 

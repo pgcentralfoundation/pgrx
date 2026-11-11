@@ -260,8 +260,6 @@ pub mod __pgrx_c_types {
     pub type r#__kernel_uid_t = crate::__pgrx_c_macros::CUnsignedInt;
     /// Preserve the compiler-established rank and width of C `__kernel_ulong_t`.
     pub type r#__kernel_ulong_t = crate::__pgrx_c_macros::CUnsignedLong;
-    /// Preserve the compiler-established rank and width of C `__kernel_uoff_t`.
-    pub type r#__kernel_uoff_t = crate::__pgrx_c_macros::CUnsignedLongLong;
     /// Preserve the compiler-established rank and width of C `__key_t`.
     pub type r#__key_t = crate::__pgrx_c_macros::CInt;
     /// Preserve the compiler-established rank and width of C `__le16`.
@@ -603,15 +601,6 @@ pub mod __pgrx_c_types {
     #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
     /// Preserve the compiler-established rank and width of C `UChar32`.
     pub type r#UChar32 = crate::__pgrx_c_macros::CInt;
-    #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-    /// Preserve the compiler-established rank and width of C `char16_t`.
-    pub type r#char16_t = crate::__pgrx_c_macros::CUnsignedShort;
-    #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-    /// Preserve the compiler-established rank and width of C `char32_t`.
-    pub type r#char32_t = crate::__pgrx_c_macros::CUnsignedInt;
-    #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-    /// Preserve the compiler-established rank and width of C `char8_t`.
-    pub type r#char8_t = crate::__pgrx_c_macros::CUnsignedChar;
     #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
     /// Preserve the compiler-established rank and width of C `ParseLoc`.
     pub type r#ParseLoc = crate::__pgrx_c_macros::CInt;
@@ -639,6 +628,12 @@ pub mod __pgrx_c_types {
     #[cfg(feature = "pg19")]
     /// Preserve the compiler-established rank and width of C `ReplOriginId`.
     pub type r#ReplOriginId = crate::__pgrx_c_macros::CUnsignedShort;
+    #[cfg(feature = "pg19")]
+    /// Preserve the compiler-established rank and width of C `char16_t`.
+    pub type r#char16_t = crate::__pgrx_c_macros::CUnsignedShort;
+    #[cfg(feature = "pg19")]
+    /// Preserve the compiler-established rank and width of C `char32_t`.
+    pub type r#char32_t = crate::__pgrx_c_macros::CUnsignedInt;
     #[cfg(feature = "pg19")]
     /// Preserve the compiler-established rank and width of C `pgoff_t`.
     pub type r#pgoff_t = crate::__pgrx_c_macros::CLong;
@@ -1077,5 +1072,124 @@ macro_rules! __pgrx_c_operand {
     };
     ($($invalid:tt)*) => {
         ::core::compile_error!("invalid C macro operand context")
+    };
+}
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_type_name_T_ {
+    (@type [$callback:ident] $state:tt; $($raw:tt)*) => {
+        $crate::__pgrx_c_type_name_T_!(
+            @walk [$callback] $state [$($raw)*] [] [
+                @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
+            ];
+            $($raw)*
+        )
+    };
+    (
+        @walk [$callback:ident] [$next:ident $plain:ident $mode:ident [$($done:tt)*]] $original:tt [
+            $($path:tt)*
+        ] $budget:tt;
+        DistinctExpr
+    ) => {
+        $crate::$callback!(
+            @$next $mode [
+                $($done)* $crate::__pgrx_c_generated::type_names_T_::DistinctExpr<
+                    $($path)* DistinctExpr
+                >,
+            ];
+        )
+    };
+    (
+        @walk [$callback:ident] [$next:ident $plain:ident $mode:ident [$($done:tt)*]] $original:tt [
+            $($path:tt)*
+        ] $budget:tt;
+        DistinctExpr,
+        $($rest:tt)*
+    ) => {
+        $crate::$callback!(
+            @$next $mode [
+                $($done)* $crate::__pgrx_c_generated::type_names_T_::DistinctExpr<
+                    $($path)* DistinctExpr
+                >,
+            ];
+            $($rest)*
+        )
+    };
+    (
+        @walk [$callback:ident] [$next:ident $plain:ident $mode:ident [$($done:tt)*]] $original:tt [
+            $($path:tt)*
+        ] $budget:tt;
+        NullIfExpr
+    ) => {
+        $crate::$callback!(
+            @$next $mode [
+                $($done)* $crate::__pgrx_c_generated::type_names_T_::NullIfExpr<
+                    $($path)* NullIfExpr
+                >,
+            ];
+        )
+    };
+    (
+        @walk [$callback:ident] [$next:ident $plain:ident $mode:ident [$($done:tt)*]] $original:tt [
+            $($path:tt)*
+        ] $budget:tt;
+        NullIfExpr,
+        $($rest:tt)*
+    ) => {
+        $crate::$callback!(
+            @$next $mode [
+                $($done)* $crate::__pgrx_c_generated::type_names_T_::NullIfExpr<
+                    $($path)* NullIfExpr
+                >,
+            ];
+            $($rest)*
+        )
+    };
+    (
+        @walk [$callback:ident] [$next:ident $plain:ident $mode:ident [$($done:tt)*]] $original:tt [
+            $($path:tt)*
+        ] $budget:tt;
+        OpExpr
+    ) => {
+        $crate::$callback!(
+            @$next $mode [
+                $($done)* $crate::__pgrx_c_generated::type_names_T_::OpExpr<$($path)* OpExpr>,
+            ];
+        )
+    };
+    (
+        @walk [$callback:ident] [$next:ident $plain:ident $mode:ident [$($done:tt)*]] $original:tt [
+            $($path:tt)*
+        ] $budget:tt;
+        OpExpr,
+        $($rest:tt)*
+    ) => {
+        $crate::$callback!(
+            @$next $mode [
+                $($done)* $crate::__pgrx_c_generated::type_names_T_::OpExpr<$($path)* OpExpr>,
+            ];
+            $($rest)*
+        )
+    };
+    (@walk [$callback:ident] $state:tt $original:tt [] [@ $($budget:tt)*]; :: $($rest:tt)+) => {
+        $crate::__pgrx_c_type_name_T_!(
+            @walk [$callback] $state $original [::] [$($budget)*];
+            $($rest)+
+        )
+    };
+    (
+        @walk [$callback:ident] $state:tt $original:tt [$($path:tt)*] [@ $($budget:tt)*];
+        $segment:ident :: $($rest:tt)+
+    ) => {
+        $crate::__pgrx_c_type_name_T_!(
+            @walk [$callback] $state $original [$($path)* $segment ::] [$($budget)*];
+            $($rest)+
+        )
+    };
+    (
+        @walk [$callback:ident] [$next:ident $plain:ident $mode:ident $done:tt] [$($original:tt)*] $path:tt $budget:tt;
+        $($other:tt)*
+    ) => {
+        $crate::$callback!(@$plain $mode $done; $($original)*)
     };
 }

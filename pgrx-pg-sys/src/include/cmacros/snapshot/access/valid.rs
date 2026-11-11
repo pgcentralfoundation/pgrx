@@ -40,6 +40,8 @@
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -51,7 +53,7 @@
 macro_rules! HeapKeyTest {
     ($tuple:expr, $tupdesc:expr, $nkeys:expr, $keys:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$tuple;
                 let _ = &$tupdesc;
                 let _ = &$nkeys;

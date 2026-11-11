@@ -9,6 +9,8 @@
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -16,7 +18,7 @@
 macro_rules! AmArchiverProcess {
     () => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::type_witness::<
@@ -36,6 +38,8 @@ macro_rules! AmArchiverProcess {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -43,7 +47,7 @@ macro_rules! AmArchiverProcess {
 macro_rules! AmArchiverProcess {
     () => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::type_witness::<
@@ -63,6 +67,8 @@ macro_rules! AmArchiverProcess {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -70,7 +76,7 @@ macro_rules! AmArchiverProcess {
 macro_rules! AmAutoVacuumLauncherProcess {
     () => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::type_witness::<
@@ -90,6 +96,8 @@ macro_rules! AmAutoVacuumLauncherProcess {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -97,7 +105,7 @@ macro_rules! AmAutoVacuumLauncherProcess {
 macro_rules! AmAutoVacuumWorkerProcess {
     () => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::type_witness::<
@@ -117,6 +125,8 @@ macro_rules! AmAutoVacuumWorkerProcess {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -124,7 +134,7 @@ macro_rules! AmAutoVacuumWorkerProcess {
 macro_rules! AmBackgroundWorkerProcess {
     () => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::type_witness::<
@@ -144,6 +154,8 @@ macro_rules! AmBackgroundWorkerProcess {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -151,7 +163,7 @@ macro_rules! AmBackgroundWorkerProcess {
 macro_rules! AmBackgroundWriterProcess {
     () => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::type_witness::<
@@ -171,6 +183,8 @@ macro_rules! AmBackgroundWriterProcess {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -178,7 +192,7 @@ macro_rules! AmBackgroundWriterProcess {
 macro_rules! AmBackgroundWriterProcess {
     () => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::type_witness::<
@@ -198,6 +212,8 @@ macro_rules! AmBackgroundWriterProcess {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -205,7 +221,7 @@ macro_rules! AmBackgroundWriterProcess {
 macro_rules! AmCheckpointerProcess {
     () => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::type_witness::<
@@ -225,6 +241,8 @@ macro_rules! AmCheckpointerProcess {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -232,7 +250,7 @@ macro_rules! AmCheckpointerProcess {
 macro_rules! AmCheckpointerProcess {
     () => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::type_witness::<
@@ -252,6 +270,8 @@ macro_rules! AmCheckpointerProcess {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -259,7 +279,7 @@ macro_rules! AmCheckpointerProcess {
 macro_rules! AmIoWorkerProcess {
     () => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::type_witness::<
@@ -279,6 +299,8 @@ macro_rules! AmIoWorkerProcess {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -286,7 +308,7 @@ macro_rules! AmIoWorkerProcess {
 macro_rules! AmLogicalSlotSyncWorkerProcess {
     () => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::type_witness::<
@@ -305,6 +327,8 @@ macro_rules! AmLogicalSlotSyncWorkerProcess {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -312,7 +336,7 @@ macro_rules! AmLogicalSlotSyncWorkerProcess {
 macro_rules! AmRegularBackendProcess {
     () => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::type_witness::<
@@ -332,6 +356,8 @@ macro_rules! AmRegularBackendProcess {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -339,7 +365,7 @@ macro_rules! AmRegularBackendProcess {
 macro_rules! AmSpecialWorkerProcess {
     () => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::type_witness::<
@@ -359,6 +385,8 @@ macro_rules! AmSpecialWorkerProcess {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -366,7 +394,7 @@ macro_rules! AmSpecialWorkerProcess {
 macro_rules! AmStartupProcess {
     () => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::type_witness::<
@@ -386,6 +414,8 @@ macro_rules! AmStartupProcess {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -393,7 +423,7 @@ macro_rules! AmStartupProcess {
 macro_rules! AmStartupProcess {
     () => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::type_witness::<
@@ -413,6 +443,8 @@ macro_rules! AmStartupProcess {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -420,7 +452,7 @@ macro_rules! AmStartupProcess {
 macro_rules! AmWalReceiverProcess {
     () => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::type_witness::<
@@ -440,6 +472,8 @@ macro_rules! AmWalReceiverProcess {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -447,7 +481,7 @@ macro_rules! AmWalReceiverProcess {
 macro_rules! AmWalReceiverProcess {
     () => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::type_witness::<
@@ -467,6 +501,8 @@ macro_rules! AmWalReceiverProcess {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -474,7 +510,7 @@ macro_rules! AmWalReceiverProcess {
 macro_rules! AmWalSenderProcess {
     () => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::type_witness::<
@@ -494,6 +530,8 @@ macro_rules! AmWalSenderProcess {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -501,7 +539,7 @@ macro_rules! AmWalSenderProcess {
 macro_rules! AmWalSummarizerProcess {
     () => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::type_witness::<
@@ -521,6 +559,8 @@ macro_rules! AmWalSummarizerProcess {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -528,7 +568,7 @@ macro_rules! AmWalSummarizerProcess {
 macro_rules! AmWalWriterProcess {
     () => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::type_witness::<
@@ -548,6 +588,8 @@ macro_rules! AmWalWriterProcess {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -555,7 +597,7 @@ macro_rules! AmWalWriterProcess {
 macro_rules! AmWalWriterProcess {
     () => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::type_witness::<
@@ -749,6 +791,8 @@ macro_rules! HOLD_INTERRUPTS {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -756,7 +800,7 @@ macro_rules! HOLD_INTERRUPTS {
 macro_rules! INTERRUPTS_CAN_BE_PROCESSED {
     () => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::type_witness::<
@@ -775,6 +819,8 @@ macro_rules! INTERRUPTS_CAN_BE_PROCESSED {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -786,7 +832,7 @@ macro_rules! INTERRUPTS_CAN_BE_PROCESSED {
 macro_rules! INTERRUPTS_PENDING_CONDITION {
     () => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::type_witness::<
@@ -805,6 +851,8 @@ macro_rules! INTERRUPTS_PENDING_CONDITION {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -812,7 +860,7 @@ macro_rules! INTERRUPTS_PENDING_CONDITION {
 macro_rules! IsBootstrapProcessingMode {
     () => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::type_witness::<
@@ -832,6 +880,8 @@ macro_rules! IsBootstrapProcessingMode {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -839,7 +889,7 @@ macro_rules! IsBootstrapProcessingMode {
 macro_rules! IsExternalConnectionBackend {
     ($backend_type:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$backend_type;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -859,6 +909,8 @@ macro_rules! IsExternalConnectionBackend {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -866,7 +918,7 @@ macro_rules! IsExternalConnectionBackend {
 macro_rules! IsInitProcessingMode {
     () => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::type_witness::<
@@ -885,6 +937,8 @@ macro_rules! IsInitProcessingMode {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -892,7 +946,7 @@ macro_rules! IsInitProcessingMode {
 macro_rules! IsNormalProcessingMode {
     () => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::type_witness::<

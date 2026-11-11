@@ -94,15 +94,19 @@ fn main() {
     record("nested", value, trace.get(), calls.get());
     reset();
     let atomic_value = 16_i32;
-    let value = EXPR_ATOMIC_POW2!(atomic_value);
+    // The macro is a logical `&&`, so its public result is a Rust `bool`. Its value arm
+    // keeps the C `int` that the original yields, which these records compare.
+    let truth: bool = EXPR_ATOMIC_POW2!(atomic_value);
+    assert!(truth);
+    let value = EXPR_ATOMIC_POW2!(@__pgrx_c_value; atomic_value);
     record("atomic_identifier", value, trace.get(), calls.get());
-    let value = EXPR_ATOMIC_POW2!(15_i32);
+    let value = EXPR_ATOMIC_POW2!(@__pgrx_c_value; 15_i32);
     record("atomic_literal", value, trace.get(), calls.get());
-    let value = EXPR_ATOMIC_POW2!((1_i32 + 3_i32));
+    let value = EXPR_ATOMIC_POW2!(@__pgrx_c_value; (1_i32 + 3_i32));
     record("atomic_parenthesized", value, trace.get(), calls.get());
-    let value = EXPR_ATOMIC_POW2!((-1_i32));
+    let value = EXPR_ATOMIC_POW2!(@__pgrx_c_value; (-1_i32));
     record("atomic_signed_parenthesized", value, trace.get(), calls.get());
-    let value = EXPR_ATOMIC_POW2!(0x80000000_u32);
+    let value = EXPR_ATOMIC_POW2!(@__pgrx_c_value; 0x80000000_u32);
     record("atomic_unsigned", value, trace.get(), calls.get());
     reset();
     let value = EXPR_STATEMENT!(tick(4, 7));

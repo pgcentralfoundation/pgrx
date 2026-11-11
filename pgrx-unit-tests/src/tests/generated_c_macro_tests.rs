@@ -206,8 +206,8 @@ mod tests {
     /// check calls it.
     #[pg_test]
     fn generated_buffer_checks_read_globals_without_unsafe() {
-        assert!(!pg::BufferIsValid!(0_i32).is_true());
-        assert!(pg::BufferIsValid!(1_i32).is_true());
+        assert!(!pg::BufferIsValid!(0_i32));
+        assert!(pg::BufferIsValid!(1_i32));
         assert_eq!(pg::BufferGetPageSize!(1_i32).get(), u64::from(pg::BLCKSZ));
     }
 
@@ -253,8 +253,8 @@ mod tests {
             let query: *mut pg::Query = pg::makeNode!(pg::Query).get();
             let node = query.cast::<pg::Node>();
             assert_eq!(pg::nodeTag!(node).get(), pg::NodeTag::T_Query as u32);
-            assert!(pg::IsA!(node, pg::Query).is_true());
-            assert!(!pg::IsA!(node, pg::List).is_true());
+            assert!(pg::IsA!(node, pg::Query));
+            assert!(!pg::IsA!(node, pg::List));
             let cast: *mut pg::Query = pg::castNode!(pg::Query, node).get();
             assert_eq!(cast, query);
             assert!(!(*query).canSetTag && (*query).rtable.is_null());
@@ -283,9 +283,9 @@ mod tests {
             );
             for (index, node) in [op, distinct, null_if].into_iter().enumerate() {
                 let is = [
-                    pg::IsA!(node, pg::OpExpr).is_true(),
-                    pg::IsA!(node, pg::DistinctExpr).is_true(),
-                    pg::IsA!(node, pg::NullIfExpr).is_true(),
+                    pg::IsA!(node, pg::OpExpr),
+                    pg::IsA!(node, pg::DistinctExpr),
+                    pg::IsA!(node, pg::NullIfExpr),
                 ];
                 assert_eq!(is, [index == 0, index == 1, index == 2]);
             }
@@ -335,8 +335,8 @@ mod tests {
             // A null pointer has no tag to check.
             let null = core::ptr::null_mut::<pg::Node>();
             assert!(pg::castNode!(pg::Integer, null).get().is_null());
-            assert!(pg::IsA!(last, pg::String).is_true());
-            assert!(!pg::IsA!(last, pg::Integer).is_true());
+            assert!(pg::IsA!(last, pg::String));
+            assert!(!pg::IsA!(last, pg::Integer));
             pg::list_free_deep(list);
         }
     }
@@ -355,11 +355,11 @@ mod tests {
                 let constant = pg::makeBoolConst(expected, false);
                 let qual = pg::lappend(core::ptr::null_mut(), constant.cast());
                 let state = pg::ExecInitQual(qual, core::ptr::null_mut());
-                assert_eq!(pg::ExecQual!(state, econtext).get(), expected);
+                assert_eq!(pg::ExecQual!(state, econtext), expected);
             }
             // An empty qual has no state and is true.
             let empty = core::ptr::null_mut::<pg::ExprState>();
-            assert!(pg::ExecQual!(empty, econtext).get());
+            assert!(pg::ExecQual!(empty, econtext));
             pg::FreeExprContext(econtext, true);
         }
     }
@@ -399,9 +399,7 @@ mod tests {
     /// backend thread, and panics before reading it on any other thread.
     #[pg_test]
     fn generated_interrupt_condition_checks_the_thread() {
-        let pending = || {
-            pg::__pgrx_c_macros::expression::truth(pg::INTERRUPTS_PENDING_CONDITION!().into_value())
-        };
+        let pending = || -> bool { pg::INTERRUPTS_PENDING_CONDITION!() };
         // The first checked call claims its thread as the one allowed to read PostgreSQL's
         // globals, so this one must come before the read on another thread.
         pending();

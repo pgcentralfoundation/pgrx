@@ -8,6 +8,8 @@
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -15,7 +17,7 @@
 macro_rules! XLogRecPtrIsInvalid {
     ($r:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$r;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -35,6 +37,8 @@ macro_rules! XLogRecPtrIsInvalid {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -42,7 +46,7 @@ macro_rules! XLogRecPtrIsInvalid {
 macro_rules! XLogRecPtrIsValid {
     ($r:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$r;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(

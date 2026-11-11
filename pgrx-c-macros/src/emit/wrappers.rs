@@ -193,13 +193,15 @@ fn function(
         arguments.push(local);
     }
     let arguments = arguments.join(", ");
-    // The public arm finishes the value arm's result, so the shared entry is finished too.
-    let call = match thread_check {
-        Check::Shared(_) => format!(
-            "{SUPPORT}::expression_result::finish($crate::{function_name}!(@{SHARED_ENTRY} [{THREAD}]; {arguments}))"
-        ),
-        Check::None | Check::Own(_) => format!("$crate::{function_name}!({arguments})"),
+    // The function returns the C value, which the public arm may have turned into a Rust
+    // `bool`, so each form enters a value arm and finishes its result here.
+    let entry = match thread_check {
+        Check::Shared(_) => format!("@{SHARED_ENTRY} [{THREAD}]"),
+        Check::None | Check::Own(_) => "@__pgrx_c_value".to_owned(),
     };
+    let call = format!(
+        "{SUPPORT}::expression_result::finish($crate::{function_name}!({entry}; {arguments}))"
+    );
     let (output, evaluation) = if signature.result.category == TypeCategory::Void {
         if binding.result != RustBindingType::Unit {
             return Err("binding returns a value from a void C function".into());

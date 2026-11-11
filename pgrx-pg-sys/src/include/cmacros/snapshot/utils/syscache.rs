@@ -439,6 +439,8 @@ macro_rules! SearchSysCacheCopy4 {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -450,7 +452,7 @@ macro_rules! SearchSysCacheCopy4 {
 macro_rules! SearchSysCacheExists1 {
     ($cacheId:expr, $key1:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$cacheId;
                 let _ = &$key1;
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -469,6 +471,8 @@ macro_rules! SearchSysCacheExists1 {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -480,7 +484,7 @@ macro_rules! SearchSysCacheExists1 {
 macro_rules! SearchSysCacheExists2 {
     ($cacheId:expr, $key1:expr, $key2:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$cacheId;
                 let _ = &$key1;
                 let _ = &$key2;
@@ -500,6 +504,8 @@ macro_rules! SearchSysCacheExists2 {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -511,7 +517,7 @@ macro_rules! SearchSysCacheExists2 {
 macro_rules! SearchSysCacheExists3 {
     ($cacheId:expr, $key1:expr, $key2:expr, $key3:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$cacheId;
                 let _ = &$key1;
                 let _ = &$key2;
@@ -532,6 +538,8 @@ macro_rules! SearchSysCacheExists3 {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -543,7 +551,7 @@ macro_rules! SearchSysCacheExists3 {
 macro_rules! SearchSysCacheExists4 {
     ($cacheId:expr, $key1:expr, $key2:expr, $key3:expr, $key4:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$cacheId;
                 let _ = &$key1;
                 let _ = &$key2;

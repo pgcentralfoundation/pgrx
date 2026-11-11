@@ -207,22 +207,22 @@ pub struct TriggerEvent(u32);
 impl TriggerEvent {
     #[inline]
     pub fn fired_by_insert(&self) -> bool {
-        pg_sys::TRIGGER_FIRED_BY_INSERT!(self.0).get() != 0
+        pg_sys::TRIGGER_FIRED_BY_INSERT!(self.0)
     }
 
     #[inline]
     pub fn fired_by_delete(&self) -> bool {
-        pg_sys::TRIGGER_FIRED_BY_DELETE!(self.0).get() != 0
+        pg_sys::TRIGGER_FIRED_BY_DELETE!(self.0)
     }
 
     #[inline]
     pub fn fired_by_update(&self) -> bool {
-        pg_sys::TRIGGER_FIRED_BY_UPDATE!(self.0).get() != 0
+        pg_sys::TRIGGER_FIRED_BY_UPDATE!(self.0)
     }
 
     #[inline]
     pub fn fired_by_truncate(&self) -> bool {
-        pg_sys::TRIGGER_FIRED_BY_TRUNCATE!(self.0).get() != 0
+        pg_sys::TRIGGER_FIRED_BY_TRUNCATE!(self.0)
     }
 
     #[inline]
@@ -232,21 +232,21 @@ impl TriggerEvent {
 
     #[inline]
     pub fn fired_for_statement(&self) -> bool {
-        pg_sys::TRIGGER_FIRED_FOR_STATEMENT!(self.0).get() != 0
+        pg_sys::TRIGGER_FIRED_FOR_STATEMENT!(self.0)
     }
 
     #[inline]
     pub fn fired_before(&self) -> bool {
-        pg_sys::TRIGGER_FIRED_BEFORE!(self.0).get() != 0
+        pg_sys::TRIGGER_FIRED_BEFORE!(self.0)
     }
 
     #[inline]
     pub fn fired_after(&self) -> bool {
-        pg_sys::TRIGGER_FIRED_AFTER!(self.0).get() != 0
+        pg_sys::TRIGGER_FIRED_AFTER!(self.0)
     }
 
     #[inline]
     pub fn fired_instead(&self) -> bool {
-        pg_sys::TRIGGER_FIRED_INSTEAD!(self.0).get() != 0
+        pg_sys::TRIGGER_FIRED_INSTEAD!(self.0)
     }
 }

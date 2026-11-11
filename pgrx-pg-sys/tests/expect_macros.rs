@@ -106,11 +106,13 @@ fn generated_expectation_wrappers_match_original_c_types_truth_and_evaluation() 
         ($input:expr) => {{
             let value = $input;
             let calls = Cell::new(0_u32);
-            let likely = pg::likely!({ calls.set(calls.get() + 1); value });
-            check(&mut observations, "likely", likely.into_value(), calls.get());
+            // The value arm keeps the C type. The public result is a Rust `bool` where the
+            // headers define these as a comparison, as they do for MSVC.
+            let likely = pg::likely!(@__pgrx_c_value; { calls.set(calls.get() + 1); value });
+            check(&mut observations, "likely", likely, calls.get());
             calls.set(0);
-            let unlikely = pg::unlikely!({ calls.set(calls.get() + 1); value });
-            check(&mut observations, "unlikely", unlikely.into_value(), calls.get());
+            let unlikely = pg::unlikely!(@__pgrx_c_value; { calls.set(calls.get() + 1); value });
+            check(&mut observations, "unlikely", unlikely, calls.get());
         }};
     }
     for value in [i32::MIN, -2147483647_i32, -1, 0, 1, 17, i32::MAX] {

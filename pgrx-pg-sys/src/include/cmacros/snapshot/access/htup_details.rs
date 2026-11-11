@@ -77,6 +77,8 @@ macro_rules! BITMAPLEN {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -188,6 +190,8 @@ macro_rules! GETSTRUCT {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -218,6 +222,8 @@ macro_rules! GETSTRUCT {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -225,7 +231,7 @@ macro_rules! GETSTRUCT {
 macro_rules! HEAP_LOCKED_UPGRADED {
     ($infomask:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$infomask;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -255,6 +261,8 @@ macro_rules! HEAP_LOCKED_UPGRADED {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -262,7 +270,7 @@ macro_rules! HEAP_LOCKED_UPGRADED {
 macro_rules! HEAP_LOCKED_UPGRADED {
     ($infomask:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$infomask;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
@@ -277,6 +285,8 @@ macro_rules! HEAP_LOCKED_UPGRADED {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -284,7 +294,7 @@ macro_rules! HEAP_LOCKED_UPGRADED {
 macro_rules! HEAP_XMAX_IS_EXCL_LOCKED {
     ($infomask:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$infomask;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -311,6 +321,8 @@ macro_rules! HEAP_XMAX_IS_EXCL_LOCKED {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -318,7 +330,7 @@ macro_rules! HEAP_XMAX_IS_EXCL_LOCKED {
 macro_rules! HEAP_XMAX_IS_EXCL_LOCKED {
     ($infomask:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$infomask;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
@@ -339,6 +351,8 @@ macro_rules! HEAP_XMAX_IS_EXCL_LOCKED {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -346,7 +360,7 @@ macro_rules! HEAP_XMAX_IS_EXCL_LOCKED {
 macro_rules! HEAP_XMAX_IS_EXCL_LOCKED {
     ($infomask:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$infomask;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
@@ -361,6 +375,8 @@ macro_rules! HEAP_XMAX_IS_EXCL_LOCKED {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -368,7 +384,7 @@ macro_rules! HEAP_XMAX_IS_EXCL_LOCKED {
 macro_rules! HEAP_XMAX_IS_KEYSHR_LOCKED {
     ($infomask:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$infomask;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -395,6 +411,8 @@ macro_rules! HEAP_XMAX_IS_KEYSHR_LOCKED {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -402,7 +420,7 @@ macro_rules! HEAP_XMAX_IS_KEYSHR_LOCKED {
 macro_rules! HEAP_XMAX_IS_KEYSHR_LOCKED {
     ($infomask:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$infomask;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
@@ -423,6 +441,8 @@ macro_rules! HEAP_XMAX_IS_KEYSHR_LOCKED {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -430,7 +450,7 @@ macro_rules! HEAP_XMAX_IS_KEYSHR_LOCKED {
 macro_rules! HEAP_XMAX_IS_KEYSHR_LOCKED {
     ($infomask:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$infomask;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
@@ -445,6 +465,8 @@ macro_rules! HEAP_XMAX_IS_KEYSHR_LOCKED {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -452,7 +474,7 @@ macro_rules! HEAP_XMAX_IS_KEYSHR_LOCKED {
 macro_rules! HEAP_XMAX_IS_LOCKED_ONLY {
     ($infomask:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$infomask;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -480,6 +502,8 @@ macro_rules! HEAP_XMAX_IS_LOCKED_ONLY {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -487,7 +511,7 @@ macro_rules! HEAP_XMAX_IS_LOCKED_ONLY {
 macro_rules! HEAP_XMAX_IS_LOCKED_ONLY {
     ($infomask:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$infomask;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
@@ -502,6 +526,8 @@ macro_rules! HEAP_XMAX_IS_LOCKED_ONLY {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -509,7 +535,7 @@ macro_rules! HEAP_XMAX_IS_LOCKED_ONLY {
 macro_rules! HEAP_XMAX_IS_SHR_LOCKED {
     ($infomask:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$infomask;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -536,6 +562,8 @@ macro_rules! HEAP_XMAX_IS_SHR_LOCKED {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -543,7 +571,7 @@ macro_rules! HEAP_XMAX_IS_SHR_LOCKED {
 macro_rules! HEAP_XMAX_IS_SHR_LOCKED {
     ($infomask:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$infomask;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
@@ -564,6 +592,8 @@ macro_rules! HEAP_XMAX_IS_SHR_LOCKED {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -571,7 +601,7 @@ macro_rules! HEAP_XMAX_IS_SHR_LOCKED {
 macro_rules! HEAP_XMAX_IS_SHR_LOCKED {
     ($infomask:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$infomask;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
@@ -586,6 +616,8 @@ macro_rules! HEAP_XMAX_IS_SHR_LOCKED {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -593,7 +625,7 @@ macro_rules! HEAP_XMAX_IS_SHR_LOCKED {
 macro_rules! HeapTupleAllFixed {
     ($tuple:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$tuple;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -620,6 +652,8 @@ macro_rules! HeapTupleAllFixed {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -627,7 +661,7 @@ macro_rules! HeapTupleAllFixed {
 macro_rules! HeapTupleAllFixed {
     ($tuple:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$tuple;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
@@ -723,6 +757,8 @@ macro_rules! HeapTupleClearHeapOnly {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -826,6 +862,8 @@ macro_rules! HeapTupleClearHotUpdated {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -846,6 +884,8 @@ macro_rules! HeapTupleClearHotUpdated {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -853,7 +893,7 @@ macro_rules! HeapTupleClearHotUpdated {
 macro_rules! HeapTupleHasExternal {
     ($tuple:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$tuple;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -880,6 +920,8 @@ macro_rules! HeapTupleHasExternal {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -887,7 +929,7 @@ macro_rules! HeapTupleHasExternal {
 macro_rules! HeapTupleHasExternal {
     ($tuple:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$tuple;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
@@ -902,6 +944,8 @@ macro_rules! HeapTupleHasExternal {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -909,7 +953,7 @@ macro_rules! HeapTupleHasExternal {
 macro_rules! HeapTupleHasNulls {
     ($tuple:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$tuple;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -936,6 +980,8 @@ macro_rules! HeapTupleHasNulls {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -943,7 +989,7 @@ macro_rules! HeapTupleHasNulls {
 macro_rules! HeapTupleHasNulls {
     ($tuple:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$tuple;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
@@ -958,6 +1004,8 @@ macro_rules! HeapTupleHasNulls {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -965,7 +1013,7 @@ macro_rules! HeapTupleHasNulls {
 macro_rules! HeapTupleHasVarWidth {
     ($tuple:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$tuple;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -992,6 +1040,8 @@ macro_rules! HeapTupleHasVarWidth {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -999,7 +1049,7 @@ macro_rules! HeapTupleHasVarWidth {
 macro_rules! HeapTupleHasVarWidth {
     ($tuple:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$tuple;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
@@ -1078,6 +1128,8 @@ macro_rules! HeapTupleHeaderClearHeapOnly {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -1163,6 +1215,8 @@ macro_rules! HeapTupleHeaderClearHotUpdated {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -1250,6 +1304,8 @@ macro_rules! HeapTupleHeaderClearMatch {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -1361,6 +1417,8 @@ macro_rules! HeapTupleHeaderGetDatumLength {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -1510,6 +1568,8 @@ macro_rules! HeapTupleHeaderGetRawCommandId {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1597,6 +1657,8 @@ macro_rules! HeapTupleHeaderGetRawXmax {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1683,6 +1745,8 @@ macro_rules! HeapTupleHeaderGetRawXmin {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -1852,6 +1916,8 @@ macro_rules! HeapTupleHeaderGetSpeculativeToken {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
 #[doc = crate::__pgrx_c_doc_assertions!()]
@@ -1947,6 +2013,8 @@ macro_rules! HeapTupleHeaderGetTypMod {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -2031,6 +2099,8 @@ macro_rules! HeapTupleHeaderGetTypeId {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -2157,6 +2227,8 @@ macro_rules! HeapTupleHeaderGetUpdateXid {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -2279,6 +2351,8 @@ macro_rules! HeapTupleHeaderGetXmin {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -2441,6 +2515,8 @@ macro_rules! HeapTupleHeaderGetXvac {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -2468,6 +2544,8 @@ macro_rules! HeapTupleHeaderGetXvac {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -2475,7 +2553,7 @@ macro_rules! HeapTupleHeaderGetXvac {
 macro_rules! HeapTupleHeaderHasExternal {
     ($tup:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$tup;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2496,6 +2574,8 @@ macro_rules! HeapTupleHeaderHasExternal {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -2503,7 +2583,7 @@ macro_rules! HeapTupleHeaderHasExternal {
 macro_rules! HeapTupleHeaderHasMatch {
     ($tup:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$tup;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2530,6 +2610,8 @@ macro_rules! HeapTupleHeaderHasMatch {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -2537,7 +2619,7 @@ macro_rules! HeapTupleHeaderHasMatch {
 macro_rules! HeapTupleHeaderHasMatch {
     ($tup:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$tup;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
@@ -2551,6 +2633,8 @@ macro_rules! HeapTupleHeaderHasMatch {
 /// #define HeapTupleHeaderIndicatesMovedPartitions( tup ) ItemPointerIndicatesMovedPartitions ( & ( tup ) -> t_ctid )
 /// ```
 ///
+///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
 ///
 #[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
 ///
@@ -2569,7 +2653,7 @@ macro_rules! HeapTupleHeaderHasMatch {
 macro_rules! HeapTupleHeaderIndicatesMovedPartitions {
     ($tup:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$tup;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2590,6 +2674,8 @@ macro_rules! HeapTupleHeaderIndicatesMovedPartitions {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -2601,7 +2687,7 @@ macro_rules! HeapTupleHeaderIndicatesMovedPartitions {
 macro_rules! HeapTupleHeaderIndicatesMovedPartitions {
     ($tup:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$tup;
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::type_witness::<
@@ -2626,6 +2712,8 @@ macro_rules! HeapTupleHeaderIndicatesMovedPartitions {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -2637,7 +2725,7 @@ macro_rules! HeapTupleHeaderIndicatesMovedPartitions {
 macro_rules! HeapTupleHeaderIndicatesMovedPartitions {
     ($tup:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$tup;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
@@ -2652,6 +2740,8 @@ macro_rules! HeapTupleHeaderIndicatesMovedPartitions {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -2659,7 +2749,7 @@ macro_rules! HeapTupleHeaderIndicatesMovedPartitions {
 macro_rules! HeapTupleHeaderIsHeapOnly {
     ($tup:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$tup;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2686,6 +2776,8 @@ macro_rules! HeapTupleHeaderIsHeapOnly {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -2693,7 +2785,7 @@ macro_rules! HeapTupleHeaderIsHeapOnly {
 macro_rules! HeapTupleHeaderIsHeapOnly {
     ($tup:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$tup;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
@@ -2708,6 +2800,8 @@ macro_rules! HeapTupleHeaderIsHeapOnly {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -2715,7 +2809,7 @@ macro_rules! HeapTupleHeaderIsHeapOnly {
 macro_rules! HeapTupleHeaderIsHotUpdated {
     ($tup:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$tup;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2745,6 +2839,8 @@ macro_rules! HeapTupleHeaderIsHotUpdated {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -2752,7 +2848,7 @@ macro_rules! HeapTupleHeaderIsHotUpdated {
 macro_rules! HeapTupleHeaderIsHotUpdated {
     ($tup:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$tup;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
@@ -2767,6 +2863,8 @@ macro_rules! HeapTupleHeaderIsHotUpdated {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -2774,7 +2872,7 @@ macro_rules! HeapTupleHeaderIsHotUpdated {
 macro_rules! HeapTupleHeaderIsSpeculative {
     ($tup:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$tup;
                 (
                     (
@@ -2803,6 +2901,8 @@ macro_rules! HeapTupleHeaderIsSpeculative {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -2810,7 +2910,7 @@ macro_rules! HeapTupleHeaderIsSpeculative {
 macro_rules! HeapTupleHeaderIsSpeculative {
     ($tup:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$tup;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
@@ -2866,6 +2966,8 @@ macro_rules! HeapTupleHeaderSetCmax {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
@@ -2930,6 +3032,8 @@ macro_rules! HeapTupleHeaderSetCmin {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
@@ -3050,6 +3154,8 @@ macro_rules! HeapTupleHeaderSetDatumLength {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -3136,6 +3242,8 @@ macro_rules! HeapTupleHeaderSetHeapOnly {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -3217,6 +3325,8 @@ macro_rules! HeapTupleHeaderSetHotUpdated {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -3297,6 +3407,8 @@ macro_rules! HeapTupleHeaderSetMatch {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -3434,6 +3546,8 @@ macro_rules! HeapTupleHeaderSetMovedPartitions {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -3692,6 +3806,8 @@ macro_rules! HeapTupleHeaderSetSpeculativeToken {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -3722,6 +3838,8 @@ macro_rules! HeapTupleHeaderSetSpeculativeToken {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -3816,6 +3934,8 @@ macro_rules! HeapTupleHeaderSetTypMod {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -3904,6 +4024,8 @@ macro_rules! HeapTupleHeaderSetTypeId {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -3994,6 +4116,8 @@ macro_rules! HeapTupleHeaderSetXmax {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -4082,6 +4206,8 @@ macro_rules! HeapTupleHeaderSetXmin {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -4186,6 +4312,8 @@ macro_rules! HeapTupleHeaderSetXminCommitted {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
@@ -4294,6 +4422,8 @@ macro_rules! HeapTupleHeaderSetXminFrozen {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
 #[doc = crate::__pgrx_c_doc_assertions!()]
@@ -4401,6 +4531,8 @@ macro_rules! HeapTupleHeaderSetXminInvalid {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
 #[doc = crate::__pgrx_c_doc_assertions!()]
@@ -4460,6 +4592,8 @@ macro_rules! HeapTupleHeaderSetXvac {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
 #[doc = crate::__pgrx_c_doc_assertions!()]
@@ -4485,6 +4619,8 @@ macro_rules! HeapTupleHeaderSetXvac {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -4492,7 +4628,7 @@ macro_rules! HeapTupleHeaderSetXvac {
 macro_rules! HeapTupleHeaderXminCommitted {
     ($tup:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$tup;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -4519,6 +4655,8 @@ macro_rules! HeapTupleHeaderXminCommitted {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -4526,7 +4664,7 @@ macro_rules! HeapTupleHeaderXminCommitted {
 macro_rules! HeapTupleHeaderXminCommitted {
     ($tup:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$tup;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
@@ -4541,6 +4679,8 @@ macro_rules! HeapTupleHeaderXminCommitted {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -4548,7 +4688,7 @@ macro_rules! HeapTupleHeaderXminCommitted {
 macro_rules! HeapTupleHeaderXminFrozen {
     ($tup:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$tup;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -4575,6 +4715,8 @@ macro_rules! HeapTupleHeaderXminFrozen {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -4582,7 +4724,7 @@ macro_rules! HeapTupleHeaderXminFrozen {
 macro_rules! HeapTupleHeaderXminFrozen {
     ($tup:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$tup;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
@@ -4597,6 +4739,8 @@ macro_rules! HeapTupleHeaderXminFrozen {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -4604,7 +4748,7 @@ macro_rules! HeapTupleHeaderXminFrozen {
 macro_rules! HeapTupleHeaderXminInvalid {
     ($tup:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$tup;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -4632,6 +4776,8 @@ macro_rules! HeapTupleHeaderXminInvalid {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -4639,7 +4785,7 @@ macro_rules! HeapTupleHeaderXminInvalid {
 macro_rules! HeapTupleHeaderXminInvalid {
     ($tup:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$tup;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
@@ -4654,6 +4800,8 @@ macro_rules! HeapTupleHeaderXminInvalid {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -4661,7 +4809,7 @@ macro_rules! HeapTupleHeaderXminInvalid {
 macro_rules! HeapTupleIsHeapOnly {
     ($tuple:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$tuple;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -4688,6 +4836,8 @@ macro_rules! HeapTupleIsHeapOnly {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -4695,7 +4845,7 @@ macro_rules! HeapTupleIsHeapOnly {
 macro_rules! HeapTupleIsHeapOnly {
     ($tuple:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$tuple;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
@@ -4710,6 +4860,8 @@ macro_rules! HeapTupleIsHeapOnly {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -4717,7 +4869,7 @@ macro_rules! HeapTupleIsHeapOnly {
 macro_rules! HeapTupleIsHotUpdated {
     ($tuple:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$tuple;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -4744,6 +4896,8 @@ macro_rules! HeapTupleIsHotUpdated {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -4751,7 +4905,7 @@ macro_rules! HeapTupleIsHotUpdated {
 macro_rules! HeapTupleIsHotUpdated {
     ($tuple:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$tuple;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
@@ -4766,6 +4920,8 @@ macro_rules! HeapTupleIsHotUpdated {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -4773,7 +4929,7 @@ macro_rules! HeapTupleIsHotUpdated {
 macro_rules! HeapTupleNoNulls {
     ($tuple:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$tuple;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -4800,6 +4956,8 @@ macro_rules! HeapTupleNoNulls {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -4807,7 +4965,7 @@ macro_rules! HeapTupleNoNulls {
 macro_rules! HeapTupleNoNulls {
     ($tuple:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$tuple;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
@@ -4899,6 +5057,8 @@ macro_rules! HeapTupleSetHeapOnly {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -4998,6 +5158,8 @@ macro_rules! HeapTupleSetHotUpdated {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -5046,6 +5208,8 @@ macro_rules! HeapTupleSetHotUpdated {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
@@ -5109,6 +5273,8 @@ macro_rules! fastgetattr {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
 #[doc = crate::__pgrx_c_doc_assertions!()]
@@ -5171,6 +5337,8 @@ macro_rules! fastgetattr {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
 #[doc = crate::__pgrx_c_doc_assertions!()]
@@ -5216,6 +5384,8 @@ macro_rules! fastgetattr {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///

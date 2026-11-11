@@ -457,6 +457,8 @@ macro_rules! BUFFERALIGN_DOWN {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -464,7 +466,7 @@ macro_rules! BUFFERALIGN_DOWN {
 macro_rules! BoolIsValid {
     ($boolean:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$boolean;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -725,6 +727,8 @@ macro_rules! DOUBLEALIGN_DOWN {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -736,7 +740,7 @@ macro_rules! DOUBLEALIGN_DOWN {
 macro_rules! FLOAT4_FITS_IN_INT16 {
     ($num:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$num;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -756,6 +760,8 @@ macro_rules! FLOAT4_FITS_IN_INT16 {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -767,7 +773,7 @@ macro_rules! FLOAT4_FITS_IN_INT16 {
 macro_rules! FLOAT4_FITS_IN_INT32 {
     ($num:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$num;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -787,6 +793,8 @@ macro_rules! FLOAT4_FITS_IN_INT32 {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -798,7 +806,7 @@ macro_rules! FLOAT4_FITS_IN_INT32 {
 macro_rules! FLOAT4_FITS_IN_INT64 {
     ($num:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$num;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -818,6 +826,8 @@ macro_rules! FLOAT4_FITS_IN_INT64 {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -829,7 +839,7 @@ macro_rules! FLOAT4_FITS_IN_INT64 {
 macro_rules! FLOAT8_FITS_IN_INT16 {
     ($num:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$num;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -849,6 +859,8 @@ macro_rules! FLOAT8_FITS_IN_INT16 {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -860,7 +872,7 @@ macro_rules! FLOAT8_FITS_IN_INT16 {
 macro_rules! FLOAT8_FITS_IN_INT32 {
     ($num:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$num;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -880,6 +892,8 @@ macro_rules! FLOAT8_FITS_IN_INT32 {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -891,7 +905,7 @@ macro_rules! FLOAT8_FITS_IN_INT32 {
 macro_rules! FLOAT8_FITS_IN_INT64 {
     ($num:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$num;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1766,6 +1780,8 @@ macro_rules! Max {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1777,7 +1793,7 @@ macro_rules! Max {
 macro_rules! MemSetTest {
     ($val:expr, $len:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$val;
                 let _ = &$len;
                 (
@@ -1954,6 +1970,8 @@ macro_rules! OffsetToPointer {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1965,7 +1983,7 @@ macro_rules! OffsetToPointer {
 macro_rules! Oid8IsValid {
     ($objectId:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$objectId;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1985,6 +2003,8 @@ macro_rules! Oid8IsValid {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1996,7 +2016,7 @@ macro_rules! Oid8IsValid {
 macro_rules! OidIsValid {
     ($objectId:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$objectId;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2016,6 +2036,8 @@ macro_rules! OidIsValid {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -2027,7 +2049,7 @@ macro_rules! OidIsValid {
 macro_rules! PointerIsAligned {
     ($pointer:expr, $type:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$pointer;
                 let _ = &$type;
                 (
@@ -2049,6 +2071,8 @@ macro_rules! PointerIsAligned {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -2060,7 +2084,7 @@ macro_rules! PointerIsAligned {
 macro_rules! PointerIsValid {
     ($pointer:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$pointer;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2080,6 +2104,8 @@ macro_rules! PointerIsValid {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -2091,7 +2117,7 @@ macro_rules! PointerIsValid {
 macro_rules! RegProcedureIsValid {
     ($p:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$p;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2257,6 +2283,8 @@ macro_rules! SHORTALIGN_DOWN {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -2264,7 +2292,7 @@ macro_rules! SHORTALIGN_DOWN {
 macro_rules! SQL_STR_DOUBLE {
     ($ch:expr, $escape_backslash:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$ch;
                 let _ = &$escape_backslash;
                 (
@@ -2554,6 +2582,8 @@ macro_rules! Trap {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 #[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
 ///
 /// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
@@ -2571,7 +2601,7 @@ macro_rules! Trap {
 macro_rules! TrapMacro {
     ($condition:expr, $errorType:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$condition;
                 let _ = &$errorType;
                 (
@@ -2817,6 +2847,8 @@ macro_rules! lengthof {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -2828,7 +2860,7 @@ macro_rules! lengthof {
 macro_rules! likely {
     ($x:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$x;
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::type_witness::<
@@ -3010,6 +3042,8 @@ macro_rules! strtou64 {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -3021,7 +3055,7 @@ macro_rules! strtou64 {
 macro_rules! unlikely {
     ($x:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$x;
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::type_witness::<

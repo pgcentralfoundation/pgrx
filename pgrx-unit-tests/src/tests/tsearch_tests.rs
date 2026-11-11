@@ -43,7 +43,7 @@ mod tests {
     #[pg_extern]
     fn tsearch_vector_varsize(v: &TsVector) -> i32 {
         let ptr = v.as_varlena_ptr().cast_mut();
-        assert!(unsafe { pg_sys::VARATT_IS_4B_U!(ptr).get() } != 0);
+        assert!(unsafe { pg_sys::VARATT_IS_4B_U!(ptr) });
         unsafe { pg_sys::VARSIZE_4B!(ptr).get() as i32 }
     }
 

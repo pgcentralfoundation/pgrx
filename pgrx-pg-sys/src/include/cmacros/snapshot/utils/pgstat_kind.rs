@@ -15,6 +15,8 @@
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -22,7 +24,7 @@
 macro_rules! pgstat_is_kind_builtin {
     ($kind:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$kind;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
@@ -43,6 +45,8 @@ macro_rules! pgstat_is_kind_builtin {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -50,7 +54,7 @@ macro_rules! pgstat_is_kind_builtin {
 macro_rules! pgstat_is_kind_custom {
     ($kind:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$kind;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }

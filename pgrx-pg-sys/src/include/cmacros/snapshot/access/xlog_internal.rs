@@ -18,6 +18,8 @@
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -57,6 +59,8 @@ macro_rules! BackupHistoryFileName {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -94,6 +98,8 @@ macro_rules! BackupHistoryFilePath {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -123,7 +129,9 @@ macro_rules! GetRmgr {
 /// ```text
 /// #define IsBackupHistoryFileName( fname ) ( strlen ( fname ) > XLOG_FNAME_LEN && strspn ( fname , "0123456789ABCDEF" ) == XLOG_FNAME_LEN && strcmp ( ( fname ) + strlen ( fname ) - strlen ( ".backup" ) , ".backup" ) == 0 )
 /// ```
-///  String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+///
+///
+/// Returns a Rust `bool`, which is `true` when the C result is nonzero. The C result is a truth value: `_Bool`, or the `int` zero or one of a comparison or logical operator. As an operand of another generated macro, an invocation still has that C type. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
 /// # Safety
 ///
@@ -136,7 +144,7 @@ macro_rules! GetRmgr {
 macro_rules! IsBackupHistoryFileName {
     ($fname:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$fname;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -163,7 +171,9 @@ macro_rules! IsBackupHistoryFileName {
 /// ```
 ///
 ///
-/// Translates the original function definition. Each operand is evaluated once and converted to its parameter type using C assignment rules, the statements run in order, and the returned value is converted to the function's C return type. `.get()` extracts its native storage, including `()` for a void function. Calls to other translated inline functions run their translations; other calls keep the backend thread and PostgreSQL error contracts of their guarded bindings. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// Returns a Rust `bool`, which is `true` when the C result is nonzero. The C result is a truth value: `_Bool`, or the `int` zero or one of a comparison or logical operator. As an operand of another generated macro, an invocation still has that C type. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
 /// # Safety
 ///
@@ -176,7 +186,7 @@ macro_rules! IsBackupHistoryFileName {
 macro_rules! IsBackupHistoryFileName {
     ($fname:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$fname;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
@@ -189,7 +199,9 @@ macro_rules! IsBackupHistoryFileName {
 /// ```text
 /// #define IsPartialXLogFileName( fname ) ( strlen ( fname ) == XLOG_FNAME_LEN + strlen ( ".partial" ) && strspn ( fname , "0123456789ABCDEF" ) == XLOG_FNAME_LEN && strcmp ( ( fname ) + XLOG_FNAME_LEN , ".partial" ) == 0 )
 /// ```
-///  String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+///
+///
+/// Returns a Rust `bool`, which is `true` when the C result is nonzero. The C result is a truth value: `_Bool`, or the `int` zero or one of a comparison or logical operator. As an operand of another generated macro, an invocation still has that C type. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
 /// # Safety
 ///
@@ -202,7 +214,7 @@ macro_rules! IsBackupHistoryFileName {
 macro_rules! IsPartialXLogFileName {
     ($fname:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$fname;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -229,7 +241,9 @@ macro_rules! IsPartialXLogFileName {
 /// ```
 ///
 ///
-/// Translates the original function definition. Each operand is evaluated once and converted to its parameter type using C assignment rules, the statements run in order, and the returned value is converted to the function's C return type. `.get()` extracts its native storage, including `()` for a void function. Calls to other translated inline functions run their translations; other calls keep the backend thread and PostgreSQL error contracts of their guarded bindings. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// Returns a Rust `bool`, which is `true` when the C result is nonzero. The C result is a truth value: `_Bool`, or the `int` zero or one of a comparison or logical operator. As an operand of another generated macro, an invocation still has that C type. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
 /// # Safety
 ///
@@ -242,7 +256,7 @@ macro_rules! IsPartialXLogFileName {
 macro_rules! IsPartialXLogFileName {
     ($fname:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$fname;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
@@ -256,6 +270,8 @@ macro_rules! IsPartialXLogFileName {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -267,7 +283,7 @@ macro_rules! IsPartialXLogFileName {
 macro_rules! IsPowerOf2 {
     ($x:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$x;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -286,7 +302,9 @@ macro_rules! IsPowerOf2 {
 /// ```text
 /// #define IsTLHistoryFileName( fname ) ( strlen ( fname ) == 8 + strlen ( ".history" ) && strspn ( fname , "0123456789ABCDEF" ) == 8 && strcmp ( ( fname ) + 8 , ".history" ) == 0 )
 /// ```
-///  String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+///
+///
+/// Returns a Rust `bool`, which is `true` when the C result is nonzero. The C result is a truth value: `_Bool`, or the `int` zero or one of a comparison or logical operator. As an operand of another generated macro, an invocation still has that C type. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
 /// # Safety
 ///
@@ -299,7 +317,7 @@ macro_rules! IsPowerOf2 {
 macro_rules! IsTLHistoryFileName {
     ($fname:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$fname;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -326,7 +344,9 @@ macro_rules! IsTLHistoryFileName {
 /// ```
 ///
 ///
-/// Translates the original function definition. Each operand is evaluated once and converted to its parameter type using C assignment rules, the statements run in order, and the returned value is converted to the function's C return type. `.get()` extracts its native storage, including `()` for a void function. Calls to other translated inline functions run their translations; other calls keep the backend thread and PostgreSQL error contracts of their guarded bindings. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// Returns a Rust `bool`, which is `true` when the C result is nonzero. The C result is a truth value: `_Bool`, or the `int` zero or one of a comparison or logical operator. As an operand of another generated macro, an invocation still has that C type. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
 /// # Safety
 ///
@@ -339,7 +359,7 @@ macro_rules! IsTLHistoryFileName {
 macro_rules! IsTLHistoryFileName {
     ($fname:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$fname;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
@@ -353,6 +373,8 @@ macro_rules! IsTLHistoryFileName {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -364,7 +386,7 @@ macro_rules! IsTLHistoryFileName {
 macro_rules! IsValidWalSegSize {
     ($size:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$size;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
@@ -383,7 +405,9 @@ macro_rules! IsValidWalSegSize {
 /// ```text
 /// #define IsXLogFileName( fname ) ( strlen ( fname ) == XLOG_FNAME_LEN && strspn ( fname , "0123456789ABCDEF" ) == XLOG_FNAME_LEN )
 /// ```
-///  String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+///
+///
+/// Returns a Rust `bool`, which is `true` when the C result is nonzero. The C result is a truth value: `_Bool`, or the `int` zero or one of a comparison or logical operator. As an operand of another generated macro, an invocation still has that C type. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
 /// # Safety
 ///
@@ -396,7 +420,7 @@ macro_rules! IsValidWalSegSize {
 macro_rules! IsXLogFileName {
     ($fname:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$fname;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -422,7 +446,9 @@ macro_rules! IsXLogFileName {
 /// ```
 ///
 ///
-/// Translates the original function definition. Each operand is evaluated once and converted to its parameter type using C assignment rules, the statements run in order, and the returned value is converted to the function's C return type. `.get()` extracts its native storage, including `()` for a void function. Calls to other translated inline functions run their translations; other calls keep the backend thread and PostgreSQL error contracts of their guarded bindings. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// Returns a Rust `bool`, which is `true` when the C result is nonzero. The C result is a truth value: `_Bool`, or the `int` zero or one of a comparison or logical operator. As an operand of another generated macro, an invocation still has that C type. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
 /// # Safety
 ///
@@ -435,7 +461,7 @@ macro_rules! IsXLogFileName {
 macro_rules! IsXLogFileName {
     ($fname:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$fname;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
@@ -455,6 +481,8 @@ macro_rules! IsXLogFileName {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -466,7 +494,7 @@ macro_rules! IsXLogFileName {
 macro_rules! RmgrIdExists {
     ($rmid:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$rmid;
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::type_witness::<
@@ -490,6 +518,8 @@ macro_rules! RmgrIdExists {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -525,6 +555,8 @@ macro_rules! StatusFilePath {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -558,6 +590,8 @@ macro_rules! TLHistoryFileName {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -584,6 +618,8 @@ macro_rules! TLHistoryFilePath {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -595,7 +631,7 @@ macro_rules! TLHistoryFilePath {
 macro_rules! XLByteInPrevSeg {
     ($xlrp:expr, $logSegNo:expr, $wal_segsz_bytes:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$xlrp;
                 let _ = &$logSegNo;
                 let _ = &$wal_segsz_bytes;
@@ -617,6 +653,8 @@ macro_rules! XLByteInPrevSeg {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -628,7 +666,7 @@ macro_rules! XLByteInPrevSeg {
 macro_rules! XLByteInSeg {
     ($xlrp:expr, $logSegNo:expr, $wal_segsz_bytes:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$xlrp;
                 let _ = &$logSegNo;
                 let _ = &$wal_segsz_bytes;
@@ -777,6 +815,8 @@ macro_rules! XLByteToSeg {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -811,6 +851,8 @@ macro_rules! XLogFileName {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -848,6 +890,8 @@ macro_rules! XLogFileNameById {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -887,6 +931,8 @@ macro_rules! XLogFilePath {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -1462,6 +1508,8 @@ macro_rules! XLogSegmentsPerXLogId {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1473,7 +1521,7 @@ macro_rules! XLogSegmentsPerXLogId {
 macro_rules! XRecOffIsValid {
     ($xlrp:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$xlrp;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(

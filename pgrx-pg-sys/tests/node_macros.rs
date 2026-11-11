@@ -37,13 +37,13 @@ fn is_a_compares_a_node_with_the_tag_of_its_type_operand() {
     // tag as every node does. Only the tag is written.
     unsafe { addr_of_mut!((*node).type_).write(pg::NodeTag::T_Query) };
     // SAFETY: this call and each one below read only the tag written above.
-    assert_eq!(unsafe { pg::IsA!(node, pg::Query) }.get(), 1_i32);
+    assert!(unsafe { pg::IsA!(node, pg::Query) });
     // SAFETY: as above.
-    assert!(unsafe { pg::IsA!(node, Statement) }.is_true());
+    assert!(unsafe { pg::IsA!(node, Statement) });
     // SAFETY: as above.
-    assert!(!unsafe { pg::IsA!(node, pg::List) }.is_true());
+    assert!(!unsafe { pg::IsA!(node, pg::List) });
     // SAFETY: as above.
-    assert!(!unsafe { pg::IsA!(node, pg::RangeVar) }.is_true());
+    assert!(!unsafe { pg::IsA!(node, pg::RangeVar) });
 }
 
 /// `nodeTag` yields the tag as the C integer a node stores, signed on MSVC and unsigned
@@ -83,24 +83,20 @@ fn is_a_selects_the_tag_of_the_c_name_its_operand_spells() {
         unsafe { addr_of_mut!((*node).type_).write(tag) };
         // SAFETY: each call in this loop reads only the tag written above.
         let bare = unsafe {
-            [
-                pg::IsA!(node, OpExpr).is_true(),
-                pg::IsA!(node, DistinctExpr).is_true(),
-                pg::IsA!(node, NullIfExpr).is_true(),
-            ]
+            [pg::IsA!(node, OpExpr), pg::IsA!(node, DistinctExpr), pg::IsA!(node, NullIfExpr)]
         };
         assert_eq!(bare, expected, "{tag:?}");
         // SAFETY: as above.
         let qualified = unsafe {
             [
-                pg::IsA!(node, pg::OpExpr,).is_true(),
-                pg::IsA!(node, ::pgrx_pg_sys::DistinctExpr).is_true(),
-                pg::IsA!(node, pgrx_pg_sys::NullIfExpr,).is_true(),
+                pg::IsA!(node, pg::OpExpr,),
+                pg::IsA!(node, ::pgrx_pg_sys::DistinctExpr),
+                pg::IsA!(node, pgrx_pg_sys::NullIfExpr,),
             ]
         };
         assert_eq!(qualified, expected, "{tag:?}");
         // SAFETY: as above.
-        assert!(!unsafe { pg::IsA!(node, pg::Query) }.is_true(), "{tag:?}");
+        assert!(!unsafe { pg::IsA!(node, pg::Query) }, "{tag:?}");
     }
 }
 

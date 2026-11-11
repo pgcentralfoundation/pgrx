@@ -14,6 +14,8 @@
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -25,7 +27,7 @@
 macro_rules! XLogReaderHasQueuedRecordOrError {
     ($state:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$state;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
@@ -735,6 +737,8 @@ macro_rules! XLogRecGetXid {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -742,7 +746,7 @@ macro_rules! XLogRecGetXid {
 macro_rules! XLogRecHasAnyBlockRefs {
     ($decoder:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$decoder;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -917,6 +921,8 @@ macro_rules! XLogRecHasBlockImage {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -924,7 +930,7 @@ macro_rules! XLogRecHasBlockImage {
 macro_rules! XLogRecHasBlockRef {
     ($decoder:expr, $block_id:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$decoder;
                 let _ = &$block_id;
                 (

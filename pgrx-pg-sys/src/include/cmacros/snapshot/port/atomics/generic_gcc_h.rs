@@ -15,6 +15,8 @@
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -52,6 +54,8 @@ macro_rules! pg_atomic_exchange_u32_impl {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -87,6 +91,8 @@ macro_rules! pg_atomic_exchange_u64_impl {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -124,6 +130,8 @@ macro_rules! pg_atomic_fetch_and_u32_impl {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -159,6 +167,8 @@ macro_rules! pg_atomic_fetch_and_u64_impl {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -196,6 +206,8 @@ macro_rules! pg_atomic_fetch_or_u32_impl {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -231,6 +243,8 @@ macro_rules! pg_atomic_fetch_or_u64_impl {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -268,6 +282,8 @@ macro_rules! pg_atomic_fetch_sub_u32_impl {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -304,6 +320,8 @@ macro_rules! pg_atomic_fetch_sub_u64_impl {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -333,6 +351,8 @@ macro_rules! pg_atomic_init_flag_impl {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -340,7 +360,7 @@ macro_rules! pg_atomic_init_flag_impl {
 macro_rules! pg_atomic_unlocked_test_flag_impl {
     ($ptr:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$ptr;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }

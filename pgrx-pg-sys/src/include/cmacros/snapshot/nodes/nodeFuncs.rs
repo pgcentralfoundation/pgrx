@@ -45,6 +45,8 @@ macro_rules! expression_tree_mutator {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -56,7 +58,7 @@ macro_rules! expression_tree_mutator {
 macro_rules! expression_tree_walker {
     ($n:expr, $w:expr, $c:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$n;
                 let _ = &$w;
                 let _ = &$c;
@@ -86,6 +88,8 @@ macro_rules! expression_tree_walker {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -123,6 +127,8 @@ macro_rules! get_leftop {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -166,6 +172,8 @@ macro_rules! get_notclausearg {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -205,6 +213,8 @@ macro_rules! get_rightop {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -216,7 +226,7 @@ macro_rules! get_rightop {
 macro_rules! is_andclause {
     ($clause:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$clause;
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::type_witness::<
@@ -240,6 +250,8 @@ macro_rules! is_andclause {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -251,7 +263,7 @@ macro_rules! is_andclause {
 macro_rules! is_funcclause {
     ($clause:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$clause;
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::type_witness::<
@@ -277,6 +289,8 @@ macro_rules! is_funcclause {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -288,7 +302,7 @@ macro_rules! is_funcclause {
 macro_rules! is_notclause {
     ($clause:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$clause;
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::type_witness::<
@@ -312,6 +326,8 @@ macro_rules! is_notclause {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -323,7 +339,7 @@ macro_rules! is_notclause {
 macro_rules! is_opclause {
     ($clause:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$clause;
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::type_witness::<
@@ -349,6 +365,8 @@ macro_rules! is_opclause {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -360,7 +378,7 @@ macro_rules! is_opclause {
 macro_rules! is_orclause {
     ($clause:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$clause;
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::type_witness::<
@@ -379,6 +397,8 @@ macro_rules! is_orclause {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -390,7 +410,7 @@ macro_rules! is_orclause {
 macro_rules! planstate_tree_walker {
     ($ps:expr, $w:expr, $c:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$ps;
                 let _ = &$w;
                 let _ = &$c;
@@ -448,6 +468,8 @@ macro_rules! query_or_expression_tree_mutator {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -459,7 +481,7 @@ macro_rules! query_or_expression_tree_mutator {
 macro_rules! query_or_expression_tree_walker {
     ($n:expr, $w:expr, $c:expr, $f:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$n;
                 let _ = &$w;
                 let _ = &$c;
@@ -518,6 +540,8 @@ macro_rules! query_tree_mutator {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -529,7 +553,7 @@ macro_rules! query_tree_mutator {
 macro_rules! query_tree_walker {
     ($q:expr, $w:expr, $c:expr, $f:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$q;
                 let _ = &$w;
                 let _ = &$c;
@@ -551,6 +575,8 @@ macro_rules! query_tree_walker {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -562,7 +588,7 @@ macro_rules! query_tree_walker {
 macro_rules! range_table_entry_walker {
     ($r:expr, $w:expr, $c:expr, $f:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$r;
                 let _ = &$w;
                 let _ = &$c;
@@ -621,6 +647,8 @@ macro_rules! range_table_mutator {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -632,7 +660,7 @@ macro_rules! range_table_mutator {
 macro_rules! range_table_walker {
     ($rt:expr, $w:expr, $c:expr, $f:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$rt;
                 let _ = &$w;
                 let _ = &$c;
@@ -654,6 +682,8 @@ macro_rules! range_table_walker {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -665,7 +695,7 @@ macro_rules! range_table_walker {
 macro_rules! raw_expression_tree_walker {
     ($n:expr, $w:expr, $c:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$n;
                 let _ = &$w;
                 let _ = &$c;

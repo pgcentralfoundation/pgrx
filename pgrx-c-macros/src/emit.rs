@@ -6,7 +6,8 @@
 //!
 //! Each C parameter occurrence remains a separate Rust expression occurrence. Results
 //! retain their C identity behind the semantic support's evaluated `CExpression` wrapper;
-//! callers use `.get()` to extract native storage. Shared adapters reconcile compiler
+//! callers use `.get()` to extract native storage. A result that analysis proves to be a C
+//! truth value is returned as a Rust `bool` instead. Shared adapters reconcile compiler
 //! declarations with actual binding types and preserve raw aggregate and enum validity.
 //! Place and native-call operations retain explicit caller safety obligations. Emission
 //! does not establish differential validation, and the generic helpers are runtime calls.
@@ -246,6 +247,9 @@ pub enum EmissionStatus {
         /// Whether a call needs the caller's `unsafe` for operations the macro itself
         /// performs. Caller operands that need `unsafe` need it in either case.
         caller_unsafe: bool,
+        /// Whether a call returns a Rust `bool`, because the macro's C result is a truth
+        /// value. Any other expression macro returns the `CExpression` wrapper.
+        returns_bool: bool,
         /// Rustdoc-facing parts used to publish a documentation snapshot.
         #[serde(skip)]
         documentation: Box<MacroDocumentation>,
@@ -375,15 +379,30 @@ fn emit_with_lowering<'a>(
         }
     }
     let status = match lowered {
-        Ok((rust, documentation, caller_unsafe)) => EmissionStatus::Emitted {
-            rust,
-            const_capability: ConstCapability::RuntimeOnly,
-            caller_unsafe,
-            documentation: Box::new(documentation),
-        },
+        Ok(Lowered { rust, documentation, caller_unsafe, returns_bool }) => {
+            EmissionStatus::Emitted {
+                rust,
+                const_capability: ConstCapability::RuntimeOnly,
+                caller_unsafe,
+                returns_bool,
+                documentation: Box::new(documentation),
+            }
+        }
         Err(reason) => EmissionStatus::Skipped { reason },
     };
     MacroEmission { analysis, status, fallback }
+}
+
+/// One rendered root.
+struct Lowered {
+    /// The macro's formatted definition.
+    rust: String,
+    /// Its documentation and the result type of its shell.
+    documentation: MacroDocumentation,
+    /// Whether a call needs the caller's `unsafe`.
+    caller_unsafe: bool,
+    /// Whether a call returns a Rust `bool`.
+    returns_bool: bool,
 }
 
 /// Check bindings and render one analyzed root.
@@ -393,7 +412,7 @@ fn lower<'a>(
     bindings: &'a BindingCatalog,
     generated: Generated<'a>,
     lowering: &mut Option<types::Lowering<'a>>,
-) -> Result<(String, MacroDocumentation, bool), SkipReason> {
+) -> Result<Lowered, SkipReason> {
     if let Some(reason) = binding_mismatch(session, analysis, bindings) {
         return Err(reason);
     }
@@ -1324,7 +1343,7 @@ fn render(
     bindings: &BindingCatalog,
     generated: Generated<'_>,
     lowering: &types::Lowering<'_>,
-) -> Result<(String, MacroDocumentation, bool), SkipReason> {
+) -> Result<Lowered, SkipReason> {
     let identifier = macro_identifier(&analysis.name).ok_or_else(|| {
         skip(
             analysis,
@@ -1385,6 +1404,19 @@ fn render(
         && matches!(expression.syntax.nodes[expression.syntax.root].kind, ExpressionKind::Empty);
     let statement_body =
         expression.syntax.statement_body.as_ref().filter(|_| inline_body.is_none());
+    // An expression macro whose C result is a truth value returns a Rust `bool` from its
+    // public arm. Its other arms keep the C value, so the macro contributes its C type as
+    // an operand of another generated macro.
+    let declarations = session.frontend().declarations();
+    let returns_bool = !empty
+        && statement_body.is_none()
+        && match &inline_body {
+            Some(InlineResult::Void) => false,
+            Some(InlineResult::Value { declared, .. }) => {
+                crate::analysis::truth_result(declarations, expression, Some(declared))
+            }
+            None => crate::analysis::truth_result(declarations, expression, None),
+        };
     let returning = statement_body.is_some_and(|body| body.return_tokens.is_some());
     let statement_boundary = statement_body.is_some_and(|body| body.requires_boundary);
     let normalizer = arguments.as_ref().map(|arguments| arguments.normalizer.as_str());
@@ -1475,6 +1507,13 @@ fn render(
     } else if matches!(original, InvocationSource::Inline(_)) {
         comment.push_str("\n\n");
         comment.push_str(documentation::INLINE_CALL);
+    }
+    if returns_bool {
+        comment.push_str("\n\n");
+        comment.push_str(documentation::TRUTH_RESULT);
+    } else if matches!(original, InvocationSource::Inline(_)) {
+        comment.push_str("\n\n");
+        comment.push_str(documentation::INLINE_RESULT);
     }
     if expression.syntax.nodes.iter().any(|node| {
         matches!(node.kind, ExpressionKind::InvocationFile | ExpressionKind::InvocationLine)
@@ -1631,14 +1670,16 @@ fn render(
         }
     } else if empty {
         checks.clone().unwrap_or_default()
-    } else if let Some(checks) = &checks {
-        format!(
-            "{SUPPORT}::expression_result::finish_checked({checks}, $crate::{identifier}!(@__pgrx_emit_value; {operands}))"
-        )
     } else {
-        format!(
-            "{SUPPORT}::expression_result::finish($crate::{identifier}!(@__pgrx_emit_value; {operands}))"
-        )
+        let finish = if returns_bool { "finish_truth" } else { "finish" };
+        match &checks {
+            Some(checks) => format!(
+                "{SUPPORT}::expression_result::{finish}_checked({checks}, $crate::{identifier}!(@__pgrx_emit_value; {operands}))"
+            ),
+            None => format!(
+                "{SUPPORT}::expression_result::{finish}($crate::{identifier}!(@__pgrx_emit_value; {operands}))"
+            ),
+        }
     };
     writeln!(&mut rust, "(@__pgrx_emit_public; {matcher}) => {{ {public_body} }};")
         .expect("String output");
@@ -1800,9 +1841,9 @@ fn render(
             explicit_boundary,
         ),
         hidden,
-        result: documentation::result(analysis, renderer, inline_body.as_ref()),
+        result: documentation::result(analysis, renderer, inline_body.as_ref(), returns_bool),
     };
-    Ok((rust, documentation, caller_unsafe))
+    Ok(Lowered { rust, documentation, caller_unsafe, returns_bool })
 }
 
 /// The C result of a translated inline function body.

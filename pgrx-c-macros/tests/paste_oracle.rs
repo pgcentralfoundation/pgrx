@@ -158,7 +158,7 @@ fn main() {
     let value=PASTE_NESTED!(); println!("{:016x} {} {}",value.get(),rank(value.into_value()),core::mem::size_of_val(&value.get()));
     for value in [-1_i32,0,7,19,257] {
         let word=PASTE_TYPE!(value);
-        println!("{} {} {} {}",PASTE_ENUM!(value).get(),PASTE_OBJECT!(value).get(),word.get(),rank(word.into_value()));
+        println!("{} {} {} {}",i32::from(PASTE_ENUM!(value)),PASTE_OBJECT!(value).get(),word.get(),rank(word.into_value()));
     }
     // SAFETY: the record is live, aligned, fully initialized owned storage with
     // exclusive raw-pointer access. The generated casts preserve its address;

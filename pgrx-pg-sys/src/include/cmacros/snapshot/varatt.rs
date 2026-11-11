@@ -103,6 +103,8 @@ macro_rules! SET_VARSIZE {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -516,6 +518,8 @@ macro_rules! SET_VARSIZE_COMPRESSED {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -640,6 +644,8 @@ macro_rules! SET_VARSIZE_SHORT {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -808,6 +814,8 @@ macro_rules! SET_VARTAG_EXTERNAL {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -833,6 +841,8 @@ macro_rules! SET_VARTAG_EXTERNAL {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -844,7 +854,7 @@ macro_rules! SET_VARTAG_EXTERNAL {
 macro_rules! VARATT_CAN_MAKE_SHORT {
     ($PTR:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$PTR;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -872,6 +882,8 @@ macro_rules! VARATT_CAN_MAKE_SHORT {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -883,7 +895,7 @@ macro_rules! VARATT_CAN_MAKE_SHORT {
 macro_rules! VARATT_CAN_MAKE_SHORT {
     ($PTR:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$PTR;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
@@ -1030,6 +1042,8 @@ macro_rules! VARATT_CONVERTED_SHORT_SIZE {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -1180,6 +1194,8 @@ macro_rules! VARATT_EXTERNAL_GET_COMPRESS_METHOD {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1329,6 +1345,8 @@ macro_rules! VARATT_EXTERNAL_GET_EXTSIZE {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1361,6 +1379,8 @@ macro_rules! VARATT_EXTERNAL_GET_EXTSIZE {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1372,7 +1392,7 @@ macro_rules! VARATT_EXTERNAL_GET_EXTSIZE {
 macro_rules! VARATT_EXTERNAL_IS_COMPRESSED {
     ($toast_pointer:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$toast_pointer;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1400,6 +1420,8 @@ macro_rules! VARATT_EXTERNAL_IS_COMPRESSED {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1411,7 +1433,7 @@ macro_rules! VARATT_EXTERNAL_IS_COMPRESSED {
 macro_rules! VARATT_EXTERNAL_IS_COMPRESSED {
     ($toast_pointer:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$toast_pointer;
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::type_witness::<
@@ -1465,6 +1487,8 @@ macro_rules! VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1476,7 +1500,7 @@ macro_rules! VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD {
 macro_rules! VARATT_IS_1B {
     ($PTR:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$PTR;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1497,6 +1521,8 @@ macro_rules! VARATT_IS_1B {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1508,7 +1534,7 @@ macro_rules! VARATT_IS_1B {
 macro_rules! VARATT_IS_1B {
     ($PTR:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$PTR;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1529,6 +1555,8 @@ macro_rules! VARATT_IS_1B {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1540,7 +1568,7 @@ macro_rules! VARATT_IS_1B {
 macro_rules! VARATT_IS_1B_E {
     ($PTR:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$PTR;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1561,6 +1589,8 @@ macro_rules! VARATT_IS_1B_E {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1572,7 +1602,7 @@ macro_rules! VARATT_IS_1B_E {
 macro_rules! VARATT_IS_1B_E {
     ($PTR:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$PTR;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1593,6 +1623,8 @@ macro_rules! VARATT_IS_1B_E {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1604,7 +1636,7 @@ macro_rules! VARATT_IS_1B_E {
 macro_rules! VARATT_IS_4B {
     ($PTR:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$PTR;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1625,6 +1657,8 @@ macro_rules! VARATT_IS_4B {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1636,7 +1670,7 @@ macro_rules! VARATT_IS_4B {
 macro_rules! VARATT_IS_4B {
     ($PTR:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$PTR;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1657,6 +1691,8 @@ macro_rules! VARATT_IS_4B {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1668,7 +1704,7 @@ macro_rules! VARATT_IS_4B {
 macro_rules! VARATT_IS_4B_C {
     ($PTR:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$PTR;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1689,6 +1725,8 @@ macro_rules! VARATT_IS_4B_C {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1700,7 +1738,7 @@ macro_rules! VARATT_IS_4B_C {
 macro_rules! VARATT_IS_4B_C {
     ($PTR:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$PTR;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1721,6 +1759,8 @@ macro_rules! VARATT_IS_4B_C {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1732,7 +1772,7 @@ macro_rules! VARATT_IS_4B_C {
 macro_rules! VARATT_IS_4B_U {
     ($PTR:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$PTR;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1753,6 +1793,8 @@ macro_rules! VARATT_IS_4B_U {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1764,7 +1806,7 @@ macro_rules! VARATT_IS_4B_U {
 macro_rules! VARATT_IS_4B_U {
     ($PTR:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$PTR;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1785,6 +1827,8 @@ macro_rules! VARATT_IS_4B_U {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1796,7 +1840,7 @@ macro_rules! VARATT_IS_4B_U {
 macro_rules! VARATT_IS_COMPRESSED {
     ($PTR:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$PTR;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1823,6 +1867,8 @@ macro_rules! VARATT_IS_COMPRESSED {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1834,7 +1880,7 @@ macro_rules! VARATT_IS_COMPRESSED {
 macro_rules! VARATT_IS_COMPRESSED {
     ($PTR:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$PTR;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
@@ -1849,6 +1895,8 @@ macro_rules! VARATT_IS_COMPRESSED {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1860,7 +1908,7 @@ macro_rules! VARATT_IS_COMPRESSED {
 macro_rules! VARATT_IS_EXTENDED {
     ($PTR:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$PTR;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1887,6 +1935,8 @@ macro_rules! VARATT_IS_EXTENDED {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1898,7 +1948,7 @@ macro_rules! VARATT_IS_EXTENDED {
 macro_rules! VARATT_IS_EXTENDED {
     ($PTR:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$PTR;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
@@ -1913,6 +1963,8 @@ macro_rules! VARATT_IS_EXTENDED {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1924,7 +1976,7 @@ macro_rules! VARATT_IS_EXTENDED {
 macro_rules! VARATT_IS_EXTERNAL {
     ($PTR:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$PTR;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1951,6 +2003,8 @@ macro_rules! VARATT_IS_EXTERNAL {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1962,7 +2016,7 @@ macro_rules! VARATT_IS_EXTERNAL {
 macro_rules! VARATT_IS_EXTERNAL {
     ($PTR:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$PTR;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
@@ -1977,6 +2031,8 @@ macro_rules! VARATT_IS_EXTERNAL {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1988,7 +2044,7 @@ macro_rules! VARATT_IS_EXTERNAL {
 macro_rules! VARATT_IS_EXTERNAL_EXPANDED {
     ($PTR:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$PTR;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2015,6 +2071,8 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -2026,7 +2084,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED {
 macro_rules! VARATT_IS_EXTERNAL_EXPANDED {
     ($PTR:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$PTR;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
@@ -2041,6 +2099,8 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -2052,7 +2112,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED {
 macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RO {
     ($PTR:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$PTR;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2079,6 +2139,8 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RO {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -2090,7 +2152,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RO {
 macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RO {
     ($PTR:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$PTR;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
@@ -2105,6 +2167,8 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RO {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -2116,7 +2180,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RO {
 macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RW {
     ($PTR:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$PTR;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2143,6 +2207,8 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RW {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -2154,7 +2220,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RW {
 macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RW {
     ($PTR:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$PTR;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
@@ -2169,6 +2235,8 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RW {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -2180,7 +2248,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RW {
 macro_rules! VARATT_IS_EXTERNAL_INDIRECT {
     ($PTR:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$PTR;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2207,6 +2275,8 @@ macro_rules! VARATT_IS_EXTERNAL_INDIRECT {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -2218,7 +2288,7 @@ macro_rules! VARATT_IS_EXTERNAL_INDIRECT {
 macro_rules! VARATT_IS_EXTERNAL_INDIRECT {
     ($PTR:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$PTR;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
@@ -2233,6 +2303,8 @@ macro_rules! VARATT_IS_EXTERNAL_INDIRECT {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -2244,7 +2316,7 @@ macro_rules! VARATT_IS_EXTERNAL_INDIRECT {
 macro_rules! VARATT_IS_EXTERNAL_NON_EXPANDED {
     ($PTR:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$PTR;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2271,6 +2343,8 @@ macro_rules! VARATT_IS_EXTERNAL_NON_EXPANDED {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -2282,7 +2356,7 @@ macro_rules! VARATT_IS_EXTERNAL_NON_EXPANDED {
 macro_rules! VARATT_IS_EXTERNAL_NON_EXPANDED {
     ($PTR:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$PTR;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
@@ -2297,6 +2371,8 @@ macro_rules! VARATT_IS_EXTERNAL_NON_EXPANDED {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -2308,7 +2384,7 @@ macro_rules! VARATT_IS_EXTERNAL_NON_EXPANDED {
 macro_rules! VARATT_IS_EXTERNAL_ONDISK {
     ($PTR:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$PTR;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2335,6 +2411,8 @@ macro_rules! VARATT_IS_EXTERNAL_ONDISK {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -2346,7 +2424,7 @@ macro_rules! VARATT_IS_EXTERNAL_ONDISK {
 macro_rules! VARATT_IS_EXTERNAL_ONDISK {
     ($PTR:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$PTR;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
@@ -2361,6 +2439,8 @@ macro_rules! VARATT_IS_EXTERNAL_ONDISK {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -2372,7 +2452,7 @@ macro_rules! VARATT_IS_EXTERNAL_ONDISK {
 macro_rules! VARATT_IS_SHORT {
     ($PTR:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$PTR;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2399,6 +2479,8 @@ macro_rules! VARATT_IS_SHORT {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -2410,7 +2492,7 @@ macro_rules! VARATT_IS_SHORT {
 macro_rules! VARATT_IS_SHORT {
     ($PTR:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$PTR;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
@@ -2425,6 +2507,8 @@ macro_rules! VARATT_IS_SHORT {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -2436,7 +2520,7 @@ macro_rules! VARATT_IS_SHORT {
 macro_rules! VARATT_NOT_PAD_BYTE {
     ($PTR:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$PTR;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2457,6 +2541,8 @@ macro_rules! VARATT_NOT_PAD_BYTE {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -2468,7 +2554,7 @@ macro_rules! VARATT_NOT_PAD_BYTE {
 macro_rules! VARATT_NOT_PAD_BYTE {
     ($PTR:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$PTR;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2553,6 +2639,8 @@ macro_rules! VARDATA {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -2928,6 +3016,8 @@ macro_rules! VARDATA_ANY {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -3032,6 +3122,8 @@ macro_rules! VARDATA_COMPRESSED_GET_COMPRESS_METHOD {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -3132,6 +3224,8 @@ macro_rules! VARDATA_COMPRESSED_GET_EXTSIZE {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -3216,6 +3310,8 @@ macro_rules! VARDATA_EXTERNAL {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -3305,6 +3401,8 @@ macro_rules! VARDATA_SHORT {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -3426,6 +3524,8 @@ macro_rules! VARSIZE {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -4140,6 +4240,8 @@ macro_rules! VARSIZE_ANY {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -4587,6 +4689,8 @@ macro_rules! VARSIZE_ANY_EXHDR {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -4778,6 +4882,8 @@ macro_rules! VARSIZE_EXTERNAL {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -4888,6 +4994,8 @@ macro_rules! VARSIZE_SHORT {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -5062,6 +5170,8 @@ macro_rules! VARTAG_EXTERNAL {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -5093,6 +5203,8 @@ macro_rules! VARTAG_EXTERNAL {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -5100,7 +5212,7 @@ macro_rules! VARTAG_EXTERNAL {
 macro_rules! VARTAG_IS_EXPANDED {
     ($tag:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$tag;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -5127,6 +5239,8 @@ macro_rules! VARTAG_IS_EXPANDED {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -5134,7 +5248,7 @@ macro_rules! VARTAG_IS_EXPANDED {
 macro_rules! VARTAG_IS_EXPANDED {
     ($tag:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$tag;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
@@ -5297,6 +5411,8 @@ macro_rules! VARTAG_SIZE {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///

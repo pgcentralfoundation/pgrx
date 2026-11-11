@@ -9,6 +9,8 @@
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -20,7 +22,7 @@
 macro_rules! MemoryContextIsValid {
     ($context:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$context;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -41,6 +43,8 @@ macro_rules! MemoryContextIsValid {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -52,7 +56,7 @@ macro_rules! MemoryContextIsValid {
 macro_rules! MemoryContextIsValid {
     ($context:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$context;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(

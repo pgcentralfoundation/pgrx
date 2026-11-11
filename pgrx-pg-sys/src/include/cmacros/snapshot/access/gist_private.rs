@@ -8,6 +8,8 @@
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -19,7 +21,7 @@
 macro_rules! BUFFER_HALF_FILLED {
     ($nodeBuffer:expr, $gfbb:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$nodeBuffer;
                 let _ = &$gfbb;
                 (
@@ -40,6 +42,8 @@ macro_rules! BUFFER_HALF_FILLED {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -47,7 +51,7 @@ macro_rules! BUFFER_HALF_FILLED {
 macro_rules! BUFFER_OVERFLOWED {
     ($nodeBuffer:expr, $gfbb:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$nodeBuffer;
                 let _ = &$gfbb;
                 (
@@ -68,6 +72,8 @@ macro_rules! BUFFER_OVERFLOWED {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -75,7 +81,7 @@ macro_rules! BUFFER_OVERFLOWED {
 macro_rules! GISTSearchItemIsHeap {
     ($item:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$item;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -96,6 +102,8 @@ macro_rules! GISTSearchItemIsHeap {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 #[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
 ///
 /// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
@@ -113,7 +121,7 @@ macro_rules! GISTSearchItemIsHeap {
 macro_rules! GistTupleIsInvalid {
     ($itup:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$itup;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -134,6 +142,8 @@ macro_rules! GistTupleIsInvalid {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -145,7 +155,7 @@ macro_rules! GistTupleIsInvalid {
 macro_rules! GistTupleIsInvalid {
     ($itup:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$itup;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -166,6 +176,8 @@ macro_rules! GistTupleIsInvalid {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -173,7 +185,7 @@ macro_rules! GistTupleIsInvalid {
 macro_rules! GistTupleIsInvalid {
     ($itup:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$itup;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -329,6 +341,8 @@ macro_rules! GistTupleSetValid {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -340,7 +354,7 @@ macro_rules! GistTupleSetValid {
 macro_rules! LEVEL_HAS_BUFFERS {
     ($nlevel:expr, $gfbb:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$nlevel;
                 let _ = &$gfbb;
                 (
@@ -397,6 +411,8 @@ macro_rules! PAGE_FREE_SPACE {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -408,7 +424,7 @@ macro_rules! PAGE_FREE_SPACE {
 macro_rules! PAGE_IS_EMPTY {
     ($nbp:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$nbp;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -428,6 +444,8 @@ macro_rules! PAGE_IS_EMPTY {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -439,7 +457,7 @@ macro_rules! PAGE_IS_EMPTY {
 macro_rules! PAGE_NO_SPACE {
     ($nbp:expr, $itup:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$nbp;
                 let _ = &$itup;
                 (

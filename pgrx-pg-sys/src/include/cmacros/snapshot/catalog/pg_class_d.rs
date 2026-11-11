@@ -8,6 +8,8 @@
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -15,7 +17,7 @@
 macro_rules! RELKIND_HAS_PARTITIONS {
     ($relkind:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$relkind;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -35,6 +37,8 @@ macro_rules! RELKIND_HAS_PARTITIONS {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -42,7 +46,7 @@ macro_rules! RELKIND_HAS_PARTITIONS {
 macro_rules! RELKIND_HAS_STORAGE {
     ($relkind:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$relkind;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -62,6 +66,8 @@ macro_rules! RELKIND_HAS_STORAGE {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -69,7 +75,7 @@ macro_rules! RELKIND_HAS_STORAGE {
 macro_rules! RELKIND_HAS_TABLESPACE {
     ($relkind:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$relkind;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -89,6 +95,8 @@ macro_rules! RELKIND_HAS_TABLESPACE {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -96,7 +104,7 @@ macro_rules! RELKIND_HAS_TABLESPACE {
 macro_rules! RELKIND_HAS_TABLE_AM {
     ($relkind:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$relkind;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(

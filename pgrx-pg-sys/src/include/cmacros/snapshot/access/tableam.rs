@@ -19,6 +19,8 @@
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -63,6 +65,8 @@ macro_rules! table_beginscan {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -110,6 +114,8 @@ macro_rules! table_beginscan {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -154,6 +160,8 @@ macro_rules! table_beginscan {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -195,6 +203,8 @@ macro_rules! table_beginscan_analyze {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -235,6 +245,8 @@ macro_rules! table_beginscan_analyze {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -283,6 +295,8 @@ macro_rules! table_beginscan_bm {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -329,6 +343,8 @@ macro_rules! table_beginscan_bm {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -373,6 +389,8 @@ macro_rules! table_beginscan_bm {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -427,6 +445,8 @@ macro_rules! table_beginscan_bm {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -493,6 +513,8 @@ macro_rules! table_beginscan_sampling {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -556,6 +578,8 @@ macro_rules! table_beginscan_sampling {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -609,6 +633,8 @@ macro_rules! table_beginscan_strat {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -654,6 +680,8 @@ macro_rules! table_beginscan_strat {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -695,6 +723,8 @@ macro_rules! table_beginscan_tid {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -744,6 +774,8 @@ macro_rules! table_beginscan_tid {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -797,6 +829,8 @@ macro_rules! table_beginscan_tidrange {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -838,6 +872,8 @@ macro_rules! table_beginscan_tidrange {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -869,6 +905,8 @@ macro_rules! table_endscan {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -902,6 +940,8 @@ macro_rules! table_finish_bulk_insert {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -953,6 +993,8 @@ macro_rules! table_finish_bulk_insert {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -1030,6 +1072,8 @@ macro_rules! table_index_build_range_scan {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1103,6 +1147,8 @@ macro_rules! table_index_build_range_scan {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1170,6 +1216,8 @@ macro_rules! table_index_build_scan {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1219,6 +1267,8 @@ macro_rules! table_index_build_scan {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1253,6 +1303,8 @@ macro_rules! table_index_delete_tuples {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -1302,6 +1354,8 @@ macro_rules! table_index_fetch_begin {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1342,6 +1396,8 @@ macro_rules! table_index_fetch_begin {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1370,6 +1426,8 @@ macro_rules! table_index_fetch_end {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -1415,6 +1473,8 @@ macro_rules! table_index_fetch_reset {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1426,7 +1486,7 @@ macro_rules! table_index_fetch_reset {
 macro_rules! table_index_fetch_tuple {
     ($scan:expr, $tid:expr, $snapshot:expr, $slot:expr, $call_again:expr, $all_dead:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$scan;
                 let _ = &$tid;
                 let _ = &$snapshot;
@@ -1462,6 +1522,8 @@ macro_rules! table_index_fetch_tuple {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1473,7 +1535,7 @@ macro_rules! table_index_fetch_tuple {
 macro_rules! table_index_fetch_tuple {
     ($scan:expr, $tid:expr, $snapshot:expr, $slot:expr, $call_again:expr, $all_dead:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$scan;
                 let _ = &$tid;
                 let _ = &$snapshot;
@@ -1506,6 +1568,8 @@ macro_rules! table_index_fetch_tuple {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -1551,6 +1615,8 @@ macro_rules! table_index_validate_scan {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1588,6 +1654,8 @@ macro_rules! table_index_validate_scan {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -1628,6 +1696,8 @@ macro_rules! table_multi_insert {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1664,6 +1734,8 @@ macro_rules! table_multi_insert {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1695,6 +1767,8 @@ macro_rules! table_parallelscan_reinitialize {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1725,6 +1799,8 @@ macro_rules! table_relation_copy_data {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -1768,6 +1844,8 @@ macro_rules! table_relation_copy_data {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -1835,6 +1913,8 @@ macro_rules! table_relation_copy_for_cluster {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1891,6 +1971,8 @@ macro_rules! table_relation_copy_for_cluster {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1931,6 +2013,8 @@ macro_rules! table_relation_estimate_size {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -1981,6 +2065,8 @@ macro_rules! table_relation_fetch_toast_slice {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -2024,6 +2110,8 @@ macro_rules! table_relation_fetch_toast_slice {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -2035,7 +2123,7 @@ macro_rules! table_relation_fetch_toast_slice {
 macro_rules! table_relation_needs_toast_table {
     ($rel:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$rel;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
@@ -2054,6 +2142,8 @@ macro_rules! table_relation_needs_toast_table {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -2090,6 +2180,8 @@ macro_rules! table_relation_nontransactional_truncate {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -2132,6 +2224,8 @@ macro_rules! table_relation_set_new_filelocator {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -2167,6 +2261,8 @@ macro_rules! table_relation_set_new_filenode {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -2198,6 +2294,8 @@ macro_rules! table_relation_size {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -2231,6 +2329,8 @@ macro_rules! table_relation_toast_am {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -2267,6 +2367,8 @@ macro_rules! table_relation_vacuum {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -2302,6 +2404,8 @@ macro_rules! table_relation_vacuum {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -2332,6 +2436,8 @@ macro_rules! table_rescan {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -2366,6 +2472,8 @@ macro_rules! table_rescan {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -2405,6 +2513,8 @@ macro_rules! table_rescan_set_params {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -2446,6 +2556,8 @@ macro_rules! table_rescan_set_params {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
 #[doc = crate::__pgrx_c_doc_assertions!()]
@@ -2486,6 +2598,8 @@ macro_rules! table_rescan_tidrange {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -2497,7 +2611,7 @@ macro_rules! table_rescan_tidrange {
 macro_rules! table_scan_analyze_next_block {
     ($scan:expr, $blockno:expr, $bstrategy:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$scan;
                 let _ = &$blockno;
                 let _ = &$bstrategy;
@@ -2520,6 +2634,8 @@ macro_rules! table_scan_analyze_next_block {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -2531,7 +2647,7 @@ macro_rules! table_scan_analyze_next_block {
 macro_rules! table_scan_analyze_next_block {
     ($scan:expr, $stream:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$scan;
                 let _ = &$stream;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
@@ -2557,6 +2673,8 @@ macro_rules! table_scan_analyze_next_block {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -2568,7 +2686,7 @@ macro_rules! table_scan_analyze_next_block {
 macro_rules! table_scan_analyze_next_tuple {
     ($scan:expr, $OldestXmin:expr, $liverows:expr, $deadrows:expr, $slot:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$scan;
                 let _ = &$OldestXmin;
                 let _ = &$liverows;
@@ -2597,6 +2715,8 @@ macro_rules! table_scan_analyze_next_tuple {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -2608,7 +2728,7 @@ macro_rules! table_scan_analyze_next_tuple {
 macro_rules! table_scan_analyze_next_tuple {
     ($scan:expr, $liverows:expr, $deadrows:expr, $slot:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$scan;
                 let _ = &$liverows;
                 let _ = &$deadrows;
@@ -2642,6 +2762,8 @@ macro_rules! table_scan_analyze_next_tuple {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -2653,7 +2775,7 @@ macro_rules! table_scan_analyze_next_tuple {
 macro_rules! table_scan_bitmap_next_block {
     ($scan:expr, $tbmres:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$scan;
                 let _ = &$tbmres;
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2691,6 +2813,8 @@ macro_rules! table_scan_bitmap_next_block {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -2702,7 +2826,7 @@ macro_rules! table_scan_bitmap_next_block {
 macro_rules! table_scan_bitmap_next_tuple {
     ($scan:expr, $tbmres:expr, $slot:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$scan;
                 let _ = &$tbmres;
                 let _ = &$slot;
@@ -2745,6 +2869,8 @@ macro_rules! table_scan_bitmap_next_tuple {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -2756,7 +2882,7 @@ macro_rules! table_scan_bitmap_next_tuple {
 macro_rules! table_scan_bitmap_next_tuple {
     ($scan:expr, $slot:expr, $recheck:expr, $lossy_pages:expr, $exact_pages:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$scan;
                 let _ = &$slot;
                 let _ = &$recheck;
@@ -2793,6 +2919,8 @@ macro_rules! table_scan_bitmap_next_tuple {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -2804,7 +2932,7 @@ macro_rules! table_scan_bitmap_next_tuple {
 macro_rules! table_scan_bitmap_next_tuple {
     ($scan:expr, $slot:expr, $recheck:expr, $lossy_pages:expr, $exact_pages:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$scan;
                 let _ = &$slot;
                 let _ = &$recheck;
@@ -2839,6 +2967,8 @@ macro_rules! table_scan_bitmap_next_tuple {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -2850,7 +2980,7 @@ macro_rules! table_scan_bitmap_next_tuple {
 macro_rules! table_scan_getnextslot {
     ($sscan:expr, $direction:expr, $slot:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$sscan;
                 let _ = &$direction;
                 let _ = &$slot;
@@ -2891,6 +3021,8 @@ macro_rules! table_scan_getnextslot {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -2902,7 +3034,7 @@ macro_rules! table_scan_getnextslot {
 macro_rules! table_scan_getnextslot {
     ($sscan:expr, $direction:expr, $slot:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$sscan;
                 let _ = &$direction;
                 let _ = &$slot;
@@ -2935,6 +3067,8 @@ macro_rules! table_scan_getnextslot {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
 #[doc = crate::__pgrx_c_doc_assertions!()]
@@ -2950,7 +3084,7 @@ macro_rules! table_scan_getnextslot {
 macro_rules! table_scan_getnextslot {
     ($sscan:expr, $direction:expr, $slot:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$sscan;
                 let _ = &$direction;
                 let _ = &$slot;
@@ -2979,6 +3113,8 @@ macro_rules! table_scan_getnextslot {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
 #[doc = crate::__pgrx_c_doc_assertions!()]
@@ -2994,7 +3130,7 @@ macro_rules! table_scan_getnextslot {
 macro_rules! table_scan_getnextslot_tidrange {
     ($sscan:expr, $direction:expr, $slot:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$sscan;
                 let _ = &$direction;
                 let _ = &$slot;
@@ -3027,6 +3163,8 @@ macro_rules! table_scan_getnextslot_tidrange {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
 #[doc = crate::__pgrx_c_doc_assertions!()]
@@ -3042,7 +3180,7 @@ macro_rules! table_scan_getnextslot_tidrange {
 macro_rules! table_scan_getnextslot_tidrange {
     ($sscan:expr, $direction:expr, $slot:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$sscan;
                 let _ = &$direction;
                 let _ = &$slot;
@@ -3073,6 +3211,8 @@ macro_rules! table_scan_getnextslot_tidrange {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -3084,7 +3224,7 @@ macro_rules! table_scan_getnextslot_tidrange {
 macro_rules! table_scan_sample_next_block {
     ($scan:expr, $scanstate:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$scan;
                 let _ = &$scanstate;
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -3111,6 +3251,8 @@ macro_rules! table_scan_sample_next_block {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -3122,7 +3264,7 @@ macro_rules! table_scan_sample_next_block {
 macro_rules! table_scan_sample_next_block {
     ($scan:expr, $scanstate:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$scan;
                 let _ = &$scanstate;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
@@ -3154,6 +3296,8 @@ macro_rules! table_scan_sample_next_block {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -3165,7 +3309,7 @@ macro_rules! table_scan_sample_next_block {
 macro_rules! table_scan_sample_next_tuple {
     ($scan:expr, $scanstate:expr, $slot:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$scan;
                 let _ = &$scanstate;
                 let _ = &$slot;
@@ -3195,6 +3339,8 @@ macro_rules! table_scan_sample_next_tuple {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -3206,7 +3352,7 @@ macro_rules! table_scan_sample_next_tuple {
 macro_rules! table_scan_sample_next_tuple {
     ($scan:expr, $scanstate:expr, $slot:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$scan;
                 let _ = &$scanstate;
                 let _ = &$slot;
@@ -3229,6 +3375,8 @@ macro_rules! table_scan_sample_next_tuple {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -3268,6 +3416,8 @@ macro_rules! table_tuple_complete_speculative {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -3325,6 +3475,8 @@ macro_rules! table_tuple_delete {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -3389,6 +3541,8 @@ macro_rules! table_tuple_delete {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -3400,7 +3554,7 @@ macro_rules! table_tuple_delete {
 macro_rules! table_tuple_fetch_row_version {
     ($rel:expr, $tid:expr, $snapshot:expr, $slot:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$rel;
                 let _ = &$tid;
                 let _ = &$snapshot;
@@ -3429,6 +3583,8 @@ macro_rules! table_tuple_fetch_row_version {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -3467,6 +3623,8 @@ macro_rules! table_tuple_insert {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -3507,6 +3665,8 @@ macro_rules! table_tuple_insert {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -3549,6 +3709,8 @@ macro_rules! table_tuple_insert_speculative {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -3589,6 +3751,8 @@ macro_rules! table_tuple_insert_speculative {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -3645,6 +3809,8 @@ macro_rules! table_tuple_lock {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -3656,7 +3822,7 @@ macro_rules! table_tuple_lock {
 macro_rules! table_tuple_satisfies_snapshot {
     ($rel:expr, $slot:expr, $snapshot:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$rel;
                 let _ = &$slot;
                 let _ = &$snapshot;
@@ -3678,6 +3844,8 @@ macro_rules! table_tuple_satisfies_snapshot {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -3689,7 +3857,7 @@ macro_rules! table_tuple_satisfies_snapshot {
 macro_rules! table_tuple_tid_valid {
     ($scan:expr, $tid:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$scan;
                 let _ = &$tid;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
@@ -3716,6 +3884,8 @@ macro_rules! table_tuple_tid_valid {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -3780,6 +3950,8 @@ macro_rules! table_tuple_update {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -3843,6 +4015,8 @@ macro_rules! table_tuple_update {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///

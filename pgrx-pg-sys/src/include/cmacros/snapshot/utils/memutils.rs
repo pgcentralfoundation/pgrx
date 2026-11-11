@@ -8,6 +8,8 @@
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -19,7 +21,7 @@
 macro_rules! AllocSizeIsValid {
     ($size:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$size;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -62,6 +64,8 @@ macro_rules! AllocSizeIsValid {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -253,6 +257,8 @@ macro_rules! MemoryContextResetAndDeleteChildren {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -264,7 +270,7 @@ macro_rules! MemoryContextResetAndDeleteChildren {
 macro_rules! pg_memory_is_all_zeros {
     ($ptr:expr, $len:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$ptr;
                 let _ = &$len;
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -388,6 +394,8 @@ macro_rules! pg_memory_is_all_zeros {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -399,7 +407,7 @@ macro_rules! pg_memory_is_all_zeros {
 macro_rules! pg_memory_is_all_zeros {
     ($ptr:expr, $len:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$ptr;
                 let _ = &$len;
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(

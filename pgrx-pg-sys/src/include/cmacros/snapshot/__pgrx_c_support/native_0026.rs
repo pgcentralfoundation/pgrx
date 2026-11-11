@@ -1,51 +1,5 @@
 // Shared generated C macro support.
 
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::xl_hash_update_meta_page>() == 8);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::xl_hash_update_meta_page>() == 8);
-};
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::xl_hash_update_meta_page {}
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::varatt_indirect>() == 8);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::varatt_indirect>() == 8);
-};
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::varatt_indirect {}
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::varatt_expanded>() == 8);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::varatt_expanded>() == 8);
-};
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::varatt_expanded {}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::tzEntry {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::tzEntry {
-    type Marker = c::expression::COpaque<Self>;
-}
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::slist_iter>() == 8);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::slist_iter>() == 8);
-};
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::slist_iter {}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::shm_toc {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::shm_toc {
-    type Marker = c::expression::COpaque<Self>;
-}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::shm_mq_handle {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::shm_mq_handle {
-    type Marker = c::expression::COpaque<Self>;
-}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::shm_mq {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::shm_mq {
-    type Marker = c::expression::COpaque<Self>;
-}
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::relopt_real>() == 56);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::relopt_real>() == 8);
-};
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::relopt_real {}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::pg_tzenum {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::pg_tzenum {
-    type Marker = c::expression::COpaque<Self>;
-}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::pg_tz {}
 impl c::expression::NativeType for crate::__pgrx_c_bindings::pg_tz {
     type Marker = c::expression::COpaque<Self>;
 }
@@ -3610,410 +3564,490 @@ mod type_enumerator_seals {
 #[diagnostic::on_unimplemented(
     message = "no enumerator of `enum NodeTag` is `T_` followed by the C name of `{Self}`",
     label = "`T_` pasted onto this type's C name must name an enumerator",
-    note = "a Rust type that several C type names share, each with its own enumerator, selects none: DistinctExpr, NullIfExpr, OpExpr"
+    note = "a structure that several C type names share has an enumerator for each, so the operand must end in one of those names, written as the last segment of a plain path and not through an alias or a captured `ty` fragment: DistinctExpr, NullIfExpr, OpExpr"
 )]
 pub trait TypeEnumerator_T_: type_enumerator_seals::Seal_T_ {
+    /// The structure type the operand names.
+    type Type;
     /// The enumerator, with its C type.
     const VALUE: c::CValue<c::CInt>;
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::A_ArrayExpr {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::A_ArrayExpr {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_A_ArrayExpr as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::A_Const {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::A_Const {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_A_Const as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::A_Expr {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::A_Expr {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_A_Expr as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::A_Indices {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::A_Indices {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_A_Indices as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::A_Indirection {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::A_Indirection {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_A_Indirection as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::A_Star {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::A_Star {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_A_Star as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AccessPriv {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AccessPriv {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AccessPriv as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::Agg {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::Agg {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_Agg as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AggPath {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AggPath {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AggPath as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AggState {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AggState {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AggState as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::Aggref {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::Aggref {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_Aggref as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::Alias {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::Alias {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_Alias as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterCollationStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterCollationStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AlterCollationStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterDatabaseRefreshCollStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterDatabaseRefreshCollStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> = c::CValue::<c::CInt>::new(
         crate::__pgrx_c_bindings::NodeTag::T_AlterDatabaseRefreshCollStmt as i32,
     );
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterDatabaseSetStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterDatabaseSetStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AlterDatabaseSetStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterDatabaseStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterDatabaseStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AlterDatabaseStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterDefaultPrivilegesStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterDefaultPrivilegesStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> = c::CValue::<c::CInt>::new(
         crate::__pgrx_c_bindings::NodeTag::T_AlterDefaultPrivilegesStmt as i32,
     );
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterDomainStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterDomainStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AlterDomainStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterEnumStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterEnumStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AlterEnumStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterEventTrigStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterEventTrigStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AlterEventTrigStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterExtensionContentsStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterExtensionContentsStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> = c::CValue::<c::CInt>::new(
         crate::__pgrx_c_bindings::NodeTag::T_AlterExtensionContentsStmt as i32,
     );
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterExtensionStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterExtensionStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AlterExtensionStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterFdwStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterFdwStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AlterFdwStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterForeignServerStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterForeignServerStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> = c::CValue::<c::CInt>::new(
         crate::__pgrx_c_bindings::NodeTag::T_AlterForeignServerStmt as i32,
     );
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterFunctionStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterFunctionStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AlterFunctionStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterObjectDependsStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterObjectDependsStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> = c::CValue::<c::CInt>::new(
         crate::__pgrx_c_bindings::NodeTag::T_AlterObjectDependsStmt as i32,
     );
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterObjectSchemaStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterObjectSchemaStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> = c::CValue::<c::CInt>::new(
         crate::__pgrx_c_bindings::NodeTag::T_AlterObjectSchemaStmt as i32,
     );
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterOpFamilyStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterOpFamilyStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AlterOpFamilyStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterOperatorStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterOperatorStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AlterOperatorStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterOwnerStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterOwnerStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AlterOwnerStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterPolicyStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterPolicyStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AlterPolicyStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterPublicationStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterPublicationStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AlterPublicationStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterRoleSetStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterRoleSetStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AlterRoleSetStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterRoleStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterRoleStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AlterRoleStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterSeqStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterSeqStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AlterSeqStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterStatsStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterStatsStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AlterStatsStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterSubscriptionStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterSubscriptionStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> = c::CValue::<c::CInt>::new(
         crate::__pgrx_c_bindings::NodeTag::T_AlterSubscriptionStmt as i32,
     );
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterSystemStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterSystemStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AlterSystemStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterTSConfigurationStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterTSConfigurationStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> = c::CValue::<c::CInt>::new(
         crate::__pgrx_c_bindings::NodeTag::T_AlterTSConfigurationStmt as i32,
     );
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterTSDictionaryStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterTSDictionaryStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> = c::CValue::<c::CInt>::new(
         crate::__pgrx_c_bindings::NodeTag::T_AlterTSDictionaryStmt as i32,
     );
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterTableCmd {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterTableCmd {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AlterTableCmd as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterTableMoveAllStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterTableMoveAllStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> = c::CValue::<c::CInt>::new(
         crate::__pgrx_c_bindings::NodeTag::T_AlterTableMoveAllStmt as i32,
     );
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterTableSpaceOptionsStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterTableSpaceOptionsStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> = c::CValue::<c::CInt>::new(
         crate::__pgrx_c_bindings::NodeTag::T_AlterTableSpaceOptionsStmt as i32,
     );
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterTableStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterTableStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AlterTableStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterTypeStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterTypeStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AlterTypeStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlterUserMappingStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterUserMappingStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AlterUserMappingStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AlternativeSubPlan {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlternativeSubPlan {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AlternativeSubPlan as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::Append {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::Append {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_Append as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AppendPath {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AppendPath {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AppendPath as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AppendRelInfo {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AppendRelInfo {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AppendRelInfo as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AppendState {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AppendState {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AppendState as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::ArrayCoerceExpr {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::ArrayCoerceExpr {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_ArrayCoerceExpr as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::ArrayExpr {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::ArrayExpr {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_ArrayExpr as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::BaseBackupCmd {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::BaseBackupCmd {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_BaseBackupCmd as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::BitString {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::BitString {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_BitString as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::BitmapAnd {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::BitmapAnd {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_BitmapAnd as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::BitmapAndPath {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::BitmapAndPath {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_BitmapAndPath as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::BitmapAndState {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::BitmapAndState {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_BitmapAndState as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::BitmapHeapPath {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::BitmapHeapPath {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_BitmapHeapPath as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::BitmapHeapScan {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::BitmapHeapScan {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_BitmapHeapScan as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::BitmapHeapScanState {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::BitmapHeapScanState {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_BitmapHeapScanState as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::BitmapIndexScan {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::BitmapIndexScan {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_BitmapIndexScan as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::BitmapIndexScanState {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::BitmapIndexScanState {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_BitmapIndexScanState as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::BitmapOr {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::BitmapOr {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_BitmapOr as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::BitmapOrPath {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::BitmapOrPath {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_BitmapOrPath as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::BitmapOrState {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::BitmapOrState {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_BitmapOrState as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::BoolExpr {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::BoolExpr {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_BoolExpr as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::Boolean {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::Boolean {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_Boolean as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::BooleanTest {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::BooleanTest {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_BooleanTest as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CTECycleClause {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CTECycleClause {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CTECycleClause as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CTESearchClause {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CTESearchClause {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CTESearchClause as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CallContext {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CallContext {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CallContext as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CallStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CallStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CallStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CaseExpr {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CaseExpr {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CaseExpr as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CaseTestExpr {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CaseTestExpr {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CaseTestExpr as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CaseWhen {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CaseWhen {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CaseWhen as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CheckPointStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CheckPointStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CheckPointStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::ClosePortalStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::ClosePortalStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_ClosePortalStmt as i32);
 }
@@ -4021,580 +4055,664 @@ impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::ClosePortalStmt {
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::ClusterStmt {}
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::ClusterStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_ClusterStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CoalesceExpr {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CoalesceExpr {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CoalesceExpr as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CoerceToDomain {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CoerceToDomain {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CoerceToDomain as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CoerceToDomainValue {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CoerceToDomainValue {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CoerceToDomainValue as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CoerceViaIO {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CoerceViaIO {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CoerceViaIO as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CollateClause {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CollateClause {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CollateClause as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CollateExpr {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CollateExpr {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CollateExpr as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::ColumnDef {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::ColumnDef {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_ColumnDef as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::ColumnRef {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::ColumnRef {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_ColumnRef as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CommentStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CommentStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CommentStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CommonTableExpr {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CommonTableExpr {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CommonTableExpr as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CompositeTypeStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CompositeTypeStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CompositeTypeStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::Const {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::Const {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_Const as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::Constraint {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::Constraint {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_Constraint as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::ConstraintsSetStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::ConstraintsSetStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_ConstraintsSetStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::ConvertRowtypeExpr {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::ConvertRowtypeExpr {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_ConvertRowtypeExpr as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CopyStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CopyStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CopyStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreateAmStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreateAmStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CreateAmStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreateCastStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreateCastStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CreateCastStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreateConversionStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreateConversionStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CreateConversionStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreateDomainStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreateDomainStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CreateDomainStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreateEnumStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreateEnumStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CreateEnumStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreateEventTrigStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreateEventTrigStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CreateEventTrigStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreateExtensionStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreateExtensionStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CreateExtensionStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreateFdwStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreateFdwStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CreateFdwStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreateForeignServerStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreateForeignServerStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> = c::CValue::<c::CInt>::new(
         crate::__pgrx_c_bindings::NodeTag::T_CreateForeignServerStmt as i32,
     );
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreateForeignTableStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreateForeignTableStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> = c::CValue::<c::CInt>::new(
         crate::__pgrx_c_bindings::NodeTag::T_CreateForeignTableStmt as i32,
     );
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreateFunctionStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreateFunctionStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CreateFunctionStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreateOpClassItem {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreateOpClassItem {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CreateOpClassItem as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreateOpClassStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreateOpClassStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CreateOpClassStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreateOpFamilyStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreateOpFamilyStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CreateOpFamilyStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreatePLangStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreatePLangStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CreatePLangStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreatePolicyStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreatePolicyStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CreatePolicyStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreatePublicationStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreatePublicationStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> = c::CValue::<c::CInt>::new(
         crate::__pgrx_c_bindings::NodeTag::T_CreatePublicationStmt as i32,
     );
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreateRangeStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreateRangeStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CreateRangeStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreateReplicationSlotCmd {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreateReplicationSlotCmd {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> = c::CValue::<c::CInt>::new(
         crate::__pgrx_c_bindings::NodeTag::T_CreateReplicationSlotCmd as i32,
     );
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreateRoleStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreateRoleStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CreateRoleStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreateSchemaStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreateSchemaStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CreateSchemaStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreateSeqStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreateSeqStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CreateSeqStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreateStatsStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreateStatsStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CreateStatsStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreateStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreateStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CreateStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreateSubscriptionStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreateSubscriptionStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> = c::CValue::<c::CInt>::new(
         crate::__pgrx_c_bindings::NodeTag::T_CreateSubscriptionStmt as i32,
     );
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreateTableAsStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreateTableAsStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CreateTableAsStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreateTableSpaceStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreateTableSpaceStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CreateTableSpaceStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreateTransformStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreateTransformStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CreateTransformStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreateTrigStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreateTrigStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CreateTrigStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreateUserMappingStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreateUserMappingStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> = c::CValue::<c::CInt>::new(
         crate::__pgrx_c_bindings::NodeTag::T_CreateUserMappingStmt as i32,
     );
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CreatedbStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CreatedbStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CreatedbStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CteScan {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CteScan {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CteScan as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CteScanState {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CteScanState {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CteScanState as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CurrentOfExpr {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CurrentOfExpr {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CurrentOfExpr as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CustomPath {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CustomPath {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CustomPath as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CustomScan {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CustomScan {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CustomScan as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::CustomScanState {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::CustomScanState {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_CustomScanState as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::DeallocateStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::DeallocateStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_DeallocateStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::DeclareCursorStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::DeclareCursorStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_DeclareCursorStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::DefElem {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::DefElem {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_DefElem as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::DefineStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::DefineStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_DefineStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::DeleteStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::DeleteStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_DeleteStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::DiscardStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::DiscardStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_DiscardStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::DoStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::DoStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_DoStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::DomainConstraintState {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::DomainConstraintState {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> = c::CValue::<c::CInt>::new(
         crate::__pgrx_c_bindings::NodeTag::T_DomainConstraintState as i32,
     );
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::DropOwnedStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::DropOwnedStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_DropOwnedStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::DropReplicationSlotCmd {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::DropReplicationSlotCmd {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> = c::CValue::<c::CInt>::new(
         crate::__pgrx_c_bindings::NodeTag::T_DropReplicationSlotCmd as i32,
     );
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::DropRoleStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::DropRoleStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_DropRoleStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::DropStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::DropStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_DropStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::DropSubscriptionStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::DropSubscriptionStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_DropSubscriptionStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::DropTableSpaceStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::DropTableSpaceStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_DropTableSpaceStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::DropUserMappingStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::DropUserMappingStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_DropUserMappingStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::DropdbStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::DropdbStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_DropdbStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::EState {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::EState {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_EState as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::EquivalenceClass {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::EquivalenceClass {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_EquivalenceClass as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::EquivalenceMember {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::EquivalenceMember {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_EquivalenceMember as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::EventTriggerData {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::EventTriggerData {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_EventTriggerData as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::ExecuteStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::ExecuteStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_ExecuteStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::ExplainStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::ExplainStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_ExplainStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::ExprContext {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::ExprContext {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_ExprContext as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::ExprState {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::ExprState {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_ExprState as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::ExtensibleNode {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::ExtensibleNode {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_ExtensibleNode as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::FdwRoutine {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::FdwRoutine {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_FdwRoutine as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::FetchStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::FetchStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_FetchStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::FieldSelect {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::FieldSelect {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_FieldSelect as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::FieldStore {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::FieldStore {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_FieldStore as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::Float {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::Float {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_Float as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::ForeignKeyCacheInfo {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::ForeignKeyCacheInfo {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_ForeignKeyCacheInfo as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::ForeignKeyOptInfo {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::ForeignKeyOptInfo {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_ForeignKeyOptInfo as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::ForeignPath {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::ForeignPath {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_ForeignPath as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::ForeignScan {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::ForeignScan {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_ForeignScan as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::ForeignScanState {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::ForeignScanState {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_ForeignScanState as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::FromExpr {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::FromExpr {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_FromExpr as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::FuncCall {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::FuncCall {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_FuncCall as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::FuncExpr {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::FuncExpr {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_FuncExpr as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::FunctionParameter {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::FunctionParameter {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_FunctionParameter as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::FunctionScan {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::FunctionScan {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_FunctionScan as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::FunctionScanState {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::FunctionScanState {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_FunctionScanState as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::Gather {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::Gather {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_Gather as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::GatherMerge {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::GatherMerge {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_GatherMerge as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::GatherMergePath {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::GatherMergePath {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_GatherMergePath as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::GatherMergeState {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::GatherMergeState {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_GatherMergeState as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::GatherPath {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::GatherPath {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_GatherPath as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::GatherState {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::GatherState {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_GatherState as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::GrantRoleStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::GrantRoleStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_GrantRoleStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::GrantStmt {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::GrantStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_GrantStmt as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::Group {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::Group {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_Group as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::GroupPath {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::GroupPath {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_GroupPath as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::GroupResultPath {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::GroupResultPath {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_GroupResultPath as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::GroupState {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::GroupState {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_GroupState as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::GroupingFunc {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::GroupingFunc {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_GroupingFunc as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::GroupingSet {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::GroupingSet {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_GroupingSet as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::GroupingSetData {}
-impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::GroupingSetData {
-    const VALUE: c::CValue<c::CInt> =
-        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_GroupingSetData as i32);
-}
-impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::GroupingSetsPath {}
-impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::GroupingSetsPath {
-    const VALUE: c::CValue<c::CInt> =
-        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_GroupingSetsPath as i32);
-}
-impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::Hash {}
-impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::Hash {
-    const VALUE: c::CValue<c::CInt> =
-        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_Hash as i32);
-}
-impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::HashJoin {}
-impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::HashJoin {
-    const VALUE: c::CValue<c::CInt> =
-        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_HashJoin as i32);
-}
-impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::HashJoinState {}
-impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::HashJoinState {
-    const VALUE: c::CValue<c::CInt> =
-        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_HashJoinState as i32);
-}
-impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::HashPath {}

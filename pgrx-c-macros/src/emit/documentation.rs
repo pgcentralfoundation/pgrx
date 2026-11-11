@@ -16,9 +16,13 @@ use crate::{MacroAnalysis, ParameterRole};
 use std::fmt::Write;
 
 /// How a typed inline-function adapter calls and converts.
-pub(super) const INLINE_CALL: &str = "Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.";
+pub(super) const INLINE_CALL: &str = "Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.";
 /// How a translated inline function body evaluates.
-pub(super) const INLINE_BODY: &str = "Translates the original function definition. Each operand is evaluated once and converted to its parameter type using C assignment rules, the statements run in order, and the returned value is converted to the function's C return type. `.get()` extracts its native storage, including `()` for a void function. Calls to other translated inline functions run their translations; other calls keep the backend thread and PostgreSQL error contracts of their guarded bindings.";
+pub(super) const INLINE_BODY: &str = "Translates the original function definition. Each operand is evaluated once and converted to its parameter type using C assignment rules, the statements run in order, and the returned value is converted to the function's C return type. Calls to other translated inline functions run their translations; other calls keep the backend thread and PostgreSQL error contracts of their guarded bindings.";
+/// What an inline function's macro returns when its result is not a truth value.
+pub(super) const INLINE_RESULT: &str = "The result retains the function's original C type. `.get()` extracts its native storage, including `()` for a void function.";
+/// What a macro returns when its C result is a truth value.
+pub(super) const TRUTH_RESULT: &str = "Returns a Rust `bool`, which is `true` when the C result is nonzero. The C result is a truth value: `_Bool`, or the `int` zero or one of a comparison or logical operator. As an operand of another generated macro, an invocation still has that C type.";
 /// How `__FILE__` and `__LINE__` translate.
 pub(super) const INVOCATION_DIAGNOSTICS: &str = "Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract.";
 /// How dependency stringification translates.
@@ -57,11 +61,13 @@ pub(super) fn type_enumerator_operand(
 ///
 /// Documentation shells refer to each one through the macro named here instead of
 /// repeating its text; [`documentation_shell_support`] defines those macros.
-const SHARED_PARAGRAPHS: [(&str, &str); 9] = [
+const SHARED_PARAGRAPHS: [(&str, &str); 11] = [
     ("__pgrx_c_doc_assertions", ASSERTIONS),
     ("__pgrx_c_doc_flavor_call", FLAVOR_CALL),
     ("__pgrx_c_doc_inline_call", INLINE_CALL),
     ("__pgrx_c_doc_inline_body", INLINE_BODY),
+    ("__pgrx_c_doc_inline_result", INLINE_RESULT),
+    ("__pgrx_c_doc_truth_result", TRUTH_RESULT),
     ("__pgrx_c_doc_invocation_diagnostics", INVOCATION_DIAGNOSTICS),
     ("__pgrx_c_doc_stringification", STRINGIFICATION),
     ("__pgrx_c_doc_caller_returns", CALLER_RETURNS),
@@ -109,6 +115,12 @@ pub enum DocumentedResult {
         /// A block of the same type as the real value arm.
         witness: String,
     },
+    /// The real public arm is `finish_truth(v)`, a Rust `bool`; `witness` is a block
+    /// whose type equals `v`'s.
+    Truth {
+        /// A block of the same type as the real value arm.
+        witness: String,
+    },
     /// Every path returns from the caller.
     Diverges,
     /// The witness could not be rendered; the shell keeps the `!` placeholder.
@@ -142,6 +154,13 @@ pub fn documentation_shell_support() -> String {
              (@value $witness:block) => {\n        \
                  if false {\n            \
                      $crate::__pgrx_c_macros::expression_result::finish($witness)\n        \
+                 } else {\n            \
+                     $crate::__pgrx_c_documentation_shell!()\n        \
+                 }\n    \
+             };\n    \
+             (@truth $witness:block) => {\n        \
+                 if false {\n            \
+                     $crate::__pgrx_c_macros::expression_result::finish_truth($witness)\n        \
                  } else {\n            \
                      $crate::__pgrx_c_documentation_shell!()\n        \
                  }\n    \
@@ -217,7 +236,11 @@ impl MacroDocumentation {
         let mut arms = Vec::new();
         let body = match &self.result {
             DocumentedResult::Unit { body } => format!("@unit {body}"),
-            DocumentedResult::Value { witness } => {
+            DocumentedResult::Value { witness } | DocumentedResult::Truth { witness } => {
+                let kind = match self.result {
+                    DocumentedResult::Truth { .. } => "@truth",
+                    _ => "@value",
+                };
                 if let Some(name) = single_read_place(witness) {
                     let native = format!("(@native [${name}])");
                     let operand = format!("${name}:expr");
@@ -231,12 +254,12 @@ impl MacroDocumentation {
                                 .replace(&native, &format!("(@deref [{spelling}] [${name}])"));
                             arms.push((
                                 form.replace(&operand, &matcher),
-                                format!("@value {witness}"),
+                                format!("{kind} {witness}"),
                             ));
                         }
                     }
                 }
-                format!("@value {witness}")
+                format!("{kind} {witness}")
             }
             DocumentedResult::Diverges | DocumentedResult::Untyped { .. } => String::new(),
         };
@@ -333,18 +356,27 @@ pub(super) fn documentation_forms(
 /// function, after evaluating every argument. Other statement bodies yield `()` unless
 /// every path returns from the caller, and an empty macro yields `()`. Any other
 /// expression renders its value root as a witness; a witness that cannot be rendered
-/// never affects the real macro.
+/// never affects the real macro. `returns_bool` says that the real public arm returns the
+/// value as a Rust `bool`.
 pub(super) fn result(
     analysis: &MacroAnalysis,
     renderer: typed::Renderer<'_>,
     inline_body: Option<&InlineResult<'_>>,
+    returns_bool: bool,
 ) -> DocumentedResult {
+    let value = |witness: String| {
+        if returns_bool {
+            DocumentedResult::Truth { witness }
+        } else {
+            DocumentedResult::Value { witness }
+        }
+    };
     if let Some(inline_body) = inline_body {
         let spine = match inline_body {
             InlineResult::Void => "()".to_owned(),
             InlineResult::Value { declared, marker } => renderer.value_witness(declared, marker),
         };
-        return DocumentedResult::Value { witness: block(analysis, &spine) };
+        return value(block(analysis, &spine));
     }
     let expression = analysis.expression.as_ref().expect("emitted macros have an expression");
     if let Some(statements) = &expression.syntax.statement_body {
@@ -362,7 +394,7 @@ pub(super) fn result(
     }
     let mut spine = String::new();
     match renderer.witness().render(expression.syntax.root, typed::Context::Value, &mut spine) {
-        Ok(()) => DocumentedResult::Value { witness: block(analysis, &spine) },
+        Ok(()) => value(block(analysis, &spine)),
         Err(reason) => DocumentedResult::Untyped { reason: reason.message },
     }
 }

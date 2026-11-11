@@ -51,6 +51,8 @@ macro_rules! DatumGetJsonbP {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -125,6 +127,8 @@ macro_rules! DatumGetJsonbPCopy {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -156,6 +160,8 @@ macro_rules! DatumGetJsonbPCopy {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -163,7 +169,7 @@ macro_rules! DatumGetJsonbPCopy {
 macro_rules! IsAJsonbScalar {
     ($jsonbval:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$jsonbval;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -208,6 +214,8 @@ macro_rules! JBE_ADVANCE_OFFSET {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -215,7 +223,7 @@ macro_rules! JBE_ADVANCE_OFFSET {
 macro_rules! JBE_HAS_OFF {
     ($je_:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$je_;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -235,6 +243,8 @@ macro_rules! JBE_HAS_OFF {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -242,7 +252,7 @@ macro_rules! JBE_HAS_OFF {
 macro_rules! JBE_ISBOOL {
     ($je_:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$je_;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -262,6 +272,8 @@ macro_rules! JBE_ISBOOL {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -269,7 +281,7 @@ macro_rules! JBE_ISBOOL {
 macro_rules! JBE_ISBOOL_FALSE {
     ($je_:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$je_;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -289,6 +301,8 @@ macro_rules! JBE_ISBOOL_FALSE {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -296,7 +310,7 @@ macro_rules! JBE_ISBOOL_FALSE {
 macro_rules! JBE_ISBOOL_TRUE {
     ($je_:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$je_;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -316,6 +330,8 @@ macro_rules! JBE_ISBOOL_TRUE {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -323,7 +339,7 @@ macro_rules! JBE_ISBOOL_TRUE {
 macro_rules! JBE_ISCONTAINER {
     ($je_:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$je_;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -343,6 +359,8 @@ macro_rules! JBE_ISCONTAINER {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -350,7 +368,7 @@ macro_rules! JBE_ISCONTAINER {
 macro_rules! JBE_ISNULL {
     ($je_:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$je_;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -370,6 +388,8 @@ macro_rules! JBE_ISNULL {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -377,7 +397,7 @@ macro_rules! JBE_ISNULL {
 macro_rules! JBE_ISNUMERIC {
     ($je_:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$je_;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -397,6 +417,8 @@ macro_rules! JBE_ISNUMERIC {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -404,7 +426,7 @@ macro_rules! JBE_ISNUMERIC {
 macro_rules! JBE_ISSTRING {
     ($je_:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$je_;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -505,6 +527,8 @@ macro_rules! JB_ROOT_COUNT {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -516,7 +540,7 @@ macro_rules! JB_ROOT_COUNT {
 macro_rules! JB_ROOT_IS_ARRAY {
     ($jbp_:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$jbp_;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -536,6 +560,8 @@ macro_rules! JB_ROOT_IS_ARRAY {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -547,7 +573,7 @@ macro_rules! JB_ROOT_IS_ARRAY {
 macro_rules! JB_ROOT_IS_OBJECT {
     ($jbp_:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$jbp_;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -567,6 +593,8 @@ macro_rules! JB_ROOT_IS_OBJECT {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -578,7 +606,7 @@ macro_rules! JB_ROOT_IS_OBJECT {
 macro_rules! JB_ROOT_IS_SCALAR {
     ($jbp_:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$jbp_;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -598,6 +626,8 @@ macro_rules! JB_ROOT_IS_SCALAR {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -605,7 +635,7 @@ macro_rules! JB_ROOT_IS_SCALAR {
 macro_rules! JsonContainerIsArray {
     ($jc:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$jc;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -625,6 +655,8 @@ macro_rules! JsonContainerIsArray {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -632,7 +664,7 @@ macro_rules! JsonContainerIsArray {
 macro_rules! JsonContainerIsObject {
     ($jc:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$jc;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -652,6 +684,8 @@ macro_rules! JsonContainerIsObject {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -659,7 +693,7 @@ macro_rules! JsonContainerIsObject {
 macro_rules! JsonContainerIsScalar {
     ($jc:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$jc;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -772,6 +806,8 @@ macro_rules! JsonbPGetDatum {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///

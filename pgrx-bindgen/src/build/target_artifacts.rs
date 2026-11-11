@@ -20,8 +20,10 @@ use std::sync::atomic::{AtomicU64, Ordering};
 
 /// On-disk contract version, including inline invocation roots and runtime marker configuration.
 /// Format 1 predates those interfaces even when the package version matches; consumers require
-/// a freshly generated complete bundle rather than partial source upgrades.
-const FORMAT: u32 = 2;
+/// a freshly generated complete bundle rather than partial source upgrades. Format 3 returns a
+/// Rust `bool` from macros whose C result is a truth value, which callers of format 2's macros
+/// had to extract from `CExpression`.
+const FORMAT: u32 = 3;
 /// Bound one member before allocation, leaving room above the roughly 64 MiB PG15 report.
 const MAX_MEMBER: u64 = 128 * 1024 * 1024;
 /// Bound the complete materialized bundle, whose generated support can exceed one source file.
@@ -377,7 +379,7 @@ fn load(
         serde_json::from_slice(&bytes).wrap_err("invalid target artifact manifest")?;
     if manifest.format != FORMAT {
         return Err(eyre!(
-            "target artifact format {} is unsupported (required {}); generate a fresh complete bundle in a new directory with this generator's inline invocation-root contract",
+            "target artifact format {} is unsupported (required {}); generate a fresh complete bundle in a new directory with this generator's inline invocation-root and macro result contract",
             manifest.format,
             FORMAT,
         ));
@@ -777,13 +779,13 @@ mod tests {
             let path = bundle.join(manifest_name(domain.major));
             let mut manifest: Manifest =
                 serde_json::from_slice(&std::fs::read(&path).unwrap()).unwrap();
-            assert_eq!(manifest.format, 2);
-            manifest.format = 1;
+            assert_eq!(manifest.format, 3);
+            manifest.format = 2;
             let previous = serde_json::to_vec(&manifest).unwrap();
             std::fs::write(&path, &previous).unwrap();
             let out = directory.path.join("out");
             let error = import(&bundle, domain, &out, true).err().unwrap().to_string();
-            assert!(error.contains("format 1") && error.contains("required 2"), "{error}");
+            assert!(error.contains("format 2") && error.contains("required 3"), "{error}");
             assert!(
                 error.contains("fresh complete bundle") && error.contains("inline invocation-root"),
                 "{error}"
@@ -829,7 +831,7 @@ mod tests {
             let manifest: Manifest =
                 serde_json::from_slice(&std::fs::read(bundle.join(manifest_name(18))).unwrap())
                     .unwrap();
-            assert_eq!(manifest.format, 2);
+            assert_eq!(manifest.format, 3);
             assert_eq!(manifest.runtime_cfg, macros.runtime_cfg);
             let (_, imported) = import(&bundle, domain, &directory.path.join("out"), true).unwrap();
             assert_eq!(imported.runtime_cfg, macros.runtime_cfg);

@@ -83,7 +83,7 @@ fn main() {
         );
         println!(
             "flexarrayequal\t{}",
-            RECORD_FLEX_ARRAY_EQUAL!(flexible, items.cast::<[u32; 3]>()).get()
+            i32::from(RECORD_FLEX_ARRAY_EQUAL!(flexible, items.cast::<[u32; 3]>()))
         );
         println!(
             "flexarrayvoid\t{}",
@@ -109,7 +109,7 @@ fn main() {
         let opaque = allocation.as_mut_ptr().cast::<OpaqueRecord>();
         println!("opaque\t{}", u8::from(RECORD_OPAQUE!(opaque).get() == opaque));
         println!("opaqueinline\t{}", u8::from(RECORD_OPAQUE_INLINE!(opaque).get() == opaque));
-        println!("compare\t{}", RECORD_OPAQUE_COMPARE!(opaque, opaque).get());
+        println!("compare\t{}", i32::from(RECORD_OPAQUE_COMPARE!(opaque, opaque)));
         println!(
             "void\t{}",
             u8::from(RECORD_OPAQUE_VOID!(opaque).get() == allocation.as_mut_ptr().cast())

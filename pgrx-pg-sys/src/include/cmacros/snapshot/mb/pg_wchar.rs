@@ -37,6 +37,8 @@ macro_rules! CHECK_ENCODING_CONVERSION_ARGS {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -44,7 +46,7 @@ macro_rules! CHECK_ENCODING_CONVERSION_ARGS {
 macro_rules! ISSJISHEAD {
     ($c:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$c;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -64,6 +66,8 @@ macro_rules! ISSJISHEAD {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -71,7 +75,7 @@ macro_rules! ISSJISHEAD {
 macro_rules! ISSJISTAIL {
     ($c:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$c;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -92,6 +96,8 @@ macro_rules! ISSJISTAIL {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -103,7 +109,7 @@ macro_rules! ISSJISTAIL {
 macro_rules! IS_LC1 {
     ($c:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$c;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -124,6 +130,8 @@ macro_rules! IS_LC1 {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -135,7 +143,7 @@ macro_rules! IS_LC1 {
 macro_rules! IS_LC2 {
     ($c:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$c;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -156,6 +164,8 @@ macro_rules! IS_LC2 {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -167,7 +177,7 @@ macro_rules! IS_LC2 {
 macro_rules! IS_LCPRV1 {
     ($c:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$c;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -188,6 +198,8 @@ macro_rules! IS_LCPRV1 {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -199,7 +211,7 @@ macro_rules! IS_LCPRV1 {
 macro_rules! IS_LCPRV1_A_RANGE {
     ($c:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$c;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -220,6 +232,8 @@ macro_rules! IS_LCPRV1_A_RANGE {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -231,7 +245,7 @@ macro_rules! IS_LCPRV1_A_RANGE {
 macro_rules! IS_LCPRV1_B_RANGE {
     ($c:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$c;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -252,6 +266,8 @@ macro_rules! IS_LCPRV1_B_RANGE {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -263,7 +279,7 @@ macro_rules! IS_LCPRV1_B_RANGE {
 macro_rules! IS_LCPRV2 {
     ($c:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$c;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -284,6 +300,8 @@ macro_rules! IS_LCPRV2 {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -295,7 +313,7 @@ macro_rules! IS_LCPRV2 {
 macro_rules! IS_LCPRV2_A_RANGE {
     ($c:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$c;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -316,6 +334,8 @@ macro_rules! IS_LCPRV2_A_RANGE {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -327,7 +347,7 @@ macro_rules! IS_LCPRV2_A_RANGE {
 macro_rules! IS_LCPRV2_B_RANGE {
     ($c:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$c;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -347,6 +367,8 @@ macro_rules! IS_LCPRV2_B_RANGE {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -354,7 +376,7 @@ macro_rules! IS_LCPRV2_B_RANGE {
 macro_rules! PG_ENCODING_IS_CLIENT_ONLY {
     ($_enc:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$_enc;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -375,6 +397,8 @@ macro_rules! PG_ENCODING_IS_CLIENT_ONLY {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -382,7 +406,7 @@ macro_rules! PG_ENCODING_IS_CLIENT_ONLY {
 macro_rules! PG_UNUSED_ENCODING {
     ($_enc:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$_enc;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -403,6 +427,8 @@ macro_rules! PG_UNUSED_ENCODING {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -410,7 +436,7 @@ macro_rules! PG_UNUSED_ENCODING {
 macro_rules! PG_VALID_BE_ENCODING {
     ($_enc:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$_enc;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -431,6 +457,8 @@ macro_rules! PG_VALID_BE_ENCODING {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -438,7 +466,7 @@ macro_rules! PG_VALID_BE_ENCODING {
 macro_rules! PG_VALID_BE_ENCODING {
     ($_enc:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$_enc;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -459,6 +487,8 @@ macro_rules! PG_VALID_BE_ENCODING {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -466,7 +496,7 @@ macro_rules! PG_VALID_BE_ENCODING {
 macro_rules! PG_VALID_ENCODING {
     ($_enc:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$_enc;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -487,6 +517,8 @@ macro_rules! PG_VALID_ENCODING {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -494,7 +526,7 @@ macro_rules! PG_VALID_ENCODING {
 macro_rules! PG_VALID_ENCODING {
     ($_enc:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$_enc;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -514,6 +546,8 @@ macro_rules! PG_VALID_ENCODING {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -521,7 +555,7 @@ macro_rules! PG_VALID_ENCODING {
 macro_rules! PG_VALID_FE_ENCODING {
     ($_enc:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$_enc;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -548,6 +582,8 @@ macro_rules! PG_VALID_FE_ENCODING {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -555,7 +591,7 @@ macro_rules! PG_VALID_FE_ENCODING {
 macro_rules! is_utf16_surrogate_first {
     ($c:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$c;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
@@ -576,6 +612,8 @@ macro_rules! is_utf16_surrogate_first {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -583,7 +621,7 @@ macro_rules! is_utf16_surrogate_first {
 macro_rules! is_utf16_surrogate_first {
     ($c:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$c;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
@@ -604,6 +642,8 @@ macro_rules! is_utf16_surrogate_first {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -611,7 +651,7 @@ macro_rules! is_utf16_surrogate_first {
 macro_rules! is_utf16_surrogate_second {
     ($c:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$c;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
@@ -632,6 +672,8 @@ macro_rules! is_utf16_surrogate_second {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -639,7 +681,7 @@ macro_rules! is_utf16_surrogate_second {
 macro_rules! is_utf16_surrogate_second {
     ($c:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$c;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
@@ -660,6 +702,8 @@ macro_rules! is_utf16_surrogate_second {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -667,7 +711,7 @@ macro_rules! is_utf16_surrogate_second {
 macro_rules! is_valid_unicode_codepoint {
     ($c:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$c;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
@@ -688,6 +732,8 @@ macro_rules! is_valid_unicode_codepoint {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -695,7 +741,7 @@ macro_rules! is_valid_unicode_codepoint {
 macro_rules! is_valid_unicode_codepoint {
     ($c:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$c;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
@@ -715,6 +761,8 @@ macro_rules! is_valid_unicode_codepoint {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -750,6 +798,8 @@ macro_rules! surrogate_pair_to_codepoint {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -809,6 +859,8 @@ macro_rules! surrogate_pair_to_codepoint {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -853,6 +905,8 @@ macro_rules! unicode_to_utf8 {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -887,6 +941,8 @@ macro_rules! unicode_utf8len {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -931,6 +987,8 @@ macro_rules! unicode_utf8len {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///

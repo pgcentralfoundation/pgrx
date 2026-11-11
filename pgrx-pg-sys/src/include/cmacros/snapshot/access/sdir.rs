@@ -52,6 +52,8 @@ macro_rules! ScanDirectionCombine {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -63,7 +65,7 @@ macro_rules! ScanDirectionCombine {
 macro_rules! ScanDirectionIsBackward {
     ($direction:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$direction;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -83,6 +85,8 @@ macro_rules! ScanDirectionIsBackward {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -94,7 +98,7 @@ macro_rules! ScanDirectionIsBackward {
 macro_rules! ScanDirectionIsForward {
     ($direction:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$direction;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -114,6 +118,8 @@ macro_rules! ScanDirectionIsForward {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -125,7 +131,7 @@ macro_rules! ScanDirectionIsForward {
 macro_rules! ScanDirectionIsNoMovement {
     ($direction:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$direction;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -145,6 +151,8 @@ macro_rules! ScanDirectionIsNoMovement {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -156,7 +164,7 @@ macro_rules! ScanDirectionIsNoMovement {
 macro_rules! ScanDirectionIsValid {
     ($direction:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$direction;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(

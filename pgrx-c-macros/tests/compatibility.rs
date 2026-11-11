@@ -284,6 +284,17 @@ impl Sources {
     }
 }
 
+/// The entry a recorded invocation of `COMP_<operator>` uses.
+///
+/// A comparison or logical operator returns a Rust `bool` from its public arm. Its value
+/// arm keeps the C `int` that the records compare with the original.
+fn value_entry(operator: &str) -> &'static str {
+    match operator {
+        "EQ" | "NE" | "LT" | "LE" | "GT" | "GE" | "NOT" | "AND" | "OR" => "@__pgrx_c_value; ",
+        _ => "",
+    }
+}
+
 /// Add paired C/Rust observations across integer ranks and casts so equal numeric results
 /// cannot hide a type mismatch.
 fn append_type_and_cast_matrix(sources: &mut Sources) {
@@ -314,7 +325,10 @@ fn append_type_and_cast_matrix(sources: &mut Sources) {
                 sources.record(
                     &format!("pair-{from}-{to}-{operator}"),
                     &format!("COMP_{operator}({c_left}, {c_right})"),
-                    &format!("COMP_{operator}!({rust_left}, {rust_right})"),
+                    &format!(
+                        "COMP_{operator}!({}{rust_left}, {rust_right})",
+                        value_entry(operator)
+                    ),
                 );
             }
             sources.record(
@@ -329,7 +343,7 @@ fn append_type_and_cast_matrix(sources: &mut Sources) {
             sources.record(
                 &format!("unary-{from}-{operator}"),
                 &format!("COMP_{operator}({c})"),
-                &format!("COMP_{operator}!({rust})"),
+                &format!("COMP_{operator}!({}{rust})", value_entry(operator)),
             );
         }
     }
@@ -353,8 +367,8 @@ fn append_unsigned_byte_samples(sources: &mut Sources) {
          println!(\"u8 {} {} {} {} {} {} {} {} {} {} {} {} {}\", i, j,\n\
          COMP_ADD!(a,b).get(), COMP_SUB!(a,b).get(), COMP_MUL!(a,b).get(),\n\
          COMP_DIV!(a,b).get(), COMP_REM!(a,b).get(), COMP_AND_BITS!(a,b).get(),\n\
-         COMP_OR_BITS!(a,b).get(), COMP_XOR_BITS!(a,b).get(), COMP_EQ!(a,b).get(),\n\
-         COMP_LT!(a,b).get(), COMP_NOT_BITS!(a).get());\n\
+         COMP_OR_BITS!(a,b).get(), COMP_XOR_BITS!(a,b).get(), i32::from(COMP_EQ!(a,b)),\n\
+         i32::from(COMP_LT!(a,b)), COMP_NOT_BITS!(a).get());\n\
          }}\n",
     );
     sources.rows += 4096;
@@ -366,10 +380,10 @@ fn append_evaluation_cases(sources: &mut Sources) {
     for (label, c, rust) in [
         ("repeat", "COMP_REPEAT(bump())", "COMP_REPEAT!(bump(&mut calls))"),
         ("unused", "COMP_UNUSED(bump())", "COMP_UNUSED!(bump(&mut calls))"),
-        ("and-lazy", "COMP_AND(0, bump())", "COMP_AND!(0_i32, bump(&mut calls))"),
-        ("and-right", "COMP_AND(1, bump())", "COMP_AND!(1_i32, bump(&mut calls))"),
-        ("or-lazy", "COMP_OR(1, bump())", "COMP_OR!(1_i32, bump(&mut calls))"),
-        ("or-right", "COMP_OR(0, bump())", "COMP_OR!(0_i32, bump(&mut calls))"),
+        ("and-lazy", "COMP_AND(0, bump())", "COMP_AND!(@__pgrx_c_value; 0_i32, bump(&mut calls))"),
+        ("and-right", "COMP_AND(1, bump())", "COMP_AND!(@__pgrx_c_value; 1_i32, bump(&mut calls))"),
+        ("or-lazy", "COMP_OR(1, bump())", "COMP_OR!(@__pgrx_c_value; 1_i32, bump(&mut calls))"),
+        ("or-right", "COMP_OR(0, bump())", "COMP_OR!(@__pgrx_c_value; 0_i32, bump(&mut calls))"),
         (
             "choose-left",
             "COMP_CHOOSE(1, bump(), bump())",

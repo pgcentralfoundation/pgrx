@@ -41,6 +41,8 @@ macro_rules! TRIGGER_CLEAR_TYPE {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -48,7 +50,7 @@ macro_rules! TRIGGER_CLEAR_TYPE {
 macro_rules! TRIGGER_FOR_AFTER {
     ($type:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$type;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -68,6 +70,8 @@ macro_rules! TRIGGER_FOR_AFTER {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -75,7 +79,7 @@ macro_rules! TRIGGER_FOR_AFTER {
 macro_rules! TRIGGER_FOR_BEFORE {
     ($type:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$type;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -165,6 +169,8 @@ macro_rules! TRIGGER_FOR_INSERT {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -172,7 +178,7 @@ macro_rules! TRIGGER_FOR_INSERT {
 macro_rules! TRIGGER_FOR_INSTEAD {
     ($type:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$type;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -625,6 +631,8 @@ macro_rules! TRIGGER_SETT_UPDATE {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -632,7 +640,7 @@ macro_rules! TRIGGER_SETT_UPDATE {
 macro_rules! TRIGGER_TYPE_MATCHES {
     ($type:expr, $level:expr, $timing:expr, $event:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$type;
                 let _ = &$level;
                 let _ = &$timing;
@@ -655,6 +663,8 @@ macro_rules! TRIGGER_TYPE_MATCHES {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -666,7 +676,7 @@ macro_rules! TRIGGER_TYPE_MATCHES {
 macro_rules! TRIGGER_USES_TRANSITION_TABLE {
     ($namepointer:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$namepointer;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(

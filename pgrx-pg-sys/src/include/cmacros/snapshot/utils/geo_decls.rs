@@ -49,6 +49,8 @@ macro_rules! BoxPGetDatum {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -114,6 +116,8 @@ macro_rules! CirclePGetDatum {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -182,6 +186,8 @@ macro_rules! DatumGetBoxP {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -254,6 +260,8 @@ macro_rules! DatumGetCircleP {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -329,6 +337,8 @@ macro_rules! DatumGetLineP {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -402,6 +412,8 @@ macro_rules! DatumGetLsegP {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -477,6 +489,8 @@ macro_rules! DatumGetPathP {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -550,6 +564,8 @@ macro_rules! DatumGetPathPCopy {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -625,6 +641,8 @@ macro_rules! DatumGetPointP {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -698,6 +716,8 @@ macro_rules! DatumGetPolygonP {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -773,6 +793,8 @@ macro_rules! DatumGetPolygonPCopy {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -810,6 +832,8 @@ macro_rules! DatumGetPolygonPCopy {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -821,7 +845,7 @@ macro_rules! DatumGetPolygonPCopy {
 macro_rules! FPeq {
     ($A:expr, $B:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$A;
                 let _ = &$B;
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -846,6 +870,8 @@ macro_rules! FPeq {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -857,7 +883,7 @@ macro_rules! FPeq {
 macro_rules! FPge {
     ($A:expr, $B:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$A;
                 let _ = &$B;
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -882,6 +908,8 @@ macro_rules! FPge {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -893,7 +921,7 @@ macro_rules! FPge {
 macro_rules! FPgt {
     ($A:expr, $B:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$A;
                 let _ = &$B;
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -918,6 +946,8 @@ macro_rules! FPgt {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -929,7 +959,7 @@ macro_rules! FPgt {
 macro_rules! FPle {
     ($A:expr, $B:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$A;
                 let _ = &$B;
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -954,6 +984,8 @@ macro_rules! FPle {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -965,7 +997,7 @@ macro_rules! FPle {
 macro_rules! FPlt {
     ($A:expr, $B:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$A;
                 let _ = &$B;
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -990,6 +1022,8 @@ macro_rules! FPlt {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1001,7 +1035,7 @@ macro_rules! FPlt {
 macro_rules! FPne {
     ($A:expr, $B:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$A;
                 let _ = &$B;
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1092,6 +1126,8 @@ macro_rules! LinePGetDatum {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1157,6 +1193,8 @@ macro_rules! LsegPGetDatum {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -2083,6 +2121,8 @@ macro_rules! PathPGetDatum {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -2149,6 +2189,8 @@ macro_rules! PointPGetDatum {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -2214,6 +2256,8 @@ macro_rules! PolygonPGetDatum {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///

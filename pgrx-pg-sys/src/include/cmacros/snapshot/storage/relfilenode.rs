@@ -9,6 +9,8 @@
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -16,7 +18,7 @@
 macro_rules! RelFileNodeBackendEquals {
     ($node1:expr, $node2:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$node1;
                 let _ = &$node2;
                 (
@@ -38,6 +40,8 @@ macro_rules! RelFileNodeBackendEquals {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -45,7 +49,7 @@ macro_rules! RelFileNodeBackendEquals {
 macro_rules! RelFileNodeBackendIsTemp {
     ($rnode:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$rnode;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -66,6 +70,8 @@ macro_rules! RelFileNodeBackendIsTemp {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -73,7 +79,7 @@ macro_rules! RelFileNodeBackendIsTemp {
 macro_rules! RelFileNodeEquals {
     ($node1:expr, $node2:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$node1;
                 let _ = &$node2;
                 (

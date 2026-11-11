@@ -201,11 +201,12 @@ reaches their macros or is itself conditional: glibc defines `INT64_MIN` with a
 token paste, which keeps `pg_abs_s64` native on Linux, and macOS defines `memcpy`
 as a macro over a compiler builtin, which keeps `pq_writeint32` native there. An
 assert-enabled build and a release build translate the same bodies; see
-[Assertions and build flavors](#assertions-and-build-flavors). Predicate
-callers can use `.is_true()` for either C `int` or C `bool`; this explicitly
-converts truth without changing `.get()` or the original C identity. Native calls
-retain generated FFI guards and require the original function's unsafe caller
-contract.
+[Assertions and build flavors](#assertions-and-build-flavors). A function
+that returns C `bool` gives a macro that returns Rust `bool`; see
+[Truth values](#truth-values). On any other scalar result, `.is_true()` tests
+the value against zero without changing `.get()` or the original C identity.
+Native calls retain generated FFI guards and require the original function's
+unsafe caller contract.
 
 `emit` writes Rust source to stdout and skip reasons to stderr. JSON output contains
 the compilation profile, analysis, source, and structured skips. An inline function
@@ -297,7 +298,8 @@ Precomputed imports require a complete target bundle containing raw bindings,
 macro/support source, the compiler report, native wrapper source, and the native
 archive. The importer checks member hashes and lengths, target, major, generator
 version, and `cshim` before linkage. Raw-only imports cannot supply the migrated
-callers. Format 2 includes the inline invocation interface; older bundles require
+callers. Format 2 added the inline invocation interface, and format 3 returns Rust
+`bool` from macros whose C result is a truth value; older bundles require
 fresh generation into a new directory. See the [cross-compilation guide](../docs/src/extension/build/cross-compile.md)
 for `PGRX_PG_SYS_EXTRA_TARGET_INFO_PATH` export and
 `PGRX_TARGET_INFO_PATH_PGnn` import. Bundle integrity does not authenticate its
@@ -613,11 +615,57 @@ definitions became one body, and `native_only` those that both builds call.
 
 ## Calling generated macros
 
-Public expression results use `CExpression<V>`. Its `.into_value()` retains the
+Public expression results use `CExpression<V>`, except a proved truth value,
+which is a Rust `bool`; see [Truth values](#truth-values). `.into_value()` retains the
 semantic value, such as `CValue<K>` or a typed pointer, and `.get()` extracts the
 native Rust storage. Integer markers keep `long` and `long long` distinct even
 when both use `i64` storage. The wrapper is an already evaluated value, not a
 deferred load or an ABI type. Empty replacements expand to an empty Rust expression.
+
+### Truth values
+
+A macro whose C result is provably a truth value returns a Rust `bool`, which is
+`true` when the C value is nonzero. Use it as a condition directly:
+
+```rust,ignore
+use pgrx_pg_sys as pg_sys;
+
+if pg_sys::TransactionIdIsNormal!(pg_sys::TransactionId::from_inner(3)) {
+    // ...
+}
+```
+
+`analysis::truth_result` is the one rule. Through grouping parentheses, a result
+qualifies when:
+
+- Its C type is `_Bool`: a cast, an object, a call through a prototype that
+  returns `_Bool`, or a translated inline function declared to return it.
+- It is a relational or equality operator, logical `&&` or `||`, or `!`. C
+  defines each as the `int` zero or one.
+- It is a comma expression whose right operand qualifies, or a GNU statement
+  expression whose value does.
+- It is a conditional whose two result operands both qualify. The integer constant
+  `0` or `1` stands for one of them when the other qualifies.
+- It is the compiler's branch hint, `__builtin_expect`, of a first operand that
+  qualifies. The hint returns that operand, as a `long`. So `likely(x)` and
+  `unlikely(x)` return `bool` where the headers define them with the hint and
+  where they define them as `((x) != 0)` alone, as they do for MSVC.
+
+Nothing else does. A bare constant and arithmetic are numbers, even where the
+value is always zero or one, as in `(x) & 1` or `(c) ? 1 : 0`. A result whose type
+depends on the caller's operands, such as a member or a parameter, has no
+established type. Such a macro returns `CExpression<V>`, and `.is_true()` gives
+its truth.
+The emission report records the decision as `returns_bool`.
+
+Only the public result changes. A generated macro written as an operand of
+another generated macro is expanded through its value arm, so it still
+contributes its C type, `int` or `_Bool`. The same invocation inside another Rust
+expression, or in `(@__pgrx_c_native [...])`, is a Rust `bool`, which enters as C
+`_Bool`. The decision depends only on the analyzed definition, so an
+assert-enabled and a release build agree on it. It can differ between PostgreSQL
+versions where the definition does, as a macro that reads a member becomes an
+inline function returning `bool`.
 
 Return macros perform the return in the enclosing Rust function and apply C
 assignment conversion to that function's result type. Call them directly:
@@ -677,16 +725,15 @@ storage and `long long` retains 64-bit storage and its higher rank.
 Generated adapters accept `pgrx-pg-sys::Oid` and `TransactionId` after checking
 their original C typedef identities and storage. The verified `Datum` adapter
 preserves exposed pointer provenance when converting its pointer-backed Rust
-storage to and from the C pointer-width integer representation. C comparisons
-return a tagged C `int`, so extract the value and compare it to zero when a Rust
-`bool` is needed:
+storage to and from the C pointer-width integer representation. An arithmetic
+result keeps its C type behind the wrapper, and a comparison is a truth value:
 
 ```rust,ignore
 use pgrx_pg_sys as pg_sys;
 use pg_sys::cmacros::c::CValue;
 
 let aligned = pg_sys::TYPEALIGN!(8_i32, CValue::<pg_sys::__pgrx_c_types::size_t>::new(13 as _)).get();
-let normal = pg_sys::TransactionIdIsNormal!(pg_sys::TransactionId::from_inner(3)).get() != 0;
+let normal: bool = pg_sys::TransactionIdIsNormal!(pg_sys::TransactionId::from_inner(3));
 ```
 
 Nested generated macro operands carry the C context requested by each use:
@@ -744,7 +791,7 @@ use pgrx_pg_sys as pg_sys;
 unsafe {
     let query: *mut pg_sys::Query = pg_sys::makeNode!(pg_sys::Query).get();
     let node = query.cast::<pg_sys::Node>();
-    assert!(pg_sys::IsA!(node, pg_sys::Query).is_true());
+    assert!(pg_sys::IsA!(node, pg_sys::Query));
     let same: *mut pg_sys::Query = pg_sys::castNode!(pg_sys::Query, node).get();
 }
 ```
@@ -775,7 +822,7 @@ structure implements nothing and the operand's spelling selects the name, as in 
 ```rust,ignore
 // SAFETY: `node` points to a node, and a backend allocates the new one.
 unsafe {
-    assert!(pg_sys::IsA!(node, pg_sys::DistinctExpr).is_true()); // T_DistinctExpr
+    assert!(pg_sys::IsA!(node, pg_sys::DistinctExpr)); // T_DistinctExpr
     let null_if: *mut pg_sys::OpExpr = pg_sys::makeNode!(pg_sys::NullIfExpr).get(); // T_NullIfExpr
 }
 ```

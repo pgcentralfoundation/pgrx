@@ -51,11 +51,14 @@ fn main() {
 
     let narrow: CExpression<CValue<CUnsignedShort>> = renamed_generated::EMIT_WORD!(-1_i32);
     assert_eq!(narrow.get(), u16::MAX);
-    let truth: CExpression<CValue<CBool>> = renamed_generated::EMIT_BOOL!(256_i32);
-    assert!(truth.get());
-    let _: CExpression<CValue<CInt>> = renamed_generated::EMIT_COMPARE!(-1_i32, 1_u32);
-    assert_eq!(renamed_generated::EMIT_COMPARE!(-1_i32, 1_u32).get(), 0);
-    assert_eq!(renamed_generated::EMIT_NOT!(0_u8).get(), 1);
+    // A truth value is a Rust `bool` at the public boundary. Its value arm keeps the C
+    // type: `_Bool` for the cast and `int` for the comparison.
+    let truth: bool = renamed_generated::EMIT_BOOL!(256_i32);
+    assert!(truth);
+    let _: CValue<CBool> = renamed_generated::EMIT_BOOL!(@__pgrx_c_value; 256_i32);
+    let _: CValue<CInt> = renamed_generated::EMIT_COMPARE!(@__pgrx_c_value; -1_i32, 1_u32);
+    assert!(!renamed_generated::EMIT_COMPARE!(-1_i32, 1_u32));
+    assert!(renamed_generated::EMIT_NOT!(0_u8));
     assert_eq!(renamed_generated::EMIT_PLUS!(255_u8).get(), 255);
     assert_eq!(renamed_generated::EMIT_NEGATE!(i32::MIN).get(), i32::MIN);
     assert_eq!(renamed_generated::EMIT_DIVIDE!(-7_i32, 3_i32).get(), -2);
@@ -91,31 +94,19 @@ fn main() {
     assert_eq!(unused_calls, 0);
 
     let mut lazy_calls = 0;
-    assert_eq!(
-        renamed_generated::EMIT_LOGICAL_AND!(0_i32, {
-            lazy_calls += 1;
-            9_i32
-        })
-        .get(),
-        0
-    );
-    assert_eq!(
-        renamed_generated::EMIT_LOGICAL_OR!(1_i32, {
-            lazy_calls += 1;
-            9_i32
-        })
-        .get(),
-        1
-    );
+    assert!(!renamed_generated::EMIT_LOGICAL_AND!(0_i32, {
+        lazy_calls += 1;
+        9_i32
+    }));
+    assert!(renamed_generated::EMIT_LOGICAL_OR!(1_i32, {
+        lazy_calls += 1;
+        9_i32
+    }));
     assert_eq!(lazy_calls, 0);
-    assert_eq!(
-        renamed_generated::EMIT_LOGICAL_AND!(1_i32, {
-            lazy_calls += 1;
-            9_i32
-        })
-        .get(),
-        1
-    );
+    assert!(renamed_generated::EMIT_LOGICAL_AND!(1_i32, {
+        lazy_calls += 1;
+        9_i32
+    }));
     assert_eq!(lazy_calls, 1);
 
     // Both arms determine the result type; the unchosen arm remains unevaluated.

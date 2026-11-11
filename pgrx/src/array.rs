@@ -229,7 +229,7 @@ impl RawArray {
     #[allow(unused)]
     fn nullable(&self) -> bool {
         // SAFETY: The constructor requires an initialized ArrayType header.
-        unsafe { pg_sys::ARR_HASNULL!(self.ptr.as_ptr()).get() != 0 }
+        unsafe { pg_sys::ARR_HASNULL!(self.ptr.as_ptr()) }
     }
 
     /// The null bitmap's bytes, or `None` when the array has no bitmap. This only computes a

@@ -103,6 +103,8 @@ macro_rules! TMODULO {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -114,7 +116,7 @@ macro_rules! TMODULO {
 macro_rules! isleap {
     ($y:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$y;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(

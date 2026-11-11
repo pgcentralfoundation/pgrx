@@ -547,9 +547,10 @@ conditions.
 The normal native capability path preserves prototype conversions, qualifiers,
 original C result identity and guard boundaries. Function operands evaluate once;
 macro roots retain substitution, repetition and lazy/unevaluated contexts. Void
-calls produce a `CExpression<()>`, whose `.get()` yields `()`. An explicit
-`.is_true()` accepts C integer and bool predicate results without normalizing
-their original C types. Unsupported prototypes, ABIs, transport or source budgets
+calls produce a `CExpression<()>`, whose `.get()` yields `()`. A call whose
+prototype returns `_Bool` is a truth value, which the public arm returns as a
+Rust `bool` (section 9). An explicit `.is_true()` tests any other scalar result
+without normalizing its original C type. Unsupported prototypes, ABIs, transport or source budgets
 retain structured refusals. Call source uses the shared root/token/source limits;
 refusal records can cover the bounded 16,384-function compiler catalog.
 
@@ -1057,6 +1058,33 @@ an integer is therefore not generally used as a bare native Rust integer until
 the caller extracts or converts it. Composition through generated macro syntax
 can retain additional source metadata; an evaluated Rust value boundary must
 drop source-only null-constant or bitfield information where C would lose it.
+
+A result that is provably a C truth value is the exception: the public arm
+returns it as a Rust `bool`, `true` when the value is nonzero, through
+`expression_result::finish_truth`. `analysis::truth_result` is the one rule, and
+`render` asks it once for each expression macro. Through grouping parentheses,
+the root qualifies when its analyzed type is `_Bool`; when it is a relational,
+equality or logical operator or `!`, which C defines as the `int` zero or one;
+when it is a comma or statement expression whose value qualifies; or when it is
+a conditional whose result operands both qualify, with the integer constant
+`0` or `1` standing for one of them when the other qualifies. A translated
+inline function qualifies by its declared `_Bool` result. A bare constant,
+arithmetic, a cast to another type, and a result whose type is `Deferred`,
+`Parameter`, `Promotion` or `Common` do not: the first three are numbers, and
+the rest have no established type. `finish_truth` accepts only `CValue<CInt>`
+and `CValue<CBool>` through the sealed `TruthValue`, so a value of another C
+type cannot become a `bool` even if the rule were wrong.
+
+Only the public arm differs. `@__pgrx_emit_value` and the other internal arms
+keep the C value, and every use of one generated macro by another goes through
+them: a recovered call, a classified `NAME!(...)` operand, a call to a
+translated inline function, and the Rust functions of
+`__pgrx_c_inline_functions!`, which enter `@__pgrx_c_value` and finish the
+result themselves. A truth-valued macro therefore still contributes `int` or
+`_Bool` to an enclosing macro's arithmetic and `sizeof`. Statement macros,
+returning macros, empty macros and `void` results are unaffected. Both build
+flavors analyze the assert-enabled definition, so they agree on the result
+type, and the emission report records it as `returns_bool`.
 
 Raw aggregate values use `RawRecordValue<R>` and `MaybeUninit<R>`. Reading one
 initialized field must not materialize invalid bool/enum values or read
@@ -2196,7 +2224,9 @@ like every evaluated or unused operand, it is an `expr`. Every arm expands to th
   only its value, and the witness never delegates to another macro's
   internal arms, so it never names a translated callee's value arm. The shell
   evaluates `if false { finish(witness) } else { panic }`, which has the real
-  macro's `CExpression<V>` type.
+  macro's `CExpression<V>` type. For a macro that returns a truth value as a
+  Rust `bool`, `DocumentedResult::Truth` holds the same witness and the shell
+  evaluates `finish_truth(witness)`, a `bool`.
   A name pasted onto a type operand renders its lookup, so a shell requires the
   same trait of that type as the real macro unless an enclosing collapsed node,
   such as a cast or comparison, closes over it, or the prefix has C names that
@@ -2417,7 +2447,8 @@ compiler report, bindgen wrapper source, native source and target archive. It
 records member SHA-256 hashes/lengths, PostgreSQL major, exact Cargo Rust target,
 generator version and cshim feature. The report's canonical compiler target must
 agree with the expected Rust target too.
-Manifest format 2 includes the uniform inline-call interface. Reject older
+Manifest format 2 added the uniform inline-call interface, and format 3 the Rust
+`bool` result of truth-valued macros (section 9). Reject older
 bundles before publication and regenerate them with the current generator.
 
 Import owns bounded validated bytes before parsing or publishing native linkage.

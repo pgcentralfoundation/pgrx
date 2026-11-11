@@ -62,7 +62,7 @@ impl TryFrom<pg_sys::DateADT> for Date {
     fn try_from(value: pg_sys::DateADT) -> Result<Self, Self::Error> {
         // Values can fit DateADT but lie outside PostgreSQL's supported calendar
         // range. Those are range errors; its two infinity sentinels remain valid.
-        if pg_sys::DATE_NOT_FINITE!(value).get() != 0 || pg_sys::IS_VALID_DATE!(value).get() != 0 {
+        if pg_sys::DATE_NOT_FINITE!(value) || pg_sys::IS_VALID_DATE!(value) {
             Ok(Date(value))
         } else {
             Err(DateTimeConversionError::OutOfRange)
@@ -204,13 +204,13 @@ impl Date {
     /// Does this [`Date`] represent positive infinity?
     #[inline]
     pub fn is_infinity(&self) -> bool {
-        pg_sys::DATE_IS_NOEND!(self.0).get() != 0
+        pg_sys::DATE_IS_NOEND!(self.0)
     }
 
     /// Does this [`Date`] represent negative infinity?
     #[inline]
     pub fn is_neg_infinity(&self) -> bool {
-        pg_sys::DATE_IS_NOBEGIN!(self.0).get() != 0
+        pg_sys::DATE_IS_NOBEGIN!(self.0)
     }
 
     /// Return the Julian days value of this [`Date`]
@@ -240,7 +240,7 @@ impl Date {
     }
 
     pub fn is_finite(&self) -> bool {
-        pg_sys::DATE_NOT_FINITE!(self.0).get() == 0
+        !pg_sys::DATE_NOT_FINITE!(self.0)
     }
 
     /// Return the backing [`pg_sys::DateADT`] value.

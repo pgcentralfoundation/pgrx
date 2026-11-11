@@ -1,6 +1,314 @@
 // Shared generated C macro support.
 
 #[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_skiplsn>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::Subscription>
+{
+    type Member = c::CUnsignedLong;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 16;
+}
+#[cfg(feature = "pg19")]
+const _: () = assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::Subscription, owner) == 32);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_owner>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::Subscription>
+{
+    type Member = c::expression::CIntegerStorage<c::CUnsignedInt, crate::__pgrx_c_bindings::Oid>;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 32;
+}
+#[cfg(feature = "pg19")]
+const _: () =
+    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::Subscription, ownersuperuser) == 36);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_ownersuperuser>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::Subscription>
+{
+    type Member = c::CBool;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 36;
+}
+#[cfg(feature = "pg19")]
+const _: () =
+    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::Subscription, enabled) == 37);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_enabled>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::Subscription>
+{
+    type Member = c::CBool;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 37;
+}
+#[cfg(feature = "pg19")]
+const _: () =
+    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::Subscription, binary) == 38);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_binary>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::Subscription>
+{
+    type Member = c::CBool;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 38;
+}
+#[cfg(feature = "pg19")]
+const _: () =
+    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::Subscription, stream) == 39);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_stream>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::Subscription>
+{
+    type Member = c::expression::CIntegerStorage<c::CChar, ::core::ffi::c_char>;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 39;
+}
+#[cfg(feature = "pg19")]
+const _: () =
+    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::Subscription, twophasestate) == 40);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_twophasestate>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::Subscription>
+{
+    type Member = c::expression::CIntegerStorage<c::CChar, ::core::ffi::c_char>;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 40;
+}
+#[cfg(feature = "pg19")]
+const _: () =
+    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::Subscription, disableonerr) == 41);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_disableonerr>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::Subscription>
+{
+    type Member = c::CBool;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 41;
+}
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::offset_of!(crate::__pgrx_c_bindings::Subscription, passwordrequired) == 42
+);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_passwordrequired>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::Subscription>
+{
+    type Member = c::CBool;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 42;
+}
+#[cfg(feature = "pg19")]
+const _: () =
+    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::Subscription, runasowner) == 43);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_runasowner>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::Subscription>
+{
+    type Member = c::CBool;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 43;
+}
+#[cfg(feature = "pg19")]
+const _: () =
+    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::Subscription, failover) == 44);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_failover>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::Subscription>
+{
+    type Member = c::CBool;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 44;
+}
+#[cfg(feature = "pg19")]
+#[doc(hidden)]
+pub struct Field_retaindeadtuples;
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::offset_of!(crate::__pgrx_c_bindings::Subscription, retaindeadtuples) == 45
+);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_retaindeadtuples>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::Subscription>
+{
+    type Member = c::CBool;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 45;
+}
+#[cfg(feature = "pg19")]
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::Subscription, <<c::expression::CRecord<crate::__pgrx_c_bindings::Subscription> as c::expression::OrdinaryField<Field_retaindeadtuples>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).retaindeadtuples) };
+#[cfg(feature = "pg19")]
+#[doc(hidden)]
+pub struct Field_maxretention;
+#[cfg(feature = "pg19")]
+const _: () =
+    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::Subscription, maxretention) == 48);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_maxretention>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::Subscription>
+{
+    type Member = c::CInt;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 48;
+}
+#[cfg(feature = "pg19")]
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::Subscription, <<c::expression::CRecord<crate::__pgrx_c_bindings::Subscription> as c::expression::OrdinaryField<Field_maxretention>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).maxretention) };
+#[cfg(feature = "pg19")]
+#[doc(hidden)]
+pub struct Field_retentionactive;
+#[cfg(feature = "pg19")]
+const _: () =
+    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::Subscription, retentionactive) == 52);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_retentionactive>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::Subscription>
+{
+    type Member = c::CBool;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 52;
+}
+#[cfg(feature = "pg19")]
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::Subscription, <<c::expression::CRecord<crate::__pgrx_c_bindings::Subscription> as c::expression::OrdinaryField<Field_retentionactive>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).retentionactive) };
+#[cfg(feature = "pg19")]
+const _: () =
+    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::Subscription, publications) == 80);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_publications>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::Subscription>
+{
+    type Member = c::expression::CPointer<
+        c::expression::CRecord<crate::__pgrx_c_bindings::List>,
+        c::expression::ReadWrite,
+    >;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 80;
+}
+#[cfg(feature = "pg19")]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::SupportRequestInlineInFrom>() == 32);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::SupportRequestInlineInFrom>() == 8);
+};
+#[cfg(feature = "pg19")]
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::SupportRequestInlineInFrom {}
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::offset_of!(crate::__pgrx_c_bindings::SupportRequestInlineInFrom, type_) == 0
+);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_type>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::SupportRequestInlineInFrom>
+{
+    type Member = c::expression::CEnumObject<
+        crate::__pgrx_c_generated::EnumIdentity_enum__NodeTag,
+        c::CUnsignedInt,
+        crate::__pgrx_c_bindings::NodeTag,
+    >;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 0;
+}
+#[cfg(feature = "pg19")]
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::SupportRequestInlineInFrom, <<c::expression::CRecord<crate::__pgrx_c_bindings::SupportRequestInlineInFrom> as c::expression::OrdinaryField<Field_type>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).type_) };
+#[cfg(feature = "pg19")]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::SupportRequestSimplifyAggref>() == 24);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::SupportRequestSimplifyAggref>() == 8);
+};
+#[cfg(feature = "pg19")]
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::SupportRequestSimplifyAggref {}
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::offset_of!(crate::__pgrx_c_bindings::SupportRequestSimplifyAggref, type_) == 0
+);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_type>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::SupportRequestSimplifyAggref>
+{
+    type Member = c::expression::CEnumObject<
+        crate::__pgrx_c_generated::EnumIdentity_enum__NodeTag,
+        c::CUnsignedInt,
+        crate::__pgrx_c_bindings::NodeTag,
+    >;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 0;
+}
+#[cfg(feature = "pg19")]
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::SupportRequestSimplifyAggref, <<c::expression::CRecord<crate::__pgrx_c_bindings::SupportRequestSimplifyAggref> as c::expression::OrdinaryField<Field_type>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).type_) };
+#[cfg(feature = "pg19")]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::TableScanDescData>() == 72);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::TableScanDescData>() == 8);
+};
+#[cfg(feature = "pg19")]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::TidRangeScanState>() == 264);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::TidRangeScanState>() == 8);
+};
+#[cfg(feature = "pg19")]
+#[doc(hidden)]
+pub struct Field_trss_pscanlen;
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::offset_of!(crate::__pgrx_c_bindings::TidRangeScanState, trss_pscanlen) == 248
+);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_trss_pscanlen>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::TidRangeScanState>
+{
+    type Member = c::expression::CIntegerStorage<c::CUnsignedLong, usize>;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 248;
+}
+#[cfg(feature = "pg19")]
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::TidRangeScanState, <<c::expression::CRecord<crate::__pgrx_c_bindings::TidRangeScanState> as c::expression::OrdinaryField<Field_trss_pscanlen>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).trss_pscanlen) };
+#[cfg(feature = "pg19")]
+#[doc(hidden)]
+pub struct Field_firings;
+#[cfg(feature = "pg19")]
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::TriggerInstrumentation>() == 368);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::TriggerInstrumentation>() == 8);
+};
+#[cfg(feature = "pg19")]
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::TriggerInstrumentation {}
+#[cfg(feature = "pg19")]
+const _: () = assert!(
+    ::core::mem::offset_of!(crate::__pgrx_c_bindings::TriggerInstrumentation, firings) == 360
+);
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_firings>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::TriggerInstrumentation>
+{
+    type Member = c::CLong;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 360;
+}
+#[cfg(feature = "pg19")]
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::TriggerInstrumentation, <<c::expression::CRecord<crate::__pgrx_c_bindings::TriggerInstrumentation> as c::expression::OrdinaryField<Field_firings>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).firings) };
+#[cfg(feature = "pg19")]
 const _: () = {
     assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::TupleDescData>() == 32);
     assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::TupleDescData>() == 8);
@@ -47,6 +355,37 @@ const _: Projection<crate::__pgrx_c_bindings::TupleDescData, <<c::expression::CR
 #[cfg(feature = "pg19")]
 const _: () =
     assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::TupleDescData, compact_attrs) == 32);
+#[cfg(feature = "pg19")]
+const _: () = {
+    assert!(
+        ::core::mem::size_of::<
+            crate::__pgrx_c_bindings::__IncompleteArrayField<
+                crate::__pgrx_c_bindings::CompactAttribute,
+            >,
+        >() == 0
+    );
+    assert!(
+        ::core::mem::align_of::<
+            crate::__pgrx_c_bindings::__IncompleteArrayField<
+                crate::__pgrx_c_bindings::CompactAttribute,
+            >,
+        >() == 2
+    );
+};
+#[cfg(feature = "pg19")]
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_compact_attrs>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::TupleDescData>
+{
+    type Member = c::expression::CFlexibleArray<
+        c::expression::CRecord<crate::__pgrx_c_bindings::CompactAttribute>,
+        crate::__pgrx_c_bindings::__IncompleteArrayField<
+            crate::__pgrx_c_bindings::CompactAttribute,
+        >,
+    >;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 32;
+}
 #[cfg(feature = "pg19")]
 const _: () = {
     assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::TupleTableSlot>() == 72);
@@ -2963,6 +3302,7 @@ impl c::expression::enumeration::NumericEnum for EnumIdentity_enum__vartag_exter
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::AggClauseInfo {}
 #[cfg(feature = "pg19")]
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AggClauseInfo {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_AggClauseInfo as i32);
 }
@@ -2970,6 +3310,7 @@ impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AggClauseInfo {
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::ElidedNode {}
 #[cfg(feature = "pg19")]
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::ElidedNode {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_ElidedNode as i32);
 }
@@ -2977,6 +3318,7 @@ impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::ElidedNode {
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::GroupingExprInfo {}
 #[cfg(feature = "pg19")]
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::GroupingExprInfo {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_GroupingExprInfo as i32);
 }
@@ -2984,6 +3326,7 @@ impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::GroupingExprInfo {
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::OnConflictActionState {}
 #[cfg(feature = "pg19")]
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::OnConflictActionState {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> = c::CValue::<c::CInt>::new(
         crate::__pgrx_c_bindings::NodeTag::T_OnConflictActionState as i32,
     );
@@ -2992,6 +3335,7 @@ impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::OnConflictActionState {
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::PublicationAllObjSpec {}
 #[cfg(feature = "pg19")]
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::PublicationAllObjSpec {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> = c::CValue::<c::CInt>::new(
         crate::__pgrx_c_bindings::NodeTag::T_PublicationAllObjSpec as i32,
     );
@@ -3000,6 +3344,7 @@ impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::PublicationAllObjSpec {
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::RelAggInfo {}
 #[cfg(feature = "pg19")]
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::RelAggInfo {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_RelAggInfo as i32);
 }
@@ -3007,6 +3352,7 @@ impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::RelAggInfo {
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::RepackStmt {}
 #[cfg(feature = "pg19")]
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::RepackStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_RepackStmt as i32);
 }
@@ -3014,6 +3360,7 @@ impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::RepackStmt {
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::SubPlanRTInfo {}
 #[cfg(feature = "pg19")]
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::SubPlanRTInfo {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_SubPlanRTInfo as i32);
 }
@@ -3021,6 +3368,7 @@ impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::SubPlanRTInfo {
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::SupportRequestInlineInFrom {}
 #[cfg(feature = "pg19")]
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::SupportRequestInlineInFrom {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> = c::CValue::<c::CInt>::new(
         crate::__pgrx_c_bindings::NodeTag::T_SupportRequestInlineInFrom as i32,
     );
@@ -3029,6 +3377,7 @@ impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::SupportRequestInlineInFrom 
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::SupportRequestSimplifyAggref {}
 #[cfg(feature = "pg19")]
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::SupportRequestSimplifyAggref {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> = c::CValue::<c::CInt>::new(
         crate::__pgrx_c_bindings::NodeTag::T_SupportRequestSimplifyAggref as i32,
     );
@@ -3037,6 +3386,7 @@ impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::SupportRequestSimplifyAggre
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::WaitStmt {}
 #[cfg(feature = "pg19")]
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::WaitStmt {
+    type Type = Self;
     const VALUE: c::CValue<c::CInt> =
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_WaitStmt as i32);
 }

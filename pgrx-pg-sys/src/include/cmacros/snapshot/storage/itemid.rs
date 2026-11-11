@@ -184,6 +184,8 @@ macro_rules! ItemIdGetRedirect {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -191,7 +193,7 @@ macro_rules! ItemIdGetRedirect {
 macro_rules! ItemIdHasStorage {
     ($itemId:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$itemId;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -211,6 +213,8 @@ macro_rules! ItemIdHasStorage {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -218,7 +222,7 @@ macro_rules! ItemIdHasStorage {
 macro_rules! ItemIdIsDead {
     ($itemId:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$itemId;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -238,6 +242,8 @@ macro_rules! ItemIdIsDead {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -245,7 +251,7 @@ macro_rules! ItemIdIsDead {
 macro_rules! ItemIdIsNormal {
     ($itemId:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$itemId;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -265,6 +271,8 @@ macro_rules! ItemIdIsNormal {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -272,7 +280,7 @@ macro_rules! ItemIdIsNormal {
 macro_rules! ItemIdIsRedirected {
     ($itemId:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$itemId;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -292,6 +300,8 @@ macro_rules! ItemIdIsRedirected {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -299,7 +309,7 @@ macro_rules! ItemIdIsRedirected {
 macro_rules! ItemIdIsUsed {
     ($itemId:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$itemId;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -320,6 +330,8 @@ macro_rules! ItemIdIsUsed {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -331,7 +343,7 @@ macro_rules! ItemIdIsUsed {
 macro_rules! ItemIdIsValid {
     ($itemId:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$itemId;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -352,6 +364,8 @@ macro_rules! ItemIdIsValid {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -363,7 +377,7 @@ macro_rules! ItemIdIsValid {
 macro_rules! ItemIdIsValid {
     ($itemId:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$itemId;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(

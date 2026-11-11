@@ -541,6 +541,8 @@ macro_rules! GinDataLeafPageGetPostingListSize {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 #[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
 ///
 /// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
@@ -558,7 +560,7 @@ macro_rules! GinDataLeafPageGetPostingListSize {
 macro_rules! GinDataLeafPageIsEmpty {
     ($page:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$page;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -613,6 +615,8 @@ macro_rules! GinDataLeafPageIsEmpty {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -624,7 +628,7 @@ macro_rules! GinDataLeafPageIsEmpty {
 macro_rules! GinDataLeafPageIsEmpty {
     ($page:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$page;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1688,6 +1692,8 @@ macro_rules! GinGetPostingTree {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1695,7 +1701,7 @@ macro_rules! GinGetPostingTree {
 macro_rules! GinIsPostingTree {
     ($itup:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$itup;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2203,6 +2209,8 @@ macro_rules! GinItemPointerSetOffsetNumber {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -2214,7 +2222,7 @@ macro_rules! GinItemPointerSetOffsetNumber {
 macro_rules! GinItupIsCompressed {
     ($itup:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$itup;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -3157,6 +3165,8 @@ macro_rules! GinPageGetOpaque {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 #[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
 ///
 /// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
@@ -3174,7 +3184,7 @@ macro_rules! GinPageGetOpaque {
 macro_rules! GinPageHasFullRow {
     ($page:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$page;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -3195,6 +3205,8 @@ macro_rules! GinPageHasFullRow {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -3206,7 +3218,7 @@ macro_rules! GinPageHasFullRow {
 macro_rules! GinPageHasFullRow {
     ($page:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$page;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -3227,6 +3239,8 @@ macro_rules! GinPageHasFullRow {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 #[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
 ///
 /// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
@@ -3244,7 +3258,7 @@ macro_rules! GinPageHasFullRow {
 macro_rules! GinPageIsCompressed {
     ($page:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$page;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -3265,6 +3279,8 @@ macro_rules! GinPageIsCompressed {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -3276,7 +3292,7 @@ macro_rules! GinPageIsCompressed {
 macro_rules! GinPageIsCompressed {
     ($page:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$page;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -3297,6 +3313,8 @@ macro_rules! GinPageIsCompressed {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 #[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
 ///
 /// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
@@ -3314,7 +3332,7 @@ macro_rules! GinPageIsCompressed {
 macro_rules! GinPageIsData {
     ($page:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$page;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -3335,6 +3353,8 @@ macro_rules! GinPageIsData {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -3346,7 +3366,7 @@ macro_rules! GinPageIsData {
 macro_rules! GinPageIsData {
     ($page:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$page;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -3367,6 +3387,8 @@ macro_rules! GinPageIsData {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 #[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
 ///
 /// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
@@ -3384,7 +3406,7 @@ macro_rules! GinPageIsData {
 macro_rules! GinPageIsDeleted {
     ($page:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$page;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -3405,6 +3427,8 @@ macro_rules! GinPageIsDeleted {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -3416,7 +3440,7 @@ macro_rules! GinPageIsDeleted {
 macro_rules! GinPageIsDeleted {
     ($page:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$page;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -3437,6 +3461,8 @@ macro_rules! GinPageIsDeleted {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 #[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
 ///
 /// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
@@ -3454,7 +3480,7 @@ macro_rules! GinPageIsDeleted {
 macro_rules! GinPageIsIncompleteSplit {
     ($page:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$page;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -3475,6 +3501,8 @@ macro_rules! GinPageIsIncompleteSplit {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -3486,7 +3514,7 @@ macro_rules! GinPageIsIncompleteSplit {
 macro_rules! GinPageIsIncompleteSplit {
     ($page:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$page;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -3507,6 +3535,8 @@ macro_rules! GinPageIsIncompleteSplit {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 #[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
 ///
 /// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
@@ -3524,7 +3554,7 @@ macro_rules! GinPageIsIncompleteSplit {
 macro_rules! GinPageIsLeaf {
     ($page:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$page;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -3545,6 +3575,8 @@ macro_rules! GinPageIsLeaf {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -3556,7 +3588,7 @@ macro_rules! GinPageIsLeaf {
 macro_rules! GinPageIsLeaf {
     ($page:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$page;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -3577,6 +3609,8 @@ macro_rules! GinPageIsLeaf {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 #[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
 ///
 /// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
@@ -3594,7 +3628,7 @@ macro_rules! GinPageIsLeaf {
 macro_rules! GinPageIsList {
     ($page:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$page;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -3615,6 +3649,8 @@ macro_rules! GinPageIsList {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -3626,7 +3662,7 @@ macro_rules! GinPageIsList {
 macro_rules! GinPageIsList {
     ($page:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$page;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -3647,6 +3683,8 @@ macro_rules! GinPageIsList {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 #[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
 ///
 /// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
@@ -3664,7 +3702,7 @@ macro_rules! GinPageIsList {
 macro_rules! GinPageRightMost {
     ($page:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$page;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -3685,6 +3723,8 @@ macro_rules! GinPageRightMost {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -3696,7 +3736,7 @@ macro_rules! GinPageRightMost {
 macro_rules! GinPageRightMost {
     ($page:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$page;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -5582,6 +5622,8 @@ macro_rules! GinSetPostingTree {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -5593,7 +5635,7 @@ macro_rules! GinSetPostingTree {
 macro_rules! ItemPointerIsLossyPage {
     ($p:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$p;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -5613,6 +5655,8 @@ macro_rules! ItemPointerIsLossyPage {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -5624,7 +5668,7 @@ macro_rules! ItemPointerIsLossyPage {
 macro_rules! ItemPointerIsMin {
     ($p:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$p;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(

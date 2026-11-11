@@ -380,7 +380,7 @@ fn generated_timestamp_range_check_preserves_both_boundaries_and_lazy_evaluation
         let calls=Cell::new(0_u32);
         let value=pg::__pgrx_c_macros::CValue::<pg::__pgrx_c_macros::CLongLong>::new(input);
         let result=pg::IS_VALID_TIMESTAMP!({calls.set(calls.get()+1);value});
-        assert_eq!(pg::__pgrx_c_macros::expression::truth(result.into_value()),case.result,"input={input}");
+        assert_eq!(result,case.result,"input={input}");
         assert_eq!(calls.get(),case.evaluations,"input={input}");
     }
 }
@@ -434,9 +434,7 @@ fn generated_trigger_context_check_uses_the_closed_pasted_node_tag() {
     exercise_context(|info,calls| {
         // SAFETY: exercise_context establishes owned context and tag read contracts.
         unsafe {
-            pg::__pgrx_c_macros::expression::truth(
-                pg::CALLED_AS_TRIGGER!({calls.set(calls.get()+1);info}).into_value()
-            )
+            pg::CALLED_AS_TRIGGER!({calls.set(calls.get()+1);info})
         }
     },&original_results().trigger);
 }
@@ -449,9 +447,7 @@ fn generated_event_trigger_context_check_uses_the_closed_pasted_node_tag() {
     exercise_context(|info,calls| {
         // SAFETY: exercise_context establishes owned context and tag read contracts.
         unsafe {
-            pg::__pgrx_c_macros::expression::truth(
-                pg::CALLED_AS_EVENT_TRIGGER!({calls.set(calls.get()+1);info}).into_value()
-            )
+            pg::CALLED_AS_EVENT_TRIGGER!({calls.set(calls.get()+1);info})
         }
     },&original_results().event_trigger);
 }
@@ -636,7 +632,7 @@ fn generated_dummy_append_short_circuits_before_uninitialized_subpaths() {
             if case.input != 0 {
                 addr_of_mut!((*append).subpaths).write(if case.input == 1 {core::ptr::null_mut()} else {list});
             }
-            let actual=pg::__pgrx_c_macros::expression::truth(pg::IS_DUMMY_APPEND!({calls.set(calls.get()+1);append}).into_value());
+            let actual=pg::IS_DUMMY_APPEND!({calls.set(calls.get()+1);append});
             assert_eq!(actual,case.result,"case={}",case.input);
             assert_eq!(calls.replace(0),case.evaluations,"case={}",case.input);
         }
@@ -665,7 +661,7 @@ fn generated_memory_context_tags_match_original_c_lazy_disjunction() {
                 addr_of_mut!((*context).type_).write(tag);
                 context
             };
-            let actual=pg::__pgrx_c_macros::expression::truth(pg::MemoryContextIsValid!({calls.set(calls.get()+1);input}).into_value());
+            let actual=pg::MemoryContextIsValid!({calls.set(calls.get()+1);input});
             assert_eq!(actual,case.result,"tag={}",case.input);
             assert_eq!(calls.replace(0),case.evaluations,"tag={}",case.input);
         }
@@ -692,7 +688,7 @@ fn generated_soft_error_checks_only_initialized_fields_on_the_selected_path() {
                 addr_of_mut!((*context).error_occurred).write(case.input == 3);
             }
             let input=if case.input == 0 {core::ptr::null_mut()} else {context};
-            let actual=pg::__pgrx_c_macros::expression::truth(pg::SOFT_ERROR_OCCURRED!({calls.set(calls.get()+1);input}).into_value());
+            let actual=pg::SOFT_ERROR_OCCURRED!({calls.set(calls.get()+1);input});
             assert_eq!(actual,case.result,"case={}",case.input);
             assert_eq!(calls.replace(0),case.evaluations,"case={}",case.input);
         }

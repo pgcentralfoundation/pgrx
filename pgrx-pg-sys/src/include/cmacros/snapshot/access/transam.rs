@@ -79,6 +79,8 @@ macro_rules! EpochFromFullTransactionId {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -104,6 +106,8 @@ macro_rules! FullTransactionIdAdvance {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -111,7 +115,7 @@ macro_rules! FullTransactionIdAdvance {
 macro_rules! FullTransactionIdEquals {
     ($a:expr, $b:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$a;
                 let _ = &$b;
                 (
@@ -132,6 +136,8 @@ macro_rules! FullTransactionIdEquals {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -139,7 +145,7 @@ macro_rules! FullTransactionIdEquals {
 macro_rules! FullTransactionIdFollows {
     ($a:expr, $b:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$a;
                 let _ = &$b;
                 (
@@ -160,6 +166,8 @@ macro_rules! FullTransactionIdFollows {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -167,7 +175,7 @@ macro_rules! FullTransactionIdFollows {
 macro_rules! FullTransactionIdFollowsOrEquals {
     ($a:expr, $b:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$a;
                 let _ = &$b;
                 (
@@ -225,6 +233,8 @@ macro_rules! FullTransactionIdFollowsOrEquals {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -265,6 +275,8 @@ macro_rules! FullTransactionIdFromAllowableAt {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -307,6 +319,8 @@ macro_rules! FullTransactionIdFromEpochAndXid {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -337,6 +351,8 @@ macro_rules! FullTransactionIdFromU64 {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -348,7 +364,7 @@ macro_rules! FullTransactionIdFromU64 {
 macro_rules! FullTransactionIdIsNormal {
     ($x:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$x;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -368,6 +384,8 @@ macro_rules! FullTransactionIdIsNormal {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -379,7 +397,7 @@ macro_rules! FullTransactionIdIsNormal {
 macro_rules! FullTransactionIdIsValid {
     ($x:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$x;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -413,6 +431,8 @@ macro_rules! FullTransactionIdIsValid {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -444,6 +464,8 @@ macro_rules! FullTransactionIdNewer {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -451,7 +473,7 @@ macro_rules! FullTransactionIdNewer {
 macro_rules! FullTransactionIdPrecedes {
     ($a:expr, $b:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$a;
                 let _ = &$b;
                 (
@@ -472,6 +494,8 @@ macro_rules! FullTransactionIdPrecedes {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -479,7 +503,7 @@ macro_rules! FullTransactionIdPrecedes {
 macro_rules! FullTransactionIdPrecedesOrEquals {
     ($a:expr, $b:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$a;
                 let _ = &$b;
                 (
@@ -521,6 +545,8 @@ macro_rules! FullTransactionIdPrecedesOrEquals {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -546,6 +572,8 @@ macro_rules! FullTransactionIdRetreat {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 #[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
 ///
 /// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
@@ -563,7 +591,7 @@ macro_rules! FullTransactionIdRetreat {
 macro_rules! NormalTransactionIdFollows {
     ($id1:expr, $id2:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$id1;
                 let _ = &$id2;
                 (
@@ -598,6 +626,8 @@ macro_rules! NormalTransactionIdFollows {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
 #[doc = crate::__pgrx_c_doc_assertions!()]
@@ -630,6 +660,8 @@ macro_rules! NormalTransactionIdOlder {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 #[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
 ///
 /// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
@@ -647,7 +679,7 @@ macro_rules! NormalTransactionIdOlder {
 macro_rules! NormalTransactionIdPrecedes {
     ($id1:expr, $id2:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$id1;
                 let _ = &$id2;
                 (
@@ -677,6 +709,8 @@ macro_rules! NormalTransactionIdPrecedes {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -767,6 +801,8 @@ macro_rules! TransactionIdAdvance {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -774,7 +810,7 @@ macro_rules! TransactionIdAdvance {
 macro_rules! TransactionIdEquals {
     ($id1:expr, $id2:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$id1;
                 let _ = &$id2;
                 (
@@ -808,6 +844,8 @@ macro_rules! TransactionIdEquals {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -819,7 +857,7 @@ macro_rules! TransactionIdEquals {
 macro_rules! TransactionIdFollows {
     ($id1:expr, $id2:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$id1;
                 let _ = &$id2;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
@@ -847,6 +885,8 @@ macro_rules! TransactionIdFollows {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -858,7 +898,7 @@ macro_rules! TransactionIdFollows {
 macro_rules! TransactionIdFollowsOrEquals {
     ($id1:expr, $id2:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$id1;
                 let _ = &$id2;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
@@ -873,6 +913,8 @@ macro_rules! TransactionIdFollowsOrEquals {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -880,7 +922,7 @@ macro_rules! TransactionIdFollowsOrEquals {
 macro_rules! TransactionIdIsNormal {
     ($xid:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$xid;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -900,6 +942,8 @@ macro_rules! TransactionIdIsNormal {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -907,7 +951,7 @@ macro_rules! TransactionIdIsNormal {
 macro_rules! TransactionIdIsValid {
     ($xid:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$xid;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -941,6 +985,8 @@ macro_rules! TransactionIdIsValid {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -984,6 +1030,8 @@ macro_rules! TransactionIdOlder {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -1030,6 +1078,8 @@ macro_rules! TransactionIdOlder {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1041,7 +1091,7 @@ macro_rules! TransactionIdOlder {
 macro_rules! TransactionIdPrecedes {
     ($id1:expr, $id2:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$id1;
                 let _ = &$id2;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
@@ -1069,6 +1119,8 @@ macro_rules! TransactionIdPrecedes {
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -1080,7 +1132,7 @@ macro_rules! TransactionIdPrecedes {
 macro_rules! TransactionIdPrecedesOrEquals {
     ($id1:expr, $id2:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$id1;
                 let _ = &$id2;
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
@@ -1105,6 +1157,8 @@ macro_rules! TransactionIdPrecedesOrEquals {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///

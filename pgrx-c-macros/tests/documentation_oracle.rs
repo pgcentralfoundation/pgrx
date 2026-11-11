@@ -53,6 +53,8 @@ fn is_builtin_oid(name: &str) -> bool {
 enum Kind {
     /// `DocumentedResult::Value`.
     Value,
+    /// `DocumentedResult::Truth`: the macro and its shell return a Rust `bool`.
+    Truth,
     /// `DocumentedResult::Unit`.
     Unit,
     /// `DocumentedResult::Diverges`.
@@ -73,12 +75,12 @@ const MACROS: &[(&str, Kind, &str)] = &[
     ("DOC_FIELD", Kind::Value, "unsafe { DOC_FIELD!(record) }"),
     ("DOC_NESTED", Kind::Value, "unsafe { DOC_NESTED!(record) }"),
     ("DOC_STATE", Kind::Value, "unsafe { DOC_STATE!(record) }"),
-    ("DOC_IS_BUSY", Kind::Value, "unsafe { DOC_IS_BUSY!(record) }"),
+    ("DOC_IS_BUSY", Kind::Truth, "unsafe { DOC_IS_BUSY!(record) }"),
     ("DOC_MEMBER", Kind::Value, "unsafe { DOC_MEMBER!(record, value) }"),
     ("DOC_DATA", Kind::Value, "unsafe { DOC_DATA!(varlena) }"),
     ("DOC_MAX", Kind::Value, "DOC_MAX!(value, 3)"),
-    ("DOC_AND", Kind::Value, "DOC_AND!(value, flag)"),
-    ("DOC_NOT", Kind::Value, "DOC_NOT!(value)"),
+    ("DOC_AND", Kind::Truth, "DOC_AND!(value, flag)"),
+    ("DOC_NOT", Kind::Truth, "DOC_NOT!(value)"),
     ("DOC_ADD", Kind::Value, "DOC_ADD!(value, word)"),
     // The classifier's literal descriptor and the shell's native one type literals alike.
     ("DOC_ADD", Kind::Value, "DOC_ADD!(value, -1)"),
@@ -100,9 +102,9 @@ const MACROS: &[(&str, Kind, &str)] = &[
     // A type operand that C pastes onto a prefix selects that type's enumerator.
     ("DOC_TAG_OF", Kind::Value, "DOC_TAG_OF!(DocRecord)"),
     ("DOC_TAG_SIZE", Kind::Value, "DOC_TAG_SIZE!(DocInner)"),
-    ("DOC_TAGGED", Kind::Value, "unsafe { DOC_TAGGED!(record, DocRecord) }"),
+    ("DOC_TAGGED", Kind::Truth, "unsafe { DOC_TAGGED!(record, DocRecord) }"),
     ("DOC_SWAP16", Kind::Value, "DOC_SWAP16!(value)"),
-    ("DOC_LIKELY", Kind::Value, "DOC_LIKELY!(value)"),
+    ("DOC_LIKELY", Kind::Truth, "DOC_LIKELY!(value)"),
     ("DOC_FILE", Kind::Value, "DOC_FILE!()"),
     ("DOC_LINE", Kind::Value, "DOC_LINE!()"),
     ("DOC_STRING", Kind::Value, "DOC_STRING!()"),
@@ -153,14 +155,14 @@ const MACROS: &[(&str, Kind, &str)] = &[
     ("DOC_INLINE_REAL", Kind::Value, "DOC_INLINE_REAL!(value)"),
     ("DOC_INLINE_STATE", Kind::Value, "unsafe { DOC_INLINE_STATE!(record) }"),
     ("DOC_INLINE_NAME", Kind::Value, "unsafe { DOC_INLINE_NAME!(name) }"),
-    ("DOC_INLINE_BUSY", Kind::Value, "unsafe { DOC_INLINE_BUSY!(record) }"),
+    ("DOC_INLINE_BUSY", Kind::Truth, "unsafe { DOC_INLINE_BUSY!(record) }"),
     ("DOC_INLINE_NESTED", Kind::Value, "DOC_INLINE_NESTED!(value)"),
     ("DOC_INLINE_STORE_CALL", Kind::Value, "unsafe { DOC_INLINE_STORE_CALL!(pointer, value) }"),
     ("DOC_INLINE_WORD_CALL", Kind::Value, "DOC_INLINE_WORD_CALL!(word)"),
     ("DOC_INLINE_REAL_CALL", Kind::Value, "DOC_INLINE_REAL_CALL!(value)"),
     ("DOC_INLINE_STATE_CALL", Kind::Value, "unsafe { DOC_INLINE_STATE_CALL!(record) }"),
     ("DOC_INLINE_NAME_CALL", Kind::Value, "unsafe { DOC_INLINE_NAME_CALL!(name) }"),
-    ("DOC_INLINE_BUSY_CALL", Kind::Value, "unsafe { DOC_INLINE_BUSY_CALL!(record) }"),
+    ("DOC_INLINE_BUSY_CALL", Kind::Truth, "unsafe { DOC_INLINE_BUSY_CALL!(record) }"),
 ];
 
 /// Invocations that a real macro accepts and its shell rejects, where the shell's
@@ -340,6 +342,7 @@ fn documentation_shells_have_the_real_result_types() {
     for (name, kind, _) in MACROS {
         let actual = match &results[name] {
             DocumentedResult::Value { .. } => Kind::Value,
+            DocumentedResult::Truth { .. } => Kind::Truth,
             DocumentedResult::Unit { .. } => Kind::Unit,
             DocumentedResult::Diverges => Kind::Diverges,
             DocumentedResult::Untyped { reason } => panic!("{name} is untyped: {reason}"),
@@ -384,7 +387,11 @@ fn documentation_shells_have_the_real_result_types() {
         ("DOC_TAG_SIZE", "<$type as $crate::__pgrx_c_generated::TypeEnumerator_DOC_TAG_>::VALUE"),
         ("DOC_TAGGED", "{ let _ = &$record; "),
     ] {
-        let DocumentedResult::Value { witness } = &results[name] else { unreachable!() };
+        let (DocumentedResult::Value { witness } | DocumentedResult::Truth { witness }) =
+            &results[name]
+        else {
+            unreachable!()
+        };
         assert!(witness.contains(expected), "{name}: {witness}");
     }
     assert_eq!(
@@ -424,11 +431,14 @@ fn documentation_shells_have_the_real_result_types() {
         } else {
             value
         };
-        assert_eq!(
-            results[macro_name],
-            DocumentedResult::Value { witness: format!("{{ let _ = &{borrows}; {value} }}") },
-            "{macro_name}"
-        );
+        // A function that returns `_Bool` returns a Rust `bool`, with the same witness.
+        let witness = format!("{{ let _ = &{borrows}; {value} }}");
+        let expected = if macro_name.starts_with("DOC_INLINE_BUSY") {
+            DocumentedResult::Truth { witness }
+        } else {
+            DocumentedResult::Value { witness }
+        };
+        assert_eq!(results[macro_name], expected, "{macro_name}");
     }
     for (macro_name, value) in [
         ("DOC_INLINE_STORE", "()".to_owned()),
@@ -568,7 +578,7 @@ fn check_witness(
     support: &str,
 ) {
     let block = match result {
-        DocumentedResult::Value { witness } => witness,
+        DocumentedResult::Value { witness } | DocumentedResult::Truth { witness } => witness,
         DocumentedResult::Unit { body } => body,
         DocumentedResult::Diverges => return,
         DocumentedResult::Untyped { reason } => panic!("{name} is untyped: {reason}"),

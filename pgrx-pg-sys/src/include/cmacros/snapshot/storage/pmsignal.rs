@@ -16,6 +16,8 @@
 ///
 #[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -27,7 +29,7 @@
 macro_rules! PostmasterIsAlive {
     () => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )

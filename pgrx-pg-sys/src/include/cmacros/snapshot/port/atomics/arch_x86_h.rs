@@ -19,6 +19,8 @@
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -64,6 +66,8 @@ macro_rules! pg_atomic_clear_flag_impl {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -75,7 +79,7 @@ macro_rules! pg_atomic_clear_flag_impl {
 macro_rules! pg_atomic_compare_exchange_u32_impl {
     ($ptr:expr, $expected:expr, $newval:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$ptr;
                 let _ = &$expected;
                 let _ = &$newval;
@@ -116,6 +120,8 @@ macro_rules! pg_atomic_compare_exchange_u32_impl {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -127,7 +133,7 @@ macro_rules! pg_atomic_compare_exchange_u32_impl {
 macro_rules! pg_atomic_compare_exchange_u64_impl {
     ($ptr:expr, $expected:expr, $newval:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$ptr;
                 let _ = &$expected;
                 let _ = &$newval;
@@ -170,6 +176,8 @@ macro_rules! pg_atomic_compare_exchange_u64_impl {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -181,7 +189,7 @@ macro_rules! pg_atomic_compare_exchange_u64_impl {
 macro_rules! pg_atomic_compare_exchange_u64_impl {
     ($ptr:expr, $expected:expr, $newval:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$ptr;
                 let _ = &$expected;
                 let _ = &$newval;
@@ -213,6 +221,8 @@ macro_rules! pg_atomic_compare_exchange_u64_impl {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -256,6 +266,8 @@ macro_rules! pg_atomic_fetch_add_u32_impl {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -302,6 +314,8 @@ macro_rules! pg_atomic_fetch_add_u64_impl {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -313,7 +327,7 @@ macro_rules! pg_atomic_fetch_add_u64_impl {
 macro_rules! pg_atomic_test_set_flag_impl {
     ($ptr:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$ptr;
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::type_witness::<
@@ -346,6 +360,8 @@ macro_rules! pg_atomic_test_set_flag_impl {
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -357,7 +373,7 @@ macro_rules! pg_atomic_test_set_flag_impl {
 macro_rules! pg_atomic_test_set_flag_impl {
     ($ptr:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$ptr;
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::type_witness::<
@@ -381,6 +397,8 @@ macro_rules! pg_atomic_test_set_flag_impl {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///
@@ -412,6 +430,8 @@ macro_rules! pg_spin_delay_impl {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
 /// # Safety
 ///

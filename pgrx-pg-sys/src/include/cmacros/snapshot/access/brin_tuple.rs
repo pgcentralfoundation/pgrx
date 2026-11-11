@@ -41,6 +41,8 @@ macro_rules! BrinTupleDataOffset {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -52,7 +54,7 @@ macro_rules! BrinTupleDataOffset {
 macro_rules! BrinTupleHasNulls {
     ($tup:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$tup;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -72,6 +74,8 @@ macro_rules! BrinTupleHasNulls {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -83,7 +87,7 @@ macro_rules! BrinTupleHasNulls {
 macro_rules! BrinTupleIsEmptyRange {
     ($tup:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$tup;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -103,6 +107,8 @@ macro_rules! BrinTupleIsEmptyRange {
 /// ```
 ///
 ///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -114,7 +120,7 @@ macro_rules! BrinTupleIsEmptyRange {
 macro_rules! BrinTupleIsPlaceholder {
     ($tup:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
-            @value {
+            @truth {
                 let _ = &$tup;
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
