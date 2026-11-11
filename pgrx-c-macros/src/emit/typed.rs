@@ -1222,6 +1222,36 @@ impl<'a> Renderer<'a> {
                                 value(*condition),
                             ]);
                         }
+                        ExpressionKind::BuildFlavor { checked, unchecked } => {
+                            if matches!(context, Context::Place | Context::ReadPlace) {
+                                return Err(skip(
+                                    analysis,
+                                    SkipReasonCode::BuildFlavor,
+                                    "the definitions of the two build flavors give a value, not an object place",
+                                    Some(node.tokens),
+                                ));
+                            }
+                            // `select_flavor` returns the evaluated definition's value
+                            // as it is, and compiles only where both have one C type. A
+                            // witness evaluates neither, so it needs no fact about the
+                            // installation.
+                            let checking = if self.mode == RenderMode::Witness {
+                                "true"
+                            } else {
+                                super::assertions::CHECKING
+                            };
+                            write!(
+                                rust,
+                                "{EXPRESSION}::select_flavor(if {checking} {{ {SUPPORT}::Either::Left("
+                            )
+                            .expect("String output");
+                            tasks.extend([
+                                text(") })"),
+                                value(*unchecked),
+                                Task::Text(format!(") }} else {{ {SUPPORT}::Either::Right(")),
+                                value(*checked),
+                            ]);
+                        }
                         ExpressionKind::Comma { left, right } => {
                             rust.push_str("{ ");
                             tasks.extend([text(" }"), value(*right)]);
@@ -1702,8 +1732,7 @@ impl<'a> Renderer<'a> {
                             }
                             // A function that only an assert-enabled build defines is
                             // called, and its arguments evaluated, only against one.
-                            if result.is_none() && frontend.flavors.assert_functions.contains(name)
-                            {
+                            if super::assertions::unchecked_call(frontend, name) {
                                 write!(rust, "if {} {{ ", super::assertions::CHECKING)
                                     .expect("String output");
                                 tasks.push(text("; }"));
@@ -2263,6 +2292,10 @@ pub(super) fn null_pointer_access(
                 hide(*condition);
                 hide(*then_value);
                 hide(*else_value);
+            }
+            ExpressionKind::BuildFlavor { checked, unchecked } => {
+                hide(*checked);
+                hide(*unchecked);
             }
             ExpressionKind::Call { callee, arguments } => {
                 hide(*callee);

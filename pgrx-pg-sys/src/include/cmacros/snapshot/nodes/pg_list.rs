@@ -231,12 +231,41 @@ macro_rules! lfirst_node {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$lc;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::type_witness::<
-                            $crate::__pgrx_c_macros::expression::CPointer<<$type as $crate::__pgrx_c_macros::expression::NativeType
-                        >::Marker,
-                        $crate::__pgrx_c_macros::expression::ReadWrite>>()
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::select_flavor(
+                        if true {
+                            $crate::__pgrx_c_macros::Either::Left(
+                                (
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_macros::expression::CPointer<<$type as $crate::__pgrx_c_macros::expression::NativeType
+                                            >::Marker,
+                                            $crate::__pgrx_c_macros::expression::ReadWrite>>()
+                                        )
+                                    )
+                                )
+                            )
+                        } else {
+                            $crate::__pgrx_c_macros::Either::Right(
+                                (
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_macros::expression::CPointer<<$type as $crate::__pgrx_c_macros::expression::NativeType
+                                            >::Marker,
+                                            $crate::__pgrx_c_macros::expression::ReadWrite>>()
+                                        )
+                                    )
+                                )
+                            )
+                        }
                     )
                 )
             }
@@ -448,12 +477,41 @@ macro_rules! lfourth_node {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$l;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::type_witness::<
-                            $crate::__pgrx_c_macros::expression::CPointer<<$type as $crate::__pgrx_c_macros::expression::NativeType
-                        >::Marker,
-                        $crate::__pgrx_c_macros::expression::ReadWrite>>()
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::select_flavor(
+                        if true {
+                            $crate::__pgrx_c_macros::Either::Left(
+                                (
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_macros::expression::CPointer<<$type as $crate::__pgrx_c_macros::expression::NativeType
+                                            >::Marker,
+                                            $crate::__pgrx_c_macros::expression::ReadWrite>>()
+                                        )
+                                    )
+                                )
+                            )
+                        } else {
+                            $crate::__pgrx_c_macros::Either::Right(
+                                (
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_macros::expression::CPointer<<$type as $crate::__pgrx_c_macros::expression::NativeType
+                                            >::Marker,
+                                            $crate::__pgrx_c_macros::expression::ReadWrite>>()
+                                        )
+                                    )
+                                )
+                            )
+                        }
                     )
                 )
             }
@@ -638,12 +696,41 @@ macro_rules! linitial_node {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$l;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::type_witness::<
-                            $crate::__pgrx_c_macros::expression::CPointer<<$type as $crate::__pgrx_c_macros::expression::NativeType
-                        >::Marker,
-                        $crate::__pgrx_c_macros::expression::ReadWrite>>()
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::select_flavor(
+                        if true {
+                            $crate::__pgrx_c_macros::Either::Left(
+                                (
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_macros::expression::CPointer<<$type as $crate::__pgrx_c_macros::expression::NativeType
+                                            >::Marker,
+                                            $crate::__pgrx_c_macros::expression::ReadWrite>>()
+                                        )
+                                    )
+                                )
+                            )
+                        } else {
+                            $crate::__pgrx_c_macros::Either::Right(
+                                (
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_macros::expression::CPointer<<$type as $crate::__pgrx_c_macros::expression::NativeType
+                                            >::Marker,
+                                            $crate::__pgrx_c_macros::expression::ReadWrite>>()
+                                        )
+                                    )
+                                )
+                            )
+                        }
                     )
                 )
             }
@@ -1890,12 +1977,41 @@ macro_rules! list_nth_node {
             @value {
                 let _ = &$list;
                 let _ = &$n;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::type_witness::<
-                            $crate::__pgrx_c_macros::expression::CPointer<<$type as $crate::__pgrx_c_macros::expression::NativeType
-                        >::Marker,
-                        $crate::__pgrx_c_macros::expression::ReadWrite>>()
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::select_flavor(
+                        if true {
+                            $crate::__pgrx_c_macros::Either::Left(
+                                (
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_macros::expression::CPointer<<$type as $crate::__pgrx_c_macros::expression::NativeType
+                                            >::Marker,
+                                            $crate::__pgrx_c_macros::expression::ReadWrite>>()
+                                        )
+                                    )
+                                )
+                            )
+                        } else {
+                            $crate::__pgrx_c_macros::Either::Right(
+                                (
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_macros::expression::CPointer<<$type as $crate::__pgrx_c_macros::expression::NativeType
+                                            >::Marker,
+                                            $crate::__pgrx_c_macros::expression::ReadWrite>>()
+                                        )
+                                    )
+                                )
+                            )
+                        }
                     )
                 )
             }
@@ -2150,12 +2266,41 @@ macro_rules! llast_node {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$l;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::type_witness::<
-                            $crate::__pgrx_c_macros::expression::CPointer<<$type as $crate::__pgrx_c_macros::expression::NativeType
-                        >::Marker,
-                        $crate::__pgrx_c_macros::expression::ReadWrite>>()
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::select_flavor(
+                        if true {
+                            $crate::__pgrx_c_macros::Either::Left(
+                                (
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_macros::expression::CPointer<<$type as $crate::__pgrx_c_macros::expression::NativeType
+                                            >::Marker,
+                                            $crate::__pgrx_c_macros::expression::ReadWrite>>()
+                                        )
+                                    )
+                                )
+                            )
+                        } else {
+                            $crate::__pgrx_c_macros::Either::Right(
+                                (
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_macros::expression::CPointer<<$type as $crate::__pgrx_c_macros::expression::NativeType
+                                            >::Marker,
+                                            $crate::__pgrx_c_macros::expression::ReadWrite>>()
+                                        )
+                                    )
+                                )
+                            )
+                        }
                     )
                 )
             }
@@ -2442,12 +2587,41 @@ macro_rules! lsecond_node {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$l;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::type_witness::<
-                            $crate::__pgrx_c_macros::expression::CPointer<<$type as $crate::__pgrx_c_macros::expression::NativeType
-                        >::Marker,
-                        $crate::__pgrx_c_macros::expression::ReadWrite>>()
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::select_flavor(
+                        if true {
+                            $crate::__pgrx_c_macros::Either::Left(
+                                (
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_macros::expression::CPointer<<$type as $crate::__pgrx_c_macros::expression::NativeType
+                                            >::Marker,
+                                            $crate::__pgrx_c_macros::expression::ReadWrite>>()
+                                        )
+                                    )
+                                )
+                            )
+                        } else {
+                            $crate::__pgrx_c_macros::Either::Right(
+                                (
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_macros::expression::CPointer<<$type as $crate::__pgrx_c_macros::expression::NativeType
+                                            >::Marker,
+                                            $crate::__pgrx_c_macros::expression::ReadWrite>>()
+                                        )
+                                    )
+                                )
+                            )
+                        }
                     )
                 )
             }
@@ -2632,12 +2806,41 @@ macro_rules! lthird_node {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$l;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::type_witness::<
-                            $crate::__pgrx_c_macros::expression::CPointer<<$type as $crate::__pgrx_c_macros::expression::NativeType
-                        >::Marker,
-                        $crate::__pgrx_c_macros::expression::ReadWrite>>()
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::select_flavor(
+                        if true {
+                            $crate::__pgrx_c_macros::Either::Left(
+                                (
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_macros::expression::CPointer<<$type as $crate::__pgrx_c_macros::expression::NativeType
+                                            >::Marker,
+                                            $crate::__pgrx_c_macros::expression::ReadWrite>>()
+                                        )
+                                    )
+                                )
+                            )
+                        } else {
+                            $crate::__pgrx_c_macros::Either::Right(
+                                (
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_macros::expression::CPointer<<$type as $crate::__pgrx_c_macros::expression::NativeType
+                                            >::Marker,
+                                            $crate::__pgrx_c_macros::expression::ReadWrite>>()
+                                        )
+                                    )
+                                )
+                            )
+                        }
                     )
                 )
             }

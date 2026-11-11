@@ -35,6 +35,12 @@ pub(super) const STATEMENTS: &str = "This macro executes C statements in order a
 pub(super) const ASSERTIONS: &str = "This macro makes the checks of PostgreSQL's assert-enabled definition. Against a PostgreSQL built with assertions, a failed check writes a `TRAP:` line and a backtrace to stderr and aborts the process. Against one built without them, each check is compiled and never evaluated, as in C. The macro has the same operands, result and need for `unsafe` against both, so what a check reads is part of its safety contract in every build.";
 /// What a macro that calls the function of its own name stands for.
 pub(super) const FLAVOR_CALL: &str = "PostgreSQL declares this name as a function in one build flavor and as a macro or static inline function in the other. This macro is defined here, for both, to call that function. Where only a PostgreSQL built with assertions has the function, the macro evaluates nothing against a build without them.";
+/// What introduces the release definition of a macro that the build flavors define
+/// differently, after its assert-enabled definition.
+pub(super) const FLAVOR_RELEASE: &str =
+    "A PostgreSQL built without assertions defines this macro as:";
+/// How a macro that holds both build flavors' definitions evaluates.
+pub(super) const FLAVOR_DEFINITIONS: &str = "This macro holds both definitions. It evaluates the one that belongs to the PostgreSQL it was generated for and compiles the other without evaluating it. The two must give one C type, so the macro has the same operands, result and need for `unsafe` against both builds, and what either definition reads is part of its safety contract in every build.";
 /// Caller obligations shared by every generated macro.
 pub(super) const SAFETY: &str = "Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation, including the operations of an assertion that this PostgreSQL build does not evaluate. Mutation requires writable storage. Native calls and global writes require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions; checked global reads run pgrx's active-thread check themselves and panic when it fails. Generated guards preserve error boundaries; they do not prove these obligations.";
 

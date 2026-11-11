@@ -2929,6 +2929,13 @@ macro_rules! ngettext {
 /// #define pg_assume( expr ) Assert ( expr )
 /// ```
 ///
+/// A PostgreSQL built without assertions defines this macro as:
+///
+/// ```text
+/// #define pg_assume( expr ) do { if ( ! ( expr ) ) __builtin_unreachable ( ) ; } while ( 0 )
+/// ```
+///
+/// This macro holds both definitions. It evaluates the one that belongs to the PostgreSQL it was generated for and compiles the other without evaluating it. The two must give one C type, so the macro has the same operands, result and need for `unsafe` against both builds, and what either definition reads is part of its safety contract in every build.
 ///
 #[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
 ///
@@ -2955,6 +2962,13 @@ macro_rules! pg_assume {
 /// #define pg_unreachable( ) abort ( )
 /// ```
 ///
+/// A PostgreSQL built without assertions defines this macro as:
+///
+/// ```text
+/// #define pg_unreachable( ) __builtin_unreachable ( )
+/// ```
+///
+/// This macro holds both definitions. It evaluates the one that belongs to the PostgreSQL it was generated for and compiles the other without evaluating it. The two must give one C type, so the macro has the same operands, result and need for `unsafe` against both builds, and what either definition reads is part of its safety contract in every build.
 ///
 /// # Safety
 ///
@@ -2964,7 +2978,19 @@ macro_rules! pg_unreachable {
     () => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::select_flavor(
+                        if true {
+                            $crate::__pgrx_c_macros::Either::Left(
+                                ($crate::__pgrx_c_macros::expression::profile_value::<true, _>(()))
+                            )
+                        } else {
+                            $crate::__pgrx_c_macros::Either::Right(
+                                ($crate::__pgrx_c_macros::expression::profile_value::<true, _>(()))
+                            )
+                        }
+                    )
+                )
             }
         )
     };

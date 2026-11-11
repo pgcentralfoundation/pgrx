@@ -416,7 +416,8 @@ pub enum TypeExpression {
 /// - it is a comma expression whose right operand qualifies, or a GNU statement expression
 ///   whose value does;
 /// - it is a conditional whose two result operands both qualify, where the integer constant
-///   `0` or `1` stands for one of them when the other qualifies;
+///   `0` or `1` stands for one of them when the other qualifies, or the definitions of the
+///   two build flavors, which qualify alike;
 /// - it is the compiler's branch hint, `__builtin_expect`, of a first operand that
 ///   qualifies. The hint returns that operand as a `long`, so `likely` and `unlikely` are
 ///   truth values where the headers define them with the hint and where they define them
@@ -474,7 +475,9 @@ pub(crate) fn truth_result(
             ExpressionKind::Call { callee, arguments } if hints(*callee) => {
                 (arguments.first().is_some_and(|first| truth[*first]), false)
             }
-            ExpressionKind::Conditional { then_value, else_value, .. } => {
+            // One build flavor's definition is the result, so both must qualify.
+            ExpressionKind::Conditional { then_value, else_value, .. }
+            | ExpressionKind::BuildFlavor { checked: then_value, unchecked: else_value } => {
                 let (then_value, else_value) = (*then_value, *else_value);
                 (
                     (truth[then_value] && (truth[else_value] || bit[else_value]))
@@ -928,6 +931,7 @@ pub(crate) fn analyze_active_with_constants(
                         | ExpressionKind::Member { .. }
                         | ExpressionKind::Index { .. }
                         | ExpressionKind::StatementExpression { .. }
+                        | ExpressionKind::BuildFlavor { .. }
                         | ExpressionKind::OffsetOf { .. }
                 );
             if expression_boundary && !compiler_expanded {
@@ -983,6 +987,7 @@ pub(crate) fn analyze_active_with_constants(
                     matches!(
                         node.kind,
                         ExpressionKind::Conditional { .. }
+                            | ExpressionKind::BuildFlavor { .. }
                             | ExpressionKind::Binary {
                                 operator: BinaryOperator::LogicalAnd | BinaryOperator::LogicalOr,
                                 ..
@@ -1034,6 +1039,7 @@ impl MacroAnalysis {
             SyntaxErrorKind::TokenPaste => SkipReasonCode::TokenPaste,
             SyntaxErrorKind::CommaExpression => SkipReasonCode::CommaExpression,
             SyntaxErrorKind::BudgetExceeded => SkipReasonCode::BudgetExceeded,
+            SyntaxErrorKind::BuildFlavor => SkipReasonCode::BuildFlavor,
         };
         self.skip(code, error.message, Some(error.tokens))
     }
@@ -1551,6 +1557,15 @@ fn analyze_types(
                 helpers.insert(HelperRequirement::UsualArithmeticConversions);
                 common_type(&types, *then_value, *else_value, target)
             }
+            ExpressionKind::BuildFlavor { checked, unchecked } => {
+                flavor_type(&types[*checked], &types[*unchecked]).ok_or_else(|| {
+                    (
+                        SkipReasonCode::BuildFlavor,
+                        "the definitions of the two build flavors have different C types, so no one result serves both".into(),
+                        node.tokens,
+                    )
+                })?
+            }
             ExpressionKind::Comma { right, .. } => types[*right].clone(),
             ExpressionKind::StatementExpression { value, .. } => types[*value].clone(),
             ExpressionKind::Call { callee, arguments } => {
@@ -1914,6 +1929,9 @@ fn check_local_reads<'a>(
             }
             ExpressionKind::Conditional { condition, then_value, else_value } => {
                 work.extend([(*condition, true), (*then_value, true), (*else_value, true)]);
+            }
+            ExpressionKind::BuildFlavor { checked, unchecked } => {
+                work.extend([(*checked, true), (*unchecked, true)]);
             }
             ExpressionKind::Call { callee, arguments } => {
                 work.push((*callee, true));
@@ -2316,6 +2334,33 @@ fn common_type(
     }
 }
 
+/// The C type of the value that one of two build flavors' definitions gives, or `None` when
+/// the definitions have different types.
+///
+/// The value is the chosen definition's own, as with `__builtin_choose_expr`. C's conditional
+/// operator would instead convert both to a common type, which can change a value, as a
+/// negative `int` beside an `unsigned int`, or the arithmetic that follows, as an `int`
+/// beside a `long`. So the two types must be one type. A type that follows the caller's
+/// operands is not known here; the generated Rust then requires that both arms have one
+/// type wherever the macro is used, and the type that is known stands for both.
+fn flavor_type(checked: &TypeExpression, unchecked: &TypeExpression) -> Option<TypeExpression> {
+    use TypeExpression::{Concrete, External, Void};
+    match (checked, unchecked) {
+        (Void, Void) => Some(Void),
+        (Concrete { ty: left }, Concrete { ty: right }) => {
+            (left.kind == right.kind).then(|| checked.clone())
+        }
+        (External { ty: left }, External { ty: right }) => {
+            (left.canonical_spelling == right.canonical_spelling).then(|| checked.clone())
+        }
+        (Void | Concrete { .. } | External { .. }, Void | Concrete { .. } | External { .. }) => {
+            None
+        }
+        (_, known @ (Void | Concrete { .. } | External { .. })) => Some(known.clone()),
+        (other, _) => Some(other.clone()),
+    }
+}
+
 /// Select the corresponding unsigned C identity needed by usual arithmetic conversions.
 fn unsigned_kind(kind: IntegerKind) -> IntegerKind {
     match kind {
@@ -2397,6 +2442,42 @@ mod tests {
             radix,
             suffix: crate::syntax::IntegerSuffix { unsigned, size },
         }
+    }
+
+    /// The definitions of two build flavors have one C type, with no conversion between
+    /// them, or the macro has none. A type that follows the caller's operands leaves the
+    /// decision to the generated Rust, and the type that is known stands for both.
+    #[test]
+    fn flavor_definitions_have_one_type_without_conversion() {
+        use IntegerKind::{Bool, Int, Long, UnsignedInt};
+        use TypeExpression::{Concrete, Deferred, Parameter, Void};
+        let target = target(64);
+        let concrete = |kind| Concrete { ty: target.integers[&kind] };
+        assert!(matches!(flavor_type(&Void, &Void), Some(Void)));
+        assert!(matches!(
+            flavor_type(&concrete(Int), &concrete(Int)),
+            Some(Concrete { ty }) if ty.kind == Int
+        ));
+        // A conditional would convert these to a common type.
+        for (checked, unchecked) in [(Int, UnsignedInt), (Int, Long), (Bool, Int)] {
+            assert!(flavor_type(&concrete(checked), &concrete(unchecked)).is_none());
+        }
+        assert!(flavor_type(&Void, &concrete(Int)).is_none());
+        assert!(flavor_type(&concrete(Int), &Void).is_none());
+        for (checked, unchecked) in [
+            (Parameter { index: 0 }, concrete(Long)),
+            (concrete(Long), Parameter { index: 0 }),
+            (concrete(Long), Deferred),
+        ] {
+            assert!(matches!(
+                flavor_type(&checked, &unchecked),
+                Some(Concrete { ty }) if ty.kind == Long
+            ));
+        }
+        assert!(matches!(
+            flavor_type(&Parameter { index: 0 }, &Deferred),
+            Some(Parameter { index: 0 })
+        ));
     }
 
     /// Checks literal types follow radix suffix and target.

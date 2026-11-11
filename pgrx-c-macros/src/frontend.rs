@@ -38,6 +38,7 @@ mod builtins;
 mod flavors;
 pub(crate) use flavors::ASSERTION_REPORT;
 pub use flavors::Flavors;
+pub(crate) use flavors::Inert;
 /// Reparse original inline bodies to prove local definitions match the declaration-only catalog.
 mod definitions;
 /// Recheck complete input bytes with a host-appropriate SHA-256 backend and per-pass alias sharing.

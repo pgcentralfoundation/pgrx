@@ -763,6 +763,11 @@ assignment, and updates as distinct node kinds. `sizeof`, alignment, type-formal
 casts, and `offsetof` have dedicated structural nodes. A member-name formal is
 an identifier role; a type formal is a type role, not a value expression.
 
+The definitions that the two build flavors give one macro are one node too,
+`BuildFlavor { checked, unchecked }`, formed where a primary expression begins
+with `(` followed by a keyword token that no C lexer produces; see **Shared macro
+definitions** in section 10.
+
 A GNU statement expression, `({ statements; value; })`, is one node,
 `StatementExpression { statements, value }`, formed where a primary expression
 begins with `(` followed by `{`. Its statements use the statement grammar below
@@ -1067,7 +1072,8 @@ the root qualifies when its analyzed type is `_Bool`; when it is a relational,
 equality or logical operator or `!`, which C defines as the `int` zero or one;
 when it is a comma or statement expression whose value qualifies; or when it is
 a conditional whose result operands both qualify, with the integer constant
-`0` or `1` standing for one of them when the other qualifies. A translated
+`0` or `1` standing for one of them when the other qualifies, or the two build
+flavors' definitions under the same rule. A translated
 inline function qualifies by its declared `_Bool` result. A bare constant,
 arithmetic, a cast to another type, and a result whose type is `Deferred`,
 `Parameter`, `Promotion` or `Common` do not: the first three are numbers, and
@@ -1083,8 +1089,9 @@ translated inline function, and the Rust functions of
 result themselves. A truth-valued macro therefore still contributes `int` or
 `_Bool` to an enclosing macro's arithmetic and `sizeof`. Statement macros,
 returning macros, empty macros and `void` results are unaffected. Both build
-flavors analyze the assert-enabled definition, so they agree on the result
-type, and the emission report records it as `returns_bool`.
+flavors analyze one definition of each macro, so they agree on the result
+type, and the emission report records it as `returns_bool`. Where that
+definition holds the two that the flavors have, both must qualify.
 
 Raw aggregate values use `RawRecordValue<R>` and `MaybeUninit<R>`. Reading one
 initialized field must not materialize invalid bool/enum values or read
@@ -1289,7 +1296,8 @@ release build of the same version, and the reverse. So a generated macro's name,
 operands, form, result type and need for the caller's `unsafe` must not depend on
 `USE_ASSERT_CHECKING`, and no macro may leave out a check the assert-enabled headers
 make. Both flavors therefore generate the same Rust from the same definitions; the
-only input that differs, apart from layout, is one constant.
+only input that differs, apart from layout, is one constant. Under that constant a
+macro must do what the C definition of its own build does, and nothing else.
 
 **Two views.** `frontend::flavors::reconcile` runs once per inspection, after the
 proofs that compare the headers with their own final macros and before any pass
@@ -1311,12 +1319,13 @@ flavors apply it to the same pair. Nothing is written to disk.
   flavor-specific, and so is a function whose prototype differs. Root selection
   skips these names and `FrontendOutput::flavor_specific_names` gives them to the
   binding generator to leave out.
-- A function-like macro that both flavors define, with different tokens, takes the
-  assert-enabled definition in both. A release inspection replaces its active
-  definition, keeping the assert-enabled definition's tokens and location. This
-  requires that the definition, through the macros it names, reaches no name that
-  the release flavor lacks, declares as another kind, or defines as a different
-  object-like macro. Otherwise the macro is a conflict.
+- A function-like macro that both flavors define, with different tokens, gets one
+  definition in both, as **Shared macro definitions** describes: the assert-enabled
+  definition when the macro is nothing but checks, and otherwise a definition that
+  holds both. Either requires that each definition used, through the macros it
+  names, reaches no name that the other flavor lacks, declares as another kind, or
+  defines as a different object-like macro, and names no member that only one
+  flavor's record has. Otherwise the macro is a conflict.
 - A static inline function that only the assert-enabled flavor defines is a helper,
   and a shared definition may call it, when its prototype uses types the release
   flavor declares and every identifier in its source text is shared in the same
@@ -1344,11 +1353,10 @@ flavors apply it to the same pair. Nothing is written to disk.
   the release flavor declares. It gets no macro, since no release name stands for
   it. A merged inline body may call it, from the statements that only the
   assert-enabled flavor has: a release inspection adds its prototype to the catalog,
-  and the call renders as described under **Calls to assertion functions**. A
-  function-like macro whose assert-enabled definition calls it stays a conflict,
-  because the macro's release definition is other text that could do work the call
-  leaves out. A helper may not call it either, because a release build compiles a
-  helper's C text, where the function is not declared.
+  and the call renders as described under **Calls to assertion functions**. So may
+  a function-like macro's assert-enabled definition, which a release build then
+  holds beside its own. A helper may not call it, because a release build compiles
+  a helper's C text, where the function is not declared.
 - A conflict is skipped in both flavors with `SkipReasonCode::BuildFlavor`. So is
   every root whose dependency closure contains one, at expansion, and an inline
   body that names one keeps only its call root. A flavor that has no macro of a
@@ -1369,6 +1377,106 @@ probes build on it. The check that an overlay reproduces the final macro
 environment covers them, because the same definitions replace the inspection's
 active ones. A shared definition is spelled from its own source text, so its
 spacing, which a later stringification could show, is the assert-enabled build's.
+
+**Shared macro definitions.** `frontend::flavors::share` decides, from the tokens
+of a macro's two definitions, which definition both flavors expand. Comments are
+dropped and each definition is its parameter list and replacement list.
+
+A replacement list is *closed* when wrapping it in parentheses or braces changes no
+use of the macro: one parenthesized group, one constant, one identifier that is no
+macro, one call whose callee is an identifier and no macro, one
+`do { ... } while (0)`, or one invocation of a function-like macro whose own
+replacement list is closed in the same way. A parameter is never a callee, since
+its operand can be any tokens, and neither is a keyword such as `sizeof`, which
+binds a subscript that follows the use. `2 * M()` reads `1 + 1` differently from
+`(1 + 1)`, and an unbraced `if` takes the `else` that follows its use, so neither
+is closed.
+
+A replacement list *does nothing* when, after its object-like macros are replaced,
+it holds only grouping, a cast to `void` or `bool`, one integer constant, an empty
+block, or `do { } while (0)` with a zero condition. It yields nothing, or that
+constant. A parameter, any other identifier, and a macro that names itself are not
+nothing.
+
+- *Checks only.* The release definition does nothing, and the assert-enabled one is
+  `do { if (condition) report; } while (0)`, a parenthesized
+  `holds || (report, 0)` under an optional cast to `void` or `bool`, with `holds`
+  parenthesized and optionally negated, or one invocation of a macro already
+  admitted here. `report` is a call to `ExceptionalCondition`. What the shape
+  yields with its checks off must be what the release definition yields. Both
+  flavors then expand the assert-enabled definition, and `Flavors::checked` records
+  the macro with that yield. A release inspection replaces its active definition,
+  keeping the assert-enabled definition's text and location.
+- *Both definitions.* Otherwise the release definition's parameters take the
+  assert-enabled names, which is refused when the counts differ or a renamed
+  parameter would capture another name. Two closed expressions become
+  `( __pgrx_c_assert_checking ? ( assert-enabled ) : ( release ) )`. Two closed
+  statements, or one beside a definition that does nothing, become
+  `do { __pgrx_c_assert_checking { assert-enabled ; } { release ; } } while ( 0 )`,
+  where a definition that does nothing leaves its block empty. Both inspections
+  replace the active definition with this one, under the assert-enabled
+  definition's location, and `Flavors::selected` records both original texts.
+- A statement beside an expression that is not nothing, a definition that is not
+  closed, and a header that already uses the keyword's spelling leave a conflict.
+
+The token test is deliberately narrower than what the emitter turns off, and it is
+not the proof. `session::unproved_checks` analyzes each checked macro's own
+expansion and asks `emit::unchecked` what it yields against an installation without
+assertions. That function follows exactly what the renderers turn off, through the
+predicates they use: an `if` without `else` whose branch `reports`, an
+`assertion_alternative`, a report that `stop` recognizes, and a call that
+`unchecked_call` admits. Around those it admits grouping, blocks, comma
+sequencing, integer constants, and casts to `void` or of zero or one to an integer
+type. A macro that evaluates anything else, or yields another value than its
+release definition, is unproved. `AnalysisSession::analyze` then skips it and every
+root whose expansion depends on it with `SkipReasonCode::BuildFlavor`, naming the
+macro, and `session::inline` leaves a translated body that expands it as a call. A
+checked macro outside the batch is expanded by a pass of its own.
+
+That proof reads the macro with its own parameters as operands. Whether `stop`
+recognizes a report also depends on the operands of each use: PostgreSQL 15's `Trap`
+passes its error type on, and `stop` admits only diagnostic text or an operand there.
+So `emit::lower` refuses, as `BuildFlavor`, every root that
+`assertions::unguarded_report` finds a call to `ExceptionalCondition` in which is not
+such a report and lies outside the code that only a build with assertions runs. A
+release build would make that call, where C makes none.
+
+A checked macro that yields a value keeps the assert-enabled definition's C type.
+PostgreSQL 15's `TrapMacro` is `(bool)` there and `(true)` in a release build, which
+is an `int` where `true` is `<stdbool.h>`'s macro. The value is the same; its
+`sizeof` is the assert-enabled build's.
+
+The parser reads the expression form as `ExpressionKind::BuildFlavor`, only where
+an operand may begin with `(` followed by the keyword, and requires each definition
+to be one parenthesized group. So the outer parentheses are never a call's argument
+list or a cast's type, and the keyword anywhere else is a syntax error that is
+reported as `BuildFlavor`. Analysis gives the node the type of its definitions and
+refuses two resolved types that differ, since no conversion brings them together:
+C's conditional operator would convert a negative `int` beside an `unsigned int`,
+and change the arithmetic that follows an `int` beside a `long`. Where a type
+follows the caller's operands, the generated `expression::select_flavor` requires
+one type through its `SameType` bound, so a use with two types does not compile in
+either flavor. It converts an integer only to its ordinary identity, which drops a
+literal's source facts and nothing else. The node is never a place. Both
+definitions count toward the caller's `unsafe`, a parameter that only one names is
+still an operand in both, and a truth result needs both to qualify. The statement
+form is the `Statement::BuildFlavor` of **Merged inline bodies**.
+
+`#` spells its operand unexpanded, so C spells a shared macro's expansion in a
+string only where another macro forwards it as an operand, and then it spells the
+definition of its own build. Expansion therefore refuses, as `BuildFlavor`, a root
+whose dependency closure holds both a shared definition and a macro that
+stringifies, unless that macro stringifies only the condition
+`ExceptionalCondition` reports, and any expansion with a string that spells the
+keyword.
+
+The keyword must be a token no header can produce. `reconcile` requires that no
+flavor declares its spelling and that no macro definition either flavor ever had
+spells it; otherwise no macro holds both definitions and no body is merged. The
+paste proof poisons the spelling, so a `##` that forms it refuses its root. Every
+token with the spelling in a compiler expansion is then one written here, and
+`expansion::restore_build_flavor` makes it a keyword again after each pass that
+reads an expansion back.
 
 **Merged inline bodies.** `frontend::definitions` retains a body's tokens only after
 proving that they are the compiler's statements and that their macros expand at the
@@ -1391,6 +1499,7 @@ no header can write it. The merge is refused when:
 - the statement would sit inside a `(` or `[`, where it could be part of a macro
   invocation's arguments;
 - two tokens overlap, or a digraph or the keyword's own spelling appears;
+- any macro definition spells the keyword;
 - the flavors do not both define the function `static inline` with one prototype
   and one set of parameter names on the same lines of one file, whose text
   documents the function in both;
@@ -1417,9 +1526,10 @@ Clang's `<stddef.h>` under glibc is the known case that needs the report.
 The emitter renders the statement as `if __pgrx_c_assert_checking!() { .. } else
 { .. }`, without the empty branch. Both blocks are type-checked against either
 installation and both count toward the caller's `unsafe`. The compiler pass that
-expands a body's macros spells the keyword as an identifier; `session::inline`
-restores its kind only when the expansion spells it exactly once per statement, so a
-macro that names the same identifier leaves the call root instead.
+expands a body's macros spells the keyword as an identifier, and
+`expansion::restore_build_flavor` makes it a keyword again. A body may name a
+parameter, local or member with the keyword's spelling, which no catalog shows, so
+`session::inline` never gives such a body to that pass and leaves the call root.
 
 **Assertions.** A check that ends in `ExceptionalCondition` runs only against an
 installation that enables assertions. `emit::assertions::checking` adds
@@ -2740,7 +2850,7 @@ generalized; do not add a macro-name exception.
 | Batch lowering and support order | [`src/emit.rs`](src/emit.rs), [`demands.rs`](src/emit/demands.rs). |
 | Documentation shells and witnesses | [`documentation.rs`](src/emit/documentation.rs), [`expression/witness.rs`](../pgrx-pg-sys/src/c_macros/expression/witness.rs), [`macro_snapshot.rs`](../pgrx-bindgen/src/build/macro_snapshot.rs). |
 | Arguments, expressions, statements | [`arguments.rs`](src/emit/arguments.rs), [`typed.rs`](src/emit/typed.rs), [`statements.rs`](src/emit/statements.rs). |
-| Assertions and build flavors | [`flavors.rs`](src/frontend/flavors.rs), [`flavors/merge.rs`](src/frontend/flavors/merge.rs), [`assertions.rs`](src/emit/assertions.rs), [`expression/assertion.rs`](../pgrx-pg-sys/src/c_macros/expression/assertion.rs). |
+| Assertions and build flavors | [`flavors.rs`](src/frontend/flavors.rs), [`flavors/share.rs`](src/frontend/flavors/share.rs), [`flavors/merge.rs`](src/frontend/flavors/merge.rs), [`assertions.rs`](src/emit/assertions.rs), [`expression/assertion.rs`](../pgrx-pg-sys/src/c_macros/expression/assertion.rs). |
 | Native/nominal capabilities | [`fields.rs`](src/emit/fields.rs), [`bitfields.rs`](src/emit/bitfields.rs), [`functions.rs`](src/emit/functions.rs), [`addresses.rs`](src/emit/addresses.rs), [`callbacks.rs`](src/emit/callbacks.rs), [`enumerations.rs`](src/emit/enumerations.rs), [`type_enumerators.rs`](src/emit/type_enumerators.rs). |
 | Readable delegation and layout | [`src/delegation.rs`](src/delegation.rs), [`src/formatting.rs`](src/formatting.rs). |
 | Runtime target gate/bridges | [`src/support_generation.rs`](src/support_generation.rs). |

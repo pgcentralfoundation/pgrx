@@ -39,6 +39,10 @@ pub struct AnalysisSession<'a> {
     integer_zero_constants: BTreeMap<String, BTreeSet<crate::NodeId>>,
     /// Explicit compiler-owned static-inline calls prepared independently of real macro roots.
     inline_roots: BTreeMap<String, inline::InlineRoot<'a>>,
+    /// Macros that keep their assert-enabled definition in both build flavors although
+    /// that definition, analyzed, is not proved to do what the release definition does
+    /// when its checks are off, each with why. Nothing that expands one is generated.
+    unproved_checks: BTreeMap<String, String>,
 }
 
 /// Prepare and analyze a batch only within the borrowed coherent frontend environment.
@@ -129,7 +133,12 @@ impl<'a> AnalysisSession<'a> {
             ExpansionLimits::default(),
             session.expansions.results.len(),
         );
-        inline::expand_bodies(scanner, frontend, &mut session.inline_roots)?;
+        inline::expand_bodies(
+            scanner,
+            frontend,
+            &session.unproved_checks,
+            &mut session.inline_roots,
+        )?;
         session.verify_inputs()?;
         Ok(session)
     }
@@ -166,6 +175,10 @@ impl<'a> AnalysisSession<'a> {
                 .dependencies()
                 .with_expansions(&expansions, &frontend.declarations().integer_constants)
         });
+        let unproved_checks =
+            unproved_checks(scanner, frontend, &expansions, &integer_constants, limits);
+        crate::frontend::verify_input_files(&frontend.profile().inputs)?;
+        crate::expansion::verify_environment(frontend)?;
         let mut session = Self {
             frontend,
             expansions,
@@ -173,6 +186,7 @@ impl<'a> AnalysisSession<'a> {
             integer_constants,
             inline_roots: BTreeMap::new(),
             integer_zero_constants: BTreeMap::new(),
+            unproved_checks: unproved_checks?,
         };
         session.integer_zero_constants = crate::frontend::zero_constants::probe(scanner, &session)?;
         session.verify_inputs()?;
@@ -228,6 +242,25 @@ impl<'a> AnalysisSession<'a> {
             return root.analyze(self.frontend, name, &self.integer_constants);
         }
         match self.expansions.results.get(name) {
+            Some(ExpansionResult::Expanded { expansion })
+                if let Some((checked, why)) = std::iter::once(name)
+                    .chain(expansion.dependencies.iter().map(|dependency| dependency.name.as_str()))
+                    .find_map(|name| self.unproved_checks.get_key_value(name)) =>
+            {
+                let mut analysis = crate::analyze(self.frontend, name);
+                analysis.expression = None;
+                analysis.status = AnalysisStatus::Skipped {
+                    reason: SkipReason {
+                        code: SkipReasonCode::BuildFlavor,
+                        message: format!(
+                            "{checked} keeps its assert-enabled definition in a build without assertions, where its release definition does nothing, but {why}"
+                        ),
+                        tokens: None,
+                        spans: analysis.provenance.iter().cloned().collect(),
+                    },
+                };
+                analysis
+            }
             Some(ExpansionResult::Expanded { expansion }) => {
                 // Marker names stay distinct from captured identifiers introduced by
                 // nested expansion, even when those identifiers match a formal's name.
@@ -317,4 +350,72 @@ impl<'a> AnalysisSession<'a> {
             }
         }
     }
+}
+
+/// Prove, on its analyzed definition, each macro that keeps its assert-enabled definition in
+/// both build flavors, and return those the proof fails with why.
+///
+/// The frontend chose them by their tokens: a release definition that does nothing beside
+/// an assert-enabled one that is nothing but checks. The emitter decides what a check is,
+/// so `emit::unchecked` reads the analyzed definition as an installation without assertions
+/// evaluates it, and it must yield what the release definition yields without evaluating
+/// anything. A macro outside this batch is expanded by a pass of its own.
+fn unproved_checks(
+    scanner: &MacroScanner,
+    frontend: &FrontendOutput,
+    expansions: &ExpansionBatch,
+    constants: &BTreeMap<String, IntegerConstant>,
+    limits: ExpansionLimits,
+) -> Result<BTreeMap<String, String>, FrontendError> {
+    let checked = &frontend.flavors.checked;
+    let missing =
+        checked.keys().filter(|name| !expansions.results.contains_key(*name)).collect::<Vec<_>>();
+    let own = if missing.is_empty() {
+        None
+    } else {
+        Some(crate::expansion::prepare_inner(scanner, frontend, &missing, limits)?)
+    };
+    let mut unproved = BTreeMap::new();
+    for (name, release) in checked {
+        let result = expansions.results.get(name).or_else(|| own.as_ref()?.results.get(name));
+        let why = match result {
+            Some(ExpansionResult::Expanded { expansion }) => {
+                let active = ActiveMacro {
+                    definition: expansion.definition.clone(),
+                    provenance: ActiveProvenance::Resolved,
+                };
+                let analysis = crate::analysis::analyze_active_with_constants(
+                    frontend,
+                    name,
+                    Some(&active),
+                    constants,
+                    Some(&expansion.pastes),
+                );
+                match (&analysis.status, &analysis.expression) {
+                    (AnalysisStatus::Candidate, Some(expression)) => {
+                        match crate::emit::unchecked(frontend, expression) {
+                            Some(off) if off == *release => continue,
+                            Some(_) => "with its checks off the assert-enabled definition yields another value".to_owned(),
+                            None => "with its checks off the assert-enabled definition still evaluates an operand or does other work".to_owned(),
+                        }
+                    }
+                    (AnalysisStatus::Skipped { reason }, _) => {
+                        format!(
+                            "the assert-enabled definition could not be analyzed: {}",
+                            reason.message
+                        )
+                    }
+                    (AnalysisStatus::Candidate, None) => {
+                        "the assert-enabled definition has no analyzed expression".to_owned()
+                    }
+                }
+            }
+            Some(ExpansionResult::Skipped { reason }) => {
+                format!("the assert-enabled definition could not be expanded: {}", reason.message)
+            }
+            None => "the assert-enabled definition was not expanded".to_owned(),
+        };
+        unproved.insert(name.clone(), why);
+    }
+    Ok(unproved)
 }

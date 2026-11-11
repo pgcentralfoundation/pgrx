@@ -283,6 +283,13 @@ macro_rules! NodeSetTag {
 /// #define castNode( _type_ , nodeptr ) ( ( _type_ * ) castNodeImpl ( T_ ## _type_ , nodeptr ) )
 /// ```
 ///
+/// A PostgreSQL built without assertions defines this macro as:
+///
+/// ```text
+/// #define castNode( _type_ , nodeptr ) ( ( _type_ * ) ( nodeptr ) )
+/// ```
+///
+/// This macro holds both definitions. It evaluates the one that belongs to the PostgreSQL it was generated for and compiles the other without evaluating it. The two must give one C type, so the macro has the same operands, result and need for `unsafe` against both builds, and what either definition reads is part of its safety contract in every build.
 ///
 /// `_type_` is a structure type, named by a Rust path to its binding. C pastes `T_` onto the type's C name to name an enumerator of `enum NodeTag`, so a type whose name has no such enumerator fails to compile. C gives some structures several names, each with its own enumerator. Name such a structure by a plain path whose last segment is the C name meant. An alias of it, or a type that another macro captured as a `ty` fragment, names none of them and fails to compile.
 ///
@@ -299,12 +306,41 @@ macro_rules! castNode {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$nodeptr;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::type_witness::<
-                            $crate::__pgrx_c_macros::expression::CPointer<<$_type_ as $crate::__pgrx_c_macros::expression::NativeType
-                        >::Marker,
-                        $crate::__pgrx_c_macros::expression::ReadWrite>>()
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::select_flavor(
+                        if true {
+                            $crate::__pgrx_c_macros::Either::Left(
+                                (
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_macros::expression::CPointer<<$_type_ as $crate::__pgrx_c_macros::expression::NativeType
+                                            >::Marker,
+                                            $crate::__pgrx_c_macros::expression::ReadWrite>>()
+                                        )
+                                    )
+                                )
+                            )
+                        } else {
+                            $crate::__pgrx_c_macros::Either::Right(
+                                (
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_macros::expression::CPointer<<$_type_ as $crate::__pgrx_c_macros::expression::NativeType
+                                            >::Marker,
+                                            $crate::__pgrx_c_macros::expression::ReadWrite>>()
+                                        )
+                                    )
+                                )
+                            )
+                        }
                     )
                 )
             }

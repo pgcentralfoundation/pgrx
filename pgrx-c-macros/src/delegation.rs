@@ -231,6 +231,13 @@ fn match_node(
             ]);
             true
         }
+        (
+            ExpressionKind::BuildFlavor { checked: left_checked, unchecked: left_unchecked },
+            ExpressionKind::BuildFlavor { checked: right_checked, unchecked: right_unchecked },
+        ) => {
+            pending.extend([(*left_checked, *right_checked), (*left_unchecked, *right_unchecked)]);
+            true
+        }
         _ => false,
     }
 }

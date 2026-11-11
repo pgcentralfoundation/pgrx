@@ -102,7 +102,7 @@ ValidateObject(const int *object)
 
 /*
  * Checks that only an assert-enabled build declares, and a macro that makes one only
- * there. Nothing compares the macro's two definitions, so it is not shared.
+ * there. The macro holds both of its definitions, so a release build makes no call.
  */
 #ifdef USE_ASSERT_CHECKING
 extern void VerifyElement(const int *elements, int index);
@@ -218,5 +218,67 @@ extern int *PointerVariable;
 
 /* A stop that is no assertion keeps its condition's effects in both flavors. */
 #define COUNT_OR_ABORT(counter) do { if (++(*(counter)) > 5) abort(); } while (0)
+
+/*
+ * Macros whose two definitions do different work. Each build must do what its own does.
+ */
+#define SLOT_LIMIT 8
+extern int WorkCounterVariable;
+#ifdef USE_ASSERT_CHECKING
+/* A release build wraps where an assert-enabled build checks. */
+#define NEXT_SLOT(slot) (AssertMacro((slot) + 1 < SLOT_LIMIT), (slot) + 1)
+/* Work that only an assert-enabled build does, as an expression and as a statement. */
+#define COUNT_CHECKED(value) (WorkCounterVariable++, AssertMacro((value) >= 0))
+#define COUNT_STATEMENT(value) do { WorkCounterVariable += 2; Assert((value) >= 0); } while (0)
+/* Parameters that the release definition names otherwise. */
+#define RENAMED(first, second) ((first) - (second))
+/* Definitions that have one type for a `long` operand and two for an `int`. */
+#define WIDENED(value) ((value) + 1L)
+#else
+#define NEXT_SLOT(slot) (((slot) + 1) % SLOT_LIMIT)
+#define COUNT_CHECKED(value) ((void)1)
+#define COUNT_STATEMENT(value) ((void)1)
+#define RENAMED(second, first) ((second) - (first) + 100)
+#define WIDENED(value) ((value) + 0)
+#endif
+/*
+ * An assertion with assertions and an assumption without, as PostgreSQL 19's pg_assume.
+ * A release build evaluates the operand, which the assertion it replaces would not.
+ */
+#ifdef USE_ASSERT_CHECKING
+#define flavor_assume(holds) Assert(holds)
+#else
+#define flavor_assume(holds) do { if (!(holds)) __builtin_unreachable(); } while (0)
+#endif
+/* Uses of them inside other macros, one as the unbraced branch of an `if`. */
+#define SLOT_AFTER(slot) (NEXT_SLOT(slot) + 1)
+#define COUNT_IF(flag, value) \
+	do { if (flag) COUNT_STATEMENT(value); else WorkCounterVariable += 10; } while (0)
+/* A check as the unbraced branch of an `if`, and checks inside a comma expression. */
+#define CHECK_IF(flag, value) \
+	do { if (flag) Assert((value) > 0); else WorkCounterVariable += 100; } while (0)
+#define CHECK_THEN(value) (AssertMacro((value) > 0), AssertMacro((value) < 100), (value) + 1)
+/* Unreachable code behind a condition. */
+#define UNREACHABLE_UNLESS(flag) do { if (!(flag)) flavor_unreachable(); } while (0)
+
+/*
+ * Pairs of definitions that no one definition can hold: a statement beside a value, two
+ * types, a replacement list that an operator of its use could bind, and a name that only
+ * a release build declares. A macro that uses one follows it.
+ */
+#ifdef USE_ASSERT_CHECKING
+#define MIXED_FORMS(value) do { WorkCounterVariable += (value); } while (0)
+#define MIXED_TYPES(value) ((long) (value))
+#define OPEN_SUM(value) (value) + 1
+#define NEEDS_RELEASE_ONLY(value) (value)
+#else
+#define MIXED_FORMS(value) (value)
+#define MIXED_TYPES(value) ((unsigned int) (value))
+#define OPEN_SUM(value) (value) + 2
+#define NEEDS_RELEASE_ONLY(value) (ReleaseOnlyFunction(value))
+#endif
+#define USES_MIXED_FORMS(value) (MIXED_FORMS(value) + 1)
+#define USES_MIXED_TYPES(value) (MIXED_TYPES(value) < 0)
+#define USES_OPEN_SUM(value) (2 * OPEN_SUM(value))
 
 #endif

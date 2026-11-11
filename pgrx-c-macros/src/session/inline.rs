@@ -20,8 +20,10 @@
 //!
 //! A definition that differs between assert-enabled and release PostgreSQL has one body
 //! that the frontend merged from both. Its statements of one build flavor open with a
-//! keyword token that no C source holds, which the compiler pass returns as an identifier
-//! and this module makes a keyword again.
+//! keyword token that no C source holds, as does a macro definition that holds both build
+//! flavors' definitions. The compiler pass returns that token as an identifier and makes it
+//! a keyword again, so a body that itself names an identifier with the keyword's spelling
+//! is never given to that pass.
 //!
 //! The existing typed renderer and native capability planner own parameter assignment
 //! conversions, qualifiers, original result identity and guarded ABI calls. Native
@@ -30,7 +32,7 @@
 //! source and shared count/token/byte budgets use the same structured refusal path;
 //! selection does not bypass profile or input-consistency checks.
 
-use crate::syntax::{BUILD_FLAVOR, opens_build_flavor};
+use crate::syntax::BUILD_FLAVOR;
 use crate::{
     ActiveMacro, ActiveProvenance, AnalysisStatus, ExpansionLimits, FrontendOutput,
     InlineFunctionDefinition, IntegerConstant, MacroAnalysis, MacroDefinition, MacroKind,
@@ -130,15 +132,19 @@ impl InlineRoot<'_> {
 /// Expand translated bodies that name macros in the final environment, where generated
 /// macros also expand. A body the compiler pass refuses leaves only the call root.
 ///
-/// The pass spells every token and reads the result again, so the keyword that opens the
-/// statements of one build flavor returns as an identifier. Such a statement lies outside
-/// every macro invocation, and the frontend merged a body only where the keyword's
-/// spelling names no macro and no body token has it. So the expansion spells it once for
-/// each statement, unless a macro's replacement list spells it too. An expansion that
-/// spells it any other number of times leaves only the call root.
+/// The pass spells every token and reads the result again, so the keyword that selects a
+/// build flavor returns as an identifier, and `expansion::restore_build_flavor` makes each
+/// token with its spelling a keyword. A body may name a parameter, local or member with
+/// that spelling, which no declaration catalog shows. Such a body leaves only the call
+/// root: its identifier would return as the keyword.
+///
+/// A body that expands a macro of `unproved_checks` leaves only the call root too: the
+/// macro keeps its assert-enabled definition in a build without assertions, and nothing
+/// proves that the definition does nothing there.
 pub(super) fn expand_bodies(
     scanner: &crate::MacroScanner,
     frontend: &FrontendOutput,
+    unproved_checks: &BTreeMap<String, String>,
     roots: &mut BTreeMap<String, InlineRoot<'_>>,
 ) -> Result<(), crate::FrontendError> {
     let names_macro = |body: &ActiveMacro| {
@@ -147,10 +153,16 @@ pub(super) fn expand_bodies(
                 && frontend.environment().active.contains_key(&token.spelling)
         })
     };
+    let forges = |body: &ActiveMacro| {
+        body.definition
+            .tokens
+            .iter()
+            .any(|token| token.kind == TokenKind::Identifier && token.spelling == BUILD_FLAVOR)
+    };
     let definitions = roots
         .values()
         .filter_map(|root| match root {
-            InlineRoot::Ready { body: Some(body), .. } if names_macro(body) => {
+            InlineRoot::Ready { body: Some(body), .. } if names_macro(body) && !forges(body) => {
                 Some(body.definition.clone())
             }
             _ => None,
@@ -169,22 +181,15 @@ pub(super) fn expand_bodies(
         if let InlineRoot::Ready { body, .. } = root
             && body.as_deref().is_some_and(names_macro)
         {
-            let opened = body.as_deref().map_or(0, |body| {
-                body.definition.tokens.iter().filter(|token| opens_build_flavor(token)).count()
-            });
-            let spelled = |token: &&Token| token.spelling == BUILD_FLAVOR;
             *body = match batch.results.get(name) {
                 Some(crate::ExpansionResult::Expanded { expansion })
-                    if expansion.definition.tokens.iter().filter(spelled).count() == opened =>
+                    if !expansion
+                        .dependencies
+                        .iter()
+                        .any(|dependency| unproved_checks.contains_key(&dependency.name)) =>
                 {
-                    let mut definition = expansion.definition.clone();
-                    for token in &mut definition.tokens {
-                        if token.spelling == BUILD_FLAVOR {
-                            token.kind = TokenKind::Keyword;
-                        }
-                    }
                     Some(Box::new(ActiveMacro {
-                        definition,
+                        definition: expansion.definition.clone(),
                         provenance: ActiveProvenance::Resolved,
                     }))
                 }

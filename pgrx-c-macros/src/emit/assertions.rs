@@ -8,13 +8,19 @@
 //! `ExceptionalCondition`, and `pg_unreachable()` to call `abort()`. These calls lower to
 //! safe support functions that stop the process, so no build makes a native call to stop.
 //!
-//! Both build flavors translate the assert-enabled definitions, so a macro has one form,
-//! one set of operands and one need for the caller's `unsafe`. Whether a check that ends in
+//! Both build flavors translate one definition of each macro, so a macro has one form, one
+//! set of operands and one need for the caller's `unsafe`. Whether a check that ends in
 //! `ExceptionalCondition` runs is a constant of the installation, which the generated
 //! `__pgrx_c_assert_checking!()` supplies. No check is ever left out of a macro: against a
 //! release installation its condition is compiled and never evaluated, as in release C.
+//!
+//! A macro whose two definitions differ by more than checks holds both, and the same
+//! constant selects the installation's own. [`unchecked`] proves that a macro which keeps
+//! only its assert-enabled definition does nothing with its checks off.
 
 use super::typed::Context;
+use crate::analysis::{AnalyzedExpression, TypeExpression};
+use crate::frontend::Inert;
 use crate::syntax::{
     BinaryOperator, ExpressionKind, ExpressionNode, NodeId, Statement, StringPart, full_expressions,
 };
@@ -313,6 +319,9 @@ pub(super) fn unevaluated_parameters(
             ExpressionKind::Conditional { condition, then_value, else_value } => {
                 pending.extend([*condition, *then_value, *else_value]);
             }
+            ExpressionKind::BuildFlavor { checked, unchecked } => {
+                pending.extend([*checked, *unchecked]);
+            }
             ExpressionKind::Call { callee, arguments } => {
                 pending.push(*callee);
                 pending.extend(arguments);
@@ -380,6 +389,158 @@ pub(super) fn reports(
             Some(Stop::Assertion { .. })
         ),
         _ => false,
+    }
+}
+
+/// Whether a call to the function `name` is made, and its arguments evaluated, only against
+/// an installation that enables assertions: only an assert-enabled build declares the
+/// function, which returns nothing.
+///
+/// Such a function is external, so no translation of a static inline function stands for
+/// the call.
+pub(super) fn unchecked_call(frontend: &FrontendOutput, name: &str) -> bool {
+    frontend.flavors.assert_functions.contains(name)
+        && frontend
+            .declarations()
+            .function_signatures
+            .get(name)
+            .is_some_and(|function| function.signature.result.category == TypeCategory::Void)
+}
+
+/// What `expression` yields against an installation without assertions, when it evaluates
+/// nothing there: no operand, no call and no write. `None` when it evaluates anything, or
+/// yields a value this does not follow.
+///
+/// A macro that keeps its assert-enabled definition in both build flavors must pass this
+/// with the value its release definition yields. It follows what the renderers turn off and
+/// nothing else, through the predicates they use: an `if` statement whose branch only
+/// [`reports`], `holds || (report, 0)` as [`assertion_alternative`] reads it, a report
+/// that [`stop`] recognizes, a call that [`unchecked_call`] admits, and the definition of a
+/// build without assertions where both are held. Around those it admits only grouping,
+/// blocks, comma sequencing, integer constants, and casts to `void` or of zero or one to
+/// an integer type.
+pub(crate) fn unchecked(
+    frontend: &FrontendOutput,
+    expression: &AnalyzedExpression,
+) -> Option<Inert> {
+    let off = Off { frontend, expression };
+    match &expression.syntax.statement_body {
+        Some(body) => off.statements(&body.statements).then_some(Inert::Nothing),
+        None => off.value(expression.syntax.root),
+    }
+}
+
+/// A call to `ExceptionalCondition` in `expression` that an installation without assertions
+/// would make: one that [`stop`] does not recognize as an assertion's report, outside the
+/// code that only a build with assertions runs.
+///
+/// A macro that keeps its assert-enabled definition in both build flavors is proved once,
+/// on its own operands. Whether [`stop`] recognizes its report also depends on the operands
+/// of each use: PostgreSQL 15's `Trap` passes its error type on. A use whose report is not
+/// recognized would call the function in a release build, where C makes no call, so it is
+/// not generated.
+pub(super) fn unguarded_report(
+    declarations: &DeclarationCatalog,
+    expression: &AnalyzedExpression,
+) -> Option<NodeId> {
+    let syntax = &expression.syntax;
+    let nodes = &syntax.nodes;
+    // The tokens of the definitions and statements that only a build with assertions runs.
+    let checked = nodes
+        .iter()
+        .filter_map(|node| match &node.kind {
+            ExpressionKind::BuildFlavor { checked, .. } => Some(nodes[*checked].tokens),
+            _ => None,
+        })
+        .chain(syntax.statements().filter_map(|statement| match statement {
+            Statement::BuildFlavor { checked, .. } => match checked.as_ref() {
+                Statement::Block { tokens, .. } => Some(*tokens),
+                _ => None,
+            },
+            _ => None,
+        }))
+        .collect::<Vec<_>>();
+    (0..nodes.len()).find(|&index| {
+        let ExpressionKind::Call { callee, .. } = &nodes[index].kind else { return false };
+        let tokens = nodes[index].tokens;
+        matches!(
+            &nodes[ungroup(nodes, *callee)].kind,
+            ExpressionKind::Identifier { name } if name == crate::frontend::ASSERTION_REPORT
+        ) && !matches!(stop(declarations, nodes, index), Some(Stop::Assertion { .. }))
+            && !checked.iter().any(|range| range.start <= tokens.start && tokens.end <= range.end)
+    })
+}
+
+/// An analyzed definition, read as an installation without assertions evaluates it.
+struct Off<'a> {
+    /// Declarations and the functions only an assert-enabled build has.
+    frontend: &'a FrontendOutput,
+    /// The definition.
+    expression: &'a AnalyzedExpression,
+}
+
+impl Off<'_> {
+    /// Whether `statements` evaluate nothing.
+    fn statements(&self, statements: &[Statement]) -> bool {
+        let nodes = &self.expression.syntax.nodes;
+        statements.iter().all(|statement| match statement {
+            Statement::Block { statements, .. } => self.statements(statements),
+            Statement::If { then_branch, else_branch: None, .. } => {
+                reports(self.frontend.declarations(), nodes, then_branch)
+            }
+            Statement::Expression { expression, .. } => self.value(*expression).is_some(),
+            Statement::BuildFlavor { unchecked, .. } => {
+                self.statements(std::slice::from_ref(unchecked.as_ref()))
+            }
+            Statement::If { .. } | Statement::Declaration { .. } | Statement::Return { .. } => {
+                false
+            }
+        })
+    }
+
+    /// What `node` yields, when it evaluates nothing. The parser bounds how deeply
+    /// expressions nest, except along the left operands of commas, which this follows in a
+    /// loop.
+    fn value(&self, mut node: NodeId) -> Option<Inert> {
+        let nodes = &self.expression.syntax.nodes;
+        let declarations = self.frontend.declarations();
+        let mut sequenced = None;
+        loop {
+            node = ungroup(nodes, node);
+            let ExpressionKind::Comma { left, right } = &nodes[node].kind else { break };
+            let value = self.value(*right)?;
+            sequenced.get_or_insert(value);
+            node = *left;
+        }
+        let value = match &nodes[node].kind {
+            ExpressionKind::Empty => Inert::Nothing,
+            ExpressionKind::IntegerLiteral { literal } => Inert::Integer(literal.value),
+            ExpressionKind::Cast { operand, .. } => {
+                match (&self.expression.types[node], self.value(*operand)?) {
+                    (TypeExpression::Void, _) => Inert::Nothing,
+                    (TypeExpression::Concrete { .. }, value @ Inert::Integer(0 | 1)) => value,
+                    _ => return None,
+                }
+            }
+            ExpressionKind::Binary { .. } if assertion_alternative(declarations, nodes, node) => {
+                Inert::Integer(1)
+            }
+            ExpressionKind::Call { callee, .. } => {
+                let reported =
+                    matches!(stop(declarations, nodes, node), Some(Stop::Assertion { .. }));
+                let unchecked = matches!(
+                    &nodes[ungroup(nodes, *callee)].kind,
+                    ExpressionKind::Identifier { name } if unchecked_call(self.frontend, name)
+                );
+                if !reported && !unchecked {
+                    return None;
+                }
+                Inert::Nothing
+            }
+            ExpressionKind::BuildFlavor { unchecked, .. } => self.value(*unchecked)?,
+            _ => return None,
+        };
+        Some(sequenced.unwrap_or(value))
     }
 }
 
@@ -486,6 +647,10 @@ impl<'a> Safety<'a> {
                 }
                 ExpressionKind::Conditional { condition, then_value, else_value } => {
                     pending.extend([value(condition), value(then_value), value(else_value)]);
+                }
+                // Both definitions count, whichever the installation evaluates.
+                ExpressionKind::BuildFlavor { checked, unchecked } => {
+                    pending.extend([value(checked), value(unchecked)]);
                 }
                 ExpressionKind::Comma { left, right } => {
                     pending.extend([(*left, Context::Discard), value(right)]);
