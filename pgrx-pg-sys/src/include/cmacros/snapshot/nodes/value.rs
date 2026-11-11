@@ -30,18 +30,47 @@ macro_rules! boolVal {
                                 _
                             >(
                                 $crate::__pgrx_c_macros::expression::pointee(
-                                    (
-                                        $crate::__pgrx_c_macros::expression::profile_value::<
-                                            true,
-                                            _
-                                        >(
-                                            $crate::__pgrx_c_macros::expression::type_witness::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::Boolean
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>()
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::select_flavor(
+                                            if true {
+                                                $crate::__pgrx_c_macros::Either::Left(
+                                                    (
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                    $crate::__pgrx_c_macros::expression::CPointer<
+                                                                        $crate::__pgrx_c_macros::expression::CRecord<
+                                                                            $crate::__pgrx_c_bindings::Boolean
+                                                                        >,
+                                                                        $crate::__pgrx_c_macros::expression::ReadWrite
+                                                                    >>()
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            } else {
+                                                $crate::__pgrx_c_macros::Either::Right(
+                                                    (
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                    $crate::__pgrx_c_macros::expression::CPointer<
+                                                                        $crate::__pgrx_c_macros::expression::CRecord<
+                                                                            $crate::__pgrx_c_bindings::Boolean
+                                                                        >,
+                                                                        $crate::__pgrx_c_macros::expression::ReadWrite
+                                                                    >>()
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            }
                                         )
                                     )
                                 )
@@ -111,18 +140,47 @@ macro_rules! intVal {
                                 _
                             >(
                                 $crate::__pgrx_c_macros::expression::pointee(
-                                    (
-                                        $crate::__pgrx_c_macros::expression::profile_value::<
-                                            true,
-                                            _
-                                        >(
-                                            $crate::__pgrx_c_macros::expression::type_witness::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::Integer
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>()
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::select_flavor(
+                                            if true {
+                                                $crate::__pgrx_c_macros::Either::Left(
+                                                    (
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                    $crate::__pgrx_c_macros::expression::CPointer<
+                                                                        $crate::__pgrx_c_macros::expression::CRecord<
+                                                                            $crate::__pgrx_c_bindings::Integer
+                                                                        >,
+                                                                        $crate::__pgrx_c_macros::expression::ReadWrite
+                                                                    >>()
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            } else {
+                                                $crate::__pgrx_c_macros::Either::Right(
+                                                    (
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                    $crate::__pgrx_c_macros::expression::CPointer<
+                                                                        $crate::__pgrx_c_macros::expression::CRecord<
+                                                                            $crate::__pgrx_c_bindings::Integer
+                                                                        >,
+                                                                        $crate::__pgrx_c_macros::expression::ReadWrite
+                                                                    >>()
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            }
                                         )
                                     )
                                 )
@@ -163,18 +221,47 @@ macro_rules! strVal {
                                 _
                             >(
                                 $crate::__pgrx_c_macros::expression::pointee(
-                                    (
-                                        $crate::__pgrx_c_macros::expression::profile_value::<
-                                            true,
-                                            _
-                                        >(
-                                            $crate::__pgrx_c_macros::expression::type_witness::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::String
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>()
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::select_flavor(
+                                            if true {
+                                                $crate::__pgrx_c_macros::Either::Left(
+                                                    (
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                    $crate::__pgrx_c_macros::expression::CPointer<
+                                                                        $crate::__pgrx_c_macros::expression::CRecord<
+                                                                            $crate::__pgrx_c_bindings::String
+                                                                        >,
+                                                                        $crate::__pgrx_c_macros::expression::ReadWrite
+                                                                    >>()
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            } else {
+                                                $crate::__pgrx_c_macros::Either::Right(
+                                                    (
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                    $crate::__pgrx_c_macros::expression::CPointer<
+                                                                        $crate::__pgrx_c_macros::expression::CRecord<
+                                                                            $crate::__pgrx_c_bindings::String
+                                                                        >,
+                                                                        $crate::__pgrx_c_macros::expression::ReadWrite
+                                                                    >>()
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            }
                                         )
                                     )
                                 )
