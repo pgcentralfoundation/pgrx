@@ -6,7 +6,8 @@
 //! prefix and enum, so nothing here can depend on PostgreSQL's names.
 //!
 //! The generated macro takes the operand as a Rust type and reads the enumerator from a
-//! sealed trait that only the bound structure types with an enumerator implement. Both
+//! sealed trait that only the bound structure types with an enumerator implement. Where
+//! C gives one structure several names, the operand's spelling selects the name. Both
 //! build flavors generate the same Rust, and a check behind such a macro runs only with
 //! assertions.
 
@@ -187,7 +188,38 @@ const MAIN: &str = r#"
 /// A second Rust name of a bound type selects the same enumerator.
 type Round = Circle;
 
+/// A path through another module still ends in the C name.
+mod names {
+    pub use super::{Twin, TwinAlias};
+}
+
+/// A macro of the defining crate names a type through `$crate`.
+macro_rules! alias_kind {
+    () => {
+        KindOf!($crate::TwinAlias)
+    };
+}
+
 fn main() {
+    println!(
+        "named\t{}\t{}\t{}\t{}",
+        KindOf!(Twin).get(),
+        KindOf!(TwinAlias).get(),
+        KindOf!(MaskedAlias).get(),
+        BareKind!(TwinAlias,).get()
+    );
+    println!(
+        "paths\t{}\t{}\t{}\t{}",
+        KindOf!(self::Twin).get(),
+        KindOf!(crate::names::TwinAlias).get(),
+        KindThrough!(names::Twin).get(),
+        alias_kind!().get()
+    );
+    println!(
+        "twin size\t{}\t{}",
+        KindAndSize!(Twin).get(),
+        KindAndSize!(crate::TwinAlias).get()
+    );
     println!("kind\t{}\t{}\t{}", KindOf!(Circle).get(), KindOf!(Square).get(), KindOf!(Shape).get());
     println!("alias\t{}\t{}", KindOf!(Round).get(), KindOf!(self::Circle).get());
     println!("incomplete\t{}\t{}", KindOf!(Segment).get(), BareKind!(Square).get());
@@ -207,6 +239,22 @@ fn main() {
         let list = ShapeList { first: circle.cast() };
         let first: *mut Circle = firstShape!(Circle, &raw const list).get();
         println!("first\t{}", first == circle);
+        // `Twin` and `TwinAlias` name one structure, and each spelling selects its own
+        // enumerator in every macro, as it does in C.
+        let twin: *mut Twin = makeShape!(Twin).get();
+        let alias: *mut Twin = makeShape!(self::TwinAlias).get();
+        println!("twins\t{}\t{}", shapeKind!(twin).get(), shapeKind!(alias).get());
+        println!(
+            "is twin\t{}\t{}\t{}\t{}",
+            IsShape!(twin, Twin).get(),
+            IsShape!(twin, TwinAlias).get(),
+            IsShape!(alias, crate::Twin,).get(),
+            IsShape!(alias, names::TwinAlias).get()
+        );
+        let same: *mut TwinAlias = castShape!(TwinAlias, alias).get();
+        let list = ShapeList { first: alias.cast() };
+        let first: *mut Twin = firstShape!(TwinAlias, &raw const list).get();
+        println!("twin cast\t{}\t{}", same == alias, first == alias);
         println!("before");
         let wrong: *mut Square = castShape!(Square, circle).get();
         println!("after\t{}", wrong.cast::<Circle>() == circle);
@@ -216,12 +264,13 @@ fn main() {
 
 /// The macros the fixture defines that every flavor emits: whether each needs the caller's
 /// `unsafe`, and whether its documentation witness names the lookup. A witness that closes
-/// an enclosing cast or comparison over the pasted name does not.
+/// an enclosing cast or comparison over the pasted name does not. Neither does a witness of
+/// `KIND_`, whose enumerator can depend on the operand's spelling, which a shell cannot read.
 const EMITTED: &[(&str, bool, bool)] = &[
-    ("KindOf", false, true),
-    ("BareKind", false, true),
-    ("KindThrough", false, true),
-    ("KindAndSize", false, true),
+    ("KindOf", false, false),
+    ("BareKind", false, false),
+    ("KindThrough", false, false),
+    ("KindAndSize", false, false),
     ("PaintOf", false, true),
     ("IsShape", true, false),
     ("makeShape", true, false),
@@ -335,11 +384,45 @@ fn a_prefix_pasted_onto_a_type_operand_names_that_types_enumerator() {
     };
     assert_eq!(implementations("TypeEnumerator_KIND_"), ["Circle", "Segment", "Shape", "Square"]);
     assert_eq!(implementations("TypeEnumerator_PAINT_"), ["Circle", "Square"]);
+    // Each C name of a shared structure whose enumerator no macro hides has a carrier,
+    // which implements the lookup for that structure only. `PAINT_` has none.
+    let carriers = asserted
+        .support
+        .lines()
+        .filter_map(|line| {
+            line.strip_prefix("impl TypeEnumerator_KIND_ for type_names_KIND_::")
+                .and_then(|rest| rest.split_once(" {"))
+                .map(|(carrier, _)| carrier)
+        })
+        .collect::<Vec<_>>();
+    assert_eq!(
+        carriers,
+        ["MaskedAlias<crate::Masked>", "Twin<crate::Twin>", "TwinAlias<crate::Twin>"]
+    );
+    assert!(!asserted.support.contains("type_names_PAINT_"), "{}", asserted.support);
+    assert!(!asserted.support.contains("__pgrx_c_type_name_PAINT_"), "{}", asserted.support);
     assert!(
-        asserted.support.contains("selects none: Masked, MaskedAlias; Twin, TwinAlias\""),
+        asserted.support.contains("a captured `ty` fragment: MaskedAlias; Twin, TwinAlias\""),
         "{}",
         asserted.support
     );
+    // Only a macro that pastes `KIND_` reads its type operand's spelling, and its
+    // documentation says so.
+    for (name, ..) in EMITTED {
+        let (rust, _) = asserted.emitted(name);
+        let named = *name != "PaintOf";
+        assert_eq!(rust.contains("__pgrx_c_type_name_KIND_!"), named, "{name}: {rust}");
+        assert_eq!(
+            rust.contains("whose last segment is the C name meant"),
+            named,
+            "{name}: {rust}"
+        );
+        assert!(!rust.contains("__pgrx_c_type_name_PAINT_"), "{name}: {rust}");
+    }
+    // A recovered call never forwards a type operand, so the list macro expands the cast
+    // macro it calls and its own normalizer is the only one that reads the operand.
+    let (first, _) = asserted.emitted("firstShape");
+    assert!(!first.contains("$crate::castShape!"), "{first}");
     assert!(!asserted.bindings.contains("struct Unbound"), "{}", asserted.bindings);
 
     // A binding whose value disagrees with Clang's refuses the whole lookup, since any type
@@ -376,7 +459,7 @@ fn a_prefix_pasted_onto_a_type_operand_names_that_types_enumerator() {
     // the process. Without them the same program casts.
     let (status, stdout, stderr) = asserted.run(MAIN);
     assert!(!status.success(), "{stdout}\n{stderr}");
-    let before = "kind\t3\t4\t2\nalias\t3\t3\nincomplete\t5\t4\nthrough\t4\npaint\t10\t20\nsized\t11\nmade\t3\t0\nis\t1\t0\ncast\ttrue\nnull\ttrue\nfirst\ttrue\nbefore\n";
+    let before = "named\t6\t7\t9\t7\npaths\t6\t7\t6\t7\ntwin size\t10\t11\nkind\t3\t4\t2\nalias\t3\t3\nincomplete\t5\t4\nthrough\t4\npaint\t10\t20\nsized\t11\nmade\t3\t0\nis\t1\t0\ncast\ttrue\nnull\ttrue\nfirst\ttrue\ntwins\t6\t7\nis twin\t1\t0\t0\t1\ntwin cast\ttrue\ttrue\nbefore\n";
     assert_eq!(stdout, before);
     assert!(
         stderr.contains("TRAP: failed Assert(\"shape == 0 || shapeKind(shape) == kind\")"),
@@ -391,14 +474,45 @@ fn a_prefix_pasted_onto_a_type_operand_names_that_types_enumerator() {
     // says why. Both flavors report the same errors.
     const UNIMPLEMENTED: &str =
         "no enumerator of `enum ShapeKind` is `KIND_` followed by the C name of";
+    const NAMED: &str = "the operand must end in one of those names, written as the last segment of a plain path and not through an alias or a captured `ty` fragment: MaskedAlias; Twin, TwinAlias";
     for (invocation, error, explanation) in [
         ("let _ = KindOf!(Plain);", "E0277", UNIMPLEMENTED),
-        // Rust sees one type where C has two names with different enumerators.
-        ("let _ = KindOf!(Twin);", "E0277", "selects none: Masked, MaskedAlias; Twin, TwinAlias"),
-        ("let _ = KindOf!(TwinAlias);", "E0277", UNIMPLEMENTED),
+        // Rust sees one type where C has two names with different enumerators. An alias
+        // spells neither name, so it selects neither, and the error names them.
+        ("type Pair = Twin; let _ = KindOf!(Pair);", "E0277", NAMED),
+        ("type Pair = TwinAlias; let _ = unsafe { makeShape!(Pair) };", "E0277", NAMED),
+        // A type fragment that another macro captured hides its spelling.
+        (
+            "macro_rules! through { ($t:ty) => { KindOf!($t) } } let _ = through!(TwinAlias);",
+            "E0277",
+            NAMED,
+        ),
+        // A macro gives `Masked` another enumerator, so that name selects none, and its
+        // alias's cannot stand in.
         ("let _ = KindOf!(Masked);", "E0277", UNIMPLEMENTED),
-        // A macro gives `Masked` another enumerator, so its alias's cannot stand in.
-        ("let _ = KindOf!(MaskedAlias);", "E0277", UNIMPLEMENTED),
+        ("type Hidden = MaskedAlias; let _ = KindOf!(Hidden);", "E0277", UNIMPLEMENTED),
+        // Another type whose path ends in a shared name is not the shared structure.
+        (
+            "mod other { pub struct TwinAlias; } let _ = KindOf!(other::TwinAlias);",
+            "E0277",
+            UNIMPLEMENTED,
+        ),
+        (
+            "mod other { pub type Twin = super::Circle; } let _ = KindOf!(other::Twin);",
+            "E0277",
+            UNIMPLEMENTED,
+        ),
+        // Only a plain path names a C type: a generic type is read as written.
+        ("struct Generic<T>(T); let _ = KindOf!(Generic<Twin>);", "E0277", UNIMPLEMENTED),
+        ("let _ = KindOf!(Option<TwinAlias>);", "E0277", UNIMPLEMENTED),
+        ("let _ = KindOf!(TwinAlias<u8>);", "E0107", "takes 0 generic arguments"),
+        ("let _ = KindOf!(*mut TwinAlias);", "E0277", UNIMPLEMENTED),
+        // A name must end the operand.
+        (
+            "let _ = KindOf!(TwinAlias Twin);",
+            "error",
+            "arguments do not satisfy this C macro's invocation contract",
+        ),
         ("let _ = KindOf!(u32);", "E0277", UNIMPLEMENTED),
         ("let _ = unsafe { makeShape!(Plain) };", "E0277", UNIMPLEMENTED),
         // An incomplete type has an enumerator and no size.

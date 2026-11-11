@@ -9,6 +9,9 @@
 //! release PostgreSQL. Each call below sits in its own `unsafe` block, so `unused_unsafe`
 //! rejects a build flavor in which one of them needs none.
 //!
+//! C names one structure `OpExpr`, `DistinctExpr` and `NullIfExpr`, with a tag for each.
+//! Rust sees one type, so the name written in the operand selects the tag, as in C.
+//!
 //! `IsA` only reads its node, so it runs here. The other macros call PostgreSQL, and are
 //! used in generic functions that nothing instantiates: those are type-checked and linted
 //! like any other, and compile to no code that would need a backend's symbols.
@@ -61,6 +64,75 @@ fn node_tag_converts_from_the_integer_a_node_stores() {
         pg::NodeSetTag!(node, u32::MAX);
         assert!(pg::NodeTag::try_from(pg::nodeTag!(node).get()).is_err());
     }
+}
+
+/// Each C name of the structure that `OpExpr`, `DistinctExpr` and `NullIfExpr` share
+/// selects its own tag, however the path to it is written.
+#[test]
+fn is_a_selects_the_tag_of_the_c_name_its_operand_spells() {
+    use pg::{DistinctExpr, NullIfExpr, OpExpr};
+    let mut expression = MaybeUninit::<pg::OpExpr>::zeroed();
+    let node = expression.as_mut_ptr().cast::<pg::Node>();
+    for (tag, expected) in [
+        (pg::NodeTag::T_OpExpr, [true, false, false]),
+        (pg::NodeTag::T_DistinctExpr, [false, true, false]),
+        (pg::NodeTag::T_NullIfExpr, [false, false, true]),
+    ] {
+        // SAFETY: `node` points to the aligned storage of an `OpExpr`, which starts with
+        // its tag as every node does. Only the tag is written.
+        unsafe { addr_of_mut!((*node).type_).write(tag) };
+        // SAFETY: each call in this loop reads only the tag written above.
+        let bare = unsafe {
+            [
+                pg::IsA!(node, OpExpr).is_true(),
+                pg::IsA!(node, DistinctExpr).is_true(),
+                pg::IsA!(node, NullIfExpr).is_true(),
+            ]
+        };
+        assert_eq!(bare, expected, "{tag:?}");
+        // SAFETY: as above.
+        let qualified = unsafe {
+            [
+                pg::IsA!(node, pg::OpExpr,).is_true(),
+                pg::IsA!(node, ::pgrx_pg_sys::DistinctExpr).is_true(),
+                pg::IsA!(node, pgrx_pg_sys::NullIfExpr,).is_true(),
+            ]
+        };
+        assert_eq!(qualified, expected, "{tag:?}");
+        // SAFETY: as above.
+        assert!(!unsafe { pg::IsA!(node, pg::Query) }.is_true(), "{tag:?}");
+    }
+}
+
+/// `castNode`, `makeNode` and the list macros take the same names and yield a pointer to
+/// the one structure they share.
+///
+/// # Safety
+/// The caller runs on a backend thread with a current memory context. `node` is null or
+/// points to a node whose tag is `T_DistinctExpr`, `cell` holds a pointer to a node whose
+/// tag is `T_NullIfExpr`, and `list` starts with a pointer to a node whose tag is
+/// `T_DistinctExpr`.
+#[allow(dead_code)]
+unsafe fn shared_names_reach_every_node_macro<Uninstantiated>(
+    node: *mut pg::Node,
+    list: *mut pg::List,
+    cell: *mut pg::ListCell,
+) -> [*mut pg::OpExpr; 6] {
+    [
+        // SAFETY: the caller provides the node this check reads.
+        unsafe { pg::castNode!(pg::DistinctExpr, node) }.get(),
+        // SAFETY: the caller provides the cell and the node it points to.
+        unsafe { pg::lfirst_node!(pg::NullIfExpr, cell) }.get(),
+        // SAFETY: the caller provides a list that starts with such a node.
+        unsafe { pg::linitial_node!(::pgrx_pg_sys::DistinctExpr, list) }.get(),
+        // SAFETY: the caller provides the backend in which `newNode` allocates, for this
+        // call and for each one below. The structure is larger than the tag stored in it.
+        unsafe { pg::makeNode!(pg::OpExpr) }.get(),
+        // SAFETY: as above.
+        unsafe { pg::makeNode!(pg::DistinctExpr) }.get(),
+        // SAFETY: as above.
+        unsafe { pg::makeNode!(pg::NullIfExpr,) }.get(),
+    ]
 }
 
 /// `castNode` and the list macros built on it yield a pointer to their type operand. An

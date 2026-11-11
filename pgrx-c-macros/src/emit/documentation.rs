@@ -35,11 +35,22 @@ pub(super) const FLAVOR_CALL: &str = "PostgreSQL declares this name as a functio
 pub(super) const SAFETY: &str = "Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation, including the operations of an assertion that this PostgreSQL build does not evaluate. Mutation requires writable storage. Native calls and global writes require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions; checked global reads run pgrx's active-thread check themselves and panic when it fails. Generated guards preserve error boundaries; they do not prove these obligations.";
 
 /// How a caller supplies an operand that C pastes onto `prefix` to name an enumerator of
-/// `enumeration`.
-pub(super) fn type_enumerator_operand(name: &str, prefix: &str, enumeration: &str) -> String {
-    format!(
-        "`{name}` is a structure type, named by any Rust path to its binding. C pastes `{prefix}` onto the type's C name to name an enumerator of `{enumeration}`, so a type whose name has no such enumerator fails to compile."
-    )
+/// `enumeration`. `named` says that the operand's spelling can select a C name that shares
+/// its structure with other names.
+pub(super) fn type_enumerator_operand(
+    name: &str,
+    prefix: &str,
+    enumeration: &str,
+    named: bool,
+) -> String {
+    let path = if named { "a Rust path" } else { "any Rust path" };
+    let mut text = format!(
+        "`{name}` is a structure type, named by {path} to its binding. C pastes `{prefix}` onto the type's C name to name an enumerator of `{enumeration}`, so a type whose name has no such enumerator fails to compile."
+    );
+    if named {
+        text.push_str(" C gives some structures several names, each with its own enumerator. Name such a structure by a plain path whose last segment is the C name meant. An alias of it, or a type that another macro captured as a `ty` fragment, names none of them and fails to compile.");
+    }
+    text
 }
 
 /// Documentation paragraphs that many generated macros repeat verbatim.

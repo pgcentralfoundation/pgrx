@@ -1024,6 +1024,9 @@ fn render_adapters(
             })
     });
     rust.push_str(&crate::format_rust_macros(&arguments::shared(&exports, operands)?)?);
+    if !adapters.type_enumerators.macros.is_empty() {
+        rust.push_str(&crate::format_rust_macros(&adapters.type_enumerators.macros)?);
+    }
     if !adapters.fields.markers.is_empty() {
         rust.push_str(&crate::format_rust_macros(&field_registry(&adapters.fields.markers)?)?);
     }
@@ -1330,7 +1333,18 @@ fn render(
             None,
         )
     })?;
-    let arguments = arguments::generate(analysis)?;
+    // A type operand's spelling selects a C name's carrier only for a parameter that one
+    // prefix is pasted onto, and only when that prefix has carriers.
+    let pasted = typed::pasted_parameters(analysis);
+    let type_names = pasted
+        .iter()
+        .filter(|(_, pasted)| pasted.single)
+        .filter_map(|(parameter, pasted)| {
+            let lookup = generated.adapters?.type_enumerators.lookups.get(pasted.prefix)?;
+            Some((*parameter, lookup.as_ref().ok()?.names.as_deref()?))
+        })
+        .collect::<BTreeMap<_, _>>();
+    let arguments = arguments::generate(analysis, &type_names)?;
     let expression = analysis.expression.as_ref().ok_or_else(|| {
         skip(
             analysis,
@@ -1545,10 +1559,10 @@ fn render(
         }
         comment.push_str(". Each operand must preserve its C type and place requirements.");
     }
-    let mut pasted = BTreeSet::new();
+    let mut documented = BTreeSet::new();
     for node in &expression.syntax.nodes {
         if let ExpressionKind::TypeParameterPaste { prefix, parameter } = &node.kind
-            && pasted.insert((*parameter, prefix))
+            && documented.insert((*parameter, prefix))
         {
             let enumerators = session
                 .frontend()
@@ -1559,6 +1573,7 @@ fn render(
                 &analysis.parameters[*parameter].name,
                 prefix,
                 &names::strip_location_directories(enumerators.enumeration),
+                type_names.contains_key(parameter),
             ));
         }
     }
