@@ -94,6 +94,37 @@ pub trait PgNode: crate::seal::Sealed + Sized {
     }
 }
 
+/// An integer that is not a [`NodeTag`](crate::NodeTag) of this PostgreSQL version.
+///
+/// It is the error of `NodeTag::try_from`, which converts a C integer such as the one
+/// `nodeTag!` reads from a node. PostgreSQL does not check the tag of memory that some code
+/// casts to a node, so the integer can be anything.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct NotNodeTag(i64);
+
+impl NotNodeTag {
+    /// Record the integer that named no node tag. The generated conversions call this.
+    #[doc(hidden)]
+    #[inline]
+    pub const fn new(value: i64) -> Self {
+        Self(value)
+    }
+
+    /// The integer that named no node tag.
+    #[inline]
+    pub const fn value(self) -> i64 {
+        self.0
+    }
+}
+
+impl core::fmt::Display for NotNodeTag {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{} is not a NodeTag of this PostgreSQL version", self.0)
+    }
+}
+
+impl core::error::Error for NotNodeTag {}
+
 /// implementation function for `impl Display for $NodeType`
 ///
 /// # Safety
@@ -121,6 +152,22 @@ pub(crate) unsafe fn display_node_impl(node: NonNull<crate::Node>) -> String {
 #[cfg(test)]
 mod tests {
     use super::PgNode;
+
+    #[test]
+    fn node_tags_convert_from_their_integers() {
+        use crate::NodeTag;
+        for tag in [NodeTag::T_Invalid, NodeTag::T_List, NodeTag::T_Query, NodeTag::T_OpExpr] {
+            assert_eq!(NodeTag::try_from(tag as u32), Ok(tag));
+            assert_eq!(NodeTag::try_from(tag as i32), Ok(tag));
+        }
+        let unknown = NodeTag::try_from(u32::MAX).unwrap_err();
+        assert_eq!(unknown.value(), i64::from(u32::MAX));
+        assert_eq!(
+            unknown.to_string(),
+            format!("{} is not a NodeTag of this PostgreSQL version", u32::MAX)
+        );
+        assert_eq!(NodeTag::try_from(-1_i32).unwrap_err().value(), -1);
+    }
 
     #[test]
     fn cast_roundtrip() {

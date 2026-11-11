@@ -863,6 +863,7 @@ fn rewrite_items(
 
     // append the pgnodes to the set of items
     items.extend(pgnode_impls);
+    items.extend(impl_node_tag_try_from(&items_vec)?);
 
     Ok(items)
 }
@@ -1065,6 +1066,51 @@ fn impl_pg_node(items: &[syn::Item]) -> eyre::Result<proc_macro2::TokenStream> {
         });
     }
 
+    Ok(impls)
+}
+
+/// Implement `TryFrom<u32>` and `TryFrom<i32>` for `pg_sys::NodeTag`.
+///
+/// A node's tag is a C integer: `nodeTag!` returns it as one, and it may hold a value that is
+/// no enumerator of this PostgreSQL version. Each conversion compares the integer with every
+/// enumerator, so it never produces an invalid `NodeTag`. C gives the enum the type
+/// `unsigned int` or `int` depending on the target, so both integer types convert.
+fn impl_node_tag_try_from(items: &[syn::Item]) -> eyre::Result<proc_macro2::TokenStream> {
+    let Some(node_tag) = items.iter().find_map(|item| match item {
+        syn::Item::Enum(item_enum) if item_enum.ident == "NodeTag" => Some(item_enum),
+        _ => None,
+    }) else {
+        return Ok(proc_macro2::TokenStream::new());
+    };
+    let mut arms = proc_macro2::TokenStream::new();
+    for variant in &node_tag.variants {
+        let ident = &variant.ident;
+        let Some((_, syn::Expr::Lit(syn::ExprLit { lit: syn::Lit::Int(value), .. }))) =
+            &variant.discriminant
+        else {
+            eyre::bail!("NodeTag::{ident} has no integer literal for its value");
+        };
+        // An unsuffixed literal takes the type of the integer it is matched against.
+        let value = syn::LitInt::new(value.base10_digits(), value.span());
+        arms.extend(quote! { #value => ::core::result::Result::Ok(NodeTag::#ident), });
+    }
+    let mut impls = proc_macro2::TokenStream::new();
+    for integer in ["u32", "i32"] {
+        let integer = syn::Ident::new(integer, proc_macro2::Span::call_site());
+        impls.extend(quote! {
+            impl ::core::convert::TryFrom<#integer> for NodeTag {
+                type Error = pg_sys::NotNodeTag;
+
+                #[inline]
+                fn try_from(value: #integer) -> ::core::result::Result<Self, Self::Error> {
+                    match value {
+                        #arms
+                        _ => ::core::result::Result::Err(pg_sys::NotNodeTag::new(value.into())),
+                    }
+                }
+            }
+        });
+    }
     Ok(impls)
 }
 
@@ -2524,6 +2570,31 @@ mod macro_build_tests {
             warning,
             "pg18: skipping macro `REJECTED`: rejected C witness  cargo:rustc-cfg=forged see source:12"
         );
+    }
+
+    /// The `NodeTag` conversions have one arm per enumerator for each integer type, and an
+    /// enumerator whose value is not an integer literal is an error.
+    #[test]
+    fn node_tag_conversions_cover_every_enumerator() {
+        let file: syn::File = syn::parse_quote! {
+            pub enum Other { T_Invalid = 7 }
+            #[repr(u32)]
+            pub enum NodeTag { T_Invalid = 0, T_List = 1u32 }
+        };
+        let impls: syn::File = syn::parse2(impl_node_tag_try_from(&file.items).unwrap()).unwrap();
+        let rendered = impls.to_token_stream().to_string();
+        assert_eq!(impls.items.len(), 2);
+        for integer in ["u32", "i32"] {
+            assert!(rendered.contains(&format!("TryFrom < {integer} > for NodeTag")), "{rendered}");
+        }
+        for arm in ["0 => ", "1 => "] {
+            assert_eq!(rendered.matches(arm).count(), 2, "{rendered}");
+        }
+        assert!(!rendered.contains('7') && !rendered.contains("1u32"), "{rendered}");
+
+        assert!(impl_node_tag_try_from(&[]).unwrap().is_empty());
+        let unvalued: syn::File = syn::parse_quote! { pub enum NodeTag { T_Invalid } };
+        assert!(impl_node_tag_try_from(&unvalued.items).is_err());
     }
 
     /// Checks that environment arguments match bindgen priority and shell quoting.

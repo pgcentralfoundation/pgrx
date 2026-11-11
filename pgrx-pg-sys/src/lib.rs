@@ -54,7 +54,7 @@ pub use cshim::*;
 
 pub use cstr::AsPgCStr;
 pub use include::*;
-pub use node::PgNode;
+pub use node::{NotNodeTag, PgNode};
 pub use port::*;
 
 // PostgreSQL defines these constants as casts to `Oid`, `RelFileNumber`,

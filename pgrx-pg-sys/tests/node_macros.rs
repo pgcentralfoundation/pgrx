@@ -43,6 +43,26 @@ fn is_a_compares_a_node_with_the_tag_of_its_type_operand() {
     assert!(!unsafe { pg::IsA!(node, pg::RangeVar) }.is_true());
 }
 
+/// `nodeTag` yields the tag as the C integer a node stores, signed on MSVC and unsigned
+/// elsewhere. `NodeTag` converts from either, and refuses an integer that is no tag.
+///
+/// This file is not part of the docs.rs build, whose committed bindings gain the conversions
+/// only when they are regenerated.
+#[test]
+fn node_tag_converts_from_the_integer_a_node_stores() {
+    let mut node = MaybeUninit::<pg::Node>::uninit();
+    let node = node.as_mut_ptr();
+    // SAFETY: `node` points to live, aligned storage. Only its tag is written and read, as
+    // the C integer it is stored as, so the tag that is no enumerator never becomes a
+    // `NodeTag` value.
+    unsafe {
+        pg::NodeSetTag!(node, pg::NodeTag::T_Query);
+        assert_eq!(pg::NodeTag::try_from(pg::nodeTag!(node).get()), Ok(pg::NodeTag::T_Query));
+        pg::NodeSetTag!(node, u32::MAX);
+        assert!(pg::NodeTag::try_from(pg::nodeTag!(node).get()).is_err());
+    }
+}
+
 /// `castNode` and the list macros built on it yield a pointer to their type operand. An
 /// assert-enabled PostgreSQL first checks the node's tag in `castNodeImpl`, so each call
 /// needs `unsafe` in both builds, although a release build only casts.
