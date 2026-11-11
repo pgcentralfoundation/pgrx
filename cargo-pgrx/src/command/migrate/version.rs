@@ -56,7 +56,7 @@ impl ExtVersion {
         Ok(Self { label: semver.to_string(), semver })
     }
 
-    fn is_prerelease(&self) -> bool {
+    pub(crate) fn is_prerelease(&self) -> bool {
         !self.semver.pre.is_empty()
     }
 }
@@ -92,6 +92,13 @@ pub(crate) struct UpgradeScript {
     pub(crate) path: PathBuf,
 }
 
+/// Parses `<extname>--<prev>--<target>.sql` and returns `<target>` if it is an orderable version.
+pub(crate) fn upgrade_script_target(filename: &str, extname: &str) -> Option<ExtVersion> {
+    let prefix = format!("{extname}--");
+    let (_, target) = filename.strip_circumfix(&prefix, ".sql")?.rsplit_once("--")?;
+    ExtVersion::parse(target)
+}
+
 /// Finds the upgrade scripts in `sql_dir`, oldest target first.
 pub(crate) fn existing_upgrade_scripts(
     sql_dir: &Path,
@@ -105,15 +112,13 @@ pub(crate) fn existing_upgrade_scripts(
         }
     };
 
-    let prefix = format!("{extname}--");
     let mut scripts = Vec::new();
     for entry in entries {
         let path = entry?.path();
         let target = path
             .file_name()
             .and_then(|name| name.to_str())
-            .and_then(|name| name.strip_circumfix(&prefix, ".sql")?.rsplit_once("--"))
-            .and_then(|(_, target)| ExtVersion::parse(target));
+            .and_then(|name| upgrade_script_target(name, extname));
 
         if let Some(target) = target
             && path.is_file()

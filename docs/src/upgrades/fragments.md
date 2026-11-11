@@ -78,26 +78,29 @@ comma-separated list for several dependencies, and either ID or filename: `-- de
 add_vector_index, 102.add_greeting_log.sql`. Dependencies carry through, so a fragment that depends
 on 102 doesn't need to repeat what 102 depends on.
 
-A dependency that isn't in the directory is assumed to have shipped in an earlier release, which
-means a misspelled ID is silently ignored too. [`cargo pgrx migrate check`](./ci.md) still catches
-the mistake whenever the two fragments touch the same object.
+Every `-- depends-on` entry must match either another fragment in the unreleased directory or a
+`-- Fragment: <filename>` marker in an assembled script in `sql/`. Misspelled IDs and backported
+fragments whose prerequisites haven't arrived on the target branch are rejected by `install`,
+`migrate assemble` and [`cargo pgrx migrate check`](./ci.md).
 
 ## Keeping Released and Unreleased Changes Apart
 
 Suppose a fragment on your main branch changes a function that has already shipped, and also changes
 one that an unreleased fragment added. That fragment can't be cherry-picked to a stable branch,
-which has never heard of the second function.
+which has never heard of the second function. The same problem arises when one fragment modifies
+unreleased objects from two independent pull requests: backporting one of them wouldn't let you
+cherry-pick the follow-up without the other.
 
-Split it in two. If you know a change may be backported, write one fragment for the released objects
-and a second, depending on the unreleased work, for the rest:
+Split it per prerequisite. If you know a change may be backported, write one fragment for the
+released objects and one per unreleased prerequisite:
 
 - `230.parallel_safe.sql` touches released objects only, and can go to any branch.
-- `230.parallel_safe_index_stats.sql` starts with `-- depends-on: 215` and stays on the main
-  branch.
+- `230.parallel_safe_index_stats.sql` starts with `-- depends-on: 215` and stays with `215`.
 
-`cargo pgrx migrate check --deny-mixed-objects` flags fragments that mix the two. Create new objects
-with a plain `CREATE`, which is also what `cargo pgrx schema` generates: the check reads
-`CREATE OR REPLACE` as possibly changing an object that has already shipped.
+`cargo pgrx migrate check --deny-mixed-objects` flags fragments that mix released and unreleased
+objects, or touch unreleased objects from more than one prerequisite ID. Create new objects with a
+plain `CREATE`, which is also what `cargo pgrx schema` generates: the check reads `CREATE OR REPLACE`
+as possibly changing an object that has already shipped.
 
 ## Trying an Upgrade During Development
 

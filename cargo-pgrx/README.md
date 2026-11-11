@@ -1218,7 +1218,7 @@ refuses to build while fragments are waiting, unless you pass `--assemble-unrele
 |---|---|
 | `cargo pgrx migrate info [VERSION]` | Show what assembling would do; `--json` prints it as JSON |
 | `cargo pgrx migrate assemble [VERSION]` | Write `sql/<ext>--<prev>--<target>.sql` from the fragments and delete them. Also takes `--prev-version`, `--preserve-fragments`, `--allow-empty`, `--update-control`, `--output-dir`, `--dry-run` and `--json` |
-| `cargo pgrx migrate check` | Check fragments for dependency cycles and undeclared dependencies. Also takes `--base <REF>`, `--deny-mixed-objects` and `--format` (`text`, `json` or `github`) |
+| `cargo pgrx migrate check` | Check fragments for dependency cycles, unresolved or undeclared dependencies, and release-branch drift. Also takes `--base <REF>`, `--upstream <REF>`, `--deny-mixed-objects` and `--format` (`text`, `json` or `github`) |
 
 The [Upgrading Extensions](https://github.com/pgcentralfoundation/pgrx/blob/develop/docs/src/upgrades.md)
 chapter of the pgrx book explains when fragments are worth it and how to release with them, and the
