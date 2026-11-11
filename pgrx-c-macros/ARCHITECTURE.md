@@ -346,7 +346,9 @@ cannot be inferred from a declaration's name or broad type category:
    anything: when any macro has two definitions, one driver pass with
    `-E -dD` writes each executed `#define` and `#undef` among the unit's
    tokens, and every `#undef` of the name must be followed by its `#define`
-   with only blank lines and line markers between them. libclang records no
+   with only blank lines and line markers between them. A body that needs
+   this pass is not merged with the other build flavor's definition; see
+   **Merged inline bodies**. libclang records no
    pragmas, so the text of every file in the unit is searched after removing its
    line splices, and so is every command-line `-D` definition, since a
    `_Pragma` in one pops wherever it is expanded. A name that a pop pragma names
@@ -851,7 +853,11 @@ builtins, such as `__COUNTER__` and `__func__`, stay unsupported.
 
 The statement parser shares the expression arena. It understands expression
 statements, local declarations, blocks, `if`/`else`, returns, and the supported
-`do { ... } while (0)` wrapper. Record source order, lexical scopes, first-return
+`do { ... } while (0)` wrapper. It also understands the statement that a merged
+inline body gives the statements of one build flavor, as an item of a block only;
+see **Merged inline bodies**. That statement returns on every path when both of its
+blocks do, and definite initialization joins its blocks as it joins the branches of
+an `if`. Record source order, lexical scopes, first-return
 location, whether every path returns, and whether an explicit outer boundary is
 needed to avoid C's dangling-`else` behavior.
 
@@ -1295,12 +1301,26 @@ flavors apply it to the same pair. Nothing is written to disk.
   declares as a function becomes, in both, the macro `NAME(formals) (NAME)(formals)`,
   which calls the function. The function must be external, return nothing, take as
   many arguments as the macro has formals, and use only parameter types the release
-  flavor declares; otherwise the name is a conflict. A release inspection adds the
+  flavor declares, and the release macro must do nothing: its replacement list may
+  hold only grouping, a cast to `void`, integer constants, an empty `do`/`while`, and
+  object-like macros that are nothing but those. A release build's call to the
+  function does nothing, so it cannot stand for a macro that does work. Otherwise the
+  name is a conflict, and no flavor binds the function. A release inspection adds the
   assert-enabled prototype to its catalog, so both check a call's operands alike.
   The names are also flavor-specific for the binding generator of an assert-enabled
   build, which would otherwise bind a function a release build lacks.
 - A function that one flavor defines `static inline` and the other only declares,
   with the same prototype, gets the same calling macro in both, and both bind it.
+- Any other function that only the assert-enabled flavor declares is an assertion
+  function too when it is external, returns nothing and uses only parameter types
+  the release flavor declares. It gets no macro, since no release name stands for
+  it. A merged inline body may call it, from the statements that only the
+  assert-enabled flavor has: a release inspection adds its prototype to the catalog,
+  and the call renders as described under **Calls to assertion functions**. A
+  function-like macro whose assert-enabled definition calls it stays a conflict,
+  because the macro's release definition is other text that could do work the call
+  leaves out. A helper may not call it either, because a release build compiles a
+  helper's C text, where the function is not declared.
 - A conflict is skipped in both flavors with `SkipReasonCode::BuildFlavor`. So is
   every root whose dependency closure contains one, at expansion, and an inline
   body that names one keeps only its call root. A flavor that has no macro of a
@@ -1308,9 +1328,11 @@ flavors apply it to the same pair. Nothing is written to disk.
   that both flavors define alike and that names `ExceptionalCondition` is also a
   conflict: release C would run that report, and a generated one runs only with
   assertions.
+- A static inline function whose body names `ExceptionalCondition` has no
+  translated body in either flavor. Both call it.
 - A static inline function whose definition spans source that only one flavor's
-  preprocessor skips, or whose body names `ExceptionalCondition`, has no translated
-  body in either flavor. Both call it.
+  preprocessor skips is translated from a body merged from both definitions, or
+  called by both when no such body exists. See **Merged inline bodies**.
 
 The definitions a flavor takes this way follow the main file wherever the compiler
 expands macros: `FrontendOutput::main_source` returns the file followed by an
@@ -1319,6 +1341,57 @@ probes build on it. The check that an overlay reproduces the final macro
 environment covers them, because the same definitions replace the inspection's
 active ones. A shared definition is spelled from its own source text, so its
 spacing, which a later stringification could show, is the assert-enabled build's.
+
+**Merged inline bodies.** `frontend::definitions` retains a body's tokens only after
+proving that they are the compiler's statements and that their macros expand at the
+end of the translation unit as they did in the definition. The parse of the other
+flavor has function bodies too, so `reconcile` applies the same proof there to each
+definition that spans differing source. Both flavors then hold two proved token
+sequences for the function, each token with its offset in the one file that holds
+the definition. Blanking a line keeps every offset, so a token both flavors read is
+at one offset in both.
+
+`flavors::merge` keeps the tokens found at the same offset in both sequences, which
+must be the same token. Between two of them, the tokens that only the
+assert-enabled sequence has and those that only the release sequence has become
+`__pgrx_c_assert_checking { assert-enabled tokens } { release tokens }`. The first
+token is a keyword token with a spelling that a C lexer reads as an identifier, so
+no header can write it. The merge is refused when:
+
+- the tokens of either block do not close exactly the `(`, `[` and `{` they open,
+  in order, so that the braces written around them could pair with one of theirs;
+- the statement would sit inside a `(` or `[`, where it could be part of a macro
+  invocation's arguments;
+- two tokens overlap, or a digraph or the keyword's own spelling appears;
+- the flavors do not both define the function `static inline` with one prototype
+  and one set of parameter names on the same lines of one file, whose text
+  documents the function in both;
+- either sequence names `ExceptionalCondition`, or either flavor declares the
+  keyword's spelling;
+- a name in the merged body is one the flavors do not share: the rule for shared
+  macro definitions, applied to every identifier and through the macros of both
+  flavors, plus members that only one flavor's record has.
+
+The statement parser admits the keyword only as an item of a block, where a
+declaration may stand, and parses it as `Statement::BuildFlavor` with one block for
+each flavor. As the branch of an `if` it would bind the statement after it
+differently in each flavor, and an `else` cannot follow it. Each block scopes its
+locals, so a local that later statements use fails the scope check. A body that does
+not parse, or whose analysis fails, leaves the call root, as for any other body.
+Because every decision uses both sequences, both flavors reach it.
+
+One difference between the two proofs would break that. The inspected flavor's
+proof may use the driver's report of `#undef` directives; the other flavor's files
+exist only in memory, where no driver reads them. So `definitions::prove` also
+reports which bodies are proved without that report, and only those are merged.
+Clang's `<stddef.h>` under glibc is the known case that needs the report.
+
+The emitter renders the statement as `if __pgrx_c_assert_checking!() { .. } else
+{ .. }`, without the empty branch. Both blocks are type-checked against either
+installation and both count toward the caller's `unsafe`. The compiler pass that
+expands a body's macros spells the keyword as an identifier; `session::inline`
+restores its kind only when the expansion spells it exactly once per statement, so a
+macro that names the same identifier leaves the call root instead.
 
 **Assertions.** A check that ends in `ExceptionalCondition` runs only against an
 installation that enables assertions. `emit::assertions::checking` adds
@@ -1343,7 +1416,7 @@ no panic condition. A stop other than an assertion's report, and the condition t
 guards it, runs in every build.
 
 **Calls to assertion functions.** A call to a function that only the assert-enabled
-flavor defines renders inside `if __pgrx_c_assert_checking!()`, so a release build
+flavor declares renders inside `if __pgrx_c_assert_checking!()`, so a release build
 evaluates no argument. The assert-enabled build has no binding for it and calls it
 through a generated adapter. For a release build `emit::functions` generates that
 adapter with the same Rust signature and an empty body, after the same checks of
@@ -2596,7 +2669,7 @@ generalized; do not add a macro-name exception.
 | Batch lowering and support order | [`src/emit.rs`](src/emit.rs), [`demands.rs`](src/emit/demands.rs). |
 | Documentation shells and witnesses | [`documentation.rs`](src/emit/documentation.rs), [`expression/witness.rs`](../pgrx-pg-sys/src/c_macros/expression/witness.rs), [`macro_snapshot.rs`](../pgrx-bindgen/src/build/macro_snapshot.rs). |
 | Arguments, expressions, statements | [`arguments.rs`](src/emit/arguments.rs), [`typed.rs`](src/emit/typed.rs), [`statements.rs`](src/emit/statements.rs). |
-| Assertions and build flavors | [`flavors.rs`](src/frontend/flavors.rs), [`assertions.rs`](src/emit/assertions.rs), [`expression/assertion.rs`](../pgrx-pg-sys/src/c_macros/expression/assertion.rs). |
+| Assertions and build flavors | [`flavors.rs`](src/frontend/flavors.rs), [`flavors/merge.rs`](src/frontend/flavors/merge.rs), [`assertions.rs`](src/emit/assertions.rs), [`expression/assertion.rs`](../pgrx-pg-sys/src/c_macros/expression/assertion.rs). |
 | Native/nominal capabilities | [`fields.rs`](src/emit/fields.rs), [`bitfields.rs`](src/emit/bitfields.rs), [`functions.rs`](src/emit/functions.rs), [`addresses.rs`](src/emit/addresses.rs), [`callbacks.rs`](src/emit/callbacks.rs), [`enumerations.rs`](src/emit/enumerations.rs), [`type_enumerators.rs`](src/emit/type_enumerators.rs). |
 | Readable delegation and layout | [`src/delegation.rs`](src/delegation.rs), [`src/formatting.rs`](src/formatting.rs). |
 | Runtime target gate/bridges | [`src/support_generation.rs`](src/support_generation.rs). |

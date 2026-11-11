@@ -13,10 +13,16 @@
 //! translation: the body's active tokens, and proof that every macro it names expands at the
 //! end of the translation unit exactly as it did inside the definition. libclang records no
 //! `#undef`, so one driver preprocessing pass reports them.
+//!
+//! `flavors` applies the same proof to the other build flavor's parse of a definition that
+//! differs between the flavors. The driver cannot read that parse's files, which exist only
+//! in memory, so the proof there has no report of undefinitions. [`Proved::offsets`] names
+//! the bodies of this parse whose proof needs none either, so both flavors hold a body to
+//! one standard.
 
 use super::{FrontendError, type_info};
 use crate::{
-    ActiveMacro, DeclarationLinkage, FrontendOutput, InlineFunctionDefinition, MacroKind,
+    DeclarationLinkage, FrontendOutput, InlineFunctionDefinition, MacroDefinition, MacroKind,
     MacroScanner, SourceSpan, TokenKind, splice_length, unspliced, without_splices,
 };
 use clang::source::File;
@@ -32,13 +38,27 @@ const MAX_DEFINITION_BYTES: usize = 64 * 1024;
 /// Bound all retained inline definition text; unavailable text becomes an explicit emission refusal.
 const MAX_SOURCE_BYTES: usize = 16 * 1024 * 1024;
 
+/// A body token and its byte offset in the file that holds the definition.
+pub(super) type Located = (u32, crate::Token);
+
+/// What the definition parse proved.
+pub(super) struct Proved {
+    /// The static inline functions with a matching complete definition, and what was
+    /// retained of each.
+    pub(super) definitions: BTreeMap<String, Option<InlineFunctionDefinition>>,
+    /// The offset of each token of a retained body, for the bodies whose proof holds
+    /// without the driver's report of undefinitions.
+    pub(super) offsets: BTreeMap<String, Vec<u32>>,
+}
+
 /// Reparse the same input once with function bodies enabled. Definition identity
 /// and the full prototype must agree with the declaration-only catalog; seeing
 /// braces in a token range is not sufficient evidence of a function definition.
 pub(super) fn prove(
     scanner: &MacroScanner,
     frontend: &FrontendOutput,
-) -> Result<BTreeMap<String, Option<InlineFunctionDefinition>>, FrontendError> {
+) -> Result<Proved, FrontendError> {
+    let mut proved = Proved { definitions: BTreeMap::new(), offsets: BTreeMap::new() };
     let candidates = frontend
         .declarations()
         .function_signatures
@@ -49,7 +69,7 @@ pub(super) fn prove(
         .map(|(name, _)| name.as_str())
         .collect::<BTreeSet<_>>();
     if candidates.is_empty() {
-        return Ok(BTreeMap::new());
+        return Ok(proved);
     }
     if candidates.len() > MAX_CANDIDATES {
         return Err(FrontendError::Output(
@@ -86,78 +106,13 @@ pub(super) fn prove(
             errors.join("\n")
         )));
     }
-    let mut history = MacroHistory {
-        active: &frontend.environment().active,
-        definitions: HashMap::new(),
-        expansions: HashMap::new(),
-        popped: None,
-        undefined: HashSet::new(),
-    };
-    let mut files = HashSet::new();
-    files.extend(unit.get_file(&profile.header));
+    let mut records = Records::default();
+    records.files.extend(unit.get_file(&profile.header));
     let mut admitted = Vec::new();
     let mut seen = BTreeSet::new();
-    // libclang visits the whole preprocessing record, in translation-unit order, before
-    // declarations, so positions order macro definitions and expansions only.
-    let mut position = 0_usize;
     unit.get_entity().visit_children(|entity, _| {
-        position += 1;
-        match entity.get_kind() {
-            EntityKind::InclusionDirective => {
-                files.extend(entity.get_file());
-                return EntityVisitResult::Continue;
-            }
-            EntityKind::MacroDefinition => {
-                if let Some(name) = entity.get_name() {
-                    let location = entity.get_location().and_then(|at| {
-                        let location = at.get_file_location();
-                        Some((location.file?, location.offset))
-                    });
-                    let last = Recorded { position, location };
-                    history
-                        .definitions
-                        .entry(name)
-                        .and_modify(|definitions| {
-                            definitions.one_location &= definitions.last.location == location;
-                            definitions.last = Recorded { position, location };
-                        })
-                        .or_insert(Definitions {
-                            first: position,
-                            one_location: location.is_some(),
-                            last,
-                        });
-                }
-                return EntityVisitResult::Continue;
-            }
-            EntityKind::MacroExpansion => {
-                // A file and offset name a place in the file's first entry. Records from a
-                // later entry of the same file would replace the first entry's records.
-                let Some(at) = entity.get_location() else {
-                    return EntityVisitResult::Continue;
-                };
-                let location = at.get_file_location();
-                if let Some(file) = location.file
-                    && file.get_offset_location(location.offset) == at
-                {
-                    // The definition this expansion used, which push and pop pragmas can
-                    // make differ from the last one recorded.
-                    let definition = entity
-                        .get_reference()
-                        .and_then(|definition| definition.get_location())
-                        .and_then(|at| {
-                            let location = at.get_file_location();
-                            Some((location.file?, location.offset))
-                        });
-                    history
-                        .expansions
-                        .entry(file)
-                        .or_default()
-                        .insert(location.offset, Recorded { position, location: definition });
-                }
-                return EntityVisitResult::Continue;
-            }
-            EntityKind::FunctionDecl => {}
-            _ => return EntityVisitResult::Continue,
+        if records.record(entity) || entity.get_kind() != EntityKind::FunctionDecl {
+            return EntityVisitResult::Continue;
         }
         let Some(name) = entity.get_name().filter(|name| candidates.contains(name.as_str())) else {
             return EntityVisitResult::Continue;
@@ -194,22 +149,23 @@ pub(super) fn prove(
         }
         EntityVisitResult::Continue
     });
-    history.popped = popped_names(files.iter().map(|file| file.get_path()), &profile.arguments);
     // Only a macro defined again at one location asks where it was undefined; see
     // `MacroHistory::unchanged`. Clang 16 and older define `__LP64__` twice among an
     // AArch64 target's predefined macros, which have no location and so never ask.
-    if history.definitions.values().any(|definitions| {
-        definitions.one_location && definitions.first != definitions.last.position
-    }) {
+    let undefined = if records.redefines() {
         let directives = super::preprocess(
             &profile.compiler.executable,
             &profile.header,
             &profile.arguments,
             &["-E", "-dD"],
         )?;
-        history.undefined = undefined_names(&directives.stdout);
-    }
-    let mut definitions = BTreeMap::new();
+        Some(undefined_names(&directives.stdout))
+    } else {
+        None
+    };
+    let active =
+        |name: &str| frontend.environment().active.get(name).map(|active| &active.definition);
+    let history = records.history(&active, &profile.arguments, undefined);
     let mut sources = HashMap::new();
     let mut remaining = MAX_SOURCE_BYTES;
     // Clang names a file found through a relative search path relative to the
@@ -224,9 +180,36 @@ pub(super) fn prove(
     }
     for (name, definition) in admitted {
         let source = source(definition, &directory, &mut sources, &mut remaining, &history);
-        definitions.insert(name, source);
+        let (source, offsets) = match source {
+            Some((source, offsets)) => (Some(source), offsets),
+            None => (None, None),
+        };
+        proved.offsets.extend(offsets.map(|offsets| (name.clone(), offsets)));
+        proved.definitions.insert(name, source);
     }
-    Ok(definitions)
+    Ok(proved)
+}
+
+/// The body tokens of the static inline function `definition` as another build flavor's
+/// parse read them, under the proofs that retain a body of the inspected parse. `bytes` are
+/// the contents of the definition's file.
+pub(super) fn flavor_body<'tu>(
+    definition: Entity<'tu>,
+    bytes: &[u8],
+    history: &MacroHistory<'tu, '_>,
+) -> Option<Vec<Located>> {
+    let range = definition.get_range()?;
+    let start = range.get_start().get_file_location();
+    let end = range.get_end().get_file_location();
+    let file = start.file.filter(|file| Some(*file) == end.file)?;
+    let text = bytes.get(usize::try_from(start.offset).ok()?..usize::try_from(end.offset).ok()?)?;
+    // As for a retained definition: bounded, and spelled by libclang without loss.
+    if text.len() > MAX_DEFINITION_BYTES || std::str::from_utf8(text).is_err() {
+        return None;
+    }
+    body_tokens(definition, file, bytes, history)
+        .filter(|body| body.needs_no_undefinitions)
+        .map(|body| body.tokens)
 }
 
 /// The names that `pop_macro` pragmas in these files and in the `-D` definitions among
@@ -334,7 +317,7 @@ fn source<'tu>(
     files: &mut HashMap<File<'tu>, Option<Vec<u8>>>,
     remaining: &mut usize,
     history: &MacroHistory<'tu, '_>,
-) -> Option<InlineFunctionDefinition> {
+) -> Option<(InlineFunctionDefinition, Option<Vec<u32>>)> {
     let range = definition.get_range()?;
     let provenance = SourceSpan::from_range(range, directory).ok()??;
     let start = range.get_start().get_file_location();
@@ -359,19 +342,39 @@ fn source<'tu>(
             *remaining -= text.len();
             text.into_owned()
         });
-    Some(InlineFunctionDefinition {
+    let body = contents
+        .filter(|_| exact && source.is_some())
+        .and_then(|contents| body_tokens(definition, file, contents, history));
+    let offsets = body
+        .as_ref()
+        .filter(|body| body.needs_no_undefinitions)
+        .map(|body| body.tokens.iter().map(|(offset, _)| *offset).collect());
+    let definition = InlineFunctionDefinition {
         provenance,
-        parameters: definition
-            .get_arguments()
-            .unwrap_or_default()
-            .into_iter()
-            .map(|parameter| parameter.get_name().filter(|name| !name.is_empty()))
-            .collect(),
-        body: contents
-            .filter(|_| exact && source.is_some())
-            .and_then(|contents| body_tokens(definition, file, contents, history)),
+        parameters: parameter_names(definition),
+        body: body.map(|body| body.tokens.into_iter().map(|(_, token)| token).collect()),
         source,
-    })
+    };
+    Some((definition, offsets))
+}
+
+/// A definition's parameter names in prototype order, without the names of unnamed ones.
+pub(super) fn parameter_names(definition: Entity<'_>) -> Vec<Option<String>> {
+    definition
+        .get_arguments()
+        .unwrap_or_default()
+        .into_iter()
+        .map(|parameter| parameter.get_name().filter(|name| !name.is_empty()))
+        .collect()
+}
+
+/// The tokens the preprocessor read for a definition's body.
+struct Body {
+    /// Each token with its offset in the definition's file.
+    tokens: Vec<Located>,
+    /// Whether the proof that the tokens expand unchanged holds without a report of
+    /// undefinitions, which only the inspected parse has.
+    needs_no_undefinitions: bool,
 }
 
 /// Recover the tokens the preprocessor read for a definition's body, without its braces.
@@ -391,7 +394,7 @@ fn body_tokens<'tu>(
     file: File<'tu>,
     bytes: &[u8],
     history: &MacroHistory<'tu, '_>,
-) -> Option<Vec<crate::Token>> {
+) -> Option<Body> {
     let body = definition
         .get_children()
         .into_iter()
@@ -484,7 +487,8 @@ fn body_tokens<'tu>(
         };
         active.push((location.offset, crate::Token { kind, spelling }));
     }
-    if !history.expands_unchanged(file, &active) {
+    let mut reported = false;
+    if !history.expands_unchanged(file, &active, &mut reported) {
         return None;
     }
     // Statement extents end just past their last token. Account for every active token.
@@ -508,7 +512,7 @@ fn body_tokens<'tu>(
     if active[position..].iter().any(|(_, token)| token.spelling != ";") {
         return None;
     }
-    Some(active.into_iter().map(|(_, token)| token).collect())
+    Some(Body { tokens: active, needs_no_undefinitions: !reported })
 }
 
 /// Whether only blanks separate `offset` from the start of its logical line.
@@ -585,10 +589,109 @@ fn logical_line_end(contents: &[u8], start: usize) -> Option<usize> {
     Some(contents.len())
 }
 
-/// Preprocessing history of the definition parse, in translation-unit order.
-struct MacroHistory<'tu, 'a> {
+/// The preprocessing records of a parse with function bodies, in translation-unit order.
+#[derive(Default)]
+pub(super) struct Records<'tu> {
+    /// The recorded definitions of each macro name.
+    definitions: HashMap<String, Definitions<'tu>>,
+    /// Each top-level macro expansion in the first entry of its file, by file and offset of
+    /// its name, with the location of the definition it used.
+    expansions: HashMap<File<'tu>, HashMap<u32, Recorded<'tu>>>,
+    /// The files the unit included. The caller adds a main file that is on disk.
+    files: HashSet<File<'tu>>,
+    /// How many records came before the next one. libclang visits the whole preprocessing
+    /// record, in translation-unit order, before declarations, so positions order macro
+    /// definitions and expansions.
+    position: usize,
+}
+
+impl<'tu> Records<'tu> {
+    /// Record `entity` when it is an inclusion, macro definition or macro expansion, and
+    /// report whether it is one.
+    pub(super) fn record(&mut self, entity: Entity<'tu>) -> bool {
+        self.position += 1;
+        let position = self.position;
+        match entity.get_kind() {
+            EntityKind::InclusionDirective => self.files.extend(entity.get_file()),
+            EntityKind::MacroDefinition => {
+                if let Some(name) = entity.get_name() {
+                    let location = entity.get_location().and_then(|at| {
+                        let location = at.get_file_location();
+                        Some((location.file?, location.offset))
+                    });
+                    let last = Recorded { position, location };
+                    self.definitions
+                        .entry(name)
+                        .and_modify(|definitions| {
+                            definitions.one_location &= definitions.last.location == location;
+                            definitions.last = Recorded { position, location };
+                        })
+                        .or_insert(Definitions {
+                            first: position,
+                            one_location: location.is_some(),
+                            last,
+                        });
+                }
+            }
+            EntityKind::MacroExpansion => {
+                // A file and offset name a place in the file's first entry. Records from a
+                // later entry of the same file would replace the first entry's records.
+                let Some(at) = entity.get_location() else { return true };
+                let location = at.get_file_location();
+                if let Some(file) = location.file
+                    && file.get_offset_location(location.offset) == at
+                {
+                    // The definition this expansion used, which push and pop pragmas can
+                    // make differ from the last one recorded.
+                    let definition = entity
+                        .get_reference()
+                        .and_then(|definition| definition.get_location())
+                        .and_then(|at| {
+                            let location = at.get_file_location();
+                            Some((location.file?, location.offset))
+                        });
+                    self.expansions
+                        .entry(file)
+                        .or_default()
+                        .insert(location.offset, Recorded { position, location: definition });
+                }
+            }
+            _ => return false,
+        }
+        true
+    }
+
+    /// Whether some macro was defined again at the location of its first definition. Only
+    /// such a macro asks where it was undefined; see [`MacroHistory::unchanged`].
+    fn redefines(&self) -> bool {
+        self.definitions.values().any(|definitions| {
+            definitions.one_location && definitions.first != definitions.last.position
+        })
+    }
+
+    /// The history of a parse whose final macro definitions `active` gives and whose
+    /// command line was `arguments`. `undefined` names the macros that an `#undef` left
+    /// undefined while the preprocessor read something else, when the driver reported them.
+    pub(super) fn history<'a>(
+        self,
+        active: &'a dyn Fn(&str) -> Option<&'a MacroDefinition>,
+        arguments: &[String],
+        undefined: Option<HashSet<String>>,
+    ) -> MacroHistory<'tu, 'a> {
+        MacroHistory {
+            active,
+            popped: popped_names(self.files.iter().map(|file| file.get_path()), arguments),
+            undefined,
+            definitions: self.definitions,
+            expansions: self.expansions,
+        }
+    }
+}
+
+/// Preprocessing history of a parse with function bodies, in translation-unit order.
+pub(super) struct MacroHistory<'tu, 'a> {
     /// Final active definitions, which later expansion of a retained body uses.
-    active: &'a BTreeMap<String, ActiveMacro>,
+    active: &'a dyn Fn(&str) -> Option<&'a MacroDefinition>,
     /// The recorded definitions of each macro name.
     definitions: HashMap<String, Definitions<'tu>>,
     /// Each top-level macro expansion in the first entry of its file, by file and offset of
@@ -597,8 +700,9 @@ struct MacroHistory<'tu, 'a> {
     /// Names a `pop_macro` pragma can restore, or `None` for every name.
     popped: Option<HashSet<String>>,
     /// Names that an `#undef` left undefined while the preprocessor read something else.
-    /// Empty when no macro was defined twice at one location, since nothing then asks.
-    undefined: HashSet<String>,
+    /// `None` when no macro was defined twice at one location, since nothing then asks, and
+    /// when no driver could report them, which refuses every macro that asks.
+    undefined: Option<HashSet<String>>,
 }
 
 /// The definitions the preprocessor recorded for one macro name.
@@ -632,7 +736,10 @@ impl<'tu> MacroHistory<'tu, '_> {
     /// function-like invocation, which dropped or stringified it, and be unchanged since that
     /// invocation; the unchanged invocation treats it the same way at the end. Any other name
     /// must never have been defined as a macro.
-    fn expands_unchanged(&self, file: File<'tu>, tokens: &[(u32, crate::Token)]) -> bool {
+    ///
+    /// `reported` is set when the proof needs the driver's report of undefinitions; see
+    /// [`Self::unchanged`].
+    fn expands_unchanged(&self, file: File<'tu>, tokens: &[Located], reported: &mut bool) -> bool {
         let expansions = self.expansions.get(&file);
         // Each open invocation records the parenthesis depth that closes it and its position.
         let mut invocations = Vec::<(usize, usize)>::new();
@@ -674,19 +781,22 @@ impl<'tu> MacroHistory<'tu, '_> {
                     // `unchanged` ties the active definition to the last one recorded; the
                     // expansion must have used that same definition, which a pop formed by
                     // token pasting could otherwise make differ.
-                    if !self.unchanged(name, position, &mut HashSet::new())
+                    if !self.unchanged(name, position, reported, &mut HashSet::new())
                         || expansion.location.is_none()
                         || expansion.location != self.definitions[name].last.location
                     {
                         return false;
                     }
-                    if self.active[name].definition.kind == MacroKind::FunctionLike {
+                    // `unchanged` found the active definition.
+                    if (self.active)(name)
+                        .is_some_and(|definition| definition.kind == MacroKind::FunctionLike)
+                    {
                         pending = Some(position);
                     }
                 }
-                None if self.active.contains_key(name) => {
+                None if (self.active)(name).is_some() => {
                     let Some(&(_, position)) = invocations.last() else { return false };
-                    if !self.unchanged(name, position, &mut HashSet::new()) {
+                    if !self.unchanged(name, position, reported, &mut HashSet::new()) {
                         return false;
                     }
                 }
@@ -715,32 +825,43 @@ impl<'tu> MacroHistory<'tu, '_> {
     /// macro also had its active definition at `position` when it was first defined before
     /// `position`, every definition of it is the one at that location, and no `#undef` left
     /// it undefined while the preprocessor read anything else.
-    fn unchanged(&self, name: &str, position: usize, visited: &mut HashSet<String>) -> bool {
+    ///
+    /// That last case needs the driver's report of undefinitions and sets `reported`. The
+    /// parse of the other build flavor has no report, so it never admits the case.
+    fn unchanged(
+        &self,
+        name: &str,
+        position: usize,
+        reported: &mut bool,
+        visited: &mut HashSet<String>,
+    ) -> bool {
         if !visited.insert(name.to_owned()) {
             return true;
         }
         if self.popped.as_ref().is_none_or(|popped| popped.contains(name)) {
             return false;
         }
-        let (Some(definitions), Some(active)) = (self.definitions.get(name), self.active.get(name))
+        let (Some(definitions), Some(active)) = (self.definitions.get(name), (self.active)(name))
         else {
             return false;
         };
         let last = &definitions.last;
         let defined_last = last.location.is_some_and(|(file, offset)| {
-            active.definition.location.as_ref().is_some_and(|location| {
+            active.location.as_ref().is_some_and(|location| {
                 location.offset == offset && location.file == file.get_path()
             })
         });
-        let defined_before = last.position < position
-            || (definitions.first < position
-                && definitions.one_location
-                && !self.undefined.contains(name));
-        if !defined_before || active.definition.builtin || !defined_last {
+        let defined_again = last.position >= position
+            && definitions.first < position
+            && definitions.one_location
+            && self.undefined.as_ref().is_some_and(|undefined| !undefined.contains(name));
+        *reported |= defined_again;
+        let defined_before = last.position < position || defined_again;
+        if !defined_before || active.builtin || !defined_last {
             return false;
         }
-        let tokens = &active.definition.tokens;
-        let (parameters, replacement) = match active.definition.kind {
+        let tokens = &active.tokens;
+        let (parameters, replacement) = match active.kind {
             MacroKind::ObjectLike => (HashSet::new(), tokens.get(1..).unwrap_or_default()),
             MacroKind::FunctionLike => {
                 let Some(close) = tokens.iter().position(|token| token.spelling == ")") else {
@@ -775,8 +896,8 @@ impl<'tu> MacroHistory<'tu, '_> {
             if crate::expansion::dynamic_builtin(spelling) {
                 return false;
             }
-            !(self.definitions.contains_key(spelling) || self.active.contains_key(spelling))
-                || self.unchanged(spelling, position, visited)
+            !(self.definitions.contains_key(spelling) || (self.active)(spelling).is_some())
+                || self.unchanged(spelling, position, reported, visited)
         })
     }
 }

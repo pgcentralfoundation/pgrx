@@ -23,20 +23,32 @@
 //!   build compiles that definition itself, where its assertions do nothing.
 //! - A function that an assert-enabled build declares where a release build defines a macro
 //!   that does nothing, or the reverse of a static inline function, becomes a macro that
-//!   calls the function in both.
-//! - A static inline function whose definition differs between the flavors is called, not
-//!   translated, in both.
+//!   calls the function in both. A release macro that does anything is a conflict.
+//! - An external function that only an assert-enabled build declares, and that returns
+//!   nothing, is called in both by a merged inline body, from the statements that only an
+//!   assert-enabled build has. A release build's call does nothing. A macro is never shared
+//!   on that ground: its release definition may do work that the call would leave out.
+//! - A static inline function whose definition differs between the flavors is translated
+//!   from one body merged from both definitions, in which the installation's flavor selects
+//!   the statements that only one of them has. When the definitions do not merge, both
+//!   flavors call the function.
 //!
 //! The shared definitions follow the main file wherever the compiler expands macros, so no
 //! file is written.
 
+use super::definitions::{self, Located};
 use super::{FrontendError, collect_declarations};
+use crate::syntax::BUILD_FLAVOR;
 use crate::{
-    ActiveMacro, ActiveProvenance, DeclarationCatalog, FrontendOutput, FunctionInfo,
-    MacroDefinition, MacroKind, MacroScanner, SourceSpan, Token, TokenKind, TypeCategory,
+    ActiveMacro, ActiveProvenance, DeclarationCatalog, DiagnosticSeverity, FrontendOutput,
+    FunctionInfo, MacroDefinition, MacroKind, MacroScanner, SourceSpan, Token, TokenKind,
+    TypeCategory,
 };
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
+
+/// Merge the two definitions of a static inline function's body into one.
+mod merge;
 
 /// The macro whose definition selects PostgreSQL's assertion-enabled declarations.
 const ASSERT_CHECKING: &str = "USE_ASSERT_CHECKING";
@@ -63,16 +75,25 @@ pub struct Flavors {
     /// Macros defined here to call the function of their own name, which one build flavor
     /// declares differently or not at all.
     pub(crate) calls: BTreeSet<String>,
-    /// Functions that only an assert-enabled build defines, which the macro of that name
-    /// calls. A release build's macro does nothing.
+    /// External functions that only an assert-enabled build declares and that return
+    /// nothing. Generated code calls one through its own adapter, which does nothing in a
+    /// release build, and no build binds one.
     pub(crate) assert_functions: BTreeSet<String>,
+    /// Functions that an assert-enabled build declares where a release build defines a
+    /// macro no call can stand for. The macro is a conflict, and no build binds the function.
+    pub(crate) unbound_functions: BTreeSet<String>,
     /// Static inline functions that only an assert-enabled build defines and that shared
     /// definitions may call, with their C definitions. A release build compiles them with
     /// its own macros, so their assertions do nothing there.
     pub(crate) helpers: BTreeMap<String, String>,
-    /// Static inline functions whose definitions differ between the flavors, or which report
-    /// assertions themselves. Both flavors call them.
+    /// Static inline functions whose definitions differ between the flavors and cannot be
+    /// merged, or which report assertions themselves. Both flavors call them.
     pub(crate) native_only: BTreeSet<String>,
+    /// Static inline functions whose definitions differ between the flavors and which both
+    /// give one body, merged from the two definitions, in which the installation's flavor
+    /// selects the statements that only one of them has. Both translate that body, or call
+    /// the function when it cannot be translated.
+    pub(crate) merged: BTreeSet<String>,
     /// Definitions that follow the main file wherever the compiler expands macros.
     pub(crate) definitions: String,
     /// Source the inspected flavor's preprocessor skipped.
@@ -85,7 +106,7 @@ pub(crate) type Skipped = (PathBuf, u32, u32);
 
 impl Flavors {
     /// Whether a call to `name` reaches a function this installation lacks: one that only an
-    /// assert-enabled build defines, inspected in a release build.
+    /// assert-enabled build declares, inspected in a release build.
     pub(crate) fn lacks_function(&self, name: &str) -> bool {
         !self.assert_enabled && self.assert_functions.contains(name)
     }
@@ -110,6 +131,18 @@ struct Other {
     inline_definitions: BTreeMap<String, (SourceSpan, Option<String>)>,
     /// The source text of its function-like macro definitions, from each macro's name.
     texts: BTreeMap<String, String>,
+    /// Its bodies of the static inline functions whose definitions span source that only
+    /// one flavor's preprocessor skips, where its parse proves them as the inspected
+    /// flavor's parse proves a retained body.
+    bodies: BTreeMap<String, Body>,
+}
+
+/// A static inline function's body in the other build flavor.
+struct Body {
+    /// The definition's parameter names.
+    parameters: Vec<Option<String>>,
+    /// The body's tokens, each with its offset in the definition's file.
+    tokens: Vec<Located>,
 }
 
 /// One flavor's macros and declarations.
@@ -152,14 +185,24 @@ pub(super) fn skipped(unit: &clang::TranslationUnit<'_>, directory: &Path) -> BT
         .collect()
 }
 
+/// Whether a definition at `span` holds source that only one flavor's preprocessor skips.
+fn overlaps(differing: &[Skipped], span: &SourceSpan) -> bool {
+    differing.iter().any(|(file, start, end)| {
+        *file == span.file && *start <= span.end_line && span.start_line <= *end
+    })
+}
+
 /// Compare the inspected headers with their other build flavor and make `frontend` describe
 /// the macros both flavors generate.
 ///
 /// This runs after the proofs that compare the headers with the unchanged macro environment
-/// and before any pass that expands macros.
+/// and before any pass that expands macros. `offsets` gives the offset of each token of an
+/// inline function body that those proofs retained and that the other flavor's parse could
+/// prove alike.
 pub(super) fn reconcile(
     scanner: &MacroScanner,
     frontend: &mut FrontendOutput,
+    offsets: &BTreeMap<String, Vec<u32>>,
 ) -> Result<(), FrontendError> {
     let assert_enabled = frontend.environment.active.contains_key(ASSERT_CHECKING);
     let other = inspect_other(scanner, frontend, assert_enabled)?;
@@ -230,7 +273,15 @@ pub(super) fn reconcile(
         }
         let Some(function) = assert.function(name) else { continue };
         let formals = formals(definition);
-        match assertion_function(function, &formals, release.declarations) {
+        // A release build's call to the function does nothing, so it can stand only for a
+        // release macro that does nothing.
+        let callable = if does_nothing(release, definition) {
+            assertion_function(function, Some(&formals), release.declarations)
+        } else {
+            Err("the macro does work that a call a release build does not make would leave out"
+                .into())
+        };
+        match callable {
             Ok(()) => {
                 calls.insert(name.clone(), call(name, &formals, definition.provenance.clone()));
                 flavors.assert_functions.insert(name.clone());
@@ -242,7 +293,19 @@ pub(super) fn reconcile(
                         "an assert-enabled build declares {name} as a function and a release build defines it as a macro, and {reason}"
                     ),
                 );
+                // A release build has no function of this name to bind.
+                flavors.unbound_functions.insert(name.clone());
             }
+        }
+    }
+    // A function that only an assert-enabled build declares. Nothing in a release build
+    // has its name, so only translated code calls it.
+    for (name, function) in &assert.declarations.function_signatures {
+        if !release.declares(name)
+            && assert.function(name).is_some()
+            && assertion_function(function, None, release.declarations).is_ok()
+        {
+            flavors.assert_functions.insert(name.clone());
         }
     }
     // The reverse has no form both flavors can call.
@@ -312,9 +375,18 @@ pub(super) fn reconcile(
     // definition that mentions one is kept out by its spelling.
     let members = differing_members(assert.declarations, release.declarations);
     // Names an assert-enabled definition cannot reach in a release build, given the
-    // functions a release build compiles itself.
-    let unshared_given = |name: &str, helpers: &BTreeMap<String, String>| -> Option<&'static str> {
-        if calls.contains_key(name) || helpers.contains_key(name) {
+    // functions a release build compiles itself. A `translated` definition becomes Rust,
+    // which calls an assertion function through its adapter. A definition that a release
+    // build compiles as C cannot call a function that build does not declare.
+    let assert_functions = &flavors.assert_functions;
+    let unshared_given = |name: &str,
+                          helpers: &BTreeMap<String, String>,
+                          translated: bool|
+     -> Option<&'static str> {
+        if calls.contains_key(name)
+            || helpers.contains_key(name)
+            || (translated && assert_functions.contains(name))
+        {
             return None;
         }
         match (assert.macros.get(name), release.macros.get(name)) {
@@ -341,7 +413,7 @@ pub(super) fn reconcile(
     // A candidate is shared once everything its definition names is. One candidate may
     // call another, so repeat until none is added.
     loop {
-        let unshared = |name: &str| unshared_given(name, &flavors.helpers);
+        let unshared = |name: &str| unshared_given(name, &flavors.helpers, false);
         let added = candidates
             .iter()
             .filter(|(name, _)| !flavors.helpers.contains_key(*name))
@@ -360,7 +432,14 @@ pub(super) fn reconcile(
         }
         flavors.helpers.extend(added);
     }
-    let unshared = |name: &str| unshared_given(name, &flavors.helpers);
+    // A macro's release definition is its own text, which nothing here compares with the
+    // assert-enabled one. A release build's call to an assertion function does nothing, so
+    // sharing an assert-enabled definition that makes one could leave out work the release
+    // definition does. Such a macro stays a conflict.
+    let unshared_macro = |name: &str| unshared_given(name, &flavors.helpers, false);
+    // A merged inline body holds each flavor's own statements, so a call there is one that
+    // only an assert-enabled build compiles.
+    let unshared = |name: &str| unshared_given(name, &flavors.helpers, true);
     // Function-like macros the flavors define differently take the assert-enabled
     // definition when a release build can expand it.
     let mut shared = BTreeMap::<String, MacroDefinition>::new();
@@ -383,7 +462,7 @@ pub(super) fn reconcile(
             }
             continue;
         }
-        match reaches(assert, name, &unshared) {
+        match reaches(assert, name, &unshared_macro) {
             Some((reached, reason)) => {
                 flavors.conflicts.insert(
                     name.clone(),
@@ -398,30 +477,81 @@ pub(super) fn reconcile(
         }
     }
 
-    // Static inline functions whose definitions the flavors do not share.
+    // Static inline functions whose definitions the flavors do not share. Both translate
+    // the body merged from the two definitions when there is one, and call the function
+    // otherwise.
     let differing =
         flavors.skipped.symmetric_difference(&other.skipped).cloned().collect::<Vec<_>>();
+    // Whether every flavor can name `token` in translated code, and means the same by it.
+    let shared_name = |token: &str| {
+        !members.contains(token)
+            && (assert.declares(token) || !release.declares(token))
+            && unshared(token).is_none()
+            && reaches(assert, token, &unshared).is_none()
+            && reaches(release, token, &unshared).is_none()
+    };
+    let reports =
+        |token: &Token| token.kind == TokenKind::Identifier && token.spelling == ASSERTION_REPORT;
+    // The keyword that a merged body gives its statements must name nothing else.
+    let keyword_free = !assert.declares(BUILD_FLAVOR) && !release.declares(BUILD_FLAVOR);
+    let mut merged = BTreeMap::new();
     for (name, function) in &frontend.declarations.function_signatures {
         let Some(definition) = &function.definition else { continue };
         let span = &definition.provenance;
-        let conditional = differing.iter().any(|(file, start, end)| {
-            *file == span.file && *start <= span.end_line && span.start_line <= *end
-        });
-        let reports = definition.body.as_ref().is_some_and(|body| {
-            body.iter().any(|token| {
-                token.kind == TokenKind::Identifier && token.spelling == ASSERTION_REPORT
-            })
-        });
-        if conditional || reports {
-            flavors.native_only.insert(name.clone());
+        let reporting = definition.body.as_ref().is_some_and(|body| body.iter().any(reports));
+        if !overlaps(&differing, span) {
+            if reporting {
+                flavors.native_only.insert(name.clone());
+            }
+            continue;
+        }
+        let body = || {
+            let (asserted, released) = (assert.function(name)?, release.function(name)?);
+            let theirs = other.bodies.get(name)?;
+            let ours = definition.body.as_ref()?;
+            let offsets = offsets.get(name).filter(|offsets| offsets.len() == ours.len())?;
+            // One function in both flavors, defined in one place with one set of names,
+            // so its documentation shows both flavors the same definition.
+            if !keyword_free
+                || !inline(asserted)
+                || !inline(released)
+                || prototype(asserted) != prototype(released)
+                || other.inline_definitions.get(name)?.0 != *span
+                || theirs.parameters != definition.parameters
+                || definition.parameters.iter().flatten().any(|name| name == BUILD_FLAVOR)
+                || reporting
+                || theirs.tokens.iter().any(|(_, token)| reports(token))
+            {
+                return None;
+            }
+            let ours = offsets.iter().copied().zip(ours.iter().cloned()).collect::<Vec<_>>();
+            let tokens = if assert_enabled {
+                merge::merge(&ours, &theirs.tokens)
+            } else {
+                merge::merge(&theirs.tokens, &ours)
+            }?;
+            tokens
+                .iter()
+                .filter(|token| matches!(token.kind, TokenKind::Identifier | TokenKind::Keyword))
+                .all(|token| token.spelling == BUILD_FLAVOR || shared_name(&token.spelling))
+                .then_some(tokens)
+        };
+        match body() {
+            Some(tokens) => {
+                merged.insert(name.clone(), tokens);
+            }
+            None => {
+                flavors.native_only.insert(name.clone());
+            }
         }
     }
 
-    // A release build has none of the functions its call macros name. It declares them as
-    // the assert-enabled build does, so both check a call's operands alike, and calls nothing.
-    let lacking = calls
-        .keys()
-        .filter(|name| flavors.lacks_function(name))
+    // A release build has none of the assertion functions. It declares them as the
+    // assert-enabled build does, so both check a call's operands alike, and calls nothing.
+    let lacking = flavors
+        .assert_functions
+        .iter()
+        .filter(|_| !assert_enabled)
         .map(|name| (name, false))
         .chain(flavors.helpers.keys().filter(|_| !assert_enabled).map(|name| (name, true)))
         .map(|(name, defined)| {
@@ -463,6 +593,16 @@ pub(super) fn reconcile(
         frontend.declarations.functions.extend(ty.map(|ty| (name.clone(), ty)));
         frontend.declarations.function_signatures.insert(name, function);
     }
+    for (name, tokens) in merged {
+        let definition = frontend
+            .declarations
+            .function_signatures
+            .get_mut(&name)
+            .and_then(|function| function.definition.as_mut())
+            .expect("a merged body belongs to a catalogued definition");
+        definition.body = Some(tokens);
+        flavors.merged.insert(name);
+    }
     flavors.definitions = definitions;
     frontend.dependencies = crate::MacroDependencyGraph::from_environment_with_constants(
         &frontend.environment,
@@ -472,25 +612,28 @@ pub(super) fn reconcile(
     Ok(())
 }
 
-/// Whether a release build's macro can call an assert-enabled build's function `function`:
-/// the function returns nothing, so a release build can do nothing in its place, and takes
-/// the macro's `formals`, of types a release build declares too.
+/// Whether a release build can do nothing in place of a call to an assert-enabled build's
+/// function `function`: the function is external, returns nothing, and takes parameters of
+/// types a release build declares too. A release build's macro of the same name must take
+/// as many `formals`.
 fn assertion_function(
     function: &FunctionInfo,
-    formals: &[String],
+    formals: Option<&[String]>,
     release: &DeclarationCatalog,
 ) -> Result<(), String> {
     let signature = &function.signature;
     let Some(parameters) = &signature.parameters else {
         return Err("the function has no prototype".into());
     };
-    if signature.variadic || formals.iter().any(|formal| formal == "...") {
+    if signature.variadic
+        || formals.is_some_and(|formals| formals.iter().any(|formal| formal == "..."))
+    {
         return Err("one of them is variadic".into());
     }
     if signature.result.category != TypeCategory::Void {
         return Err("the function returns a value that a release build cannot produce".into());
     }
-    if parameters.len() != formals.len() {
+    if formals.is_some_and(|formals| parameters.len() != formals.len()) {
         return Err("they take different numbers of arguments".into());
     }
     if function.is_static {
@@ -538,6 +681,42 @@ fn differing_members(
 fn identifiers(text: &str) -> impl Iterator<Item = &str> {
     text.split(|character: char| !(character.is_ascii_alphanumeric() || character == '_'))
         .filter(|word| word.bytes().next().is_some_and(|byte| !byte.is_ascii_digit()))
+}
+
+/// Whether a macro of `view` does nothing wherever it is used: its replacement list names
+/// no parameter, function or variable and writes nothing.
+///
+/// PostgreSQL defines such a macro as `((void)true)`, `((void)0)` or `do {} while (0)` where
+/// a release build has no assertion to make. Only grouping, an empty `do`/`while` body, a
+/// cast to `void`, integer constants, and object-like macros that are themselves nothing
+/// but those are accepted, so a macro that evaluates an operand does something.
+fn does_nothing(view: View<'_>, definition: &MacroDefinition) -> bool {
+    let mut pending = vec![definition];
+    let mut visited = BTreeSet::new();
+    while let Some(definition) = pending.pop() {
+        let (_, body) = parameters_and_body(definition);
+        for token in body {
+            let constant = token.bytes().next().is_some_and(|byte| byte.is_ascii_digit())
+                && token.bytes().all(|byte| byte.is_ascii_alphanumeric());
+            if constant
+                || matches!(
+                    token,
+                    "(" | ")" | "{" | "}" | ";" | "void" | "do" | "while" | "true" | "false"
+                )
+            {
+                continue;
+            }
+            match view.macros.get(token) {
+                Some(named) if named.kind == MacroKind::ObjectLike => {
+                    if visited.insert(token) {
+                        pending.push(named);
+                    }
+                }
+                _ => return false,
+            }
+        }
+    }
+    true
 }
 
 /// A function's result and parameter types, by canonical spelling.
@@ -639,6 +818,7 @@ fn inspect_other(
     let directory = std::env::current_dir().map_err(|error| {
         FrontendError::Environment(format!("could not resolve the working directory: {error}"))
     })?;
+    let own_skipped = &frontend.flavors.skipped;
     let parse = |replaced: &BTreeMap<PathBuf, String>| {
         let borrowed = replaced
             .iter()
@@ -648,12 +828,72 @@ fn inspect_other(
             let mut skipped = skipped(unit, &directory);
             // The probes skip source of their own.
             skipped.retain(|(file, ..)| *file != main_file);
-            let definitions = definitions(unit, &directory, &main_file)?;
-            Ok((inventory, collect_declarations(unit).0, skipped, definitions))
+            let differing = own_skipped.symmetric_difference(&skipped).cloned().collect::<Vec<_>>();
+            let Definitions { inline, texts, finals, conditional, records, mut files } =
+                definitions(unit, &directory, &main_file, &differing)?;
+            let defined = finals.contains_key(ASSERT_CHECKING);
+            let mut macros = BTreeMap::new();
+            for definition in inventory.macros {
+                // A name the inspected flavor never mentions has no probe; its last
+                // definition stands.
+                if probed.binary_search(&definition.name.as_str()).is_err() {
+                    macros.insert(definition.name.clone(), definition);
+                }
+            }
+            for (name, definition) in finals {
+                // A probe that found a macro without a definition of its own found a
+                // builtin, which no build flavor redefines.
+                let definition = definition
+                    .or_else(|| Some(frontend.environment().active.get(&name)?.definition.clone()));
+                macros.extend(definition.map(|definition| (name, definition)));
+            }
+            // A body is read from a parse without errors, as the inspected flavor's are.
+            let sound = !inventory.diagnostics.iter().any(|diagnostic| {
+                matches!(diagnostic.severity, DiagnosticSeverity::Error | DiagnosticSeverity::Fatal)
+            });
+            let mut bodies = BTreeMap::new();
+            if sound && !conditional.is_empty() {
+                let active = |name: &str| macros.get(name);
+                // The driver cannot read this parse's files, so nothing reports where a
+                // macro was undefined.
+                let history = records.history(&active, &arguments, None);
+                for (name, span, definition) in conditional {
+                    let Some(path) = definition
+                        .get_range()
+                        .and_then(|range| range.get_start().get_file_location().file)
+                        .map(|file| file.get_path())
+                    else {
+                        continue;
+                    };
+                    // The parse read a replaced file's contents from memory.
+                    let bytes = match replaced.get(&span.file) {
+                        Some(contents) => Some(contents.as_bytes()),
+                        None => files
+                            .entry(path)
+                            .or_insert_with_key(|path| std::fs::read(path).ok())
+                            .as_deref(),
+                    };
+                    let tokens = bytes
+                        .and_then(|bytes| definitions::flavor_body(definition, bytes, &history));
+                    bodies.extend(tokens.map(|tokens| {
+                        let parameters = definitions::parameter_names(definition);
+                        (name, Body { parameters, tokens })
+                    }));
+                }
+            }
+            let other = Other {
+                macros,
+                declarations: collect_declarations(unit).0,
+                skipped,
+                inline_definitions: inline,
+                texts,
+                bodies,
+            };
+            Ok((other, defined))
         })
     };
     let mut parsed = parse(&replaced)?;
-    if !assert_enabled && !parsed.3.finals.contains_key(ASSERT_CHECKING) {
+    if !assert_enabled && !parsed.1 {
         // A header undefined what the command line defined.
         for file in &frontend.profile().inputs.files {
             let Ok(contents) = std::fs::read_to_string(file) else { continue };
@@ -669,33 +909,18 @@ fn inspect_other(
         }
         parsed = parse(&replaced)?;
     }
-    let (inventory, declarations, skipped, definitions) = parsed;
-    let Definitions { inline: inline_definitions, texts, finals } = definitions;
-    if finals.contains_key(ASSERT_CHECKING) == assert_enabled {
+    let (other, defined) = parsed;
+    if defined == assert_enabled {
         return Err(FrontendError::Environment(format!(
             "{ASSERT_CHECKING} could not be {} to inspect the other build flavor of these headers",
             if assert_enabled { "removed" } else { "defined" }
         )));
     }
-    let mut macros = BTreeMap::new();
-    for definition in inventory.macros {
-        // A name the inspected flavor never mentions has no probe; its last definition stands.
-        if probed.binary_search(&definition.name.as_str()).is_err() {
-            macros.insert(definition.name.clone(), definition);
-        }
-    }
-    for (name, definition) in finals {
-        // A probe that found a macro without a definition of its own found a builtin, which
-        // no build flavor redefines.
-        let definition = definition
-            .or_else(|| Some(frontend.environment().active.get(&name)?.definition.clone()));
-        macros.extend(definition.map(|definition| (name, definition)));
-    }
-    Ok(Other { macros, declarations, skipped, inline_definitions, texts })
+    Ok(other)
 }
 
 /// What a build flavor's translation unit defines.
-struct Definitions {
+struct Definitions<'tu> {
     /// The spans and source text of its static inline function definitions.
     inline: BTreeMap<String, (SourceSpan, Option<String>)>,
     /// The source text of each function-like macro's last definition, from its name.
@@ -703,21 +928,39 @@ struct Definitions {
     /// The definition of each probed name that is a macro at the end of the inspected
     /// main file, when the compiler records one.
     finals: BTreeMap<String, Option<MacroDefinition>>,
+    /// The static inline function definitions that hold source only one flavor's
+    /// preprocessor skips, each with its name and span.
+    conditional: Vec<(String, SourceSpan, clang::Entity<'tu>)>,
+    /// The unit's preprocessing records, which prove a body's macros unchanged.
+    records: definitions::Records<'tu>,
+    /// The contents of the files that source text was read from, by Clang's path.
+    files: BTreeMap<PathBuf, Option<Vec<u8>>>,
 }
 
 /// Collect a build flavor's definitions. Each `#ifdef` probe in `main_file` whose name is a
-/// macro refers to the definition in force there.
-fn definitions(
-    unit: &clang::TranslationUnit<'_>,
+/// macro refers to the definition in force there. `differing` lists the source that only
+/// one flavor's preprocessor skips.
+fn definitions<'tu>(
+    unit: &'tu clang::TranslationUnit<'_>,
     directory: &Path,
     main_file: &Path,
-) -> Result<Definitions, crate::Error> {
+    differing: &[Skipped],
+) -> Result<Definitions<'tu>, crate::Error> {
     use clang::{EntityKind, EntityVisitResult, StorageClass};
-    let mut result =
-        Definitions { inline: BTreeMap::new(), texts: BTreeMap::new(), finals: BTreeMap::new() };
-    let mut files = BTreeMap::<PathBuf, Option<Vec<u8>>>::new();
+    let mut result = Definitions {
+        inline: BTreeMap::new(),
+        texts: BTreeMap::new(),
+        finals: BTreeMap::new(),
+        conditional: Vec::new(),
+        records: definitions::Records::default(),
+        files: BTreeMap::new(),
+    };
     let mut error = None;
     unit.get_entity().visit_children(|entity, _| {
+        // Only a definition that differs between the flavors asks for the records.
+        if !differing.is_empty() {
+            result.records.record(entity);
+        }
         let (Some(name), Some(range)) = (entity.get_name(), entity.get_range()) else {
             return EntityVisitResult::Continue;
         };
@@ -728,13 +971,16 @@ fn definitions(
                     && entity.get_storage_class() == Some(StorageClass::Static) =>
             {
                 if let Ok(Some(span)) = SourceSpan::from_range(range, directory) {
-                    let text =
-                        text(range, &mut files).filter(|text| text.len() <= MAX_DEFINITION_BYTES);
+                    let text = text(range, &mut result.files)
+                        .filter(|text| text.len() <= MAX_DEFINITION_BYTES);
+                    if overlaps(differing, &span) {
+                        result.conditional.push((name.clone(), span.clone(), entity));
+                    }
                     result.inline.insert(name, (span, text));
                 }
             }
             EntityKind::MacroDefinition if entity.is_function_like_macro() => {
-                match text(range, &mut files) {
+                match text(range, &mut result.files) {
                     Some(text) => result.texts.insert(name, text),
                     None => result.texts.remove(&name),
                 };
@@ -901,4 +1147,70 @@ fn define(definition: &MacroDefinition) -> Option<String> {
         return None;
     }
     Some(format!("{name}{} {}", rest[..=close].concat(), rest[close + 1..].join(" ")))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{View, does_nothing};
+    use crate::{DeclarationCatalog, MacroDefinition, MacroKind, Token, TokenKind};
+    use std::collections::BTreeMap;
+
+    /// A definition from its tokens' spellings, the macro's name first.
+    fn definition(kind: MacroKind, spellings: &[&str]) -> MacroDefinition {
+        MacroDefinition {
+            name: spellings[0].into(),
+            kind,
+            location: None,
+            provenance: None,
+            tokens: spellings
+                .iter()
+                .map(|spelling| Token { kind: TokenKind::Identifier, spelling: (*spelling).into() })
+                .collect(),
+            builtin: false,
+            main_file: false,
+        }
+    }
+
+    /// A release macro does nothing only when it names no operand, function or variable
+    /// and writes nothing, also through the object-like macros it names.
+    #[test]
+    fn a_release_macro_does_nothing_only_without_operands_calls_and_writes() {
+        let macros = [
+            definition(MacroKind::ObjectLike, &["true", "1"]),
+            definition(MacroKind::ObjectLike, &["NOTHING", "(", "(", "void", ")", "true", ")"]),
+            definition(MacroKind::ObjectLike, &["COUNTED", "counter", "++"]),
+            definition(MacroKind::ObjectLike, &["LOOP", "LOOP"]),
+            definition(MacroKind::FunctionLike, &["CALLED", "(", ")", "0"]),
+        ]
+        .into_iter()
+        .map(|definition| (definition.name.clone(), definition))
+        .collect::<BTreeMap<_, _>>();
+        let declarations = DeclarationCatalog::default();
+        let view = View { macros: &macros, declarations: &declarations };
+        for nothing in [
+            vec!["F", "(", "x", ")"],
+            vec!["F", "(", "x", ")", "(", "(", "void", ")", "true", ")"],
+            vec!["F", "(", "x", ")", "(", "(", "void", ")", "0", ")"],
+            vec!["F", "(", "a", ",", "b", ")", "do", "{", "}", "while", "(", "0", ")"],
+            vec!["F", "(", ")", "NOTHING"],
+            vec!["F", "(", ")", "LOOP"],
+        ] {
+            assert!(
+                does_nothing(view, &definition(MacroKind::FunctionLike, &nothing)),
+                "{nothing:?}"
+            );
+        }
+        for work in [
+            // It evaluates its operand, which may have an effect.
+            vec!["F", "(", "x", ")", "(", "(", "void", ")", "(", "x", ")", ")"],
+            vec!["F", "(", "x", ")", "(", "*", "(", "x", ")", "=", "0", ")"],
+            vec!["F", "(", ")", "counter", "++"],
+            vec!["F", "(", ")", "function", "(", ")"],
+            vec!["F", "(", ")", "COUNTED"],
+            vec!["F", "(", ")", "CALLED", "(", ")"],
+            vec!["F", "(", ")", "(", "(", "void", ")", "\"text\"", ")"],
+        ] {
+            assert!(!does_nothing(view, &definition(MacroKind::FunctionLike, &work)), "{work:?}");
+        }
+    }
 }

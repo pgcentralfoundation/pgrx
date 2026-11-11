@@ -889,21 +889,18 @@ pub(crate) fn analyze_active_with_constants(
                 result.evaluation.requirements.push(EvaluationRequirement::UnspecifiedOperandOrder);
             }
             if result.expression.as_ref().is_some_and(|expression| {
-                expression
-                    .syntax
-                    .statements()
-                    .any(|statement| matches!(statement, Statement::If { .. }))
-                    || expression.syntax.nodes.iter().any(|node| {
-                        matches!(
-                            node.kind,
-                            ExpressionKind::Conditional { .. }
-                                | ExpressionKind::Binary {
-                                    operator: BinaryOperator::LogicalAnd
-                                        | BinaryOperator::LogicalOr,
-                                    ..
-                                }
-                        )
-                    })
+                expression.syntax.statements().any(|statement| {
+                    matches!(statement, Statement::If { .. } | Statement::BuildFlavor { .. })
+                }) || expression.syntax.nodes.iter().any(|node| {
+                    matches!(
+                        node.kind,
+                        ExpressionKind::Conditional { .. }
+                            | ExpressionKind::Binary {
+                                operator: BinaryOperator::LogicalAnd | BinaryOperator::LogicalOr,
+                                ..
+                            }
+                    )
+                })
             }) {
                 result.evaluation.requirements.push(EvaluationRequirement::PreserveLazyBranches);
             }
@@ -1731,34 +1728,57 @@ fn check_statements<'a>(
             }
             Statement::If { condition, then_branch, else_branch, .. } => {
                 check_full_expression(expression, *condition, locals, initialized)?;
-                let mut then_initialized = initialized.clone();
-                let then_returns = check_statements(
+                if check_alternatives(
                     expression,
-                    std::slice::from_ref(then_branch.as_ref()),
+                    then_branch,
+                    else_branch.as_deref(),
                     locals,
-                    &mut then_initialized,
-                )?;
-                let mut else_initialized = initialized.clone();
-                let else_returns = if let Some(else_branch) = else_branch {
-                    check_statements(
-                        expression,
-                        std::slice::from_ref(else_branch.as_ref()),
-                        locals,
-                        &mut else_initialized,
-                    )?
-                } else {
-                    false
-                };
-                match (then_returns, else_returns) {
-                    (true, true) => return Ok(true),
-                    (false, true) => *initialized = then_initialized,
-                    (true, false) => *initialized = else_initialized,
-                    (false, false) => {
-                        then_initialized.retain(|name| else_initialized.contains(name));
-                        *initialized = then_initialized;
-                    }
+                    initialized,
+                )? {
+                    return Ok(true);
                 }
             }
+            // Either block runs, whichever build flavor the installation is.
+            Statement::BuildFlavor { checked, unchecked, .. } => {
+                if check_alternatives(expression, checked, Some(unchecked), locals, initialized)? {
+                    return Ok(true);
+                }
+            }
+        }
+    }
+    Ok(false)
+}
+
+/// Check the two statements of which one runs, the second being empty when absent, and
+/// report whether both return. Otherwise `initialized` keeps what every surviving one
+/// establishes.
+fn check_alternatives<'a>(
+    expression: &'a Expression,
+    first: &'a Statement,
+    second: Option<&'a Statement>,
+    locals: &HashMap<&'a str, TypeInfo>,
+    initialized: &mut HashSet<&'a str>,
+) -> Result<bool, TypeFailure> {
+    let mut first_initialized = initialized.clone();
+    let first_returns =
+        check_statements(expression, std::slice::from_ref(first), locals, &mut first_initialized)?;
+    let mut second_initialized = initialized.clone();
+    let second_returns = match second {
+        Some(second) => check_statements(
+            expression,
+            std::slice::from_ref(second),
+            locals,
+            &mut second_initialized,
+        )?,
+        None => false,
+    };
+    match (first_returns, second_returns) {
+        (true, true) => return Ok(true),
+        (false, true) => *initialized = first_initialized,
+        (true, false) => *initialized = second_initialized,
+        (false, false) => {
+            first_initialized.retain(|name| second_initialized.contains(name));
+            *initialized = first_initialized;
         }
     }
     Ok(false)

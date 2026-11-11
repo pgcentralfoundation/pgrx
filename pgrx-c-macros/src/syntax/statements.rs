@@ -4,7 +4,8 @@
 
 //! Structured statement parsing extends the expression parser without a second expression
 //! arena. Scopes track source order, the first return, and whether every path returns. The
-//! accepted grammar includes blocks, conditionals, local declarations, expressions, and returns;
+//! accepted grammar includes blocks, conditionals, local declarations, expressions, and returns,
+//! and the statements that a merged inline function body gives one build flavor;
 //! unsupported scope-changing constructs fail rather than becoming textual Rust substitutions.
 //! Root boundary metadata preserves the C dangling-else contract during emission.
 
@@ -101,6 +102,9 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
                     if let Some(otherwise) = else_branch {
                         scopes.push((otherwise.as_ref(), end));
                     }
+                }
+                Statement::BuildFlavor { checked, unchecked, .. } => {
+                    scopes.extend([(checked.as_ref(), end), (unchecked.as_ref(), end)]);
                 }
                 _ => {}
             }
@@ -294,7 +298,11 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
                 format!("statement nesting exceeds the {MAX_DEPTH}-level analysis budget"),
             ));
         }
-        let start = self.tokens.get(self.position).ok_or_else(|| self.unexpected())?.index;
+        let lexeme = self.tokens.get(self.position).ok_or_else(|| self.unexpected())?;
+        let start = lexeme.index;
+        if opens_build_flavor(lexeme.token) {
+            return self.build_flavor(depth, allow_declaration);
+        }
         let keyword = self.spelling().filter(|name| !self.parameters.contains_key(*name));
         match keyword {
             Some("if") => {
@@ -370,6 +378,53 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
                 always_returns: false,
             }),
         }
+    }
+
+    /// Parse `__pgrx_c_assert_checking { checked } { unchecked }` at its keyword token.
+    ///
+    /// The statement stands for the statements of one of its blocks, or for none, so it is
+    /// admitted only as an item of a block, where a declaration is. As the branch of a
+    /// conditional it would bind the statement that follows it differently in each flavor.
+    fn build_flavor(
+        &mut self,
+        depth: usize,
+        block_item: bool,
+    ) -> Result<ParsedStatement, SyntaxError> {
+        let start = self.tokens[self.position].index;
+        if !block_item {
+            return Err(self.error(
+                SyntaxErrorKind::Statement,
+                "statements of one build flavor require a C compound block",
+            ));
+        }
+        self.position += 1;
+        let block = |parser: &mut Self| {
+            if parser.spelling() != Some("{") {
+                return Err(parser.error(
+                    SyntaxErrorKind::Statement,
+                    "statements of one build flavor require a braced block",
+                ));
+            }
+            parser.statement_scope(depth, false, false)
+        };
+        let checked = block(self)?;
+        let unchecked = block(self)?;
+        let end = self.tokens[self.position - 1].index + 1;
+        Ok(ParsedStatement {
+            first_return: checked.first_return.or(unchecked.first_return),
+            always_returns: checked.always_returns && unchecked.always_returns,
+            statement: Statement::BuildFlavor {
+                checked: Box::new(Statement::Block {
+                    statements: checked.statements,
+                    tokens: checked.tokens,
+                }),
+                unchecked: Box::new(Statement::Block {
+                    statements: unchecked.statements,
+                    tokens: unchecked.tokens,
+                }),
+                tokens: TokenRange { start, end },
+            },
+        })
     }
 
     /// Parse a return value through the shared expression arena and reject missing or trailing

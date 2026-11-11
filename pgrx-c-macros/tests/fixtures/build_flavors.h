@@ -44,6 +44,16 @@ extern void SlruPagePrecedesUnitTests(const int *ctl, int per_page);
 #define SlruPagePrecedesUnitTests(ctl, per_page) do {} while (0)
 #endif
 
+/*
+ * A function with assertions whose name a release build gives to a macro that does work.
+ * A release build's call to the function does nothing, so no call can stand for the macro.
+ */
+#ifdef USE_ASSERT_CHECKING
+extern void AssertOrClear(int *value);
+#else
+#define AssertOrClear(value) (*(value) = 0)
+#endif
+
 /* A function with assertions, and a static inline function that does nothing without them. */
 #ifdef USE_ASSERT_CHECKING
 extern void AssertCouldGetRelation(void);
@@ -90,7 +100,43 @@ ValidateObject(const int *object)
 	Assert(*object >= 0);
 }
 
-/* A definition that differs between the flavors. */
+/*
+ * Checks that only an assert-enabled build declares, and a macro that makes one only
+ * there. Nothing compares the macro's two definitions, so it is not shared.
+ */
+#ifdef USE_ASSERT_CHECKING
+extern void VerifyElement(const int *elements, int index);
+extern void VerifyValue(int value);
+#define VERIFIED_ELEMENT(elements, index) (VerifyElement(elements, index), (elements)[index])
+#else
+#define VERIFIED_ELEMENT(elements, index) ((elements)[index])
+#endif
+
+/* A definition with a statement that only one flavor has, as TupleDescCompactAttr has. */
+static inline const int *
+CheckedElement(const int *elements, int index)
+{
+	const int *element = &elements[index];
+#ifdef USE_ASSERT_CHECKING
+	/* Check that the element is populated. */
+	VerifyElement(elements, index);
+#endif
+	return element;
+}
+
+/* A definition with a statement for each flavor. */
+static inline int
+FlavoredValue(int value)
+{
+	Assert(value >= 0);
+#ifdef USE_ASSERT_CHECKING
+	return value + 100;
+#else
+	return value + 200;
+#endif
+}
+
+/* A definition whose statement of one flavor uses a value of a function that flavor alone has. */
 static inline int
 ConditionalBody(int value)
 {
@@ -98,6 +144,68 @@ ConditionalBody(int value)
 	value += AssertOnlyFunction(value);
 #endif
 	return value + 1;
+}
+
+/* One whose statement uses a macro that flavor alone has. */
+static inline int
+ConditionalMacro(int value)
+{
+#ifdef USE_ASSERT_CHECKING
+	value = ASSERT_ONLY_MACRO(value);
+#endif
+	return value + 1;
+}
+
+/* Tokens of one flavor that close one block and open another. */
+static inline int
+ConditionalBraces(int value)
+{
+	if (value > 0)
+	{
+		value += 1;
+#ifdef USE_ASSERT_CHECKING
+	}
+	else
+	{
+#endif
+		value += 2;
+	}
+	return value;
+}
+
+/* Tokens of one flavor inside an expression. */
+static inline int
+ConditionalOperand(int value)
+{
+	return value
+#ifdef USE_ASSERT_CHECKING
+		+ 10
+#endif
+		;
+}
+
+/* A statement of one flavor that is the branch of a conditional. */
+static inline int
+ConditionalBranch(int value)
+{
+	if (value > 0)
+#ifdef USE_ASSERT_CHECKING
+		VerifyValue(value);
+#endif
+	value += 5;
+	return value;
+}
+
+/* A local that each flavor declares and both use afterwards. */
+static inline int
+ConditionalLocal(int value)
+{
+#ifdef USE_ASSERT_CHECKING
+	int step = 1;
+#else
+	int step = 2;
+#endif
+	return value + step;
 }
 
 /*

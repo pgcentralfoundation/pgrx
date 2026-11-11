@@ -18,6 +18,11 @@
 //! like a C macro body when it can; otherwise the call root remains. Neither root is
 //! added to the active C preprocessor definitions.
 //!
+//! A definition that differs between assert-enabled and release PostgreSQL has one body
+//! that the frontend merged from both. Its statements of one build flavor open with a
+//! keyword token that no C source holds, which the compiler pass returns as an identifier
+//! and this module makes a keyword again.
+//!
 //! The existing typed renderer and native capability planner own parameter assignment
 //! conversions, qualifiers, original result identity and guarded ABI calls. Native
 //! operands evaluate once, while actual macro roots retain their substitution rules
@@ -25,6 +30,7 @@
 //! source and shared count/token/byte budgets use the same structured refusal path;
 //! selection does not bypass profile or input-consistency checks.
 
+use crate::syntax::{BUILD_FLAVOR, opens_build_flavor};
 use crate::{
     ActiveMacro, ActiveProvenance, AnalysisStatus, ExpansionLimits, FrontendOutput,
     InlineFunctionDefinition, IntegerConstant, MacroAnalysis, MacroDefinition, MacroKind,
@@ -123,6 +129,13 @@ impl InlineRoot<'_> {
 
 /// Expand translated bodies that name macros in the final environment, where generated
 /// macros also expand. A body the compiler pass refuses leaves only the call root.
+///
+/// The pass spells every token and reads the result again, so the keyword that opens the
+/// statements of one build flavor returns as an identifier. Such a statement lies outside
+/// every macro invocation, and the frontend merged a body only where the keyword's
+/// spelling names no macro and no body token has it. So the expansion spells it once for
+/// each statement, unless a macro's replacement list spells it too. An expansion that
+/// spells it any other number of times leaves only the call root.
 pub(super) fn expand_bodies(
     scanner: &crate::MacroScanner,
     frontend: &FrontendOutput,
@@ -156,10 +169,22 @@ pub(super) fn expand_bodies(
         if let InlineRoot::Ready { body, .. } = root
             && body.as_deref().is_some_and(names_macro)
         {
+            let opened = body.as_deref().map_or(0, |body| {
+                body.definition.tokens.iter().filter(|token| opens_build_flavor(token)).count()
+            });
+            let spelled = |token: &&Token| token.spelling == BUILD_FLAVOR;
             *body = match batch.results.get(name) {
-                Some(crate::ExpansionResult::Expanded { expansion }) => {
+                Some(crate::ExpansionResult::Expanded { expansion })
+                    if expansion.definition.tokens.iter().filter(spelled).count() == opened =>
+                {
+                    let mut definition = expansion.definition.clone();
+                    for token in &mut definition.tokens {
+                        if token.spelling == BUILD_FLAVOR {
+                            token.kind = TokenKind::Keyword;
+                        }
+                    }
                     Some(Box::new(ActiveMacro {
-                        definition: expansion.definition.clone(),
+                        definition,
                         provenance: ActiveProvenance::Resolved,
                     }))
                 }
@@ -375,8 +400,9 @@ pub(super) fn prepare<'a>(
         let by_value_record = std::iter::once(&function.signature.result)
             .chain(parameters)
             .any(|ty| ty.category == crate::TypeCategory::Record);
-        // A definition that differs between assert-enabled and release PostgreSQL is
-        // called in both, so both builds give the function one form.
+        // A definition that differs between assert-enabled and release PostgreSQL has the
+        // body merged from both, or is called in both, so both builds give the function
+        // one form.
         let body = source
             .body
             .as_ref()

@@ -271,9 +271,34 @@ fn render_statements(
                     rust.push_str("} ");
                 }
             }
+            Statement::BuildFlavor { checked, unchecked, .. } => {
+                // Both blocks are compiled against either installation, which runs one.
+                let (checked, unchecked) = (block_items(checked), block_items(unchecked));
+                let checking = super::assertions::CHECKING;
+                if checked.is_empty() {
+                    write!(rust, "if !{checking} {{ ").expect("String output");
+                    render_statements(unchecked, renderer, returns, rust)?;
+                } else {
+                    write!(rust, "if {checking} {{ ").expect("String output");
+                    render_statements(checked, renderer, returns, rust)?;
+                    if !unchecked.is_empty() {
+                        rust.push_str("} else { ");
+                        render_statements(unchecked, renderer, returns, rust)?;
+                    }
+                }
+                rust.push_str("} ");
+            }
         }
     }
     Ok(())
+}
+
+/// The statements of a block, or the one statement that is not a block.
+fn block_items(statement: &Statement) -> &[Statement] {
+    match statement {
+        Statement::Block { statements, .. } => statements,
+        other => std::slice::from_ref(other),
+    }
 }
 
 /// Inspect stringified tokens before normalization, including forwarded opaque
