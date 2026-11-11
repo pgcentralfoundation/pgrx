@@ -56,13 +56,18 @@ mod tests {
     }
 
     /// `cargo pgrx test` assembles the fragments like `cargo pgrx install` does, so the extension
-    /// under test is one patch past the crate's version.
+    /// under test is one patch past the crate's version, and `extversion!()` exposes that version
+    /// at compile time.
     #[pg_test]
     fn installs_at_the_ephemeral_version() -> Result<(), pgrx::spi::Error> {
+        const COMPILED_EXTVERSION: Option<&str> = extversion!();
+        assert_eq!(pkgversion!(), Some("1.1.0"));
+        assert_eq!(COMPILED_EXTVERSION, Some("1.1.1"));
+
         let version = Spi::get_one::<String>(
             "SELECT extversion::text FROM pg_extension WHERE extname = 'migration_fragments'",
         )?;
-        assert_eq!(version.as_deref(), Some("1.1.1"));
+        assert_eq!(version.as_deref(), COMPILED_EXTVERSION);
         Ok(())
     }
 

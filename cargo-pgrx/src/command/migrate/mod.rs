@@ -279,6 +279,18 @@ fn remove_ephemeral_files(extname: &str, extdir: &Path) -> eyre::Result<()> {
 }
 
 impl UnreleasedFragments {
+    /// The `default_version` that [`Self::apply`] leaves in the installed `.control` file.
+    pub(crate) fn effective_version(
+        &self,
+        manifest_path: &Path,
+        cargo_flags: &[String],
+    ) -> eyre::Result<String> {
+        match self {
+            Self::NotEnabled | Self::NothingToAssemble => get_version(manifest_path, cargo_flags),
+            Self::Assemble(upgrade) => Ok(upgrade.target.to_string()),
+        }
+    }
+
     pub(crate) fn apply(
         self,
         manifest_path: &Path,
@@ -606,6 +618,64 @@ version = \"0.25.0\"
         assert_eq!(
             fixture.installed(),
             ["my_ext--0.24.0--0.25.0.sql", "my_ext--0.25.0.sql", "my_ext.control"]
+        );
+    }
+
+    #[test]
+    fn effective_version_matches_the_installed_control_file() {
+        let disabled = Fixture::new(NOT_ENABLED, FRAGMENT);
+        assert_eq!(
+            disabled
+                .plan(UnreleasedFragmentMode::Assemble)
+                .unwrap()
+                .effective_version(&disabled.manifest_path, &[])
+                .unwrap(),
+            "0.25.0"
+        );
+
+        let with_fragment = Fixture::new(ENABLED, FRAGMENT);
+        fs::write(with_fragment.sql_dir().join("my_ext--0.24.0--0.25.0.sql"), "-- old").unwrap();
+        assert_eq!(
+            with_fragment
+                .plan(UnreleasedFragmentMode::Assemble)
+                .unwrap()
+                .effective_version(&with_fragment.manifest_path, &[])
+                .unwrap(),
+            "0.25.1"
+        );
+        assert_eq!(
+            with_fragment
+                .plan(UnreleasedFragmentMode::Skip)
+                .unwrap()
+                .effective_version(&with_fragment.manifest_path, &[])
+                .unwrap(),
+            "0.25.0"
+        );
+
+        let ahead = Fixture::new(&ENABLED.replace("0.25.0", "0.26.0"), FRAGMENT);
+        fs::write(ahead.sql_dir().join("my_ext--0.24.0--0.25.0.sql"), "-- old").unwrap();
+        assert_eq!(
+            ahead
+                .plan(UnreleasedFragmentMode::Assemble)
+                .unwrap()
+                .effective_version(&ahead.manifest_path, &[])
+                .unwrap(),
+            "0.26.0"
+        );
+
+        let hardcoded = Fixture::new(&ENABLED.replace("0.25.0", "0.26.0"), &[]);
+        fs::write(
+            hardcoded.manifest_path.parent().unwrap().join("my_ext.control"),
+            "default_version = '0.25.0'\n",
+        )
+        .unwrap();
+        assert_eq!(
+            hardcoded
+                .plan(UnreleasedFragmentMode::Assemble)
+                .unwrap()
+                .effective_version(&hardcoded.manifest_path, &[])
+                .unwrap(),
+            "0.25.0"
         );
     }
 }
