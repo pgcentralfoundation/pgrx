@@ -17,7 +17,7 @@ pub use crate::pg_sys;
 pub use crate::pg_module_magic;
 
 // Necessary local macros:
-pub use crate::{default, impl_sql_translatable, name};
+pub use crate::{default, extension_version, impl_sql_translatable, name};
 
 // Needed for variant RETURNS
 pub use crate::iter::{SetOfIterator, TableIterator};
@@ -90,5 +90,11 @@ mod tests {
             <PreludeMacroType as SqlTranslatable>::RETURN_SQL,
             Ok(ReturnsRef::One(SqlMappingRef::literal("uuid")))
         );
+    }
+
+    #[test]
+    fn extension_version_is_const_and_falls_back_to_pkg_version() {
+        const VERSION: &str = extension_version!();
+        assert_eq!(VERSION, option_env!("CARGO_PGRX_EXTVERSION").unwrap_or(env!("CARGO_PKG_VERSION")));
     }
 }

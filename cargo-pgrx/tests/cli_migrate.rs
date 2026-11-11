@@ -479,3 +479,119 @@ fn check_base_works_for_a_crate_below_the_repository_root() {
     let (success, stdout, _) = fixture.migrate(&["check", "--base", "no-such-ref"]);
     assert!(!success, "a bad ref must not read as a clean lint: {stdout}");
 }
+
+#[test]
+fn package_exposes_effective_extversion_at_compile_time() {
+    use pgrx_pg_config::{PgConfigSelector, Pgrx};
+    use pgrx_sql_entity_graph::section::schema_section_sentinel_entry;
+
+    let Some(pg_config) = Pgrx::from_config().ok().and_then(|pgrx| {
+        pgrx.iter(PgConfigSelector::All)
+            .filter_map(Result::ok)
+            .find(|config| config.path().is_some_and(|path| path.is_file()))
+    }) else {
+        eprintln!("skipping extversion build test: no configured Postgres installation");
+        return;
+    };
+
+    let fixture = Fixture::new("0.26.0");
+    fixture
+        .sql("my_ext--0.25.0--0.26.0.sql", "-- released\n")
+        .fragment("101.init.sql", "SELECT 1;\n");
+
+    fs::write(
+        fixture.path("Cargo.toml"),
+        r#"[package]
+name = "my_ext"
+version = "0.26.0"
+edition = "2024"
+
+[workspace]
+
+[lib]
+crate-type = ["cdylib"]
+
+[features]
+pg15 = []
+pg16 = []
+pg17 = []
+pg18 = []
+pg19 = []
+
+[package.metadata.pgrx]
+unreleased-sql-dir = "sql/unreleased"
+"#,
+    )
+    .unwrap();
+    fs::write(
+        fixture.path("my_ext.control"),
+        "comment = 'test'\ndefault_version = '@CARGO_VERSION@'\nmodule_pathname = '$libdir/my_ext'\nrelocatable = false\nsuperuser = false\n",
+    )
+    .unwrap();
+
+    let sentinel = schema_section_sentinel_entry();
+    fs::write(
+        fixture.path("src/lib.rs"),
+        format!(
+            r#"#[used]
+#[unsafe(no_mangle)]
+#[cfg_attr(target_os = "macos", unsafe(link_section = "__DATA,__pgrxsc"))]
+#[cfg_attr(not(target_os = "macos"), unsafe(link_section = ".pgrxsc"))]
+pub static PGRX_SCHEMA: [u8; {len}] = {sentinel:?};
+
+const fn str_eq(a: &str, b: &str) -> bool {{
+    let (a, b) = (a.as_bytes(), b.as_bytes());
+    if a.len() != b.len() {{
+        return false;
+    }}
+    let mut i = 0;
+    while i < a.len() {{
+        if a[i] != b[i] {{
+            return false;
+        }}
+        i += 1;
+    }}
+    true
+}}
+
+const _: () = assert!(
+    str_eq(env!("CARGO_PGRX_EXTVERSION"), env!("EXPECTED_EXTVERSION")),
+    "CARGO_PGRX_EXTVERSION did not match EXPECTED_EXTVERSION",
+);
+"#,
+            len = sentinel.len(),
+        ),
+    )
+    .unwrap();
+
+    let manifest = fixture.path("Cargo.toml");
+    let out_dir = fixture.path("out");
+    for (flag, expected) in
+        [("--assemble-unreleased", "0.26.1"), ("--no-assemble-unreleased", "0.26.0")]
+    {
+        let output = Command::new(CARGO_PGRX)
+            .args([
+                "pgrx",
+                "package",
+                "--debug",
+                "--no-distrib-packages",
+                flag,
+                "--pg-config",
+                pg_config.path().unwrap().to_str().unwrap(),
+                "--manifest-path",
+                manifest.to_str().unwrap(),
+                "--out-dir",
+                out_dir.to_str().unwrap(),
+            ])
+            .env("CARGO_PGRX_EXTVERSION", "9.9.9")
+            .env("EXPECTED_EXTVERSION", expected)
+            .output()
+            .expect("failed to spawn cargo-pgrx");
+        assert!(
+            output.status.success(),
+            "package ({flag}) failed:\nstdout:\n{}\nstderr:\n{}",
+            String::from_utf8_lossy(&output.stdout),
+            String::from_utf8_lossy(&output.stderr),
+        );
+    }
+}

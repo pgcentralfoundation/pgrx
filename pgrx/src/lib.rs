@@ -228,6 +228,22 @@ const _: () = {
     );
 };
 
+/// The extension schema version (`default_version` in `.control`) that this library was built for.
+///
+/// Installing commands (`cargo pgrx install`, `run`, `test`, `regress`, `bench`, and `package`) set
+/// `CARGO_PGRX_EXTVERSION` to the installed `default_version`, including any ephemeral version
+/// assembled from unreleased SQL migration fragments. Builds run directly with `cargo` fall back to
+/// `env!("CARGO_PKG_VERSION")`.
+#[macro_export]
+macro_rules! extension_version {
+    () => {
+        match ::core::option_env!("CARGO_PGRX_EXTVERSION") {
+            ::core::option::Option::Some(version) => version,
+            ::core::option::Option::None => ::core::env!("CARGO_PKG_VERSION"),
+        }
+    };
+}
+
 /// A macro for marking a library compatible with [`pgrx`][crate].
 ///
 /// <div class="warning">

@@ -179,11 +179,20 @@ pub(crate) fn install_extension(
         unreleased_mode,
         cargo_flags,
     )?;
+    let effective_version =
+        unreleased_fragments.effective_version(package_manifest_path, cargo_flags)?;
 
     let build_manifest_path =
         manifest_path_for_build(user_manifest_path, user_package, package_manifest_path);
-    let build_command_output =
-        build_extension(build_manifest_path, user_package, profile, features, target, cargo_flags)?;
+    let build_command_output = build_extension(
+        build_manifest_path,
+        user_package,
+        profile,
+        features,
+        target,
+        EffectiveExtVersion(&effective_version),
+        cargo_flags,
+    )?;
     let build_command_bytes = build_command_output.stdout;
     let build_command_reader = BufReader::new(build_command_bytes.as_slice());
     let build_command_stream = CargoMessage::parse_stream(build_command_reader);
@@ -365,17 +374,25 @@ fn copy_file(
 
     Ok(())
 }
+
+/// The `default_version` that the installation will write to `.control`, exposed to the extension
+/// build as `CARGO_PGRX_EXTVERSION`.
+#[derive(Debug, Clone, Copy)]
+pub(crate) struct EffectiveExtVersion<'a>(pub(crate) &'a str);
+
 pub(crate) fn build_extension(
     manifest_path: Option<&Path>,
     user_package: Option<&str>,
     profile: &CargoProfile,
     features: &clap_cargo::Features,
     target: Option<&str>,
+    extversion: EffectiveExtVersion<'_>,
     cargo_flags: &[String],
 ) -> eyre::Result<std::process::Output> {
     let flags = std::env::var("PGRX_BUILD_FLAGS").unwrap_or_default();
 
     let mut command = crate::cargo::cargo();
+    command.env("CARGO_PGRX_EXTVERSION", extversion.0);
     command.arg("rustc");
     command.arg("--lib");
 
