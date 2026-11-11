@@ -17,7 +17,7 @@ pub use crate::pg_sys;
 pub use crate::pg_module_magic;
 
 // Necessary local macros:
-pub use crate::{default, extension_version, impl_sql_translatable, name};
+pub use crate::{default, extversion, impl_sql_translatable, name, pkgversion};
 
 // Needed for variant RETURNS
 pub use crate::iter::{SetOfIterator, TableIterator};
@@ -93,8 +93,14 @@ mod tests {
     }
 
     #[test]
-    fn extension_version_is_const_and_falls_back_to_pkg_version() {
-        const VERSION: &str = extension_version!();
-        assert_eq!(VERSION, option_env!("CARGO_PGRX_EXTVERSION").unwrap_or(env!("CARGO_PKG_VERSION")));
+    fn extversion_and_pkgversion_are_const_and_chainable() {
+        const EXTVERSION: Option<&str> = extversion!();
+        const PKGVERSION: Option<&str> = pkgversion!();
+        assert_eq!(EXTVERSION, option_env!("CARGO_PGRX_EXTVERSION"));
+        assert_eq!(PKGVERSION, Some(env!("CARGO_PKG_VERSION")));
+        assert_eq!(
+            EXTVERSION.or(PKGVERSION),
+            option_env!("CARGO_PGRX_EXTVERSION").or(Some(env!("CARGO_PKG_VERSION"))),
+        );
     }
 }

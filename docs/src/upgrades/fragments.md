@@ -148,9 +148,11 @@ A database created from a development install also reports the temporary version
 `pg_extension.extversion` is `1.1.1`, not the version in `Cargo.toml`, and that includes the
 databases `cargo pgrx test` creates. Code that compares `extversion` with
 `env!("CARGO_PKG_VERSION")`, for example to wait until `ALTER EXTENSION ... UPDATE` has run, sees a
-mismatch in every one of them. Compare `extversion` with `pgrx::extension_version!()` instead:
-`cargo pgrx` sets `CARGO_PGRX_EXTVERSION` while building the extension so the macro expands to the
-temporary version in a development install and to the released version in a released one.
+mismatch in every one of them. Compare `extversion` with `pgrx::extversion!()` instead: `cargo pgrx`
+sets `CARGO_PGRX_EXTVERSION` while building the extension so the macro expands to `Some` with the
+temporary version in a development install and the released version in a released one. Builds run
+directly with `cargo` get `None`, and can chain `.or(pgrx::pkgversion!())` to fall back to the crate
+version.
 
 ### Leaving Fragments Out
 
