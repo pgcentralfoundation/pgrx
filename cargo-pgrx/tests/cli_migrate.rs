@@ -54,6 +54,7 @@ fn migrate_check_help_succeeds() {
     let (success, stdout, stderr) = run(&["pgrx", "migrate", "check", "--help"]);
     assert!(success, "expected check --help to succeed, stderr was: {stderr}");
     assert!(stdout.contains("--base"), "expected --base in help");
+    assert!(stdout.contains("--upstream"), "expected --upstream in help");
     assert!(stdout.contains("--deny-mixed-objects"), "expected --deny-mixed-objects in help");
     assert!(stdout.contains("--format"), "expected --format in help");
 }
@@ -138,12 +139,16 @@ impl Fixture {
     }
 
     fn sql(&self, name: &str, sql: &str) -> &Self {
-        fs::write(self.path("sql").join(name), sql).unwrap();
+        let dir = self.path("sql");
+        fs::create_dir_all(&dir).unwrap();
+        fs::write(dir.join(name), sql).unwrap();
         self
     }
 
     fn fragment(&self, name: &str, sql: &str) -> &Self {
-        fs::write(self.path("sql/unreleased").join(name), sql).unwrap();
+        let dir = self.path("sql/unreleased");
+        fs::create_dir_all(&dir).unwrap();
+        fs::write(dir.join(name), sql).unwrap();
         self
     }
 
@@ -445,7 +450,14 @@ fn migrate_cli_check_formats_and_failures() {
 
 fn git(dir: &Path, args: &[&str]) {
     let output = Command::new("git")
-        .args(["-c", "user.name=test", "-c", "user.email=test@example.com"])
+        .args([
+            "-c",
+            "user.name=test",
+            "-c",
+            "user.email=test@example.com",
+            "-c",
+            "commit.gpgsign=false",
+        ])
         .args(args)
         .current_dir(dir)
         .output()
@@ -594,4 +606,107 @@ const _: () = assert!(
             String::from_utf8_lossy(&output.stderr),
         );
     }
+}
+
+#[test]
+fn check_enforces_shipped_deps_upstream_identity_and_released_immutability() {
+    let fixture = Fixture::new("0.26.0");
+    let repo = fixture.crate_dir.parent().unwrap().parent().unwrap();
+
+    // Baseline commit (`branch_point`): `100.shipped.sql` already shipped in `0.24.0--0.25.0`.
+    fixture.sql(
+        "my_ext--0.24.0--0.25.0.sql",
+        "\\echo Use \"ALTER EXTENSION my_ext UPDATE TO '0.25.0'\" to load this file. \\quit\n\n-- Fragment: 100.shipped.sql\nCREATE TABLE shipped_t (id int);\n",
+    );
+    git(repo, &["init", "-q", "-b", "main"]);
+    git(repo, &["add", "."]);
+    git(repo, &["commit", "-q", "-m", "branch_point"]);
+    git(repo, &["branch", "0.25.x"]);
+
+    // Unresolved `depends-on` is rejected by `check`, `info`, and `assemble`.
+    fixture.fragment("199.typo.sql", "-- depends-on: 999\nSELECT 1;\n");
+    let (success, stdout, _) = fixture.migrate(&["check", "--format", "json"]);
+    assert!(!success, "unresolved depends-on must fail check: {stdout}");
+    let issues: serde_json::Value = serde_json::from_str(&stdout).unwrap();
+    assert_eq!(issues[0]["rule"], "unresolved_dependency");
+    for cmd in [&["info"][..], &["assemble", "--dry-run"]] {
+        let (success, _, stderr) = fixture.migrate(cmd);
+        assert!(!success, "{cmd:?} must reject unresolved depends-on");
+        assert!(stderr.contains("depends on `999`"), "{stderr}");
+    }
+    fs::remove_file(fixture.path("sql/unreleased/199.typo.sql")).unwrap();
+
+    // Dependencies satisfied by `sql/` (`100`) or `sql/unreleased/` (`101`) pass on `main`.
+    fixture
+        .fragment("101.from_shipped.sql", "-- depends-on: 100\nCREATE TABLE a (id int);\n")
+        .fragment("102.needs_101.sql", "-- depends-on: 101\nALTER TABLE a ADD COLUMN x int;\n");
+    let (success, stdout, stderr) = fixture.migrate(&["check", "--deny-mixed-objects"]);
+    assert!(success, "valid shipped + unreleased deps should pass: {stderr}\n{stdout}");
+    git(repo, &["add", "."]);
+    git(repo, &["commit", "-q", "-m", "main_fragments"]);
+
+    // On `0.25.x`, backporting `101` identically passes `--upstream main`, while backporting `102`
+    // without `101` fails `unresolved_dependency`, and diverging/renaming fails `upstream_divergence`.
+    git(repo, &["checkout", "-q", "0.25.x"]);
+    fixture.fragment("101.from_shipped.sql", "-- depends-on: 100\nCREATE TABLE a (id int);\n");
+    git(repo, &["add", "."]);
+    git(repo, &["commit", "-q", "-m", "backport_101"]);
+    let (success, stdout, stderr) = fixture.migrate(&[
+        "check",
+        "--base",
+        "HEAD~1",
+        "--upstream",
+        "main",
+        "--deny-mixed-objects",
+    ]);
+    assert!(success, "clean backport should pass: {stderr}\n{stdout}");
+
+    let (success, stdout, _) = fixture.migrate(&["check", "--upstream", "no-such-ref"]);
+    assert!(!success, "bad upstream ref must fail: {stdout}");
+
+    fs::remove_file(fixture.path("sql/unreleased/101.from_shipped.sql")).unwrap();
+    fixture
+        .fragment("102.needs_101.sql", "-- depends-on: 101\nALTER TABLE a ADD COLUMN x int;\n")
+        .fragment("101.from_shipped.sql", "-- depends-on: 100\nCREATE TABLE a (id bigint);\n")
+        .fragment("300.not_on_main.sql", "SELECT 1;\n");
+    fs::remove_file(fixture.path("sql/unreleased/101.from_shipped.sql")).unwrap();
+    // First check missing prerequisite `101` + non-existent `300.not_on_main.sql`, plus edited `102`:
+    fixture.fragment("102.needs_101.sql", "-- depends-on: 101\nSELECT 'diverged';\n");
+    let (success, stdout, _) =
+        fixture.migrate(&["check", "--upstream", "main", "--format", "json"]);
+    assert!(!success, "{stdout}");
+    let issues: serde_json::Value = serde_json::from_str(&stdout).unwrap();
+    let rules: Vec<&str> =
+        issues.as_array().unwrap().iter().map(|issue| issue["rule"].as_str().unwrap()).collect();
+    assert_eq!(rules, ["upstream_divergence", "upstream_divergence", "unresolved_dependency"]);
+
+    // Restore clean fragments on `0.25.x` and verify released-script immutability under `--base`:
+    // adding a new script (`A`) is allowed, while modifying (`M`) or deleting (`D`) an existing one fails.
+    fs::remove_file(fixture.path("sql/unreleased/102.needs_101.sql")).unwrap();
+    fs::remove_file(fixture.path("sql/unreleased/300.not_on_main.sql")).unwrap();
+    git(repo, &["checkout", "-q", "--", "."]);
+
+    fixture.sql("my_ext--0.25.0--0.25.1.sql", "-- newly assembled patch release\n");
+    git(repo, &["add", "."]);
+    git(repo, &["commit", "-q", "-m", "add_patch_script"]);
+    let (success, stdout, stderr) = fixture.migrate(&["check", "--base", "HEAD~1"]);
+    assert!(success, "adding a new upgrade script must pass: {stderr}\n{stdout}");
+
+    fixture.sql("my_ext--0.24.0--0.25.0.sql", "-- tampered\n");
+    git(repo, &["add", "."]);
+    git(repo, &["commit", "-q", "-m", "modify_released_script"]);
+    let (success, stdout, _) = fixture.migrate(&["check", "--base", "HEAD~1", "--format", "json"]);
+    assert!(!success, "modifying an existing upgrade script must fail: {stdout}");
+    let issues: serde_json::Value = serde_json::from_str(&stdout).unwrap();
+    assert_eq!(issues[0]["rule"], "released_script_modified");
+    assert!(issues[0]["message"].as_str().unwrap().contains("modified"));
+
+    fs::remove_file(fixture.path("sql/my_ext--0.24.0--0.25.0.sql")).unwrap();
+    git(repo, &["add", "-A"]);
+    git(repo, &["commit", "-q", "-m", "delete_released_script"]);
+    let (success, stdout, _) = fixture.migrate(&["check", "--base", "HEAD~1", "--format", "json"]);
+    assert!(!success, "deleting an existing upgrade script must fail: {stdout}");
+    let issues: serde_json::Value = serde_json::from_str(&stdout).unwrap();
+    assert_eq!(issues[0]["rule"], "released_script_modified");
+    assert!(issues[0]["message"].as_str().unwrap().contains("deleted"));
 }

@@ -5,15 +5,56 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use super::MigrateContext;
 use super::fragment::{
-    MigrationFragment, load_fragments, prerequisites, topological_sort_fragments,
+    FragmentId, MigrationFragment, ShippedFragments, load_fragments, prerequisites,
+    topological_sort_fragments, unresolved_dependencies,
 };
 use super::sql::{ObjectRef, Verb, touched_objects};
+use super::version::{existing_upgrade_scripts, upgrade_script_target};
 use crate::CommandExecute;
 use eyre::{Context, eyre};
 use owo_colors::OwoColorize;
 use std::collections::{BTreeMap, BTreeSet};
+use std::fmt;
+use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
+use std::str::FromStr;
+
+/// Git revision used as the comparison base for `--base`.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) struct BaseRef(pub(crate) String);
+
+impl FromStr for BaseRef {
+    type Err = std::convert::Infallible;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Ok(Self(s.to_string()))
+    }
+}
+
+impl fmt::Display for BaseRef {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(&self.0)
+    }
+}
+
+/// Git revision used for release-branch fragment identity checks via `--upstream`.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) struct UpstreamRef(pub(crate) String);
+
+impl FromStr for UpstreamRef {
+    type Err = std::convert::Infallible;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Ok(Self(s.to_string()))
+    }
+}
+
+impl fmt::Display for UpstreamRef {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(&self.0)
+    }
+}
 
 #[derive(clap::Args, Debug)]
 #[clap(author)]
@@ -26,11 +67,15 @@ pub(crate) struct Check {
     #[clap(long, value_parser)]
     pub(crate) manifest_path: Option<PathBuf>,
 
-    /// Only lint fragments added or modified relative to `<REF>` (e.g. `main` or `HEAD~1`)
-    #[clap(long = "base", alias = "diff")]
-    pub(crate) base: Option<String>,
+    /// Scope fragment lints to changes since `<REF>`, and reject edits or deletions of upgrade scripts in `sql/`
+    #[clap(long = "base", alias = "diff", value_name = "REF")]
+    pub(crate) base: Option<BaseRef>,
 
-    /// Error if any fragment touches both existing (released) database objects and unreleased objects
+    /// Require every unreleased fragment to exist byte-for-byte identically on `<REF>` (e.g. `origin/main`)
+    #[clap(long, value_name = "REF")]
+    pub(crate) upstream: Option<UpstreamRef>,
+
+    /// Error if any fragment touches both released and unreleased objects, or unreleased objects from multiple prerequisite fragments
     #[clap(long)]
     pub(crate) deny_mixed_objects: bool,
 
@@ -51,8 +96,11 @@ pub(crate) enum LintFormat {
 #[serde(rename_all = "snake_case")]
 enum LintRule {
     DagCycle,
+    UnresolvedDependency,
     UndeclaredDependency,
     MixedObjects,
+    UpstreamDivergence,
+    ReleasedScriptModified,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, serde::Serialize)]
@@ -63,13 +111,29 @@ struct DiagnosticIssue {
     message: String,
 }
 
-/// Names the fragments in `unreleased_dir` added or modified since they diverged from `base_ref`.
-fn changed_fragment_files(unreleased_dir: &Path, base_ref: &str) -> eyre::Result<BTreeSet<String>> {
+fn verify_git_ref(dir: &Path, spec: &str) -> eyre::Result<()> {
+    let out = Command::new("git")
+        .args(["rev-parse", "--verify", "--quiet", spec])
+        .current_dir(dir)
+        .output()
+        .wrap_err("failed to invoke git rev-parse")?;
+    if !out.status.success() {
+        return Err(eyre!("git ref `{spec}` could not be resolved"));
+    }
+    Ok(())
+}
+
+/// Names the fragments in `unreleased_dir` added or modified since they diverged from `base`.
+fn changed_fragment_files(unreleased_dir: &Path, base: &BaseRef) -> eyre::Result<BTreeSet<String>> {
+    if !unreleased_dir.exists() {
+        return Ok(BTreeSet::new());
+    }
+
     // `--relative` scopes the diff to the current directory and reports paths relative to it, which
     // holds however deep inside the repository the crate is.
     let diff_out = Command::new("git")
         .args(["diff", "--relative", "--name-only", "--no-renames", "--diff-filter=AM", "-z"])
-        .arg(format!("{base_ref}...HEAD"))
+        .arg(format!("{base}...HEAD"))
         .current_dir(unreleased_dir)
         .output()
         .wrap_err("failed to invoke git diff")?;
@@ -85,9 +149,129 @@ fn changed_fragment_files(unreleased_dir: &Path, base_ref: &str) -> eyre::Result
         .collect())
 }
 
+/// Reports any `<extname>--<prev>--<target>.sql` upgrade scripts modified or deleted since `base`.
+fn modified_released_scripts(
+    crate_dir: &Path,
+    extname: &str,
+    base: &BaseRef,
+) -> eyre::Result<Vec<DiagnosticIssue>> {
+    let diff_out = Command::new("git")
+        .args([
+            "diff",
+            "--relative",
+            "--name-status",
+            "--no-renames",
+            "--diff-filter=MD",
+            "-z",
+            &format!("{base}...HEAD"),
+            "--",
+            "sql",
+        ])
+        .current_dir(crate_dir)
+        .output()
+        .wrap_err("failed to invoke git diff for sql/")?;
+
+    if !diff_out.status.success() {
+        return Err(eyre!("git diff failed: {}", String::from_utf8_lossy(&diff_out.stderr)));
+    }
+
+    let text = String::from_utf8_lossy(&diff_out.stdout);
+    let mut parts = text.split('\0').filter(|part| !part.is_empty());
+    let mut issues = Vec::new();
+    while let (Some(status), Some(rel_path)) = (parts.next(), parts.next()) {
+        let Some(filename) = rel_path.strip_prefix("sql/") else {
+            continue;
+        };
+        if filename.contains('/') {
+            continue;
+        }
+        let Some(target) = upgrade_script_target(filename, extname) else {
+            continue;
+        };
+        let action = if status == "D" { "deleted" } else { "modified" };
+        issues.push(DiagnosticIssue {
+            file: crate_dir.join(rel_path),
+            filename: filename.to_string(),
+            rule: LintRule::ReleasedScriptModified,
+            message: format!(
+                "Upgrade script `{filename}` (targeting `{target}`) was {action}; shipped upgrade scripts in `sql/` are immutable. Add new schema changes as a migration fragment instead."
+            ),
+        });
+    }
+    Ok(issues)
+}
+
+/// Verifies that every fragment in `fragments` exists at the same repository-relative path on
+/// `upstream` with identical bytes.
+fn upstream_divergences(
+    unreleased_dir: &Path,
+    fragments: &[MigrationFragment],
+    upstream: &UpstreamRef,
+) -> eyre::Result<Vec<DiagnosticIssue>> {
+    if fragments.is_empty() {
+        return Ok(Vec::new());
+    }
+
+    let prefix_out = Command::new("git")
+        .args(["rev-parse", "--show-prefix"])
+        .current_dir(unreleased_dir)
+        .output()
+        .wrap_err("failed to determine repository-relative path for unreleased fragments")?;
+    if !prefix_out.status.success() {
+        return Err(eyre!(
+            "git rev-parse --show-prefix failed: {}",
+            String::from_utf8_lossy(&prefix_out.stderr)
+        ));
+    }
+    let prefix = String::from_utf8_lossy(&prefix_out.stdout);
+    let prefix = prefix.trim();
+
+    let mut ordered: Vec<&MigrationFragment> = fragments.iter().collect();
+    ordered.sort_by(|a, b| a.filename.cmp(&b.filename));
+
+    let mut issues = Vec::new();
+    for fragment in ordered {
+        let repo_path = format!("{prefix}{}", fragment.filename);
+        let spec = format!("{upstream}:{repo_path}");
+        let blob_out = Command::new("git")
+            .args(["cat-file", "blob", &spec])
+            .current_dir(unreleased_dir)
+            .output()
+            .wrap_err_with(|| format!("failed to read `{spec}` from git"))?;
+
+        if !blob_out.status.success() {
+            issues.push(DiagnosticIssue {
+                file: fragment.path.clone(),
+                filename: fragment.filename.clone(),
+                rule: LintRule::UpstreamDivergence,
+                message: format!(
+                    "Fragment does not exist on `{upstream}` (`{repo_path}`); fragments on a release branch must keep the same filename as on `{upstream}`"
+                ),
+            });
+            continue;
+        }
+
+        let local_bytes = fs::read(&fragment.path)
+            .wrap_err_with(|| format!("failed to read `{}`", fragment.path.display()))?;
+        if blob_out.stdout != local_bytes {
+            issues.push(DiagnosticIssue {
+                file: fragment.path.clone(),
+                filename: fragment.filename.clone(),
+                rule: LintRule::UpstreamDivergence,
+                message: format!(
+                    "Fragment differs from `{upstream}` (`{repo_path}`); fragments sharing a filename with `{upstream}` must be byte-for-byte identical"
+                ),
+            });
+        }
+    }
+
+    Ok(issues)
+}
+
 struct LintConfig {
     deny_mixed_objects: bool,
-    base_ref: Option<String>,
+    base_ref: Option<BaseRef>,
+    upstream_ref: Option<UpstreamRef>,
 }
 
 /// For each fragment of a topologically sorted list, every fragment that is guaranteed to run
@@ -104,29 +288,80 @@ fn transitive_prerequisites(sorted: &[MigrationFragment]) -> Vec<BTreeSet<usize>
     transitive
 }
 
-fn run_lint_checks(
+fn lint_fragments(
     unreleased_dir: &Path,
-    config: &LintConfig,
-) -> eyre::Result<Vec<DiagnosticIssue>> {
-    let fragments = match topological_sort_fragments(load_fragments(unreleased_dir)?) {
-        Ok(fragments) => fragments,
+    raw_fragments: Vec<MigrationFragment>,
+    shipped: &ShippedFragments,
+    changed: Option<&BTreeSet<String>>,
+    deny_mixed_objects: bool,
+) -> Vec<DiagnosticIssue> {
+    let mut issues = Vec::new();
+    for (fragment, dep) in unresolved_dependencies(&raw_fragments, shipped) {
+        issues.push(DiagnosticIssue {
+            file: fragment.path.clone(),
+            filename: fragment.filename.clone(),
+            rule: LintRule::UnresolvedDependency,
+            message: format!(
+                "Fragment declares '-- depends-on: {dep}', which was not found in unreleased fragments or assembled scripts in `sql/`"
+            ),
+        });
+    }
+
+    match topological_sort_fragments(raw_fragments) {
+        Ok(fragments) => {
+            issues.extend(lint_sorted(&fragments, changed, deny_mixed_objects));
+        }
         Err(err) => {
-            return Ok(vec![DiagnosticIssue {
+            issues.push(DiagnosticIssue {
                 file: unreleased_dir.to_path_buf(),
                 filename: "unreleased".to_string(),
                 rule: LintRule::DagCycle,
                 message: err.to_string(),
-            }]);
+            });
         }
+    }
+
+    issues
+}
+
+fn run_lint_checks(
+    context: &MigrateContext,
+    config: &LintConfig,
+) -> eyre::Result<Vec<DiagnosticIssue>> {
+    let crate_dir = context.manifest_path.parent().unwrap_or_else(|| Path::new("."));
+
+    let mut issues = Vec::new();
+    let changed = if let Some(ref base) = config.base_ref {
+        verify_git_ref(crate_dir, &format!("{base}^{{commit}}"))?;
+        issues.extend(modified_released_scripts(crate_dir, &context.extname, base)?);
+        Some(changed_fragment_files(&context.unreleased_dir, base)?)
+    } else {
+        None
     };
 
-    let changed = config
-        .base_ref
-        .as_deref()
-        .map(|base_ref| changed_fragment_files(unreleased_dir, base_ref))
-        .transpose()?;
+    if let Some(ref upstream) = config.upstream_ref {
+        verify_git_ref(crate_dir, &format!("{upstream}^{{tree}}"))?;
+    }
 
-    Ok(lint_sorted(&fragments, changed.as_ref(), config.deny_mixed_objects))
+    let scripts = existing_upgrade_scripts(&context.sql_dir, &context.extname)?;
+    let shipped = ShippedFragments::from_scripts(
+        scripts.iter().filter(|script| !script.target.is_prerelease()),
+    )?;
+    let raw_fragments = load_fragments(&context.unreleased_dir)?;
+
+    if let Some(ref upstream) = config.upstream_ref {
+        issues.extend(upstream_divergences(&context.unreleased_dir, &raw_fragments, upstream)?);
+    }
+
+    issues.extend(lint_fragments(
+        &context.unreleased_dir,
+        raw_fragments,
+        &shipped,
+        changed.as_ref(),
+        config.deny_mixed_objects,
+    ));
+
+    Ok(issues)
 }
 
 /// Lints fragments in assembly order. With `changed`, an issue is reported only if it involves a
@@ -139,9 +374,9 @@ fn lint_sorted(
     let touched: Vec<Vec<ObjectRef>> =
         fragments.iter().map(|fragment| touched_objects(&fragment.sql_content)).collect();
 
-    // Every fragment that creates each object, wherever it falls in the order, so that a fragment
-    // touching an object a later fragment creates is caught as surely as one touching an earlier
-    // fragment's.
+    // Every fragment that creates or replaces each object, wherever it falls in the order, so that
+    // a fragment touching an object a later fragment creates is caught as surely as one touching an
+    // earlier fragment's.
     let mut creators: BTreeMap<(&str, &str), Vec<(&ObjectRef, usize)>> = BTreeMap::new();
     for (idx, objects) in touched.iter().enumerate() {
         for object in objects.iter().filter(|o| matches!(o.verb, Verb::Create | Verb::Replace)) {
@@ -155,7 +390,8 @@ fn lint_sorted(
     let mut issues = Vec::new();
 
     for (idx, fragment) in fragments.iter().enumerate() {
-        let mut owners = BTreeSet::new();
+        let mut ordering_owners = BTreeSet::new();
+        let mut unreleased_owners: BTreeSet<&FragmentId> = BTreeSet::new();
         let mut released_objects = Vec::new();
 
         for object in &touched[idx] {
@@ -168,12 +404,16 @@ fn lint_sorted(
                 .collect();
 
             // Only a plain CREATE proves an object is new. CREATE OR REPLACE may be changing
-            // something that already shipped.
-            if object.verb != Verb::Create && !same.iter().any(|(c, _)| c.verb == Verb::Create) {
+            // something that already shipped, and a DROP before a later CREATE drops the released
+            // object before recreating it.
+            let created_in_unreleased = same.iter().any(|&(c, owner)| {
+                c.verb == Verb::Create && (owner <= idx || object.verb == Verb::Alter)
+            });
+            if object.verb != Verb::Create && !created_in_unreleased {
                 released_objects.push(object.to_string());
             }
 
-            for &(_, owner) in &same {
+            for &(creator, owner) in &same {
                 if owner == idx || fragments[owner].id == fragment.id {
                     continue;
                 }
@@ -181,12 +421,15 @@ fn lint_sorted(
                 // which needs the object to exist. A DROP before a later CREATE is how a released
                 // object gets recreated, and two creations are reported from the later side.
                 if owner < idx || object.verb == Verb::Alter {
-                    owners.insert(owner);
+                    ordering_owners.insert(owner);
+                    if creator.verb == Verb::Create {
+                        unreleased_owners.insert(&fragments[owner].id);
+                    }
                 }
             }
         }
 
-        for &owner in &owners {
+        for &owner in &ordering_owners {
             if guaranteed_before[idx].contains(&owner) || !(is_changed(idx) || is_changed(owner)) {
                 continue;
             }
@@ -201,25 +444,29 @@ fn lint_sorted(
             });
         }
 
-        if deny_mixed_objects
-            && is_changed(idx)
-            && !released_objects.is_empty()
-            && !owners.is_empty()
-        {
-            let owners_str = owners
-                .iter()
-                .map(|&owner| fragments[owner].id.to_string())
-                .collect::<Vec<_>>()
-                .join(", ");
-            issues.push(DiagnosticIssue {
-                file: fragment.path.clone(),
-                filename: fragment.filename.clone(),
-                rule: LintRule::MixedObjects,
-                message: format!(
-                    "Fragment mixes modifications to already-released objects ({}) with unreleased objects from fragment(s) [{owners_str}]",
-                    released_objects.join(", ")
-                ),
-            });
+        if deny_mixed_objects && is_changed(idx) && !unreleased_owners.is_empty() {
+            let owners_str =
+                unreleased_owners.iter().map(|id| id.to_string()).collect::<Vec<_>>().join(", ");
+            if !released_objects.is_empty() {
+                issues.push(DiagnosticIssue {
+                    file: fragment.path.clone(),
+                    filename: fragment.filename.clone(),
+                    rule: LintRule::MixedObjects,
+                    message: format!(
+                        "Fragment mixes modifications to already-released objects ({}) with unreleased objects from fragment(s) [{owners_str}]",
+                        released_objects.join(", ")
+                    ),
+                });
+            } else if unreleased_owners.len() > 1 {
+                issues.push(DiagnosticIssue {
+                    file: fragment.path.clone(),
+                    filename: fragment.filename.clone(),
+                    rule: LintRule::MixedObjects,
+                    message: format!(
+                        "Fragment touches unreleased objects from multiple prerequisite fragments [{owners_str}]; split into one fragment per prerequisite so each can be backported independently"
+                    ),
+                });
+            }
         }
     }
 
@@ -269,10 +516,13 @@ impl CommandExecute for Check {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
         let context = MigrateContext::load(self.package.as_deref(), self.manifest_path.as_deref())?;
-        let config =
-            LintConfig { deny_mixed_objects: self.deny_mixed_objects, base_ref: self.base };
+        let config = LintConfig {
+            deny_mixed_objects: self.deny_mixed_objects,
+            base_ref: self.base,
+            upstream_ref: self.upstream,
+        };
 
-        let issues = run_lint_checks(&context.unreleased_dir, &config)?;
+        let issues = run_lint_checks(&context, &config)?;
         render_lint_diagnostics(&issues, self.format)?;
 
         Ok(())
@@ -283,14 +533,25 @@ impl CommandExecute for Check {
 mod tests {
     use super::*;
 
-    const NO_FLAGS: LintConfig = LintConfig { deny_mixed_objects: false, base_ref: None };
-
-    fn lint(files: &[(&str, &str)], config: &LintConfig) -> Vec<DiagnosticIssue> {
+    fn lint_with_shipped(
+        files: &[(&str, &str)],
+        shipped_sql: &str,
+        deny_mixed_objects: bool,
+    ) -> Vec<DiagnosticIssue> {
         let temp = tempfile::tempdir().unwrap();
         for (name, sql) in files {
-            std::fs::write(temp.path().join(name), sql).unwrap();
+            fs::write(temp.path().join(name), sql).unwrap();
         }
-        run_lint_checks(temp.path(), config).unwrap()
+        let mut shipped = ShippedFragments::default();
+        if !shipped_sql.is_empty() {
+            shipped.record_sql(shipped_sql, Path::new("sql/my_ext--0.25.0--0.26.0.sql"));
+        }
+        let raw_fragments = load_fragments(temp.path()).unwrap();
+        lint_fragments(temp.path(), raw_fragments, &shipped, None, deny_mixed_objects)
+    }
+
+    fn lint(files: &[(&str, &str)], deny_mixed_objects: bool) -> Vec<DiagnosticIssue> {
+        lint_with_shipped(files, "", deny_mixed_objects)
     }
 
     fn assert_undeclared(issues: &[DiagnosticIssue], filename: &str, owner: &str) {
@@ -311,7 +572,7 @@ mod tests {
                 ("101.create.sql", "CREATE TABLE t1 (id int);"),
                 ("102.modify.sql", "ALTER TABLE t1 ADD COLUMN name text;"),
             ],
-            &NO_FLAGS,
+            false,
         );
         assert_undeclared(&issues, "102.modify.sql", "101");
     }
@@ -323,7 +584,7 @@ mod tests {
                 ("101.create.sql", "CREATE TABLE t1 (id int);"),
                 ("102.modify.sql", "-- depends-on: 101\nALTER TABLE t1 ADD COLUMN name text;"),
             ],
-            &NO_FLAGS,
+            false,
         );
         assert!(issues.is_empty(), "{issues:?}");
     }
@@ -336,7 +597,7 @@ mod tests {
             ("CREATE UNIQUE INDEX a ON t1 (x);", "CREATE UNIQUE INDEX b ON t2 (y);"),
             ("CREATE FUNCTION f(int) RETURNS int;", "CREATE FUNCTION f(text) RETURNS int;"),
         ] {
-            let issues = lint(&[("101.a.sql", a), ("102.b.sql", b)], &NO_FLAGS);
+            let issues = lint(&[("101.a.sql", a), ("102.b.sql", b)], false);
             assert!(issues.is_empty(), "{a} / {b}: {issues:?}");
         }
     }
@@ -349,7 +610,7 @@ mod tests {
                 ("101.a.sql", &format!("CREATE FUNCTION g() RETURNS void {body}")),
                 ("102.b.sql", &format!("CREATE FUNCTION h() RETURNS void {body}")),
             ],
-            &NO_FLAGS,
+            false,
         );
         assert!(issues.is_empty(), "{issues:?}");
     }
@@ -366,31 +627,45 @@ mod tests {
             ("CREATE FUNCTION f(int) RETURNS int;", "DROP FUNCTION f;"),
             ("COMMENT ON TABLE t IS 'a -- b';\nCREATE TABLE u (id int);", "DROP TABLE u;"),
         ] {
-            let issues = lint(&[("101.a.sql", create), ("102.b.sql", touch)], &NO_FLAGS);
+            let issues = lint(&[("101.a.sql", create), ("102.b.sql", touch)], false);
             assert_undeclared(&issues, "102.b.sql", "101");
         }
     }
 
     #[test]
     fn a_fragment_needing_a_later_one_is_caught() {
-        // 98 sorts before 102, so without a declaration the index would be created first.
+        // 98 sorts before 102, so without a declaration (or with a declaration naming an already-
+        // shipped fragment 120 instead of 102) the index would be created first.
         for header in ["", "-- depends-on: 120\n"] {
-            let issues = lint(
+            let issues = lint_with_shipped(
                 &[
                     ("98.index.sql", &format!("{header}CREATE INDEX i ON greeting_log (x);")),
                     ("102.add_greeting_log.sql", "CREATE TABLE greeting_log (x int);"),
                 ],
-                &NO_FLAGS,
+                "-- Fragment: 120.shipped.sql\n",
+                false,
             );
             assert_undeclared(&issues, "98.index.sql", "102");
         }
+
+        // If 120 never shipped either, both the unresolved `depends-on` and the missing 102 edge
+        // are reported.
+        let issues = lint(
+            &[
+                ("98.index.sql", "-- depends-on: 120\nCREATE INDEX i ON greeting_log (x);"),
+                ("102.add_greeting_log.sql", "CREATE TABLE greeting_log (x int);"),
+            ],
+            false,
+        );
+        let rules: Vec<_> = issues.iter().map(|i| &i.rule).collect();
+        assert_eq!(rules, [&LintRule::UnresolvedDependency, &LintRule::UndeclaredDependency]);
 
         let issues = lint(
             &[
                 ("98.index.sql", "-- depends-on: 102\nCREATE INDEX i ON greeting_log (x);"),
                 ("102.add_greeting_log.sql", "CREATE TABLE greeting_log (x int);"),
             ],
-            &NO_FLAGS,
+            false,
         );
         assert!(issues.is_empty(), "{issues:?}");
     }
@@ -398,7 +673,7 @@ mod tests {
     fn sorted(files: &[(&str, &str)]) -> Vec<MigrationFragment> {
         let temp = tempfile::tempdir().unwrap();
         for (name, sql) in files {
-            std::fs::write(temp.path().join(name), sql).unwrap();
+            fs::write(temp.path().join(name), sql).unwrap();
         }
         topological_sort_fragments(load_fragments(temp.path()).unwrap()).unwrap()
     }
@@ -420,24 +695,6 @@ mod tests {
     }
 
     #[test]
-    fn replacing_a_released_function_counts_as_touching_released_objects() {
-        let config = LintConfig { deny_mixed_objects: true, base_ref: None };
-        let issues = lint(
-            &[
-                ("101.a.sql", "CREATE TABLE unreleased_t (id int);"),
-                (
-                    "102.b.sql",
-                    "-- depends-on: 101\nCREATE OR REPLACE FUNCTION released_fn() RETURNS int;\nALTER TABLE unreleased_t ADD COLUMN x int;",
-                ),
-            ],
-            &config,
-        );
-        assert_eq!(issues.len(), 1, "{issues:?}");
-        assert_eq!(issues[0].rule, LintRule::MixedObjects);
-        assert!(issues[0].message.contains("FUNCTION released_fn()"), "{}", issues[0].message);
-    }
-
-    #[test]
     fn a_transitive_dependency_is_enough() {
         let issues = lint(
             &[
@@ -445,7 +702,7 @@ mod tests {
                 ("102.b.sql", "-- depends-on: 101\nALTER TABLE t ADD COLUMN x int;"),
                 ("103.c.sql", "-- depends-on: 102\nALTER TABLE t ADD COLUMN y int;"),
             ],
-            &NO_FLAGS,
+            false,
         );
         assert!(issues.is_empty(), "{issues:?}");
     }
@@ -458,7 +715,7 @@ mod tests {
                 ("101.a.sql", "DROP FUNCTION f(int);"),
                 ("102.b.sql", "CREATE FUNCTION f(int) RETURNS text;"),
             ],
-            &NO_FLAGS,
+            true,
         );
         assert!(issues.is_empty(), "{issues:?}");
     }
@@ -466,7 +723,7 @@ mod tests {
     #[test]
     fn replacing_the_same_function_twice_needs_an_order() {
         let sql = "CREATE OR REPLACE FUNCTION released() RETURNS int;";
-        let issues = lint(&[("102.b.sql", sql), ("101.a.sql", sql)], &NO_FLAGS);
+        let issues = lint(&[("102.b.sql", sql), ("101.a.sql", sql)], false);
         assert_undeclared(&issues, "102.b.sql", "101");
     }
 
@@ -477,7 +734,7 @@ mod tests {
                 ("101.a.sql", "CREATE TABLE t (id int);"),
                 ("101.b.sql", "ALTER TABLE t ADD COLUMN x int;"),
             ],
-            &NO_FLAGS,
+            false,
         );
         assert!(issues.is_empty(), "{issues:?}");
     }
@@ -486,47 +743,120 @@ mod tests {
     fn reports_cycles() {
         let issues = lint(
             &[("101.a.sql", "-- depends-on: 102\n"), ("102.b.sql", "-- depends-on: 101\n")],
-            &NO_FLAGS,
+            false,
         );
         assert_eq!(issues.len(), 1, "{issues:?}");
         assert_eq!(issues[0].rule, LintRule::DagCycle);
     }
 
     #[test]
-    fn detects_mixed_objects_when_flag_enabled() {
-        let config = LintConfig { deny_mixed_objects: true, base_ref: None };
-        let issues = lint(
-            &[
-                ("101.create.sql", "CREATE TABLE unreleased_table (id int);"),
-                (
-                    "102.mixed.sql",
-                    "-- depends-on: 101\nALTER TABLE unreleased_table ADD COLUMN a int;\nALTER TABLE released_table ADD COLUMN b text;",
-                ),
-            ],
-            &config,
-        );
-        assert_eq!(issues.len(), 1, "{issues:?}");
-        assert_eq!(issues[0].rule, LintRule::MixedObjects);
-        assert!(
-            issues[0]
-                .message
-                .contains("mixes modifications to already-released objects (TABLE released_table)")
-        );
-    }
+    fn deny_mixed_objects_matrix() {
+        struct Case<'a> {
+            name: &'a str,
+            files: &'a [(&'a str, &'a str)],
+            expected_substring: Option<&'a str>,
+        }
 
-    #[test]
-    fn a_fragments_own_objects_are_not_released() {
-        let config = LintConfig { deny_mixed_objects: true, base_ref: None };
-        let issues = lint(
-            &[
-                ("101.create.sql", "CREATE TABLE a (id int);"),
-                (
-                    "102.own.sql",
-                    "-- depends-on: 101\nCREATE TABLE b (id int);\nALTER TABLE b ADD COLUMN x int;\nALTER TABLE a ADD COLUMN y int;",
+        let cases = [
+            Case {
+                name: "mixes released table alter with unreleased table alter",
+                files: &[
+                    ("101.create.sql", "CREATE TABLE unreleased_table (id int);"),
+                    (
+                        "102.mixed.sql",
+                        "-- depends-on: 101\nALTER TABLE unreleased_table ADD COLUMN a int;\nALTER TABLE released_table ADD COLUMN b text;",
+                    ),
+                ],
+                expected_substring: Some(
+                    "mixes modifications to already-released objects (TABLE released_table)",
                 ),
-            ],
-            &config,
-        );
-        assert!(issues.is_empty(), "{issues:?}");
+            },
+            Case {
+                name: "replacing a released function counts as touching released objects",
+                files: &[
+                    ("101.a.sql", "CREATE TABLE unreleased_t (id int);"),
+                    (
+                        "102.b.sql",
+                        "-- depends-on: 101\nCREATE OR REPLACE FUNCTION released_fn() RETURNS int;\nALTER TABLE unreleased_t ADD COLUMN x int;",
+                    ),
+                ],
+                expected_substring: Some("FUNCTION released_fn()"),
+            },
+            Case {
+                name: "touches unreleased objects from multiple prerequisite fragments",
+                files: &[
+                    ("101.a.sql", "CREATE TABLE table_a (id int);"),
+                    ("102.b.sql", "CREATE TABLE table_b (id int);"),
+                    (
+                        "103.both.sql",
+                        "-- depends-on: 101, 102\nALTER TABLE table_a ADD COLUMN x int;\nALTER TABLE table_b ADD COLUMN y int;",
+                    ),
+                ],
+                expected_substring: Some("multiple prerequisite fragments [101, 102]"),
+            },
+            Case {
+                name: "own newly created objects plus a single prerequisite are allowed",
+                files: &[
+                    ("101.create.sql", "CREATE TABLE a (id int);"),
+                    (
+                        "102.own.sql",
+                        "-- depends-on: 101\nCREATE TABLE b (id int);\nALTER TABLE b ADD COLUMN x int;\nALTER TABLE a ADD COLUMN y int;",
+                    ),
+                ],
+                expected_substring: None,
+            },
+            Case {
+                name: "multiple files sharing one PR fragment ID count as one prerequisite",
+                files: &[
+                    ("101.part1.sql", "CREATE TABLE a (id int);"),
+                    ("101.part2.sql", "CREATE TABLE b (id int);"),
+                    (
+                        "102.use_both.sql",
+                        "-- depends-on: 101\nALTER TABLE a ADD COLUMN x int;\nALTER TABLE b ADD COLUMN y int;",
+                    ),
+                ],
+                expected_substring: None,
+            },
+            Case {
+                name: "linear CREATE -> CREATE OR REPLACE -> ALTER on one unreleased function is allowed",
+                files: &[
+                    ("101.create.sql", "CREATE FUNCTION f() RETURNS int;"),
+                    (
+                        "102.replace.sql",
+                        "-- depends-on: 101\nCREATE OR REPLACE FUNCTION f() RETURNS int;",
+                    ),
+                    ("103.alter.sql", "-- depends-on: 102\nALTER FUNCTION f() PARALLEL SAFE;"),
+                ],
+                expected_substring: None,
+            },
+            Case {
+                name: "ordered CREATE OR REPLACE on the same released function is allowed",
+                files: &[
+                    ("101.first.sql", "CREATE OR REPLACE FUNCTION released_fn() RETURNS int;"),
+                    (
+                        "102.second.sql",
+                        "-- depends-on: 101\nCREATE OR REPLACE FUNCTION released_fn() RETURNS int;",
+                    ),
+                ],
+                expected_substring: None,
+            },
+        ];
+
+        for case in cases {
+            let issues = lint(case.files, true);
+            match case.expected_substring {
+                Some(sub) => {
+                    assert_eq!(issues.len(), 1, "{}: {issues:?}", case.name);
+                    assert_eq!(issues[0].rule, LintRule::MixedObjects, "{}", case.name);
+                    assert!(
+                        issues[0].message.contains(sub),
+                        "{}: {}",
+                        case.name,
+                        issues[0].message
+                    );
+                }
+                None => assert!(issues.is_empty(), "{}: {issues:?}", case.name),
+            }
+        }
     }
 }

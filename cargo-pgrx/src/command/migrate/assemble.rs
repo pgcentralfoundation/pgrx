@@ -56,9 +56,6 @@ pub(crate) struct Assemble {
     /// Output migration plan as JSON
     #[clap(long)]
     pub(crate) json: bool,
-
-    #[clap(from_global, action = clap::ArgAction::Count)]
-    pub(crate) verbose: u8,
 }
 
 /// What `--update-control` means for this package.

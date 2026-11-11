@@ -3,6 +3,7 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+use super::version::UpgradeScript;
 use eyre::{Context, eyre};
 use regex::Regex;
 use std::collections::{BTreeMap, BTreeSet, HashMap};
@@ -11,13 +12,15 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::sync::LazyLock;
 
+const FRAGMENT_MARKER_PREFIX: &str = "-- Fragment: ";
+
 static DEPENDS_ON_RE: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"(?i)(?:--|/\*)\s*depends-on:\s*([^\n*]+?)(?:\*/|\n|$)").unwrap());
 
 static PR_PREFIX_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"^(\d+)\.").unwrap());
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub enum FragmentId {
+pub(crate) enum FragmentId {
     Numeric(u64),
     Slug(String),
 }
@@ -32,7 +35,7 @@ impl fmt::Display for FragmentId {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum FragmentDependency {
+pub(crate) enum FragmentDependency {
     Id(FragmentId),
     Filename(String),
 }
@@ -47,15 +50,60 @@ impl fmt::Display for FragmentDependency {
 }
 
 #[derive(Debug, Clone)]
-pub struct MigrationFragment {
-    pub path: PathBuf,
-    pub filename: String,
-    pub id: FragmentId,
-    pub dependencies: Vec<FragmentDependency>,
-    pub sql_content: String,
+pub(crate) struct MigrationFragment {
+    pub(crate) path: PathBuf,
+    pub(crate) filename: String,
+    pub(crate) id: FragmentId,
+    pub(crate) dependencies: Vec<FragmentDependency>,
+    pub(crate) sql_content: String,
 }
 
-pub fn parse_fragment_id(filename: &str) -> FragmentId {
+/// Fragments already assembled into upgrade scripts in `sql/`.
+#[derive(Debug, Default)]
+pub(crate) struct ShippedFragments {
+    filenames: BTreeMap<String, PathBuf>,
+    ids: BTreeSet<FragmentId>,
+}
+
+impl ShippedFragments {
+    pub(crate) fn from_scripts<'a>(
+        scripts: impl IntoIterator<Item = &'a UpgradeScript>,
+    ) -> eyre::Result<Self> {
+        let mut shipped = Self::default();
+        for script in scripts {
+            let sql = fs::read_to_string(&script.path)
+                .wrap_err_with(|| format!("failed to read `{}`", script.path.display()))?;
+            shipped.record_sql(&sql, &script.path);
+        }
+        Ok(shipped)
+    }
+
+    pub(crate) fn record_sql(&mut self, sql: &str, script_path: &Path) {
+        for line in sql.lines() {
+            if let Some(filename) =
+                line.strip_prefix(FRAGMENT_MARKER_PREFIX).map(str::trim).filter(|s| !s.is_empty())
+            {
+                self.ids.insert(parse_fragment_id(filename));
+                self.filenames
+                    .entry(filename.to_string())
+                    .or_insert_with(|| script_path.to_path_buf());
+            }
+        }
+    }
+
+    pub(crate) fn shipped_in(&self, filename: &str) -> Option<&Path> {
+        self.filenames.get(filename).map(PathBuf::as_path)
+    }
+
+    pub(crate) fn satisfies(&self, dep: &FragmentDependency) -> bool {
+        match dep {
+            FragmentDependency::Id(id) => self.ids.contains(id),
+            FragmentDependency::Filename(name) => self.filenames.contains_key(name),
+        }
+    }
+}
+
+pub(crate) fn parse_fragment_id(filename: &str) -> FragmentId {
     if let Some(caps) = PR_PREFIX_RE.captures(filename)
         && let Ok(num) = caps[1].parse::<u64>()
     {
@@ -68,7 +116,7 @@ pub fn parse_fragment_id(filename: &str) -> FragmentId {
     FragmentId::Slug(slug.to_string())
 }
 
-pub fn parse_depends_on(content: &str) -> Vec<FragmentDependency> {
+pub(crate) fn parse_depends_on(content: &str) -> Vec<FragmentDependency> {
     let mut deps = Vec::new();
     let mut seen = BTreeSet::new();
 
@@ -120,7 +168,7 @@ fn load_fragment(path: &Path) -> eyre::Result<MigrationFragment> {
 }
 
 /// Reads every fragment in `unreleased_dir`, in no particular order.
-pub fn load_fragments(unreleased_dir: &Path) -> eyre::Result<Vec<MigrationFragment>> {
+pub(crate) fn load_fragments(unreleased_dir: &Path) -> eyre::Result<Vec<MigrationFragment>> {
     if !unreleased_dir.exists() {
         return Ok(Vec::new());
     }
@@ -148,12 +196,66 @@ pub fn load_fragments(unreleased_dir: &Path) -> eyre::Result<Vec<MigrationFragme
     Ok(fragments)
 }
 
-pub fn collect_fragments_from_dir(unreleased_dir: &Path) -> eyre::Result<Vec<MigrationFragment>> {
-    topological_sort_fragments(load_fragments(unreleased_dir)?)
+/// Returns every `(fragment, dependency)` pair that matches neither another fragment in
+/// `fragments` nor an entry in `shipped`, ordered deterministically by filename.
+pub(crate) fn unresolved_dependencies<'a>(
+    fragments: &'a [MigrationFragment],
+    shipped: &ShippedFragments,
+) -> Vec<(&'a MigrationFragment, &'a FragmentDependency)> {
+    let mut id_map: HashMap<&FragmentId, Vec<usize>> = HashMap::new();
+    let mut filename_map: HashMap<&str, usize> = HashMap::new();
+
+    for (idx, fragment) in fragments.iter().enumerate() {
+        id_map.entry(&fragment.id).or_default().push(idx);
+        filename_map.insert(&fragment.filename, idx);
+    }
+
+    let mut order: Vec<usize> = (0..fragments.len()).collect();
+    order.sort_by(|&a, &b| fragments[a].filename.cmp(&fragments[b].filename));
+
+    let mut unresolved = Vec::new();
+    for idx in order {
+        let fragment = &fragments[idx];
+        for dep in &fragment.dependencies {
+            let targets = match dep {
+                FragmentDependency::Id(id) => id_map.get(id).map(Vec::as_slice),
+                FragmentDependency::Filename(name) => {
+                    filename_map.get(name.as_str()).map(std::slice::from_ref)
+                }
+            };
+            let in_unreleased = targets.is_some_and(|t| t.iter().any(|&target| target != idx));
+            if !in_unreleased && !shipped.satisfies(dep) {
+                unresolved.push((fragment, dep));
+            }
+        }
+    }
+    unresolved
 }
 
-/// For each fragment, the indices of the fragments it declares as prerequisites.
-pub fn prerequisites(fragments: &[MigrationFragment]) -> Vec<BTreeSet<usize>> {
+/// Validates that every `depends-on` resolves against `fragments` or `shipped`, then orders
+/// `fragments` topologically.
+pub(crate) fn resolve_and_sort_fragments(
+    fragments: Vec<MigrationFragment>,
+    shipped: &ShippedFragments,
+    unreleased_dir: &Path,
+) -> eyre::Result<Vec<MigrationFragment>> {
+    let unresolved = unresolved_dependencies(&fragments, shipped);
+    if !unresolved.is_empty() {
+        let details = unresolved
+            .into_iter()
+            .map(|(fragment, dep)| format!("`{}` depends on `{dep}`", fragment.filename))
+            .collect::<Vec<_>>()
+            .join(", ");
+        return Err(eyre!(
+            "unresolved migration fragment dependency (not found in `{}` or assembled scripts in `sql/`): {details}",
+            unreleased_dir.display()
+        ));
+    }
+    topological_sort_fragments(fragments)
+}
+
+/// For each fragment, the indices of the fragments in `fragments` it declares as prerequisites.
+pub(crate) fn prerequisites(fragments: &[MigrationFragment]) -> Vec<BTreeSet<usize>> {
     let mut id_map: HashMap<&FragmentId, Vec<usize>> = HashMap::new();
     let mut filename_map: HashMap<&str, usize> = HashMap::new();
 
@@ -175,23 +277,16 @@ pub fn prerequisites(fragments: &[MigrationFragment]) -> Vec<BTreeSet<usize>> {
                     }
                 };
 
-                let Some(targets) = targets else {
-                    tracing::debug!(
-                        "fragment `{}` declares prerequisite `{}`, which was not found in unreleased fragments (assuming already applied in previous release)",
-                        fragment.filename,
-                        dep
-                    );
-                    continue;
-                };
-
-                prerequisite_indices.extend(targets.iter().filter(|&&target| target != idx));
+                if let Some(targets) = targets {
+                    prerequisite_indices.extend(targets.iter().filter(|&&target| target != idx));
+                }
             }
             prerequisite_indices
         })
         .collect()
 }
 
-pub fn topological_sort_fragments(
+pub(crate) fn topological_sort_fragments(
     fragments: Vec<MigrationFragment>,
 ) -> eyre::Result<Vec<MigrationFragment>> {
     if fragments.is_empty() {
@@ -263,9 +358,8 @@ fn format_echo_header(extname: &str, target_version: &str) -> String {
     )
 }
 
-/// The line that marks a fragment inside an assembled script.
-pub fn fragment_marker(filename: &str) -> String {
-    format!("-- Fragment: {filename}")
+fn fragment_marker(filename: &str) -> String {
+    format!("{FRAGMENT_MARKER_PREFIX}{filename}")
 }
 
 fn format_fragment_banner(filename: &str) -> String {
@@ -274,7 +368,7 @@ fn format_fragment_banner(filename: &str) -> String {
     format!("\n{sep}\n{marker}\n{sep}\n")
 }
 
-pub fn assemble_sql_content(
+pub(crate) fn assemble_sql_content(
     extname: &str,
     target_version: &str,
     fragments: &[MigrationFragment],
@@ -362,17 +456,51 @@ SELECT 1;
     }
 
     #[test]
-    fn missing_dependency_assumed_already_applied() {
-        let f1 = MigrationFragment {
-            path: PathBuf::from("6221.dependent.sql"),
-            filename: "6221.dependent.sql".to_string(),
-            id: FragmentId::Numeric(6221),
-            dependencies: vec![FragmentDependency::Id(FragmentId::Numeric(9999))],
-            sql_content: "-- 6221".to_string(),
+    fn resolve_and_sort_validates_against_shipped_fragments() {
+        let mut shipped = ShippedFragments::default();
+        shipped.record_sql(
+            "-- Fragment: 6099.init.sql\r\nSELECT 1;\n-- Fragment: vector_ops.sql\n",
+            Path::new("sql/my_ext--0.25.0--0.26.0.sql"),
+        );
+
+        let make = |filename: &str, deps: Vec<FragmentDependency>| MigrationFragment {
+            path: PathBuf::from(filename),
+            filename: filename.to_string(),
+            id: parse_fragment_id(filename),
+            dependencies: deps,
+            sql_content: String::new(),
         };
-        let sorted = topological_sort_fragments(vec![f1]).unwrap();
-        assert_eq!(sorted.len(), 1);
+
+        // Resolved via shipped ID, shipped slug, and shipped filename.
+        let resolved = vec![make(
+            "6221.dependent.sql",
+            vec![
+                FragmentDependency::Id(FragmentId::Numeric(6099)),
+                FragmentDependency::Id(FragmentId::Slug("vector_ops".to_string())),
+                FragmentDependency::Filename("6099.init.sql".to_string()),
+            ],
+        )];
+        let sorted = resolve_and_sort_fragments(resolved, &shipped, Path::new("sql/unreleased"))
+            .expect("shipped dependencies should resolve");
         assert_eq!(sorted[0].filename, "6221.dependent.sql");
+
+        // Unresolved dependency and self-only dependency both fail.
+        for bad_dep in [
+            FragmentDependency::Id(FragmentId::Numeric(9999)),
+            FragmentDependency::Filename("missing.sql".to_string()),
+            FragmentDependency::Id(FragmentId::Numeric(6221)),
+        ] {
+            let err = resolve_and_sort_fragments(
+                vec![make("6221.dependent.sql", vec![bad_dep.clone()])],
+                &shipped,
+                Path::new("sql/unreleased"),
+            )
+            .unwrap_err();
+            assert!(
+                err.to_string().contains(&format!("`6221.dependent.sql` depends on `{bad_dep}`")),
+                "{err}"
+            );
+        }
     }
 
     #[test]

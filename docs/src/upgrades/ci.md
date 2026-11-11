@@ -20,6 +20,10 @@ be trusted. It needs no Postgres installation, so it's quick to run on every pul
 
 **Dependency cycles.** Two fragments that depend on each other can't be ordered.
 
+**Unresolved dependencies.** Every `-- depends-on` target must match either another unreleased
+fragment or a `-- Fragment:` marker in an assembled script in `sql/`. That catches misspelled IDs on
+`main` as well as backports to a release branch whose prerequisite hasn't been backported.
+
 **Undeclared dependencies.** If fragment B touches an object fragment A creates, B has to declare
 `-- depends-on: A`, directly or through another fragment. When A has the higher number, B would run
 first and fail. When A has the lower number they run in the right order by luck, and a backport or a
@@ -35,16 +39,29 @@ $ cargo pgrx migrate check
 Two fragments that replace the same function also need an order, since the last one wins.
 
 **Mixed fragments**, with `--deny-mixed-objects`. A fragment that touches both released objects and
-unreleased ones [can't be backported](./fragments.md#keeping-released-and-unreleased-changes-apart).
-An object counts as unreleased only if some fragment creates it with a plain `CREATE`, because
+unreleased ones, or unreleased objects from multiple prerequisite fragments,
+[can't be backported cleanly](./fragments.md#keeping-released-and-unreleased-changes-apart). An
+object counts as unreleased only if some fragment creates it with a plain `CREATE`, because
 `CREATE OR REPLACE` is also how a released function is changed.
+
+**Upstream identity**, with `--upstream <REF>`. On a stable release branch, pass
+`--upstream origin/main` to require every unreleased fragment on the branch to exist at the same path
+on `origin/main` with identical bytes.
+
+**Released-script immutability**, with `--base <REF>`. Upgrade scripts in `sql/` should only ever be
+added; modifying or deleting an existing `<ext>--<prev>--<target>.sql` script relative to `<REF>` is
+rejected.
 
 ## Options
 
-- `--base <REF>` reports only problems that involve a fragment added or changed since this branch
-  left `<REF>`, so old fragments don't fail unrelated pull requests. A conflict between a new
-  fragment and an old one is still reported, even when it's the old file that needs the fix. It
-  reads committed changes, so commit first when you run it locally.
+- `--base <REF>` scopes `undeclared_dependency` and `mixed_objects` diagnostics to fragments added
+  or changed since this branch left `<REF>`, so old fragments don't fail unrelated pull requests, and
+  rejects modifications or deletions of existing upgrade scripts in `sql/`. A conflict between a new
+  fragment and an old one is still reported, even when it's the old file that needs the fix, and
+  unresolved `depends-on` entries are always reported. It reads committed changes, so commit first
+  when you run it locally.
+- `--upstream <REF>` verifies that every fragment in the unreleased directory exists byte-for-byte
+  identically on `<REF>`.
 - `--format <text|json|github>` chooses the output. `github` writes workflow annotations.
 
 ## What It Can't See
@@ -57,16 +74,6 @@ function body never counts as a statement. That also means it's blind to:
 - Renames. An object is known by the name it was created with.
 - Schemas. It compares unqualified names, because the `search_path` isn't known until the script
   runs. Objects with the same name in two schemas look like one object.
-- A misspelled dependency between fragments that don't touch the same object. It looks like a
-  fragment from an earlier release.
 
 Passing the check means the order is declared. It doesn't mean the SQL works, which takes a
 [real upgrade test](./testing.md).
-
-## Protecting Released Scripts
-
-Upgrade scripts should only ever be added. This command fails if a branch modifies or deletes one:
-
-```console
-$ git diff --exit-code --name-only --diff-filter=MD origin/main...HEAD -- 'sql/*--*--*.sql'
-```

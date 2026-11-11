@@ -48,6 +48,8 @@ previous version defaults to the newest non-pre-release script older than the ta
 - Guess a previous version it can't determine.
 - Include a fragment that already shipped, which it recognizes in any script on the path to the
   previous version.
+- Assemble a fragment whose `-- depends-on` target is in neither the unreleased directory nor a
+  script on the path to the previous version.
 
 `--dry-run` reports the same plan and the same errors without writing anything.
 
@@ -104,8 +106,9 @@ To ship a fix from a `0.25.x` branch:
 4. On the main branch, copy the new script into `sql/` and delete the fragments it consumed.
    `cargo pgrx migrate assemble` refuses to include them in the next release if you forget.
 
-A fragment with a `depends-on` can only be backported once what it depends on is on that branch.
-Nothing warns you otherwise: a missing dependency looks like one from an earlier release. A
+A fragment with a `depends-on` can only be backported once what it depends on is on that branch (in
+`sql/` or the unreleased directory); `cargo pgrx migrate check --upstream origin/main` rejects
+missing prerequisites as well as fragments that were edited or renamed during the cherry-pick. A
 [mixed fragment](./fragments.md#keeping-released-and-unreleased-changes-apart) can't be backported
 at all.
 

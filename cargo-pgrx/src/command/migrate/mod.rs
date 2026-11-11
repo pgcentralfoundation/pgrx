@@ -170,14 +170,9 @@ fn retain_unassembled(
         return Ok(());
     };
 
-    for script in scripts.iter().rev().take_while(|script| script.target == latest.target) {
-        let sql = fs::read_to_string(&script.path)
-            .wrap_err_with(|| format!("failed to read `{}`", script.path.display()))?;
-        fragments.retain(|f| {
-            let marker = fragment::fragment_marker(&f.filename);
-            !sql.lines().any(|line| line == marker)
-        });
-    }
+    let latest_scripts = scripts.iter().rev().take_while(|script| script.target == latest.target);
+    let shipped = fragment::ShippedFragments::from_scripts(latest_scripts)?;
+    fragments.retain(|f| shipped.shipped_in(&f.filename).is_none());
     Ok(())
 }
 
@@ -200,9 +195,9 @@ pub(crate) fn plan_unreleased_fragments(
     let sql_dir = manifest_path.parent().unwrap_or_else(|| Path::new(".")).join("sql");
     let scripts = version::existing_upgrade_scripts(&sql_dir, extname)?;
 
-    let mut fragments = fragment::collect_fragments_from_dir(&unreleased_dir)?;
-    retain_unassembled(&mut fragments, &scripts)?;
-    if fragments.is_empty() {
+    let mut raw_fragments = fragment::load_fragments(&unreleased_dir)?;
+    retain_unassembled(&mut raw_fragments, &scripts)?;
+    if raw_fragments.is_empty() {
         return Ok(UnreleasedFragments::NothingToAssemble);
     }
 
@@ -213,6 +208,9 @@ pub(crate) fn plan_unreleased_fragments(
             unreleased_dir.display()
         ));
     }
+
+    let shipped = fragment::ShippedFragments::from_scripts(&scripts)?;
+    let fragments = fragment::resolve_and_sort_fragments(raw_fragments, &shipped, &unreleased_dir)?;
 
     let current = current_version(manifest_path, cargo_flags)?;
     let (prev, target) = match scripts.last() {
@@ -594,7 +592,7 @@ version = \"0.25.0\"
         let released = fragment::assemble_sql_content(
             "my_ext",
             "0.25.0",
-            &fragment::collect_fragments_from_dir(&fixture.sql_dir().join("unreleased")).unwrap(),
+            &fragment::load_fragments(&fixture.sql_dir().join("unreleased")).unwrap(),
         );
         fs::write(fixture.sql_dir().join("my_ext--0.24.0--0.25.0.sql"), released).unwrap();
 
@@ -603,6 +601,22 @@ version = \"0.25.0\"
             UnreleasedFragments::NothingToAssemble
         ));
         assert!(fixture.install(UnreleasedFragmentMode::Assemble).is_empty());
+    }
+
+    #[test]
+    fn plan_checks_external_dependencies_against_assembled_scripts() {
+        let fixture = Fixture::new(ENABLED, &[("200.dep.sql", "-- depends-on: 100\nSELECT 1;")]);
+        assert!(fixture.plan(UnreleasedFragmentMode::Assemble).is_err());
+
+        fs::write(
+            fixture.sql_dir().join("my_ext--0.24.0--0.25.0.sql"),
+            "-- Fragment: 100.base.sql\nSELECT 0;\n",
+        )
+        .unwrap();
+        assert!(matches!(
+            fixture.plan(UnreleasedFragmentMode::Assemble).unwrap(),
+            UnreleasedFragments::Assemble(_)
+        ));
     }
 
     #[test]
