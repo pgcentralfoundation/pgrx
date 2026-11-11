@@ -462,7 +462,10 @@ The typed expression support also covers:
   statements, `if`/`else`, and flat typed local declarations.
   Local reads require initialization on every path that can reach them;
   unsupported control flow and
-  declaration forms remain skips.
+  declaration forms remain skips. An integer, `_Bool`, floating or pointer local
+  that is declared without an initializer and whose address is taken counts as
+  initialized: C leaves it indeterminate until it is written, as a callee writes
+  an out-parameter, and the translation declares it holding zero.
 - GNU statement expressions, `({ statements; value; })`, wherever an expression
   may stand: in a macro, in a statement block and in a translated inline body.
   The statements are those of a statement block, in a scope of their own, and

@@ -48,6 +48,11 @@ const TRANSLATED: &[&str] = &[
     "BODY_DROPPED",
     "BODY_BRANCH",
     "BODY_STORE",
+    // A local that a callee writes through its address is read after the call.
+    "BODY_OUT",
+    "BODY_OUT_NATIVE",
+    "BODY_POINT",
+    "BODY_OUT_POINTER",
     "BODY_COLOR",
     "BODY_LEAF",
     "BODY_CALLER",
@@ -296,10 +301,10 @@ fn translated_bodies_match_their_original_definitions() {
         "{rust}\n{prelude}\nconst EXPECTED_GUARDS: usize = 0;\nfn main() {{ let mut value = 0_i32; BODY_STORE!(&raw mut value, 7_i32).get(); }}\n"
     ));
     assert!(error.contains("unsafe"), "{error}");
-    // BODY_EARLY and BODY_ARRAY_SELECT are called twice and each other native root once,
-    // BODY_ARRAY only by the translated BODY_ARRAY_COUNT. The translated BODY_RECURSIVE
-    // calls itself natively once.
-    rust.push_str("const EXPECTED_GUARDS: usize = 40;\n");
+    // BODY_EARLY is called twice and once more by the translated BODY_OUT_NATIVE,
+    // BODY_ARRAY_SELECT twice and each other native root once, BODY_ARRAY only by the
+    // translated BODY_ARRAY_COUNT. The translated BODY_RECURSIVE calls itself natively once.
+    rust.push_str("const EXPECTED_GUARDS: usize = 41;\n");
     rust.push_str("fn pure() -> i32 { BODY_MACRO!(1_i32).get() + BODY_CALLER!(1_i32).get() }\n");
     rust.push_str(include_str!("fixtures/inline_bodies.rs"));
     let profile = frontend.profile();

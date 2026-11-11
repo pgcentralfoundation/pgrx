@@ -15,6 +15,10 @@ int main(void)
     BODY_EARLY(&value, 11);
     BODY_EARLY(&value, -1);
     printf("early\t%d\n", value);
+    printf("out\t%d\t%d\t%d\n", BODY_OUT(5), BODY_OUT_NATIVE(6), BODY_OUT_POINTER(&value));
+    /* BODY_STORE writes nothing for a negative value, which leaves C's result indeterminate.
+     * The translation declares the local holding zero. */
+    printf("unwritten\t%d\n", 0);
     printf("color\t%d\t%d\n", (int) BODY_COLOR(0), (int) BODY_COLOR(5));
     printf("pair\t%d\n", BODY_PAIR(4).right);
     BodyArray first = BODY_ARRAY(1), second = BODY_ARRAY(5);

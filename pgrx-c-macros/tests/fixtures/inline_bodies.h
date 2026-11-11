@@ -25,6 +25,31 @@ static inline void BODY_EARLY(int *where, int value)
 		return;
 	*where = value;
 }
+/* A callee writes a local through its address. C leaves a local whose address is taken
+ * indeterminate until then, so the read after the call is the callee's value. BODY_STORE
+ * is translated, BODY_EARLY is a native call, and BODY_POINT writes a pointer. */
+static inline int BODY_OUT(int value)
+{
+	int			out;
+
+	BODY_STORE(&out, value);
+	return out;
+}
+static inline int BODY_OUT_NATIVE(int value)
+{
+	int			out;
+
+	BODY_EARLY(&(out), value);
+	return out;
+}
+static inline void BODY_POINT(const int **where, const int *target) { *where = target; }
+static inline int BODY_OUT_POINTER(const int *target)
+{
+	const int  *out;
+
+	BODY_POINT(&out, target);
+	return *out;
+}
 typedef enum BodyColor { BODY_RED, BODY_BLUE } BodyColor;
 static inline BodyColor BODY_COLOR(int value)
 {
