@@ -2,7 +2,7 @@
 // C macros from c.h.
 
 #[cfg(feature = "pg15")]
-/// C macro Abs from c.h:1037 (PostgreSQL 15)
+/// C macro Abs from c.h:1038 (PostgreSQL 15)
 ///
 /// ```text
 /// #define Abs( x ) ( ( x ) >= 0 ? ( x ) : - ( x ) )
@@ -69,7 +69,7 @@ macro_rules! Abs {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro Assert from c.h:891 (PostgreSQL 15)
+/// C macro Assert from c.h:892 (PostgreSQL 15)
 ///
 /// ```text
 /// #define Assert( condition ) do { if ( ! ( condition ) ) ExceptionalCondition ( # condition , "FailedAssertion" , __FILE__ , __LINE__ ) ; } while ( 0 )
@@ -123,7 +123,7 @@ macro_rules! Assert {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro AssertArg from c.h:903 (PostgreSQL 15)
+/// C macro AssertArg from c.h:904 (PostgreSQL 15)
 ///
 /// ```text
 /// #define AssertArg( condition ) do { if ( ! ( condition ) ) ExceptionalCondition ( # condition , "BadArgument" , __FILE__ , __LINE__ ) ; } while ( 0 )
@@ -150,7 +150,7 @@ macro_rules! AssertArg {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro AssertMacro from c.h:898 (PostgreSQL 15)
+/// C macro AssertMacro from c.h:899 (PostgreSQL 15)
 ///
 /// ```text
 /// #define AssertMacro( condition ) ( ( void ) ( ( condition ) || ( ExceptionalCondition ( # condition , "FailedAssertion" , __FILE__ , __LINE__ ) , 0 ) ) )
@@ -214,7 +214,7 @@ macro_rules! AssertMacro {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro AssertPointerAlignment from c.h:920 (PostgreSQL 15)
+/// C macro AssertPointerAlignment from c.h:921 (PostgreSQL 15)
 ///
 /// ```text
 /// #define AssertPointerAlignment( ptr , bndr ) Trap ( TYPEALIGN ( bndr , ( uintptr_t ) ( ptr ) ) != ( uintptr_t ) ( ptr ) , "UnalignedPointer" )
@@ -278,7 +278,7 @@ macro_rules! AssertPointerAlignment {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro AssertState from c.h:910 (PostgreSQL 15)
+/// C macro AssertState from c.h:911 (PostgreSQL 15)
 ///
 /// ```text
 /// #define AssertState( condition ) do { if ( ! ( condition ) ) ExceptionalCondition ( # condition , "BadState" , __FILE__ , __LINE__ ) ; } while ( 0 )
@@ -720,7 +720,7 @@ macro_rules! DOUBLEALIGN_DOWN {
         )
     };
 }
-/// C macro FLOAT4_FITS_IN_INT16 from c.h:1142 (PostgreSQL 15), c.h:1110 (PostgreSQL 16), c.h:1102 (PostgreSQL 17), c.h:1071 (PostgreSQL 18), c.h:1178 (PostgreSQL 19)
+/// C macro FLOAT4_FITS_IN_INT16 from c.h:1143 (PostgreSQL 15), c.h:1110 (PostgreSQL 16), c.h:1102 (PostgreSQL 17), c.h:1071 (PostgreSQL 18), c.h:1178 (PostgreSQL 19)
 ///
 /// ```text
 /// #define FLOAT4_FITS_IN_INT16( num ) ( ( num ) >= ( float4 ) PG_INT16_MIN && ( num ) < - ( ( float4 ) PG_INT16_MIN ) )
@@ -753,7 +753,7 @@ macro_rules! FLOAT4_FITS_IN_INT16 {
         )
     };
 }
-/// C macro FLOAT4_FITS_IN_INT32 from c.h:1144 (PostgreSQL 15), c.h:1112 (PostgreSQL 16), c.h:1104 (PostgreSQL 17), c.h:1073 (PostgreSQL 18), c.h:1180 (PostgreSQL 19)
+/// C macro FLOAT4_FITS_IN_INT32 from c.h:1145 (PostgreSQL 15), c.h:1112 (PostgreSQL 16), c.h:1104 (PostgreSQL 17), c.h:1073 (PostgreSQL 18), c.h:1180 (PostgreSQL 19)
 ///
 /// ```text
 /// #define FLOAT4_FITS_IN_INT32( num ) ( ( num ) >= ( float4 ) PG_INT32_MIN && ( num ) < - ( ( float4 ) PG_INT32_MIN ) )
@@ -786,7 +786,7 @@ macro_rules! FLOAT4_FITS_IN_INT32 {
         )
     };
 }
-/// C macro FLOAT4_FITS_IN_INT64 from c.h:1146 (PostgreSQL 15), c.h:1114 (PostgreSQL 16), c.h:1106 (PostgreSQL 17), c.h:1075 (PostgreSQL 18), c.h:1182 (PostgreSQL 19)
+/// C macro FLOAT4_FITS_IN_INT64 from c.h:1147 (PostgreSQL 15), c.h:1114 (PostgreSQL 16), c.h:1106 (PostgreSQL 17), c.h:1075 (PostgreSQL 18), c.h:1182 (PostgreSQL 19)
 ///
 /// ```text
 /// #define FLOAT4_FITS_IN_INT64( num ) ( ( num ) >= ( float4 ) PG_INT64_MIN && ( num ) < - ( ( float4 ) PG_INT64_MIN ) )
@@ -819,7 +819,7 @@ macro_rules! FLOAT4_FITS_IN_INT64 {
         )
     };
 }
-/// C macro FLOAT8_FITS_IN_INT16 from c.h:1148 (PostgreSQL 15), c.h:1116 (PostgreSQL 16), c.h:1108 (PostgreSQL 17), c.h:1077 (PostgreSQL 18), c.h:1184 (PostgreSQL 19)
+/// C macro FLOAT8_FITS_IN_INT16 from c.h:1149 (PostgreSQL 15), c.h:1116 (PostgreSQL 16), c.h:1108 (PostgreSQL 17), c.h:1077 (PostgreSQL 18), c.h:1184 (PostgreSQL 19)
 ///
 /// ```text
 /// #define FLOAT8_FITS_IN_INT16( num ) ( ( num ) >= ( float8 ) PG_INT16_MIN && ( num ) < - ( ( float8 ) PG_INT16_MIN ) )
@@ -852,7 +852,7 @@ macro_rules! FLOAT8_FITS_IN_INT16 {
         )
     };
 }
-/// C macro FLOAT8_FITS_IN_INT32 from c.h:1150 (PostgreSQL 15), c.h:1118 (PostgreSQL 16), c.h:1110 (PostgreSQL 17), c.h:1079 (PostgreSQL 18), c.h:1186 (PostgreSQL 19)
+/// C macro FLOAT8_FITS_IN_INT32 from c.h:1151 (PostgreSQL 15), c.h:1118 (PostgreSQL 16), c.h:1110 (PostgreSQL 17), c.h:1079 (PostgreSQL 18), c.h:1186 (PostgreSQL 19)
 ///
 /// ```text
 /// #define FLOAT8_FITS_IN_INT32( num ) ( ( num ) >= ( float8 ) PG_INT32_MIN && ( num ) < - ( ( float8 ) PG_INT32_MIN ) )
@@ -885,7 +885,7 @@ macro_rules! FLOAT8_FITS_IN_INT32 {
         )
     };
 }
-/// C macro FLOAT8_FITS_IN_INT64 from c.h:1152 (PostgreSQL 15), c.h:1120 (PostgreSQL 16), c.h:1112 (PostgreSQL 17), c.h:1081 (PostgreSQL 18), c.h:1188 (PostgreSQL 19)
+/// C macro FLOAT8_FITS_IN_INT64 from c.h:1153 (PostgreSQL 15), c.h:1120 (PostgreSQL 16), c.h:1112 (PostgreSQL 17), c.h:1081 (PostgreSQL 18), c.h:1188 (PostgreSQL 19)
 ///
 /// ```text
 /// #define FLOAT8_FITS_IN_INT64( num ) ( ( num ) >= ( float8 ) PG_INT64_MIN && ( num ) < - ( ( float8 ) PG_INT64_MIN ) )
@@ -1212,7 +1212,7 @@ macro_rules! INTALIGN_DOWN {
         )
     };
 }
-/// C macro INVERT_COMPARE_RESULT from c.h:1170 (PostgreSQL 15), c.h:1134 (PostgreSQL 16), c.h:1126 (PostgreSQL 17), c.h:1095 (PostgreSQL 18), c.h:1202 (PostgreSQL 19)
+/// C macro INVERT_COMPARE_RESULT from c.h:1171 (PostgreSQL 15), c.h:1134 (PostgreSQL 16), c.h:1126 (PostgreSQL 17), c.h:1095 (PostgreSQL 18), c.h:1202 (PostgreSQL 19)
 ///
 /// ```text
 /// #define INVERT_COMPARE_RESULT( var ) ( ( var ) = ( ( var ) < 0 ) ? 1 : - ( var ) )
@@ -1293,7 +1293,7 @@ macro_rules! INVERT_COMPARE_RESULT {
         )
     };
 }
-/// C macro IS_HIGHBIT_SET from c.h:1201 (PostgreSQL 15), c.h:1183 (PostgreSQL 16), c.h:1175 (PostgreSQL 17), c.h:1144 (PostgreSQL 18), c.h:1253 (PostgreSQL 19)
+/// C macro IS_HIGHBIT_SET from c.h:1202 (PostgreSQL 15), c.h:1183 (PostgreSQL 16), c.h:1175 (PostgreSQL 17), c.h:1144 (PostgreSQL 18), c.h:1253 (PostgreSQL 19)
 ///
 /// ```text
 /// #define IS_HIGHBIT_SET( ch ) ( ( unsigned char ) ( ch ) & HIGHBIT )
@@ -1722,7 +1722,7 @@ macro_rules! MAXALIGN_DOWN {
         )
     };
 }
-/// C macro Max from c.h:1025 (PostgreSQL 15), c.h:999 (PostgreSQL 16), c.h:1015 (PostgreSQL 17), c.h:984 (PostgreSQL 18), c.h:1091 (PostgreSQL 19)
+/// C macro Max from c.h:1026 (PostgreSQL 15), c.h:999 (PostgreSQL 16), c.h:1015 (PostgreSQL 17), c.h:984 (PostgreSQL 18), c.h:1091 (PostgreSQL 19)
 ///
 /// ```text
 /// #define Max( x , y ) ( ( x ) > ( y ) ? ( x ) : ( y ) )
@@ -1773,7 +1773,7 @@ macro_rules! Max {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
-/// C macro MemSetTest from c.h:1115 (PostgreSQL 15), c.h:1083 (PostgreSQL 16)
+/// C macro MemSetTest from c.h:1116 (PostgreSQL 15), c.h:1083 (PostgreSQL 16)
 ///
 /// ```text
 /// #define MemSetTest( val , len ) ( ( ( len ) & LONG_ALIGN_MASK ) == 0 && ( len ) <= MEMSET_LOOP_LIMIT && MEMSET_LOOP_LIMIT != 0 && ( val ) == 0 )
@@ -1807,7 +1807,7 @@ macro_rules! MemSetTest {
         )
     };
 }
-/// C macro Min from c.h:1031 (PostgreSQL 15), c.h:1005 (PostgreSQL 16), c.h:1021 (PostgreSQL 17), c.h:990 (PostgreSQL 18), c.h:1097 (PostgreSQL 19)
+/// C macro Min from c.h:1032 (PostgreSQL 15), c.h:1005 (PostgreSQL 16), c.h:1021 (PostgreSQL 17), c.h:990 (PostgreSQL 18), c.h:1097 (PostgreSQL 19)
 ///
 /// ```text
 /// #define Min( x , y ) ( ( x ) < ( y ) ? ( x ) : ( y ) )
@@ -2276,7 +2276,7 @@ macro_rules! SHORTALIGN_DOWN {
         )
     };
 }
-/// C macro SQL_STR_DOUBLE from c.h:1209 (PostgreSQL 15), c.h:1191 (PostgreSQL 16), c.h:1183 (PostgreSQL 17), c.h:1152 (PostgreSQL 18), c.h:1261 (PostgreSQL 19)
+/// C macro SQL_STR_DOUBLE from c.h:1210 (PostgreSQL 15), c.h:1191 (PostgreSQL 16), c.h:1183 (PostgreSQL 17), c.h:1152 (PostgreSQL 18), c.h:1261 (PostgreSQL 19)
 ///
 /// ```text
 /// #define SQL_STR_DOUBLE( ch , escape_backslash ) ( ( ch ) == '\'' || ( ( ch ) == '\\' && ( escape_backslash ) ) )
@@ -2547,7 +2547,7 @@ macro_rules! TYPEALIGN_DOWN {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro Trap from c.h:872 (PostgreSQL 15)
+/// C macro Trap from c.h:873 (PostgreSQL 15)
 ///
 /// ```text
 /// #define Trap( condition , errorType ) do { if ( condition ) ExceptionalCondition ( # condition , ( errorType ) , __FILE__ , __LINE__ ) ; } while ( 0 )
@@ -2575,7 +2575,7 @@ macro_rules! Trap {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro TrapMacro from c.h:886 (PostgreSQL 15)
+/// C macro TrapMacro from c.h:887 (PostgreSQL 15)
 ///
 /// ```text
 /// #define TrapMacro( condition , errorType ) ( ( bool ) ( ! ( condition ) || ( ExceptionalCondition ( # condition , ( errorType ) , __FILE__ , __LINE__ ) , 0 ) ) )
@@ -2615,7 +2615,7 @@ macro_rules! TrapMacro {
         )
     };
 }
-/// C macro dgettext from c.h:1226 (PostgreSQL 15), c.h:1208 (PostgreSQL 16), c.h:1200 (PostgreSQL 17), c.h:1169 (PostgreSQL 18), c.h:1278 (PostgreSQL 19)
+/// C macro dgettext from c.h:1227 (PostgreSQL 15), c.h:1208 (PostgreSQL 16), c.h:1200 (PostgreSQL 17), c.h:1169 (PostgreSQL 18), c.h:1278 (PostgreSQL 19)
 ///
 /// ```text
 /// #define dgettext( d , x ) ( x )
@@ -2639,7 +2639,7 @@ macro_rules! dgettext {
         )
     };
 }
-/// C macro dngettext from c.h:1228 (PostgreSQL 15), c.h:1210 (PostgreSQL 16), c.h:1202 (PostgreSQL 17), c.h:1171 (PostgreSQL 18), c.h:1280 (PostgreSQL 19)
+/// C macro dngettext from c.h:1229 (PostgreSQL 15), c.h:1210 (PostgreSQL 16), c.h:1202 (PostgreSQL 17), c.h:1171 (PostgreSQL 18), c.h:1280 (PostgreSQL 19)
 ///
 /// ```text
 /// #define dngettext( d , s , p , n ) ( ( n ) == 1 ? ( s ) : ( p ) )
@@ -2690,7 +2690,7 @@ macro_rules! dngettext {
         )
     };
 }
-/// C macro gettext from c.h:1225 (PostgreSQL 15), c.h:1207 (PostgreSQL 16), c.h:1199 (PostgreSQL 17), c.h:1168 (PostgreSQL 18), c.h:1277 (PostgreSQL 19)
+/// C macro gettext from c.h:1226 (PostgreSQL 15), c.h:1207 (PostgreSQL 16), c.h:1199 (PostgreSQL 17), c.h:1168 (PostgreSQL 18), c.h:1277 (PostgreSQL 19)
 ///
 /// ```text
 /// #define gettext( x ) ( x )
@@ -2714,7 +2714,7 @@ macro_rules! gettext {
         )
     };
 }
-/// C macro gettext_noop from c.h:1242 (PostgreSQL 15), c.h:1224 (PostgreSQL 16), c.h:1216 (PostgreSQL 17), c.h:1185 (PostgreSQL 18), c.h:1294 (PostgreSQL 19)
+/// C macro gettext_noop from c.h:1243 (PostgreSQL 15), c.h:1224 (PostgreSQL 16), c.h:1216 (PostgreSQL 17), c.h:1185 (PostgreSQL 18), c.h:1294 (PostgreSQL 19)
 ///
 /// ```text
 /// #define gettext_noop( x ) ( x )
@@ -2871,7 +2871,7 @@ macro_rules! likely {
         )
     };
 }
-/// C macro ngettext from c.h:1227 (PostgreSQL 15), c.h:1209 (PostgreSQL 16), c.h:1201 (PostgreSQL 17), c.h:1170 (PostgreSQL 18), c.h:1279 (PostgreSQL 19)
+/// C macro ngettext from c.h:1228 (PostgreSQL 15), c.h:1209 (PostgreSQL 16), c.h:1201 (PostgreSQL 17), c.h:1170 (PostgreSQL 18), c.h:1279 (PostgreSQL 19)
 ///
 /// ```text
 /// #define ngettext( s , p , n ) ( ( n ) == 1 ? ( s ) : ( p ) )
@@ -2995,7 +2995,7 @@ macro_rules! pg_unreachable {
         )
     };
 }
-/// C macro strtoi64 from c.h:1366 (PostgreSQL 15), c.h:1319 (PostgreSQL 16), c.h:1314 (PostgreSQL 17), c.h:1283 (PostgreSQL 18), c.h:1416 (PostgreSQL 19)
+/// C macro strtoi64 from c.h:1367 (PostgreSQL 15), c.h:1319 (PostgreSQL 16), c.h:1314 (PostgreSQL 17), c.h:1283 (PostgreSQL 18), c.h:1416 (PostgreSQL 19)
 ///
 /// ```text
 /// #define strtoi64( str , endptr , base ) ( ( int64 ) strtol ( str , endptr , base ) )
@@ -3028,7 +3028,7 @@ macro_rules! strtoi64 {
         )
     };
 }
-/// C macro strtou64 from c.h:1367 (PostgreSQL 15), c.h:1320 (PostgreSQL 16), c.h:1315 (PostgreSQL 17), c.h:1284 (PostgreSQL 18), c.h:1417 (PostgreSQL 19)
+/// C macro strtou64 from c.h:1368 (PostgreSQL 15), c.h:1320 (PostgreSQL 16), c.h:1315 (PostgreSQL 17), c.h:1284 (PostgreSQL 18), c.h:1417 (PostgreSQL 19)
 ///
 /// ```text
 /// #define strtou64( str , endptr , base ) ( ( uint64 ) strtoul ( str , endptr , base ) )

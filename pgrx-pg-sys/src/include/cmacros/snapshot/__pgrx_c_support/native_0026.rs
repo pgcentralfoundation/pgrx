@@ -1,5 +1,46 @@
 // Shared generated C macro support.
 
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::varatt_indirect>() == 8);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::varatt_indirect>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::varatt_indirect {}
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::varatt_expanded>() == 8);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::varatt_expanded>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::varatt_expanded {}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::tzEntry {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::tzEntry {
+    type Marker = c::expression::COpaque<Self>;
+}
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::slist_iter>() == 8);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::slist_iter>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::slist_iter {}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::shm_toc {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::shm_toc {
+    type Marker = c::expression::COpaque<Self>;
+}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::shm_mq_handle {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::shm_mq_handle {
+    type Marker = c::expression::COpaque<Self>;
+}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::shm_mq {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::shm_mq {
+    type Marker = c::expression::COpaque<Self>;
+}
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::relopt_real>() == 56);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::relopt_real>() == 8);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::relopt_real {}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::pg_tzenum {}
+impl c::expression::NativeType for crate::__pgrx_c_bindings::pg_tzenum {
+    type Marker = c::expression::COpaque<Self>;
+}
+impl c::sealed::Sealed for crate::__pgrx_c_bindings::pg_tz {}
 impl c::expression::NativeType for crate::__pgrx_c_bindings::pg_tz {
     type Marker = c::expression::COpaque<Self>;
 }
@@ -789,6 +830,21 @@ const _: () = {
 };
 impl c::expression::NativeRecord
     for crate::__pgrx_c_bindings::ExprEvalStep__bindgen_ty_1__bindgen_ty_28
+{
+}
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
+const _: () = {
+    assert!(
+        ::core::mem::size_of::<crate::__pgrx_c_bindings::ExprEvalStep__bindgen_ty_1__bindgen_ty_26>(
+        ) == 32
+    );
+    assert!(
+        ::core::mem::align_of::<crate::__pgrx_c_bindings::ExprEvalStep__bindgen_ty_1__bindgen_ty_26>(
+        ) == 8
+    );
+};
+impl c::expression::NativeRecord
+    for crate::__pgrx_c_bindings::ExprEvalStep__bindgen_ty_1__bindgen_ty_26
 {
 }
 const _: () = {
@@ -4668,51 +4724,3 @@ impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::GatherState {
         c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_GatherState as i32);
 }
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::GrantRoleStmt {}
-impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::GrantRoleStmt {
-    type Type = Self;
-    const VALUE: c::CValue<c::CInt> =
-        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_GrantRoleStmt as i32);
-}
-impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::GrantStmt {}
-impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::GrantStmt {
-    type Type = Self;
-    const VALUE: c::CValue<c::CInt> =
-        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_GrantStmt as i32);
-}
-impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::Group {}
-impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::Group {
-    type Type = Self;
-    const VALUE: c::CValue<c::CInt> =
-        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_Group as i32);
-}
-impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::GroupPath {}
-impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::GroupPath {
-    type Type = Self;
-    const VALUE: c::CValue<c::CInt> =
-        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_GroupPath as i32);
-}
-impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::GroupResultPath {}
-impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::GroupResultPath {
-    type Type = Self;
-    const VALUE: c::CValue<c::CInt> =
-        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_GroupResultPath as i32);
-}
-impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::GroupState {}
-impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::GroupState {
-    type Type = Self;
-    const VALUE: c::CValue<c::CInt> =
-        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_GroupState as i32);
-}
-impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::GroupingFunc {}
-impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::GroupingFunc {
-    type Type = Self;
-    const VALUE: c::CValue<c::CInt> =
-        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_GroupingFunc as i32);
-}
-impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::GroupingSet {}
-impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::GroupingSet {
-    type Type = Self;
-    const VALUE: c::CValue<c::CInt> =
-        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_GroupingSet as i32);
-}
-impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::GroupingSetData {}

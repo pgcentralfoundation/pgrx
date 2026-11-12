@@ -3,10 +3,8 @@
 mod hashfn;
 #[allow(unused_imports)]
 pub use hashfn::*;
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
 #[path = "int.rs"]
 mod int;
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
 #[allow(unused_imports)]
 pub use int::*;
 #[path = "kwlookup.rs"]

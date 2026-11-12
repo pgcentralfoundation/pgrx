@@ -649,7 +649,7 @@ macro_rules! PGUNSIXBIT {
         )
     };
 }
-/// C macro PG_RE_THROW from elog.h:351 (PostgreSQL 15), elog.h:423 (PostgreSQL 16–17), elog.h:418 (PostgreSQL 18), elog.h:421 (PostgreSQL 19)
+/// C macro PG_RE_THROW from elog.h:354 (PostgreSQL 15), elog.h:426 (PostgreSQL 16–17), elog.h:421 (PostgreSQL 18), elog.h:424 (PostgreSQL 19)
 ///
 /// ```text
 /// #define PG_RE_THROW( ) pg_re_throw ( )

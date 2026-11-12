@@ -872,7 +872,7 @@ macro_rules! TupleHashEntrySize {
         )
     };
 }
-/// C inline function exec_rt_fetch from executor.h:579 (PostgreSQL 15), executor.h:590 (PostgreSQL 16–17), executor.h:692 (PostgreSQL 18), executor.h:708 (PostgreSQL 19)
+/// C inline function exec_rt_fetch from executor.h:580 (PostgreSQL 15), executor.h:591 (PostgreSQL 16–17), executor.h:693 (PostgreSQL 18), executor.h:708 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline RangeTblEntry *

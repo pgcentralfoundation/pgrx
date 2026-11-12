@@ -2,7 +2,7 @@
 // C macros from htup_details.h.
 
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro BITMAPLEN from htup_details.h:546 (PostgreSQL 15), htup_details.h:550 (PostgreSQL 16–17)
+/// C macro BITMAPLEN from htup_details.h:701 (PostgreSQL 15), htup_details.h:705 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define BITMAPLEN( NATTS ) ( ( ( int ) ( NATTS ) + 7 ) / 8 )
@@ -64,7 +64,7 @@ macro_rules! BITMAPLEN {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C inline function BITMAPLEN from htup_details.h:598 (PostgreSQL 18), htup_details.h:584 (PostgreSQL 19)
+/// C inline function BITMAPLEN from htup_details.h:752 (PostgreSQL 18), htup_details.h:738 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline int
@@ -98,7 +98,7 @@ macro_rules! BITMAPLEN {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro GETSTRUCT from htup_details.h:654 (PostgreSQL 15), htup_details.h:658 (PostgreSQL 16–17)
+/// C macro GETSTRUCT from htup_details.h:809 (PostgreSQL 15), htup_details.h:813 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define GETSTRUCT( TUP ) ( ( char * ) ( ( TUP ) -> t_data ) + ( TUP ) -> t_data -> t_hoff )
@@ -177,7 +177,7 @@ macro_rules! GETSTRUCT {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C inline function GETSTRUCT from htup_details.h:732 (PostgreSQL 18), htup_details.h:718 (PostgreSQL 19)
+/// C inline function GETSTRUCT from htup_details.h:886 (PostgreSQL 18), htup_details.h:872 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void *
@@ -215,7 +215,7 @@ macro_rules! GETSTRUCT {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro HEAP_LOCKED_UPGRADED from htup_details.h:252 (PostgreSQL 15), htup_details.h:253 (PostgreSQL 16–17)
+/// C macro HEAP_LOCKED_UPGRADED from htup_details.h:284 (PostgreSQL 15), htup_details.h:285 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define HEAP_LOCKED_UPGRADED( infomask ) ( ( ( infomask ) & HEAP_XMAX_IS_MULTI ) != 0 && ( ( infomask ) & HEAP_XMAX_LOCK_ONLY ) != 0 && ( ( ( infomask ) & ( HEAP_XMAX_EXCL_LOCK | HEAP_XMAX_KEYSHR_LOCK ) ) == 0 ) )
@@ -245,7 +245,7 @@ macro_rules! HEAP_LOCKED_UPGRADED {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C inline function HEAP_LOCKED_UPGRADED from htup_details.h:254 (PostgreSQL 18–19)
+/// C inline function HEAP_LOCKED_UPGRADED from htup_details.h:286 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline bool
@@ -278,7 +278,7 @@ macro_rules! HEAP_LOCKED_UPGRADED {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro HEAP_XMAX_IS_EXCL_LOCKED from htup_details.h:264 (PostgreSQL 15), htup_details.h:265 (PostgreSQL 16–17)
+/// C macro HEAP_XMAX_IS_EXCL_LOCKED from htup_details.h:296 (PostgreSQL 15), htup_details.h:297 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define HEAP_XMAX_IS_EXCL_LOCKED( infomask ) ( ( ( infomask ) & HEAP_LOCK_MASK ) == HEAP_XMAX_EXCL_LOCK )
@@ -308,7 +308,7 @@ macro_rules! HEAP_XMAX_IS_EXCL_LOCKED {
     };
 }
 #[cfg(feature = "pg18")]
-/// C inline function HEAP_XMAX_IS_EXCL_LOCKED from htup_details.h:272 (PostgreSQL 18)
+/// C inline function HEAP_XMAX_IS_EXCL_LOCKED from htup_details.h:304 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline bool
@@ -338,7 +338,7 @@ macro_rules! HEAP_XMAX_IS_EXCL_LOCKED {
     };
 }
 #[cfg(feature = "pg19")]
-/// C inline function HEAP_XMAX_IS_EXCL_LOCKED from htup_details.h:272 (PostgreSQL 19)
+/// C inline function HEAP_XMAX_IS_EXCL_LOCKED from htup_details.h:304 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -368,7 +368,7 @@ macro_rules! HEAP_XMAX_IS_EXCL_LOCKED {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro HEAP_XMAX_IS_KEYSHR_LOCKED from htup_details.h:266 (PostgreSQL 15), htup_details.h:267 (PostgreSQL 16–17)
+/// C macro HEAP_XMAX_IS_KEYSHR_LOCKED from htup_details.h:298 (PostgreSQL 15), htup_details.h:299 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define HEAP_XMAX_IS_KEYSHR_LOCKED( infomask ) ( ( ( infomask ) & HEAP_LOCK_MASK ) == HEAP_XMAX_KEYSHR_LOCK )
@@ -398,7 +398,7 @@ macro_rules! HEAP_XMAX_IS_KEYSHR_LOCKED {
     };
 }
 #[cfg(feature = "pg18")]
-/// C inline function HEAP_XMAX_IS_KEYSHR_LOCKED from htup_details.h:278 (PostgreSQL 18)
+/// C inline function HEAP_XMAX_IS_KEYSHR_LOCKED from htup_details.h:310 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline bool
@@ -428,7 +428,7 @@ macro_rules! HEAP_XMAX_IS_KEYSHR_LOCKED {
     };
 }
 #[cfg(feature = "pg19")]
-/// C inline function HEAP_XMAX_IS_KEYSHR_LOCKED from htup_details.h:278 (PostgreSQL 19)
+/// C inline function HEAP_XMAX_IS_KEYSHR_LOCKED from htup_details.h:310 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -458,7 +458,7 @@ macro_rules! HEAP_XMAX_IS_KEYSHR_LOCKED {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro HEAP_XMAX_IS_LOCKED_ONLY from htup_details.h:230 (PostgreSQL 15), htup_details.h:231 (PostgreSQL 16–17)
+/// C macro HEAP_XMAX_IS_LOCKED_ONLY from htup_details.h:262 (PostgreSQL 15), htup_details.h:263 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define HEAP_XMAX_IS_LOCKED_ONLY( infomask ) ( ( ( infomask ) & HEAP_XMAX_LOCK_ONLY ) || ( ( ( infomask ) & ( HEAP_XMAX_IS_MULTI | HEAP_LOCK_MASK ) ) == HEAP_XMAX_EXCL_LOCK ) )
@@ -488,7 +488,7 @@ macro_rules! HEAP_XMAX_IS_LOCKED_ONLY {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C inline function HEAP_XMAX_IS_LOCKED_ONLY from htup_details.h:229 (PostgreSQL 18–19)
+/// C inline function HEAP_XMAX_IS_LOCKED_ONLY from htup_details.h:261 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline bool
@@ -519,7 +519,7 @@ macro_rules! HEAP_XMAX_IS_LOCKED_ONLY {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro HEAP_XMAX_IS_SHR_LOCKED from htup_details.h:262 (PostgreSQL 15), htup_details.h:263 (PostgreSQL 16–17)
+/// C macro HEAP_XMAX_IS_SHR_LOCKED from htup_details.h:294 (PostgreSQL 15), htup_details.h:295 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define HEAP_XMAX_IS_SHR_LOCKED( infomask ) ( ( ( infomask ) & HEAP_LOCK_MASK ) == HEAP_XMAX_SHR_LOCK )
@@ -549,7 +549,7 @@ macro_rules! HEAP_XMAX_IS_SHR_LOCKED {
     };
 }
 #[cfg(feature = "pg18")]
-/// C inline function HEAP_XMAX_IS_SHR_LOCKED from htup_details.h:266 (PostgreSQL 18)
+/// C inline function HEAP_XMAX_IS_SHR_LOCKED from htup_details.h:298 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline bool
@@ -579,7 +579,7 @@ macro_rules! HEAP_XMAX_IS_SHR_LOCKED {
     };
 }
 #[cfg(feature = "pg19")]
-/// C inline function HEAP_XMAX_IS_SHR_LOCKED from htup_details.h:266 (PostgreSQL 19)
+/// C inline function HEAP_XMAX_IS_SHR_LOCKED from htup_details.h:298 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -609,7 +609,7 @@ macro_rules! HEAP_XMAX_IS_SHR_LOCKED {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro HeapTupleAllFixed from htup_details.h:669 (PostgreSQL 15), htup_details.h:673 (PostgreSQL 16–17)
+/// C macro HeapTupleAllFixed from htup_details.h:824 (PostgreSQL 15), htup_details.h:828 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define HeapTupleAllFixed( tuple ) ( ! ( ( tuple ) -> t_data -> t_infomask & HEAP_HASVARWIDTH ) )
@@ -639,7 +639,7 @@ macro_rules! HeapTupleAllFixed {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C inline function HeapTupleAllFixed from htup_details.h:760 (PostgreSQL 18), htup_details.h:746 (PostgreSQL 19)
+/// C inline function HeapTupleAllFixed from htup_details.h:914 (PostgreSQL 18), htup_details.h:900 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -669,7 +669,7 @@ macro_rules! HeapTupleAllFixed {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro HeapTupleClearHeapOnly from htup_details.h:690 (PostgreSQL 15), htup_details.h:694 (PostgreSQL 16–17)
+/// C macro HeapTupleClearHeapOnly from htup_details.h:845 (PostgreSQL 15), htup_details.h:849 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define HeapTupleClearHeapOnly( tuple ) HeapTupleHeaderClearHeapOnly ( ( tuple ) -> t_data )
@@ -745,7 +745,7 @@ macro_rules! HeapTupleClearHeapOnly {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C inline function HeapTupleClearHeapOnly from htup_details.h:802 (PostgreSQL 18), htup_details.h:788 (PostgreSQL 19)
+/// C inline function HeapTupleClearHeapOnly from htup_details.h:956 (PostgreSQL 18), htup_details.h:942 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -773,7 +773,7 @@ macro_rules! HeapTupleClearHeapOnly {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro HeapTupleClearHotUpdated from htup_details.h:681 (PostgreSQL 15), htup_details.h:685 (PostgreSQL 16–17)
+/// C macro HeapTupleClearHotUpdated from htup_details.h:836 (PostgreSQL 15), htup_details.h:840 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define HeapTupleClearHotUpdated( tuple ) HeapTupleHeaderClearHotUpdated ( ( tuple ) -> t_data )
@@ -849,7 +849,7 @@ macro_rules! HeapTupleClearHotUpdated {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C inline function HeapTupleClearHotUpdated from htup_details.h:784 (PostgreSQL 18), htup_details.h:770 (PostgreSQL 19)
+/// C inline function HeapTupleClearHotUpdated from htup_details.h:938 (PostgreSQL 18), htup_details.h:924 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -877,7 +877,7 @@ macro_rules! HeapTupleClearHotUpdated {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro HeapTupleHasExternal from htup_details.h:672 (PostgreSQL 15), htup_details.h:676 (PostgreSQL 16–17)
+/// C macro HeapTupleHasExternal from htup_details.h:827 (PostgreSQL 15), htup_details.h:831 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define HeapTupleHasExternal( tuple ) ( ( ( tuple ) -> t_data -> t_infomask & HEAP_HASEXTERNAL ) != 0 )
@@ -907,7 +907,7 @@ macro_rules! HeapTupleHasExternal {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C inline function HeapTupleHasExternal from htup_details.h:766 (PostgreSQL 18), htup_details.h:752 (PostgreSQL 19)
+/// C inline function HeapTupleHasExternal from htup_details.h:920 (PostgreSQL 18), htup_details.h:906 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -937,7 +937,7 @@ macro_rules! HeapTupleHasExternal {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro HeapTupleHasNulls from htup_details.h:660 (PostgreSQL 15), htup_details.h:664 (PostgreSQL 16–17)
+/// C macro HeapTupleHasNulls from htup_details.h:815 (PostgreSQL 15), htup_details.h:819 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define HeapTupleHasNulls( tuple ) ( ( ( tuple ) -> t_data -> t_infomask & HEAP_HASNULL ) != 0 )
@@ -967,7 +967,7 @@ macro_rules! HeapTupleHasNulls {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C inline function HeapTupleHasNulls from htup_details.h:742 (PostgreSQL 18), htup_details.h:728 (PostgreSQL 19)
+/// C inline function HeapTupleHasNulls from htup_details.h:896 (PostgreSQL 18), htup_details.h:882 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -997,7 +997,7 @@ macro_rules! HeapTupleHasNulls {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro HeapTupleHasVarWidth from htup_details.h:666 (PostgreSQL 15), htup_details.h:670 (PostgreSQL 16–17)
+/// C macro HeapTupleHasVarWidth from htup_details.h:821 (PostgreSQL 15), htup_details.h:825 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define HeapTupleHasVarWidth( tuple ) ( ( ( tuple ) -> t_data -> t_infomask & HEAP_HASVARWIDTH ) != 0 )
@@ -1027,7 +1027,7 @@ macro_rules! HeapTupleHasVarWidth {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C inline function HeapTupleHasVarWidth from htup_details.h:754 (PostgreSQL 18), htup_details.h:740 (PostgreSQL 19)
+/// C inline function HeapTupleHasVarWidth from htup_details.h:908 (PostgreSQL 18), htup_details.h:894 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -1056,8 +1056,41 @@ macro_rules! HeapTupleHasVarWidth {
         )
     };
 }
+/// C inline function HeapTupleHeaderClearDatum from htup_details.h:506 (PostgreSQL 15), htup_details.h:510 (PostgreSQL 16–17), htup_details.h:551 (PostgreSQL 18), htup_details.h:537 (PostgreSQL 19)
+///
+/// ```c
+/// static inline void
+/// HeapTupleHeaderClearDatum(HeapTupleHeaderData *tup)
+/// {
+/// 	/* otherwise we might clear transactionally relevant bits */
+/// 	Assert(HeapTupleHeaderIsDatum(tup));
+/// 	tup->t_infomask &= ~HEAP_IS_DATUM;
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
+/// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+///
+#[doc = crate::__pgrx_c_doc_assertions!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+#[macro_export]
+macro_rules! HeapTupleHeaderClearDatum {
+    ($tup:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$tup;
+            ()
+        })
+    };
+}
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro HeapTupleHeaderClearHeapOnly from htup_details.h:510 (PostgreSQL 15), htup_details.h:514 (PostgreSQL 16–17)
+/// C macro HeapTupleHeaderClearHeapOnly from htup_details.h:665 (PostgreSQL 15), htup_details.h:669 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define HeapTupleHeaderClearHeapOnly( tup ) ( ( tup ) -> t_infomask2 &= ~ HEAP_ONLY_TUPLE )
@@ -1116,7 +1149,7 @@ macro_rules! HeapTupleHeaderClearHeapOnly {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C inline function HeapTupleHeaderClearHeapOnly from htup_details.h:571 (PostgreSQL 18), htup_details.h:557 (PostgreSQL 19)
+/// C inline function HeapTupleHeaderClearHeapOnly from htup_details.h:725 (PostgreSQL 18), htup_details.h:711 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -1144,7 +1177,7 @@ macro_rules! HeapTupleHeaderClearHeapOnly {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro HeapTupleHeaderClearHotUpdated from htup_details.h:495 (PostgreSQL 15), htup_details.h:499 (PostgreSQL 16–17)
+/// C macro HeapTupleHeaderClearHotUpdated from htup_details.h:650 (PostgreSQL 15), htup_details.h:654 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define HeapTupleHeaderClearHotUpdated( tup ) ( ( tup ) -> t_infomask2 &= ~ HEAP_HOT_UPDATED )
@@ -1203,7 +1236,7 @@ macro_rules! HeapTupleHeaderClearHotUpdated {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C inline function HeapTupleHeaderClearHotUpdated from htup_details.h:553 (PostgreSQL 18), htup_details.h:539 (PostgreSQL 19)
+/// C inline function HeapTupleHeaderClearHotUpdated from htup_details.h:707 (PostgreSQL 18), htup_details.h:693 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -1231,7 +1264,7 @@ macro_rules! HeapTupleHeaderClearHotUpdated {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro HeapTupleHeaderClearMatch from htup_details.h:525 (PostgreSQL 15), htup_details.h:529 (PostgreSQL 16–17)
+/// C macro HeapTupleHeaderClearMatch from htup_details.h:680 (PostgreSQL 15), htup_details.h:684 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define HeapTupleHeaderClearMatch( tup ) ( ( tup ) -> t_infomask2 &= ~ HEAP_TUPLE_HAS_MATCH )
@@ -1292,7 +1325,7 @@ macro_rules! HeapTupleHeaderClearMatch {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C inline function HeapTupleHeaderClearMatch from htup_details.h:722 (PostgreSQL 18), htup_details.h:708 (PostgreSQL 19)
+/// C inline function HeapTupleHeaderClearMatch from htup_details.h:876 (PostgreSQL 18), htup_details.h:862 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -1320,7 +1353,7 @@ macro_rules! HeapTupleHeaderClearMatch {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro HeapTupleHeaderGetDatumLength from htup_details.h:451 (PostgreSQL 15), htup_details.h:455 (PostgreSQL 16–17)
+/// C macro HeapTupleHeaderGetDatumLength from htup_details.h:514 (PostgreSQL 15), htup_details.h:518 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define HeapTupleHeaderGetDatumLength( tup ) VARSIZE ( tup )
@@ -1405,7 +1438,7 @@ macro_rules! HeapTupleHeaderGetDatumLength {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C inline function HeapTupleHeaderGetDatumLength from htup_details.h:496 (PostgreSQL 18), htup_details.h:482 (PostgreSQL 19)
+/// C inline function HeapTupleHeaderGetDatumLength from htup_details.h:559 (PostgreSQL 18), htup_details.h:545 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline uint32
@@ -1438,7 +1471,7 @@ macro_rules! HeapTupleHeaderGetDatumLength {
         )
     };
 }
-/// C macro HeapTupleHeaderGetNatts from htup_details.h:530 (PostgreSQL 15), htup_details.h:534 (PostgreSQL 16–17), htup_details.h:582 (PostgreSQL 18), htup_details.h:568 (PostgreSQL 19)
+/// C macro HeapTupleHeaderGetNatts from htup_details.h:685 (PostgreSQL 15), htup_details.h:689 (PostgreSQL 16–17), htup_details.h:736 (PostgreSQL 18), htup_details.h:722 (PostgreSQL 19)
 ///
 /// ```text
 /// #define HeapTupleHeaderGetNatts( tup ) ( ( tup ) -> t_infomask2 & HEAP_NATTS_MASK )
@@ -1492,7 +1525,7 @@ macro_rules! HeapTupleHeaderGetNatts {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro HeapTupleHeaderGetRawCommandId from htup_details.h:391 (PostgreSQL 15), htup_details.h:392 (PostgreSQL 16–17)
+/// C macro HeapTupleHeaderGetRawCommandId from htup_details.h:423 (PostgreSQL 15), htup_details.h:424 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define HeapTupleHeaderGetRawCommandId( tup ) ( ( tup ) -> t_choice . t_heap . t_field3 . t_cid )
@@ -1555,7 +1588,7 @@ macro_rules! HeapTupleHeaderGetRawCommandId {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C inline function HeapTupleHeaderGetRawCommandId from htup_details.h:419 (PostgreSQL 18), htup_details.h:405 (PostgreSQL 19)
+/// C inline function HeapTupleHeaderGetRawCommandId from htup_details.h:451 (PostgreSQL 18), htup_details.h:437 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline CommandId
@@ -1587,7 +1620,7 @@ macro_rules! HeapTupleHeaderGetRawCommandId {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro HeapTupleHeaderGetRawXmax from htup_details.h:375 (PostgreSQL 15), htup_details.h:376 (PostgreSQL 16–17)
+/// C macro HeapTupleHeaderGetRawXmax from htup_details.h:407 (PostgreSQL 15), htup_details.h:408 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define HeapTupleHeaderGetRawXmax( tup ) ( ( tup ) -> t_choice . t_heap . t_xmax )
@@ -1644,7 +1677,7 @@ macro_rules! HeapTupleHeaderGetRawXmax {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C inline function HeapTupleHeaderGetRawXmax from htup_details.h:381 (PostgreSQL 18), htup_details.h:367 (PostgreSQL 19)
+/// C inline function HeapTupleHeaderGetRawXmax from htup_details.h:413 (PostgreSQL 18), htup_details.h:399 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline TransactionId
@@ -1676,7 +1709,7 @@ macro_rules! HeapTupleHeaderGetRawXmax {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro HeapTupleHeaderGetRawXmin from htup_details.h:308 (PostgreSQL 15), htup_details.h:309 (PostgreSQL 16–17)
+/// C macro HeapTupleHeaderGetRawXmin from htup_details.h:340 (PostgreSQL 15), htup_details.h:341 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define HeapTupleHeaderGetRawXmin( tup ) ( ( tup ) -> t_choice . t_heap . t_xmin )
@@ -1733,7 +1766,7 @@ macro_rules! HeapTupleHeaderGetRawXmin {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C inline function HeapTupleHeaderGetRawXmin from htup_details.h:322 (PostgreSQL 18–19)
+/// C inline function HeapTupleHeaderGetRawXmin from htup_details.h:354 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline TransactionId
@@ -1765,7 +1798,7 @@ macro_rules! HeapTupleHeaderGetRawXmin {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro HeapTupleHeaderGetSpeculativeToken from htup_details.h:434 (PostgreSQL 15)
+/// C macro HeapTupleHeaderGetSpeculativeToken from htup_details.h:466 (PostgreSQL 15)
 ///
 /// ```text
 /// #define HeapTupleHeaderGetSpeculativeToken( tup ) ( AssertMacro ( HeapTupleHeaderIsSpeculative ( tup ) ) , ItemPointerGetBlockNumber ( & ( tup ) -> t_ctid ) )
@@ -1860,7 +1893,7 @@ macro_rules! HeapTupleHeaderGetSpeculativeToken {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
-/// C macro HeapTupleHeaderGetSpeculativeToken from htup_details.h:438 (PostgreSQL 16–17)
+/// C macro HeapTupleHeaderGetSpeculativeToken from htup_details.h:470 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define HeapTupleHeaderGetSpeculativeToken( tup ) ( AssertMacro ( HeapTupleHeaderIsSpeculative ( tup ) ) , ItemPointerGetBlockNumber ( & ( tup ) -> t_ctid ) )
@@ -1902,7 +1935,7 @@ macro_rules! HeapTupleHeaderGetSpeculativeToken {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C inline function HeapTupleHeaderGetSpeculativeToken from htup_details.h:471 (PostgreSQL 18), htup_details.h:457 (PostgreSQL 19)
+/// C inline function HeapTupleHeaderGetSpeculativeToken from htup_details.h:503 (PostgreSQL 18), htup_details.h:489 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline BlockNumber
@@ -1942,70 +1975,25 @@ macro_rules! HeapTupleHeaderGetSpeculativeToken {
         )
     };
 }
-#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro HeapTupleHeaderGetTypMod from htup_details.h:467 (PostgreSQL 15), htup_details.h:471 (PostgreSQL 16–17)
-///
-/// ```text
-/// #define HeapTupleHeaderGetTypMod( tup ) ( ( tup ) -> t_choice . t_datum . datum_typmod )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-#[macro_export]
-macro_rules! HeapTupleHeaderGetTypMod {
-    ($tup:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::load(
-                            $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field_datum_typmod,
-                                _,
-                                _
-                            >(
-                                $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field_t_datum,
-                                    _,
-                                    _
-                                >(
-                                    $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field_t_choice,
-                                        _,
-                                        _
-                                    >(
-                                        $crate::__pgrx_c_macros::expression::pointee(
-                                            (
-                                                $crate::__pgrx_c_macros::expression::profile_value::<
-                                                    true,
-                                                    _
-                                                >(
-                                                    $crate::__pgrx_c_operand!(
-                                                        @value [true];
-                                                        (@native [$tup])
-                                                    )
-                                                )
-                                            )
-                                        )
-                                    )
-                                )
-                            )
-                        )
-                    )
-                )
-            }
-        )
-    };
-}
-#[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C inline function HeapTupleHeaderGetTypMod from htup_details.h:520 (PostgreSQL 18), htup_details.h:506 (PostgreSQL 19)
+/// C inline function HeapTupleHeaderGetTypMod from htup_details.h:530 (PostgreSQL 15), htup_details.h:534 (PostgreSQL 16–17), htup_details.h:583 (PostgreSQL 18), htup_details.h:569 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline int32
 /// HeapTupleHeaderGetTypMod(const HeapTupleHeaderData *tup)
 /// {
+/// 	/*
+/// 	 * If the tuple is versioned (only happens for !RECORDOID), datum_typmod
+/// 	 * carries part of the version. We don't want callers to have to care
+/// 	 * about that, so we return the traditional -1 in that case.
+/// 	 *
+/// 	 * As this is a static inline, extensions compiled with the old definition
+/// 	 * will return the version, but based on an inspection of extensions
+/// 	 * that's ok. Almost all just call lookup_rowtype_tupdesc(), which ignores
+/// 	 * typmod for !RECORDOID cases. The one other case (Citus) is never
+/// 	 * generated by its own planner for !RECORDOID.
+/// 	 */
+/// 	if (HeapTupleHeaderGetTypeId(tup) != RECORDOID)
+/// 		return -1;
 /// 	return tup->t_choice.t_datum.datum_typmod;
 /// }
 /// ```
@@ -2018,6 +2006,10 @@ macro_rules! HeapTupleHeaderGetTypMod {
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HeapTupleHeaderGetTypMod {
     ($tup:expr $(,)?) => {
@@ -2030,7 +2022,7 @@ macro_rules! HeapTupleHeaderGetTypMod {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro HeapTupleHeaderGetTypeId from htup_details.h:457 (PostgreSQL 15), htup_details.h:461 (PostgreSQL 16–17)
+/// C macro HeapTupleHeaderGetTypeId from htup_details.h:520 (PostgreSQL 15), htup_details.h:524 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define HeapTupleHeaderGetTypeId( tup ) ( ( tup ) -> t_choice . t_datum . datum_typeid )
@@ -2087,7 +2079,7 @@ macro_rules! HeapTupleHeaderGetTypeId {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C inline function HeapTupleHeaderGetTypeId from htup_details.h:508 (PostgreSQL 18), htup_details.h:494 (PostgreSQL 19)
+/// C inline function HeapTupleHeaderGetTypeId from htup_details.h:571 (PostgreSQL 18), htup_details.h:557 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline Oid
@@ -2117,7 +2109,7 @@ macro_rules! HeapTupleHeaderGetTypeId {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro HeapTupleHeaderGetUpdateXid from htup_details.h:365 (PostgreSQL 15), htup_details.h:366 (PostgreSQL 16–17)
+/// C macro HeapTupleHeaderGetUpdateXid from htup_details.h:397 (PostgreSQL 15), htup_details.h:398 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define HeapTupleHeaderGetUpdateXid( tup ) ( ( ! ( ( tup ) -> t_infomask & HEAP_XMAX_INVALID ) && ( ( tup ) -> t_infomask & HEAP_XMAX_IS_MULTI ) && ! ( ( tup ) -> t_infomask & HEAP_XMAX_LOCK_ONLY ) ) ? HeapTupleGetUpdateXid ( tup ) : HeapTupleHeaderGetRawXmax ( tup ) )
@@ -2209,7 +2201,7 @@ macro_rules! HeapTupleHeaderGetUpdateXid {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C inline function HeapTupleHeaderGetUpdateXid from htup_details.h:401 (PostgreSQL 18), htup_details.h:387 (PostgreSQL 19)
+/// C inline function HeapTupleHeaderGetUpdateXid from htup_details.h:433 (PostgreSQL 18), htup_details.h:419 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline TransactionId
@@ -2249,8 +2241,58 @@ macro_rules! HeapTupleHeaderGetUpdateXid {
         )
     };
 }
+/// C inline function HeapTupleHeaderGetVersion from htup_details.h:615 (PostgreSQL 15), htup_details.h:619 (PostgreSQL 16–17), htup_details.h:669 (PostgreSQL 18), htup_details.h:655 (PostgreSQL 19)
+///
+/// ```c
+/// static inline XLogRecPtr
+/// HeapTupleHeaderGetVersion(const HeapTupleHeaderData *tup)
+/// {
+/// 	XLogRecPtr	version;
+/// 	uint32		version_low;
+/// 	uint32		version_high;
+///
+/// 	Assert(HeapTupleHeaderIsVersionedDatum(tup));
+///
+/// 	version_low = tup->t_choice.t_datum.datum_typmod;
+/// 	version_high = ItemPointerGetBlockNumberNoCheck(&tup->t_ctid);
+///
+/// 	version = ((uint64) version_high) << 32 | version_low;
+///
+/// 	return version;
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
+/// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+///
+#[doc = crate::__pgrx_c_doc_assertions!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! HeapTupleHeaderGetVersion {
+    ($tup:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$tup;
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_types::XLogRecPtr
+                >()
+            }
+        )
+    };
+}
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro HeapTupleHeaderGetXmin from htup_details.h:313 (PostgreSQL 15), htup_details.h:314 (PostgreSQL 16–17)
+/// C macro HeapTupleHeaderGetXmin from htup_details.h:345 (PostgreSQL 15), htup_details.h:346 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define HeapTupleHeaderGetXmin( tup ) ( HeapTupleHeaderXminFrozen ( tup ) ? FrozenTransactionId : HeapTupleHeaderGetRawXmin ( tup ) )
@@ -2338,7 +2380,7 @@ macro_rules! HeapTupleHeaderGetXmin {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C inline function HeapTupleHeaderGetXmin from htup_details.h:328 (PostgreSQL 18–19)
+/// C inline function HeapTupleHeaderGetXmin from htup_details.h:360 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline TransactionId
@@ -2375,7 +2417,7 @@ macro_rules! HeapTupleHeaderGetXmin {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro HeapTupleHeaderGetXvac from htup_details.h:415 (PostgreSQL 15), htup_details.h:416 (PostgreSQL 16–17)
+/// C macro HeapTupleHeaderGetXvac from htup_details.h:447 (PostgreSQL 15), htup_details.h:448 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define HeapTupleHeaderGetXvac( tup ) ( ( ( tup ) -> t_infomask & HEAP_MOVED ) ? ( tup ) -> t_choice . t_heap . t_field3 . t_xvac : InvalidTransactionId )
@@ -2499,7 +2541,7 @@ macro_rules! HeapTupleHeaderGetXvac {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C inline function HeapTupleHeaderGetXvac from htup_details.h:446 (PostgreSQL 18), htup_details.h:432 (PostgreSQL 19)
+/// C inline function HeapTupleHeaderGetXvac from htup_details.h:478 (PostgreSQL 18), htup_details.h:464 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline TransactionId
@@ -2537,7 +2579,7 @@ macro_rules! HeapTupleHeaderGetXvac {
         )
     };
 }
-/// C macro HeapTupleHeaderHasExternal from htup_details.h:538 (PostgreSQL 15), htup_details.h:542 (PostgreSQL 16–17), htup_details.h:590 (PostgreSQL 18), htup_details.h:576 (PostgreSQL 19)
+/// C macro HeapTupleHeaderHasExternal from htup_details.h:693 (PostgreSQL 15), htup_details.h:697 (PostgreSQL 16–17), htup_details.h:744 (PostgreSQL 18), htup_details.h:730 (PostgreSQL 19)
 ///
 /// ```text
 /// #define HeapTupleHeaderHasExternal( tup ) ( ( ( tup ) -> t_infomask & HEAP_HASEXTERNAL ) != 0 )
@@ -2567,7 +2609,7 @@ macro_rules! HeapTupleHeaderHasExternal {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro HeapTupleHeaderHasMatch from htup_details.h:515 (PostgreSQL 15), htup_details.h:519 (PostgreSQL 16–17)
+/// C macro HeapTupleHeaderHasMatch from htup_details.h:670 (PostgreSQL 15), htup_details.h:674 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define HeapTupleHeaderHasMatch( tup ) ( ( ( tup ) -> t_infomask2 & HEAP_TUPLE_HAS_MATCH ) != 0 )
@@ -2597,7 +2639,7 @@ macro_rules! HeapTupleHeaderHasMatch {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C inline function HeapTupleHeaderHasMatch from htup_details.h:710 (PostgreSQL 18), htup_details.h:696 (PostgreSQL 19)
+/// C inline function HeapTupleHeaderHasMatch from htup_details.h:864 (PostgreSQL 18), htup_details.h:850 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -2627,7 +2669,7 @@ macro_rules! HeapTupleHeaderHasMatch {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro HeapTupleHeaderIndicatesMovedPartitions from htup_details.h:445 (PostgreSQL 15)
+/// C macro HeapTupleHeaderIndicatesMovedPartitions from htup_details.h:477 (PostgreSQL 15)
 ///
 /// ```text
 /// #define HeapTupleHeaderIndicatesMovedPartitions( tup ) ItemPointerIndicatesMovedPartitions ( & ( tup ) -> t_ctid )
@@ -2667,7 +2709,7 @@ macro_rules! HeapTupleHeaderIndicatesMovedPartitions {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
-/// C macro HeapTupleHeaderIndicatesMovedPartitions from htup_details.h:449 (PostgreSQL 16–17)
+/// C macro HeapTupleHeaderIndicatesMovedPartitions from htup_details.h:481 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define HeapTupleHeaderIndicatesMovedPartitions( tup ) ItemPointerIndicatesMovedPartitions ( & ( tup ) -> t_ctid )
@@ -2699,7 +2741,7 @@ macro_rules! HeapTupleHeaderIndicatesMovedPartitions {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C inline function HeapTupleHeaderIndicatesMovedPartitions from htup_details.h:484 (PostgreSQL 18), htup_details.h:470 (PostgreSQL 19)
+/// C inline function HeapTupleHeaderIndicatesMovedPartitions from htup_details.h:516 (PostgreSQL 18), htup_details.h:502 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -2732,8 +2774,37 @@ macro_rules! HeapTupleHeaderIndicatesMovedPartitions {
         )
     };
 }
+/// C inline function HeapTupleHeaderIsDatum from htup_details.h:494 (PostgreSQL 15), htup_details.h:498 (PostgreSQL 16–17), htup_details.h:539 (PostgreSQL 18), htup_details.h:525 (PostgreSQL 19)
+///
+/// ```c
+/// static inline bool
+/// HeapTupleHeaderIsDatum(const HeapTupleHeaderData *tup)
+/// {
+/// 	return (tup->t_infomask & HEAP_IS_DATUM) == HEAP_IS_DATUM;
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+#[macro_export]
+macro_rules! HeapTupleHeaderIsDatum {
+    ($tup:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @truth {
+                let _ = &$tup;
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
+            }
+        )
+    };
+}
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro HeapTupleHeaderIsHeapOnly from htup_details.h:500 (PostgreSQL 15), htup_details.h:504 (PostgreSQL 16–17)
+/// C macro HeapTupleHeaderIsHeapOnly from htup_details.h:655 (PostgreSQL 15), htup_details.h:659 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define HeapTupleHeaderIsHeapOnly( tup ) ( ( ( tup ) -> t_infomask2 & HEAP_ONLY_TUPLE ) != 0 )
@@ -2763,7 +2834,7 @@ macro_rules! HeapTupleHeaderIsHeapOnly {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C inline function HeapTupleHeaderIsHeapOnly from htup_details.h:559 (PostgreSQL 18), htup_details.h:545 (PostgreSQL 19)
+/// C inline function HeapTupleHeaderIsHeapOnly from htup_details.h:713 (PostgreSQL 18), htup_details.h:699 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -2793,7 +2864,7 @@ macro_rules! HeapTupleHeaderIsHeapOnly {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro HeapTupleHeaderIsHotUpdated from htup_details.h:483 (PostgreSQL 15), htup_details.h:487 (PostgreSQL 16–17)
+/// C macro HeapTupleHeaderIsHotUpdated from htup_details.h:638 (PostgreSQL 15), htup_details.h:642 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define HeapTupleHeaderIsHotUpdated( tup ) ( ( ( tup ) -> t_infomask2 & HEAP_HOT_UPDATED ) != 0 && ( ( tup ) -> t_infomask & HEAP_XMAX_INVALID ) == 0 && ! HeapTupleHeaderXminInvalid ( tup ) )
@@ -2823,7 +2894,7 @@ macro_rules! HeapTupleHeaderIsHotUpdated {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C inline function HeapTupleHeaderIsHotUpdated from htup_details.h:538 (PostgreSQL 18), htup_details.h:524 (PostgreSQL 19)
+/// C inline function HeapTupleHeaderIsHotUpdated from htup_details.h:692 (PostgreSQL 18), htup_details.h:678 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -2856,7 +2927,7 @@ macro_rules! HeapTupleHeaderIsHotUpdated {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro HeapTupleHeaderIsSpeculative from htup_details.h:429 (PostgreSQL 15), htup_details.h:433 (PostgreSQL 16–17)
+/// C macro HeapTupleHeaderIsSpeculative from htup_details.h:461 (PostgreSQL 15), htup_details.h:465 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define HeapTupleHeaderIsSpeculative( tup ) ( ( ItemPointerGetOffsetNumberNoCheck ( & ( tup ) -> t_ctid ) == SpecTokenOffsetNumber ) )
@@ -2888,7 +2959,7 @@ macro_rules! HeapTupleHeaderIsSpeculative {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C inline function HeapTupleHeaderIsSpeculative from htup_details.h:465 (PostgreSQL 18), htup_details.h:451 (PostgreSQL 19)
+/// C inline function HeapTupleHeaderIsSpeculative from htup_details.h:497 (PostgreSQL 18), htup_details.h:483 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -2917,8 +2988,67 @@ macro_rules! HeapTupleHeaderIsSpeculative {
         )
     };
 }
+/// C inline function HeapTupleHeaderIsVersionedDatum from htup_details.h:592 (PostgreSQL 15), htup_details.h:596 (PostgreSQL 16–17), htup_details.h:646 (PostgreSQL 18), htup_details.h:632 (PostgreSQL 19)
+///
+/// ```c
+/// static inline bool
+/// HeapTupleHeaderIsVersionedDatum(const HeapTupleHeaderData *tup)
+/// {
+/// 	return HeapTupleHeaderIsDatum(tup) &&
+/// 		ItemPointerGetOffsetNumberNoCheck(&tup->t_ctid) == VersionedDatumOffsetNumber;
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+#[macro_export]
+macro_rules! HeapTupleHeaderIsVersionedDatum {
+    ($tup:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @truth {
+                let _ = &$tup;
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
+            }
+        )
+    };
+}
+/// C inline function HeapTupleHeaderReallyIsDatum from htup_details.h:580 (PostgreSQL 15), htup_details.h:584 (PostgreSQL 16–17), htup_details.h:634 (PostgreSQL 18), htup_details.h:620 (PostgreSQL 19)
+///
+/// ```c
+/// static inline bool
+/// HeapTupleHeaderReallyIsDatum(const HeapTupleHeaderData *tup)
+/// {
+/// 	return HeapTupleHeaderIsDatum(tup) && tup->t_choice.t_datum.datum_len_ != 0;
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+#[macro_export]
+macro_rules! HeapTupleHeaderReallyIsDatum {
+    ($tup:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @truth {
+                let _ = &$tup;
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
+            }
+        )
+    };
+}
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro HeapTupleHeaderSetCmax from htup_details.h:405 (PostgreSQL 15), htup_details.h:406 (PostgreSQL 16–17)
+/// C macro HeapTupleHeaderSetCmax from htup_details.h:437 (PostgreSQL 15), htup_details.h:438 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define HeapTupleHeaderSetCmax( tup , cid , iscombo ) do { Assert ( ! ( ( tup ) -> t_infomask & HEAP_MOVED ) ) ; ( tup ) -> t_choice . t_heap . t_field3 . t_cid = ( cid ) ; if ( iscombo ) ( tup ) -> t_infomask |= HEAP_COMBOCID ; else ( tup ) -> t_infomask &= ~ HEAP_COMBOCID ; } while ( 0 )
@@ -2949,7 +3079,7 @@ macro_rules! HeapTupleHeaderSetCmax {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C inline function HeapTupleHeaderSetCmax from htup_details.h:435 (PostgreSQL 18), htup_details.h:421 (PostgreSQL 19)
+/// C inline function HeapTupleHeaderSetCmax from htup_details.h:467 (PostgreSQL 18), htup_details.h:453 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -2990,7 +3120,7 @@ macro_rules! HeapTupleHeaderSetCmax {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro HeapTupleHeaderSetCmin from htup_details.h:397 (PostgreSQL 15), htup_details.h:398 (PostgreSQL 16–17)
+/// C macro HeapTupleHeaderSetCmin from htup_details.h:429 (PostgreSQL 15), htup_details.h:430 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define HeapTupleHeaderSetCmin( tup , cid ) do { Assert ( ! ( ( tup ) -> t_infomask & HEAP_MOVED ) ) ; ( tup ) -> t_choice . t_heap . t_field3 . t_cid = ( cid ) ; ( tup ) -> t_infomask &= ~ HEAP_COMBOCID ; } while ( 0 )
@@ -3018,7 +3148,7 @@ macro_rules! HeapTupleHeaderSetCmin {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C inline function HeapTupleHeaderSetCmin from htup_details.h:426 (PostgreSQL 18), htup_details.h:412 (PostgreSQL 19)
+/// C inline function HeapTupleHeaderSetCmin from htup_details.h:458 (PostgreSQL 18), htup_details.h:444 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -3052,8 +3182,35 @@ macro_rules! HeapTupleHeaderSetCmin {
         })
     };
 }
+/// C inline function HeapTupleHeaderSetDatum from htup_details.h:500 (PostgreSQL 15), htup_details.h:504 (PostgreSQL 16–17), htup_details.h:545 (PostgreSQL 18), htup_details.h:531 (PostgreSQL 19)
+///
+/// ```c
+/// static inline void
+/// HeapTupleHeaderSetDatum(HeapTupleHeaderData *tup)
+/// {
+/// 	tup->t_infomask |= HEAP_IS_DATUM;
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+#[macro_export]
+macro_rules! HeapTupleHeaderSetDatum {
+    ($tup:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$tup;
+            ()
+        })
+    };
+}
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro HeapTupleHeaderSetDatumLength from htup_details.h:454 (PostgreSQL 15), htup_details.h:458 (PostgreSQL 16–17)
+/// C macro HeapTupleHeaderSetDatumLength from htup_details.h:517 (PostgreSQL 15), htup_details.h:521 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define HeapTupleHeaderSetDatumLength( tup , len ) SET_VARSIZE ( tup , len )
@@ -3141,7 +3298,7 @@ macro_rules! HeapTupleHeaderSetDatumLength {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C inline function HeapTupleHeaderSetDatumLength from htup_details.h:502 (PostgreSQL 18), htup_details.h:488 (PostgreSQL 19)
+/// C inline function HeapTupleHeaderSetDatumLength from htup_details.h:565 (PostgreSQL 18), htup_details.h:551 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -3174,7 +3331,7 @@ macro_rules! HeapTupleHeaderSetDatumLength {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro HeapTupleHeaderSetHeapOnly from htup_details.h:505 (PostgreSQL 15), htup_details.h:509 (PostgreSQL 16–17)
+/// C macro HeapTupleHeaderSetHeapOnly from htup_details.h:660 (PostgreSQL 15), htup_details.h:664 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define HeapTupleHeaderSetHeapOnly( tup ) ( ( tup ) -> t_infomask2 |= HEAP_ONLY_TUPLE )
@@ -3229,7 +3386,7 @@ macro_rules! HeapTupleHeaderSetHeapOnly {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C inline function HeapTupleHeaderSetHeapOnly from htup_details.h:565 (PostgreSQL 18), htup_details.h:551 (PostgreSQL 19)
+/// C inline function HeapTupleHeaderSetHeapOnly from htup_details.h:719 (PostgreSQL 18), htup_details.h:705 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -3257,7 +3414,7 @@ macro_rules! HeapTupleHeaderSetHeapOnly {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro HeapTupleHeaderSetHotUpdated from htup_details.h:490 (PostgreSQL 15), htup_details.h:494 (PostgreSQL 16–17)
+/// C macro HeapTupleHeaderSetHotUpdated from htup_details.h:645 (PostgreSQL 15), htup_details.h:649 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define HeapTupleHeaderSetHotUpdated( tup ) ( ( tup ) -> t_infomask2 |= HEAP_HOT_UPDATED )
@@ -3312,7 +3469,7 @@ macro_rules! HeapTupleHeaderSetHotUpdated {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C inline function HeapTupleHeaderSetHotUpdated from htup_details.h:547 (PostgreSQL 18), htup_details.h:533 (PostgreSQL 19)
+/// C inline function HeapTupleHeaderSetHotUpdated from htup_details.h:701 (PostgreSQL 18), htup_details.h:687 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -3340,7 +3497,7 @@ macro_rules! HeapTupleHeaderSetHotUpdated {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro HeapTupleHeaderSetMatch from htup_details.h:520 (PostgreSQL 15), htup_details.h:524 (PostgreSQL 16–17)
+/// C macro HeapTupleHeaderSetMatch from htup_details.h:675 (PostgreSQL 15), htup_details.h:679 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define HeapTupleHeaderSetMatch( tup ) ( ( tup ) -> t_infomask2 |= HEAP_TUPLE_HAS_MATCH )
@@ -3395,7 +3552,7 @@ macro_rules! HeapTupleHeaderSetMatch {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C inline function HeapTupleHeaderSetMatch from htup_details.h:716 (PostgreSQL 18), htup_details.h:702 (PostgreSQL 19)
+/// C inline function HeapTupleHeaderSetMatch from htup_details.h:870 (PostgreSQL 18), htup_details.h:856 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -3423,7 +3580,7 @@ macro_rules! HeapTupleHeaderSetMatch {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro HeapTupleHeaderSetMovedPartitions from htup_details.h:448 (PostgreSQL 15)
+/// C macro HeapTupleHeaderSetMovedPartitions from htup_details.h:480 (PostgreSQL 15)
 ///
 /// ```text
 /// #define HeapTupleHeaderSetMovedPartitions( tup ) ItemPointerSetMovedPartitions ( & ( tup ) -> t_ctid )
@@ -3508,7 +3665,7 @@ macro_rules! HeapTupleHeaderSetMovedPartitions {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
-/// C macro HeapTupleHeaderSetMovedPartitions from htup_details.h:452 (PostgreSQL 16–17)
+/// C macro HeapTupleHeaderSetMovedPartitions from htup_details.h:484 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define HeapTupleHeaderSetMovedPartitions( tup ) ItemPointerSetMovedPartitions ( & ( tup ) -> t_ctid )
@@ -3534,7 +3691,7 @@ macro_rules! HeapTupleHeaderSetMovedPartitions {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C inline function HeapTupleHeaderSetMovedPartitions from htup_details.h:490 (PostgreSQL 18), htup_details.h:476 (PostgreSQL 19)
+/// C inline function HeapTupleHeaderSetMovedPartitions from htup_details.h:522 (PostgreSQL 18), htup_details.h:508 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -3565,7 +3722,7 @@ macro_rules! HeapTupleHeaderSetMovedPartitions {
         })
     };
 }
-/// C macro HeapTupleHeaderSetNatts from htup_details.h:533 (PostgreSQL 15), htup_details.h:537 (PostgreSQL 16–17), htup_details.h:585 (PostgreSQL 18), htup_details.h:571 (PostgreSQL 19)
+/// C macro HeapTupleHeaderSetNatts from htup_details.h:688 (PostgreSQL 15), htup_details.h:692 (PostgreSQL 16–17), htup_details.h:739 (PostgreSQL 18), htup_details.h:725 (PostgreSQL 19)
 ///
 /// ```text
 /// #define HeapTupleHeaderSetNatts( tup , natts ) ( ( tup ) -> t_infomask2 = ( ( tup ) -> t_infomask2 & ~ HEAP_NATTS_MASK ) | ( natts ) )
@@ -3677,7 +3834,7 @@ macro_rules! HeapTupleHeaderSetNatts {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro HeapTupleHeaderSetSpeculativeToken from htup_details.h:440 (PostgreSQL 15)
+/// C macro HeapTupleHeaderSetSpeculativeToken from htup_details.h:472 (PostgreSQL 15)
 ///
 /// ```text
 /// #define HeapTupleHeaderSetSpeculativeToken( tup , token ) ( ItemPointerSet ( & ( tup ) -> t_ctid , token , SpecTokenOffsetNumber ) )
@@ -3766,7 +3923,7 @@ macro_rules! HeapTupleHeaderSetSpeculativeToken {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
-/// C macro HeapTupleHeaderSetSpeculativeToken from htup_details.h:444 (PostgreSQL 16–17)
+/// C macro HeapTupleHeaderSetSpeculativeToken from htup_details.h:476 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define HeapTupleHeaderSetSpeculativeToken( tup , token ) ( ItemPointerSet ( & ( tup ) -> t_ctid , token , SpecTokenOffsetNumber ) )
@@ -3793,7 +3950,7 @@ macro_rules! HeapTupleHeaderSetSpeculativeToken {
     };
 }
 #[cfg(feature = "pg18")]
-/// C inline function HeapTupleHeaderSetSpeculativeToken from htup_details.h:478 (PostgreSQL 18)
+/// C inline function HeapTupleHeaderSetSpeculativeToken from htup_details.h:510 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline void
@@ -3826,7 +3983,7 @@ macro_rules! HeapTupleHeaderSetSpeculativeToken {
     };
 }
 #[cfg(feature = "pg19")]
-/// C inline function HeapTupleHeaderSetSpeculativeToken from htup_details.h:464 (PostgreSQL 19)
+/// C inline function HeapTupleHeaderSetSpeculativeToken from htup_details.h:496 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -3859,7 +4016,7 @@ macro_rules! HeapTupleHeaderSetSpeculativeToken {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro HeapTupleHeaderSetTypMod from htup_details.h:472 (PostgreSQL 15), htup_details.h:476 (PostgreSQL 16–17)
+/// C macro HeapTupleHeaderSetTypMod from htup_details.h:549 (PostgreSQL 15), htup_details.h:553 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define HeapTupleHeaderSetTypMod( tup , typmod ) ( ( tup ) -> t_choice . t_datum . datum_typmod = ( typmod ) )
@@ -3921,7 +4078,7 @@ macro_rules! HeapTupleHeaderSetTypMod {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C inline function HeapTupleHeaderSetTypMod from htup_details.h:526 (PostgreSQL 18), htup_details.h:512 (PostgreSQL 19)
+/// C inline function HeapTupleHeaderSetTypMod from htup_details.h:602 (PostgreSQL 18), htup_details.h:588 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -3950,7 +4107,7 @@ macro_rules! HeapTupleHeaderSetTypMod {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro HeapTupleHeaderSetTypeId from htup_details.h:462 (PostgreSQL 15), htup_details.h:466 (PostgreSQL 16–17)
+/// C macro HeapTupleHeaderSetTypeId from htup_details.h:525 (PostgreSQL 15), htup_details.h:529 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define HeapTupleHeaderSetTypeId( tup , typeid ) ( ( tup ) -> t_choice . t_datum . datum_typeid = ( typeid ) )
@@ -4012,7 +4169,7 @@ macro_rules! HeapTupleHeaderSetTypeId {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C inline function HeapTupleHeaderSetTypeId from htup_details.h:514 (PostgreSQL 18), htup_details.h:500 (PostgreSQL 19)
+/// C inline function HeapTupleHeaderSetTypeId from htup_details.h:577 (PostgreSQL 18), htup_details.h:563 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -4040,8 +4197,54 @@ macro_rules! HeapTupleHeaderSetTypeId {
         })
     };
 }
+/// C inline function HeapTupleHeaderSetVersion from htup_details.h:599 (PostgreSQL 15), htup_details.h:603 (PostgreSQL 16–17), htup_details.h:653 (PostgreSQL 18), htup_details.h:639 (PostgreSQL 19)
+///
+/// ```c
+/// static inline void
+/// HeapTupleHeaderSetVersion(HeapTupleHeaderData *tup, XLogRecPtr version)
+/// {
+/// 	uint32		version_high = (uint32) (version >> 32);
+/// 	uint32		version_low = (uint32) (version);
+///
+/// 	Assert(HeapTupleHeaderIsDatum(tup));
+///
+/// 	/* set the version */
+/// 	tup->t_choice.t_datum.datum_typmod = version_low;
+/// 	ItemPointerSetBlockNumber(&tup->t_ctid, version_high);
+///
+/// 	/* mark as versioned */
+/// 	ItemPointerSetOffsetNumber(&tup->t_ctid, VersionedDatumOffsetNumber);
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
+/// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+///
+#[doc = crate::__pgrx_c_doc_assertions!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! HeapTupleHeaderSetVersion {
+    ($tup:expr, $version:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$tup;
+            let _ = &$version;
+            ()
+        })
+    };
+}
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro HeapTupleHeaderSetXmax from htup_details.h:380 (PostgreSQL 15), htup_details.h:381 (PostgreSQL 16–17)
+/// C macro HeapTupleHeaderSetXmax from htup_details.h:412 (PostgreSQL 15), htup_details.h:413 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define HeapTupleHeaderSetXmax( tup , xid ) ( ( tup ) -> t_choice . t_heap . t_xmax = ( xid ) )
@@ -4103,7 +4306,7 @@ macro_rules! HeapTupleHeaderSetXmax {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C inline function HeapTupleHeaderSetXmax from htup_details.h:387 (PostgreSQL 18), htup_details.h:373 (PostgreSQL 19)
+/// C inline function HeapTupleHeaderSetXmax from htup_details.h:419 (PostgreSQL 18), htup_details.h:405 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -4132,7 +4335,7 @@ macro_rules! HeapTupleHeaderSetXmax {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro HeapTupleHeaderSetXmin from htup_details.h:319 (PostgreSQL 15), htup_details.h:320 (PostgreSQL 16–17)
+/// C macro HeapTupleHeaderSetXmin from htup_details.h:351 (PostgreSQL 15), htup_details.h:352 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define HeapTupleHeaderSetXmin( tup , xid ) ( ( tup ) -> t_choice . t_heap . t_xmin = ( xid ) )
@@ -4194,7 +4397,7 @@ macro_rules! HeapTupleHeaderSetXmin {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C inline function HeapTupleHeaderSetXmin from htup_details.h:335 (PostgreSQL 18–19)
+/// C inline function HeapTupleHeaderSetXmin from htup_details.h:367 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline void
@@ -4223,7 +4426,7 @@ macro_rules! HeapTupleHeaderSetXmin {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro HeapTupleHeaderSetXminCommitted from htup_details.h:340 (PostgreSQL 15), htup_details.h:341 (PostgreSQL 16–17)
+/// C macro HeapTupleHeaderSetXminCommitted from htup_details.h:372 (PostgreSQL 15), htup_details.h:373 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define HeapTupleHeaderSetXminCommitted( tup ) ( AssertMacro ( ! HeapTupleHeaderXminInvalid ( tup ) ) , ( ( tup ) -> t_infomask |= HEAP_XMIN_COMMITTED ) )
@@ -4299,7 +4502,7 @@ macro_rules! HeapTupleHeaderSetXminCommitted {
     };
 }
 #[cfg(feature = "pg18")]
-/// C inline function HeapTupleHeaderSetXminCommitted from htup_details.h:360 (PostgreSQL 18)
+/// C inline function HeapTupleHeaderSetXminCommitted from htup_details.h:392 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline void
@@ -4332,7 +4535,7 @@ macro_rules! HeapTupleHeaderSetXminCommitted {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro HeapTupleHeaderSetXminFrozen from htup_details.h:352 (PostgreSQL 15), htup_details.h:353 (PostgreSQL 16–17)
+/// C macro HeapTupleHeaderSetXminFrozen from htup_details.h:384 (PostgreSQL 15), htup_details.h:385 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define HeapTupleHeaderSetXminFrozen( tup ) ( AssertMacro ( ! HeapTupleHeaderXminInvalid ( tup ) ) , ( ( tup ) -> t_infomask |= HEAP_XMIN_FROZEN ) )
@@ -4408,7 +4611,7 @@ macro_rules! HeapTupleHeaderSetXminFrozen {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C inline function HeapTupleHeaderSetXminFrozen from htup_details.h:374 (PostgreSQL 18), htup_details.h:360 (PostgreSQL 19)
+/// C inline function HeapTupleHeaderSetXminFrozen from htup_details.h:406 (PostgreSQL 18), htup_details.h:392 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -4441,7 +4644,7 @@ macro_rules! HeapTupleHeaderSetXminFrozen {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro HeapTupleHeaderSetXminInvalid from htup_details.h:346 (PostgreSQL 15), htup_details.h:347 (PostgreSQL 16–17)
+/// C macro HeapTupleHeaderSetXminInvalid from htup_details.h:378 (PostgreSQL 15), htup_details.h:379 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define HeapTupleHeaderSetXminInvalid( tup ) ( AssertMacro ( ! HeapTupleHeaderXminCommitted ( tup ) ) , ( ( tup ) -> t_infomask |= HEAP_XMIN_INVALID ) )
@@ -4517,7 +4720,7 @@ macro_rules! HeapTupleHeaderSetXminInvalid {
     };
 }
 #[cfg(feature = "pg18")]
-/// C inline function HeapTupleHeaderSetXminInvalid from htup_details.h:367 (PostgreSQL 18)
+/// C inline function HeapTupleHeaderSetXminInvalid from htup_details.h:399 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline void
@@ -4550,7 +4753,7 @@ macro_rules! HeapTupleHeaderSetXminInvalid {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro HeapTupleHeaderSetXvac from htup_details.h:423 (PostgreSQL 15), htup_details.h:424 (PostgreSQL 16–17)
+/// C macro HeapTupleHeaderSetXvac from htup_details.h:455 (PostgreSQL 15), htup_details.h:456 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define HeapTupleHeaderSetXvac( tup , xid ) do { Assert ( ( tup ) -> t_infomask & HEAP_MOVED ) ; ( tup ) -> t_choice . t_heap . t_field3 . t_xvac = ( xid ) ; } while ( 0 )
@@ -4578,7 +4781,7 @@ macro_rules! HeapTupleHeaderSetXvac {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C inline function HeapTupleHeaderSetXvac from htup_details.h:455 (PostgreSQL 18), htup_details.h:441 (PostgreSQL 19)
+/// C inline function HeapTupleHeaderSetXvac from htup_details.h:487 (PostgreSQL 18), htup_details.h:473 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -4612,7 +4815,7 @@ macro_rules! HeapTupleHeaderSetXvac {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro HeapTupleHeaderXminCommitted from htup_details.h:324 (PostgreSQL 15), htup_details.h:325 (PostgreSQL 16–17)
+/// C macro HeapTupleHeaderXminCommitted from htup_details.h:356 (PostgreSQL 15), htup_details.h:357 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define HeapTupleHeaderXminCommitted( tup ) ( ( ( tup ) -> t_infomask & HEAP_XMIN_COMMITTED ) != 0 )
@@ -4642,7 +4845,7 @@ macro_rules! HeapTupleHeaderXminCommitted {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C inline function HeapTupleHeaderXminCommitted from htup_details.h:341 (PostgreSQL 18–19)
+/// C inline function HeapTupleHeaderXminCommitted from htup_details.h:373 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline bool
@@ -4672,7 +4875,7 @@ macro_rules! HeapTupleHeaderXminCommitted {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro HeapTupleHeaderXminFrozen from htup_details.h:335 (PostgreSQL 15), htup_details.h:336 (PostgreSQL 16–17)
+/// C macro HeapTupleHeaderXminFrozen from htup_details.h:367 (PostgreSQL 15), htup_details.h:368 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define HeapTupleHeaderXminFrozen( tup ) ( ( ( tup ) -> t_infomask & ( HEAP_XMIN_FROZEN ) ) == HEAP_XMIN_FROZEN )
@@ -4702,7 +4905,7 @@ macro_rules! HeapTupleHeaderXminFrozen {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C inline function HeapTupleHeaderXminFrozen from htup_details.h:354 (PostgreSQL 18–19)
+/// C inline function HeapTupleHeaderXminFrozen from htup_details.h:386 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline bool
@@ -4732,7 +4935,7 @@ macro_rules! HeapTupleHeaderXminFrozen {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro HeapTupleHeaderXminInvalid from htup_details.h:329 (PostgreSQL 15), htup_details.h:330 (PostgreSQL 16–17)
+/// C macro HeapTupleHeaderXminInvalid from htup_details.h:361 (PostgreSQL 15), htup_details.h:362 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define HeapTupleHeaderXminInvalid( tup ) ( ( ( tup ) -> t_infomask & ( HEAP_XMIN_COMMITTED | HEAP_XMIN_INVALID ) ) == HEAP_XMIN_INVALID )
@@ -4762,7 +4965,7 @@ macro_rules! HeapTupleHeaderXminInvalid {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C inline function HeapTupleHeaderXminInvalid from htup_details.h:347 (PostgreSQL 18–19)
+/// C inline function HeapTupleHeaderXminInvalid from htup_details.h:379 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline bool
@@ -4793,7 +4996,7 @@ macro_rules! HeapTupleHeaderXminInvalid {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro HeapTupleIsHeapOnly from htup_details.h:684 (PostgreSQL 15), htup_details.h:688 (PostgreSQL 16–17)
+/// C macro HeapTupleIsHeapOnly from htup_details.h:839 (PostgreSQL 15), htup_details.h:843 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define HeapTupleIsHeapOnly( tuple ) HeapTupleHeaderIsHeapOnly ( ( tuple ) -> t_data )
@@ -4823,7 +5026,7 @@ macro_rules! HeapTupleIsHeapOnly {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C inline function HeapTupleIsHeapOnly from htup_details.h:790 (PostgreSQL 18), htup_details.h:776 (PostgreSQL 19)
+/// C inline function HeapTupleIsHeapOnly from htup_details.h:944 (PostgreSQL 18), htup_details.h:930 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -4853,7 +5056,7 @@ macro_rules! HeapTupleIsHeapOnly {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro HeapTupleIsHotUpdated from htup_details.h:675 (PostgreSQL 15), htup_details.h:679 (PostgreSQL 16–17)
+/// C macro HeapTupleIsHotUpdated from htup_details.h:830 (PostgreSQL 15), htup_details.h:834 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define HeapTupleIsHotUpdated( tuple ) HeapTupleHeaderIsHotUpdated ( ( tuple ) -> t_data )
@@ -4883,7 +5086,7 @@ macro_rules! HeapTupleIsHotUpdated {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C inline function HeapTupleIsHotUpdated from htup_details.h:772 (PostgreSQL 18), htup_details.h:758 (PostgreSQL 19)
+/// C inline function HeapTupleIsHotUpdated from htup_details.h:926 (PostgreSQL 18), htup_details.h:912 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -4913,7 +5116,7 @@ macro_rules! HeapTupleIsHotUpdated {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro HeapTupleNoNulls from htup_details.h:663 (PostgreSQL 15), htup_details.h:667 (PostgreSQL 16–17)
+/// C macro HeapTupleNoNulls from htup_details.h:818 (PostgreSQL 15), htup_details.h:822 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define HeapTupleNoNulls( tuple ) ( ! ( ( tuple ) -> t_data -> t_infomask & HEAP_HASNULL ) )
@@ -4943,7 +5146,7 @@ macro_rules! HeapTupleNoNulls {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C inline function HeapTupleNoNulls from htup_details.h:748 (PostgreSQL 18), htup_details.h:734 (PostgreSQL 19)
+/// C inline function HeapTupleNoNulls from htup_details.h:902 (PostgreSQL 18), htup_details.h:888 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -4973,7 +5176,7 @@ macro_rules! HeapTupleNoNulls {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro HeapTupleSetHeapOnly from htup_details.h:687 (PostgreSQL 15), htup_details.h:691 (PostgreSQL 16–17)
+/// C macro HeapTupleSetHeapOnly from htup_details.h:842 (PostgreSQL 15), htup_details.h:846 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define HeapTupleSetHeapOnly( tuple ) HeapTupleHeaderSetHeapOnly ( ( tuple ) -> t_data )
@@ -5045,7 +5248,7 @@ macro_rules! HeapTupleSetHeapOnly {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C inline function HeapTupleSetHeapOnly from htup_details.h:796 (PostgreSQL 18), htup_details.h:782 (PostgreSQL 19)
+/// C inline function HeapTupleSetHeapOnly from htup_details.h:950 (PostgreSQL 18), htup_details.h:936 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -5073,7 +5276,7 @@ macro_rules! HeapTupleSetHeapOnly {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro HeapTupleSetHotUpdated from htup_details.h:678 (PostgreSQL 15), htup_details.h:682 (PostgreSQL 16–17)
+/// C macro HeapTupleSetHotUpdated from htup_details.h:833 (PostgreSQL 15), htup_details.h:837 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define HeapTupleSetHotUpdated( tuple ) HeapTupleHeaderSetHotUpdated ( ( tuple ) -> t_data )
@@ -5145,7 +5348,7 @@ macro_rules! HeapTupleSetHotUpdated {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C inline function HeapTupleSetHotUpdated from htup_details.h:778 (PostgreSQL 18), htup_details.h:764 (PostgreSQL 19)
+/// C inline function HeapTupleSetHotUpdated from htup_details.h:932 (PostgreSQL 18), htup_details.h:918 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -5173,13 +5376,38 @@ macro_rules! HeapTupleSetHotUpdated {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C inline function fastgetattr from htup_details.h:749 (PostgreSQL 15), htup_details.h:753 (PostgreSQL 16–17)
+/// C inline function fastgetattr from htup_details.h:922 (PostgreSQL 15), htup_details.h:926 (PostgreSQL 16–17)
 ///
 /// ```c
 /// static inline Datum
 /// fastgetattr(HeapTuple tup, int attnum, TupleDesc tupleDesc, bool *isnull)
 /// {
 /// 	Assert(attnum > 0);
+///
+/// 	/*
+/// 	 * NB: Right now this does not call heap_datum_check(). The reasoning is
+/// 	 * that
+/// 	 *
+/// 	 * a) fastgetattr() is used in quite performance sensitive paths like
+/// 	 * catcache, adding code bloat to it would not be great
+/// 	 *
+/// 	 * b) The requirement that the caller already have validated attnum
+/// 	 * (without that we'd run off the end of the attribute array!), basically
+/// 	 * means it can only be used where the caller is sure that the type isn't
+/// 	 * evolving.
+/// 	 *
+/// 	 * c) fastgetattr() is called from heap_getattr(), so we would often check
+/// 	 * twice.
+/// 	 *
+/// 	 * I think that's the right decision. An investigation of extensions found
+/// 	 * only two users ("rum" and "storage_engine") and both of them use
+/// 	 * fastgetattr() on tables that can't be altered by non-superusers.
+/// 	 *
+/// 	 * While it might seem we should just assert that this is not used for
+/// 	 * datum tuples, we can't - fastgetattr() is often called on a modified
+/// 	 * copy of the tuple, and those are marked as datum tuples, so this would
+/// 	 * spuriously trigger all the time :(.
+/// 	 */
 ///
 /// 	*isnull = false;
 /// 	if (HeapTupleNoNulls(tup))
@@ -5237,13 +5465,38 @@ macro_rules! fastgetattr {
     };
 }
 #[cfg(feature = "pg18")]
-/// C inline function fastgetattr from htup_details.h:865 (PostgreSQL 18)
+/// C inline function fastgetattr from htup_details.h:1037 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline Datum
 /// fastgetattr(HeapTuple tup, int attnum, TupleDesc tupleDesc, bool *isnull)
 /// {
 /// 	Assert(attnum > 0);
+///
+/// 	/*
+/// 	 * NB: Right now this does not call heap_datum_check(). The reasoning is
+/// 	 * that
+/// 	 *
+/// 	 * a) fastgetattr() is used in quite performance sensitive paths like
+/// 	 * catcache, adding code bloat to it would not be great
+/// 	 *
+/// 	 * b) The requirement that the caller already have validated attnum
+/// 	 * (without that we'd run off the end of the attribute array!), basically
+/// 	 * means it can only be used where the caller is sure that the type isn't
+/// 	 * evolving.
+/// 	 *
+/// 	 * c) fastgetattr() is called from heap_getattr(), so we would often check
+/// 	 * twice.
+/// 	 *
+/// 	 * I think that's the right decision. An investigation of extensions found
+/// 	 * only two users ("rum" and "storage_engine") and both of them use
+/// 	 * fastgetattr() on tables that can't be altered by non-superusers.
+/// 	 *
+/// 	 * While it might seem we should just assert that this is not used for
+/// 	 * datum tuples, we can't - fastgetattr() is often called on a modified
+/// 	 * copy of the tuple, and those are marked as datum tuples, so this would
+/// 	 * spuriously trigger all the time :(.
+/// 	 */
 ///
 /// 	*isnull = false;
 /// 	if (HeapTupleNoNulls(tup))
@@ -5301,13 +5554,38 @@ macro_rules! fastgetattr {
     };
 }
 #[cfg(feature = "pg19")]
-/// C inline function fastgetattr from htup_details.h:851 (PostgreSQL 19)
+/// C inline function fastgetattr from htup_details.h:1023 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline Datum
 /// fastgetattr(HeapTuple tup, int attnum, TupleDesc tupleDesc, bool *isnull)
 /// {
 /// 	Assert(attnum > 0);
+///
+/// 	/*
+/// 	 * NB: Right now this does not call heap_datum_check(). The reasoning is
+/// 	 * that
+/// 	 *
+/// 	 * a) fastgetattr() is used in quite performance sensitive paths like
+/// 	 * catcache, adding code bloat to it would not be great
+/// 	 *
+/// 	 * b) The requirement that the caller already have validated attnum
+/// 	 * (without that we'd run off the end of the attribute array!), basically
+/// 	 * means it can only be used where the caller is sure that the type isn't
+/// 	 * evolving.
+/// 	 *
+/// 	 * c) fastgetattr() is called from heap_getattr(), so we would often check
+/// 	 * twice.
+/// 	 *
+/// 	 * I think that's the right decision. An investigation of extensions found
+/// 	 * only two users ("rum" and "storage_engine") and both of them use
+/// 	 * fastgetattr() on tables that can't be altered by non-superusers.
+/// 	 *
+/// 	 * While it might seem we should just assert that this is not used for
+/// 	 * datum tuples, we can't - fastgetattr() is often called on a modified
+/// 	 * copy of the tuple, and those are marked as datum tuples, so this would
+/// 	 * spuriously trigger all the time :(.
+/// 	 */
 ///
 /// 	*isnull = false;
 /// 	if (HeapTupleNoNulls(tup))
@@ -5364,12 +5642,20 @@ macro_rules! fastgetattr {
         )
     };
 }
-/// C inline function heap_getattr from htup_details.h:792 (PostgreSQL 15), htup_details.h:796 (PostgreSQL 16–17), htup_details.h:908 (PostgreSQL 18), htup_details.h:894 (PostgreSQL 19)
+/// C inline function heap_getattr from htup_details.h:990 (PostgreSQL 15), htup_details.h:994 (PostgreSQL 16–17), htup_details.h:1105 (PostgreSQL 18), htup_details.h:1091 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline Datum
 /// heap_getattr(HeapTuple tup, int attnum, TupleDesc tupleDesc, bool *isnull)
 /// {
+/// 	/*
+/// 	 * It's a bit sad to have an external function call here, but we shouldn't
+/// 	 * use it in too many speed critical paths anymore. Separately, the
+/// 	 * function looks like it's getting too complicated to be worth inlining.
+/// 	 */
+/// 	if (HeapTupleHeaderIsVersionedDatum(tup->t_data))
+/// 		heap_datum_check(tup->t_data, tupleDesc);
+///
 /// 	if (attnum > 0)
 /// 	{
 /// 		if (attnum > (int) HeapTupleHeaderGetNatts(tup->t_data))
@@ -5421,6 +5707,7 @@ pub use HeapTupleClearHotUpdated;
 pub use HeapTupleHasExternal;
 pub use HeapTupleHasNulls;
 pub use HeapTupleHasVarWidth;
+pub use HeapTupleHeaderClearDatum;
 pub use HeapTupleHeaderClearHeapOnly;
 pub use HeapTupleHeaderClearHotUpdated;
 pub use HeapTupleHeaderClearMatch;
@@ -5433,16 +5720,21 @@ pub use HeapTupleHeaderGetSpeculativeToken;
 pub use HeapTupleHeaderGetTypMod;
 pub use HeapTupleHeaderGetTypeId;
 pub use HeapTupleHeaderGetUpdateXid;
+pub use HeapTupleHeaderGetVersion;
 pub use HeapTupleHeaderGetXmin;
 pub use HeapTupleHeaderGetXvac;
 pub use HeapTupleHeaderHasExternal;
 pub use HeapTupleHeaderHasMatch;
 pub use HeapTupleHeaderIndicatesMovedPartitions;
+pub use HeapTupleHeaderIsDatum;
 pub use HeapTupleHeaderIsHeapOnly;
 pub use HeapTupleHeaderIsHotUpdated;
 pub use HeapTupleHeaderIsSpeculative;
+pub use HeapTupleHeaderIsVersionedDatum;
+pub use HeapTupleHeaderReallyIsDatum;
 pub use HeapTupleHeaderSetCmax;
 pub use HeapTupleHeaderSetCmin;
+pub use HeapTupleHeaderSetDatum;
 pub use HeapTupleHeaderSetDatumLength;
 pub use HeapTupleHeaderSetHeapOnly;
 pub use HeapTupleHeaderSetHotUpdated;
@@ -5452,6 +5744,7 @@ pub use HeapTupleHeaderSetNatts;
 pub use HeapTupleHeaderSetSpeculativeToken;
 pub use HeapTupleHeaderSetTypMod;
 pub use HeapTupleHeaderSetTypeId;
+pub use HeapTupleHeaderSetVersion;
 pub use HeapTupleHeaderSetXmax;
 pub use HeapTupleHeaderSetXmin;
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]

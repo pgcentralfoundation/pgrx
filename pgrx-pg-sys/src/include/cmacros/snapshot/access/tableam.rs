@@ -1955,7 +1955,7 @@ macro_rules! table_relation_copy_for_cluster {
         )
     };
 }
-/// C inline function table_relation_estimate_size from tableam.h:1916 (PostgreSQL 15), tableam.h:1941 (PostgreSQL 16), tableam.h:1944 (PostgreSQL 17), tableam.h:1903 (PostgreSQL 18), tableam.h:2010 (PostgreSQL 19)
+/// C inline function table_relation_estimate_size from tableam.h:1922 (PostgreSQL 15), tableam.h:1947 (PostgreSQL 16), tableam.h:1950 (PostgreSQL 17), tableam.h:1909 (PostgreSQL 18), tableam.h:2016 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -1996,7 +1996,7 @@ macro_rules! table_relation_estimate_size {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C inline function table_relation_fetch_toast_slice from tableam.h:1895 (PostgreSQL 15), tableam.h:1920 (PostgreSQL 16), tableam.h:1923 (PostgreSQL 17), tableam.h:1882 (PostgreSQL 18)
+/// Typed call adapter for C inline function table_relation_fetch_toast_slice from tableam.h:1895 (PostgreSQL 15), tableam.h:1920 (PostgreSQL 16), tableam.h:1923 (PostgreSQL 17), tableam.h:1882 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline void
@@ -2004,6 +2004,12 @@ macro_rules! table_relation_estimate_size {
 /// 								 int32 attrsize, int32 sliceoffset,
 /// 								 int32 slicelength, struct varlena *result)
 /// {
+/// 	if (attrsize < 0 || sliceoffset < 0 || slicelength < 0)
+/// 		elog(ERROR, "invalid toast slice: offset %d, length %d, value size %d",
+/// 			 sliceoffset, slicelength, attrsize);
+/// 	if (slicelength > attrsize - sliceoffset)
+/// 		elog(ERROR, "slice length is too big");
+///
 /// 	toastrel->rd_tableam->relation_fetch_toast_slice(toastrel, valueid,
 /// 													 attrsize,
 /// 													 sliceoffset, slicelength,
@@ -2012,7 +2018,7 @@ macro_rules! table_relation_estimate_size {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_body!()]
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 #[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
@@ -2041,13 +2047,13 @@ macro_rules! table_relation_fetch_toast_slice {
                 let _ = &$sliceoffset;
                 let _ = &$slicelength;
                 let _ = &$result;
-                ()
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
             }
         )
     };
 }
 #[cfg(feature = "pg19")]
-/// C inline function table_relation_fetch_toast_slice from tableam.h:1989 (PostgreSQL 19)
+/// Typed call adapter for C inline function table_relation_fetch_toast_slice from tableam.h:1989 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -2055,6 +2061,12 @@ macro_rules! table_relation_fetch_toast_slice {
 /// 								 int32 attrsize, int32 sliceoffset,
 /// 								 int32 slicelength, varlena *result)
 /// {
+/// 	if (attrsize < 0 || sliceoffset < 0 || slicelength < 0)
+/// 		elog(ERROR, "invalid toast slice: offset %d, length %d, value size %d",
+/// 			 sliceoffset, slicelength, attrsize);
+/// 	if (slicelength > attrsize - sliceoffset)
+/// 		elog(ERROR, "slice length is too big");
+///
 /// 	toastrel->rd_tableam->relation_fetch_toast_slice(toastrel, valueid,
 /// 													 attrsize,
 /// 													 sliceoffset, slicelength,
@@ -2063,7 +2075,7 @@ macro_rules! table_relation_fetch_toast_slice {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_body!()]
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 #[doc = crate::__pgrx_c_doc_inline_result!()]
 ///
@@ -2092,7 +2104,7 @@ macro_rules! table_relation_fetch_toast_slice {
                 let _ = &$sliceoffset;
                 let _ = &$slicelength;
                 let _ = &$result;
-                ()
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
             }
         )
     };
@@ -2739,7 +2751,7 @@ macro_rules! table_scan_analyze_next_tuple {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// Typed call adapter for C inline function table_scan_bitmap_next_block from tableam.h:1940 (PostgreSQL 15), tableam.h:1965 (PostgreSQL 16), tableam.h:1968 (PostgreSQL 17)
+/// Typed call adapter for C inline function table_scan_bitmap_next_block from tableam.h:1946 (PostgreSQL 15), tableam.h:1971 (PostgreSQL 16), tableam.h:1974 (PostgreSQL 17)
 ///
 /// ```c
 /// static inline bool
@@ -2788,7 +2800,7 @@ macro_rules! table_scan_bitmap_next_block {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// Typed call adapter for C inline function table_scan_bitmap_next_tuple from tableam.h:1964 (PostgreSQL 15), tableam.h:1989 (PostgreSQL 16), tableam.h:1992 (PostgreSQL 17)
+/// Typed call adapter for C inline function table_scan_bitmap_next_tuple from tableam.h:1970 (PostgreSQL 15), tableam.h:1995 (PostgreSQL 16), tableam.h:1998 (PostgreSQL 17)
 ///
 /// ```c
 /// static inline bool
@@ -2840,7 +2852,7 @@ macro_rules! table_scan_bitmap_next_tuple {
     };
 }
 #[cfg(feature = "pg18")]
-/// Typed call adapter for C inline function table_scan_bitmap_next_tuple from tableam.h:1931 (PostgreSQL 18)
+/// Typed call adapter for C inline function table_scan_bitmap_next_tuple from tableam.h:1937 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline bool
@@ -2898,7 +2910,7 @@ macro_rules! table_scan_bitmap_next_tuple {
     };
 }
 #[cfg(feature = "pg19")]
-/// C inline function table_scan_bitmap_next_tuple from tableam.h:2038 (PostgreSQL 19)
+/// C inline function table_scan_bitmap_next_tuple from tableam.h:2044 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -3190,7 +3202,7 @@ macro_rules! table_scan_getnextslot_tidrange {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function table_scan_sample_next_block from tableam.h:1991 (PostgreSQL 15), tableam.h:2016 (PostgreSQL 16), tableam.h:2019 (PostgreSQL 17), tableam.h:1962 (PostgreSQL 18)
+/// Typed call adapter for C inline function table_scan_sample_next_block from tableam.h:1997 (PostgreSQL 15), tableam.h:2022 (PostgreSQL 16), tableam.h:2025 (PostgreSQL 17), tableam.h:1968 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline bool
@@ -3237,7 +3249,7 @@ macro_rules! table_scan_sample_next_block {
     };
 }
 #[cfg(feature = "pg19")]
-/// C inline function table_scan_sample_next_block from tableam.h:2061 (PostgreSQL 19)
+/// C inline function table_scan_sample_next_block from tableam.h:2067 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -3273,7 +3285,7 @@ macro_rules! table_scan_sample_next_block {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function table_scan_sample_next_tuple from tableam.h:2013 (PostgreSQL 15), tableam.h:2038 (PostgreSQL 16), tableam.h:2041 (PostgreSQL 17), tableam.h:1984 (PostgreSQL 18)
+/// Typed call adapter for C inline function table_scan_sample_next_tuple from tableam.h:2019 (PostgreSQL 15), tableam.h:2044 (PostgreSQL 16), tableam.h:2047 (PostgreSQL 17), tableam.h:1990 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline bool
@@ -3323,7 +3335,7 @@ macro_rules! table_scan_sample_next_tuple {
     };
 }
 #[cfg(feature = "pg19")]
-/// C inline function table_scan_sample_next_tuple from tableam.h:2076 (PostgreSQL 19)
+/// C inline function table_scan_sample_next_tuple from tableam.h:2082 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool

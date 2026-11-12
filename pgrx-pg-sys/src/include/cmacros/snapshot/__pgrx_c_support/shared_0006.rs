@@ -108,12 +108,6 @@ macro_rules! __pgrx_c_field_marker {
     (__mask_was_saved) => {
         $crate::__pgrx_c_generated::Field___mask_was_saved
     };
-    (__pad5) => {
-        $crate::__pgrx_c_generated::Field___pad5
-    };
-    (__ss_align) => {
-        $crate::__pgrx_c_generated::Field___ss_align
-    };
     (_cur_column) => {
         $crate::__pgrx_c_generated::Field__cur_column
     };
@@ -134,6 +128,12 @@ macro_rules! __pgrx_c_field_marker {
     };
     (_old_offset) => {
         $crate::__pgrx_c_generated::Field__old_offset
+    };
+    (_total_written) => {
+        $crate::__pgrx_c_generated::Field__total_written
+    };
+    (_unused3) => {
+        $crate::__pgrx_c_generated::Field__unused3
     };
     (_vtable_offset) => {
         $crate::__pgrx_c_generated::Field__vtable_offset
@@ -4032,6 +4032,9 @@ macro_rules! __pgrx_c_field_marker {
     (hashtab) => {
         $crate::__pgrx_c_generated::Field_hashtab
     };
+    (hashtablestale) => {
+        $crate::__pgrx_c_generated::Field_hashtablestale
+    };
     (hashvalue) => {
         $crate::__pgrx_c_generated::Field_hashvalue
     };
@@ -4181,6 +4184,9 @@ macro_rules! __pgrx_c_field_marker {
     };
     (idle_in_transaction_time) => {
         $crate::__pgrx_c_generated::Field_idle_in_transaction_time
+    };
+    (idxisreplident) => {
+        $crate::__pgrx_c_generated::Field_idxisreplident
     };
     (idxoffnum) => {
         $crate::__pgrx_c_generated::Field_idxoffnum
@@ -8727,9 +8733,6 @@ macro_rules! __pgrx_c_field_marker {
     (relation_estimate_size) => {
         $crate::__pgrx_c_generated::Field_relation_estimate_size
     };
-    (relation_fetch_toast_slice) => {
-        $crate::__pgrx_c_generated::Field_relation_fetch_toast_slice
-    };
     (relation_needs_toast_table) => {
         $crate::__pgrx_c_generated::Field_relation_needs_toast_table
     };
@@ -10007,9 +10010,6 @@ macro_rules! __pgrx_c_field_marker {
     };
     (srvowner) => {
         $crate::__pgrx_c_generated::Field_srvowner
-    };
-    (ss_family) => {
-        $crate::__pgrx_c_generated::Field_ss_family
     };
     (ssize) => {
         $crate::__pgrx_c_generated::Field_ssize
@@ -11294,6 +11294,9 @@ macro_rules! __pgrx_c_field_marker {
     };
     (tz) => {
         $crate::__pgrx_c_generated::Field_tz
+    };
+    (u) => {
+        $crate::__pgrx_c_generated::Field_u
     };
     (umethod) => {
         $crate::__pgrx_c_generated::Field_umethod

@@ -2,7 +2,7 @@
 // C macros from varatt.h.
 
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro SET_VARSIZE from varatt.h:305 (PostgreSQL 16–18)
+/// C macro SET_VARSIZE from varatt.h:306 (PostgreSQL 16–18)
 ///
 /// ```text
 /// #define SET_VARSIZE( PTR , len ) SET_VARSIZE_4B ( PTR , len )
@@ -90,7 +90,7 @@ macro_rules! SET_VARSIZE {
     };
 }
 #[cfg(feature = "pg19")]
-/// C inline function SET_VARSIZE from varatt.h:431 (PostgreSQL 19)
+/// C inline function SET_VARSIZE from varatt.h:432 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -123,7 +123,7 @@ macro_rules! SET_VARSIZE {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro SET_VARSIZE_1B from varatt.h:236 (PostgreSQL 16–18), varatt.h:253 (PostgreSQL 19)
+/// C macro SET_VARSIZE_1B from varatt.h:237 (PostgreSQL 16–18), varatt.h:254 (PostgreSQL 19)
 ///
 /// ```text
 /// #define SET_VARSIZE_1B( PTR , len ) ( ( ( varattrib_1b * ) ( PTR ) ) -> va_header = ( ( ( uint8 ) ( len ) ) << 1 ) | 0x01 )
@@ -217,7 +217,7 @@ macro_rules! SET_VARSIZE_1B {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro SET_VARSIZE_4B from varatt.h:232 (PostgreSQL 16–18), varatt.h:249 (PostgreSQL 19)
+/// C macro SET_VARSIZE_4B from varatt.h:233 (PostgreSQL 16–18), varatt.h:250 (PostgreSQL 19)
 ///
 /// ```text
 /// #define SET_VARSIZE_4B( PTR , len ) ( ( ( varattrib_4b * ) ( PTR ) ) -> va_4byte . va_header = ( ( ( uint32 ) ( len ) ) << 2 ) )
@@ -305,7 +305,7 @@ macro_rules! SET_VARSIZE_4B {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro SET_VARSIZE_4B_C from varatt.h:234 (PostgreSQL 16–18), varatt.h:251 (PostgreSQL 19)
+/// C macro SET_VARSIZE_4B_C from varatt.h:235 (PostgreSQL 16–18), varatt.h:252 (PostgreSQL 19)
 ///
 /// ```text
 /// #define SET_VARSIZE_4B_C( PTR , len ) ( ( ( varattrib_4b * ) ( PTR ) ) -> va_4byte . va_header = ( ( ( uint32 ) ( len ) ) << 2 ) | 0x02 )
@@ -405,7 +405,7 @@ macro_rules! SET_VARSIZE_4B_C {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro SET_VARSIZE_COMPRESSED from varatt.h:307 (PostgreSQL 16–18)
+/// C macro SET_VARSIZE_COMPRESSED from varatt.h:308 (PostgreSQL 16–18)
 ///
 /// ```text
 /// #define SET_VARSIZE_COMPRESSED( PTR , len ) SET_VARSIZE_4B_C ( PTR , len )
@@ -505,7 +505,7 @@ macro_rules! SET_VARSIZE_COMPRESSED {
     };
 }
 #[cfg(feature = "pg19")]
-/// C inline function SET_VARSIZE_COMPRESSED from varatt.h:445 (PostgreSQL 19)
+/// C inline function SET_VARSIZE_COMPRESSED from varatt.h:446 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -538,7 +538,7 @@ macro_rules! SET_VARSIZE_COMPRESSED {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro SET_VARSIZE_SHORT from varatt.h:306 (PostgreSQL 16–18)
+/// C macro SET_VARSIZE_SHORT from varatt.h:307 (PostgreSQL 16–18)
 ///
 /// ```text
 /// #define SET_VARSIZE_SHORT( PTR , len ) SET_VARSIZE_1B ( PTR , len )
@@ -632,7 +632,7 @@ macro_rules! SET_VARSIZE_SHORT {
     };
 }
 #[cfg(feature = "pg19")]
-/// C inline function SET_VARSIZE_SHORT from varatt.h:438 (PostgreSQL 19)
+/// C inline function SET_VARSIZE_SHORT from varatt.h:439 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -665,7 +665,7 @@ macro_rules! SET_VARSIZE_SHORT {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro SET_VARTAG_1B_E from varatt.h:238 (PostgreSQL 16–18), varatt.h:255 (PostgreSQL 19)
+/// C macro SET_VARTAG_1B_E from varatt.h:239 (PostgreSQL 16–18), varatt.h:256 (PostgreSQL 19)
 ///
 /// ```text
 /// #define SET_VARTAG_1B_E( PTR , tag ) ( ( ( varattrib_1b_e * ) ( PTR ) ) -> va_header = 0x01 , ( ( varattrib_1b_e * ) ( PTR ) ) -> va_tag = ( tag ) )
@@ -733,7 +733,7 @@ macro_rules! SET_VARTAG_1B_E {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro SET_VARTAG_EXTERNAL from varatt.h:309 (PostgreSQL 16–18)
+/// C macro SET_VARTAG_EXTERNAL from varatt.h:310 (PostgreSQL 16–18)
 ///
 /// ```text
 /// #define SET_VARTAG_EXTERNAL( PTR , tag ) SET_VARTAG_1B_E ( PTR , tag )
@@ -801,7 +801,7 @@ macro_rules! SET_VARTAG_EXTERNAL {
     };
 }
 #[cfg(feature = "pg19")]
-/// C inline function SET_VARTAG_EXTERNAL from varatt.h:452 (PostgreSQL 19)
+/// C inline function SET_VARTAG_EXTERNAL from varatt.h:453 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -834,7 +834,7 @@ macro_rules! SET_VARTAG_EXTERNAL {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro VARATT_CAN_MAKE_SHORT from varatt.h:258 (PostgreSQL 16–18)
+/// C macro VARATT_CAN_MAKE_SHORT from varatt.h:259 (PostgreSQL 16–18)
 ///
 /// ```text
 /// #define VARATT_CAN_MAKE_SHORT( PTR ) ( VARATT_IS_4B_U ( PTR ) && ( VARSIZE ( PTR ) - VARHDRSZ + VARHDRSZ_SHORT ) <= VARATT_SHORT_MAX )
@@ -868,7 +868,7 @@ macro_rules! VARATT_CAN_MAKE_SHORT {
     };
 }
 #[cfg(feature = "pg19")]
-/// C inline function VARATT_CAN_MAKE_SHORT from varatt.h:416 (PostgreSQL 19)
+/// C inline function VARATT_CAN_MAKE_SHORT from varatt.h:417 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -903,7 +903,7 @@ macro_rules! VARATT_CAN_MAKE_SHORT {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro VARATT_CONVERTED_SHORT_SIZE from varatt.h:261 (PostgreSQL 16–18)
+/// C macro VARATT_CONVERTED_SHORT_SIZE from varatt.h:262 (PostgreSQL 16–18)
 ///
 /// ```text
 /// #define VARATT_CONVERTED_SHORT_SIZE( PTR ) ( VARSIZE ( PTR ) - VARHDRSZ + VARHDRSZ_SHORT )
@@ -1030,7 +1030,7 @@ macro_rules! VARATT_CONVERTED_SHORT_SIZE {
     };
 }
 #[cfg(feature = "pg19")]
-/// C inline function VARATT_CONVERTED_SHORT_SIZE from varatt.h:424 (PostgreSQL 19)
+/// C inline function VARATT_CONVERTED_SHORT_SIZE from varatt.h:425 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline Size
@@ -1064,7 +1064,7 @@ macro_rules! VARATT_CONVERTED_SHORT_SIZE {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro VARATT_EXTERNAL_GET_COMPRESS_METHOD from varatt.h:336 (PostgreSQL 16–18)
+/// C macro VARATT_EXTERNAL_GET_COMPRESS_METHOD from varatt.h:337 (PostgreSQL 16–18)
 ///
 /// ```text
 /// #define VARATT_EXTERNAL_GET_COMPRESS_METHOD( toast_pointer ) ( ( toast_pointer ) . va_extinfo >> VARLENA_EXTSIZE_BITS )
@@ -1181,7 +1181,7 @@ macro_rules! VARATT_EXTERNAL_GET_COMPRESS_METHOD {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function VARATT_EXTERNAL_GET_COMPRESS_METHOD from varatt.h:512 (PostgreSQL 19)
+/// Typed call adapter for C inline function VARATT_EXTERNAL_GET_COMPRESS_METHOD from varatt.h:513 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline uint32
@@ -1219,7 +1219,7 @@ macro_rules! VARATT_EXTERNAL_GET_COMPRESS_METHOD {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro VARATT_EXTERNAL_GET_EXTSIZE from varatt.h:334 (PostgreSQL 16–18)
+/// C macro VARATT_EXTERNAL_GET_EXTSIZE from varatt.h:335 (PostgreSQL 16–18)
 ///
 /// ```text
 /// #define VARATT_EXTERNAL_GET_EXTSIZE( toast_pointer ) ( ( toast_pointer ) . va_extinfo & VARLENA_EXTSIZE_MASK )
@@ -1332,7 +1332,7 @@ macro_rules! VARATT_EXTERNAL_GET_EXTSIZE {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function VARATT_EXTERNAL_GET_EXTSIZE from varatt.h:506 (PostgreSQL 19)
+/// Typed call adapter for C inline function VARATT_EXTERNAL_GET_EXTSIZE from varatt.h:507 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline Size
@@ -1372,7 +1372,7 @@ macro_rules! VARATT_EXTERNAL_GET_EXTSIZE {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro VARATT_EXTERNAL_IS_COMPRESSED from varatt.h:354 (PostgreSQL 16–18)
+/// C macro VARATT_EXTERNAL_IS_COMPRESSED from varatt.h:355 (PostgreSQL 16–18)
 ///
 /// ```text
 /// #define VARATT_EXTERNAL_IS_COMPRESSED( toast_pointer ) ( VARATT_EXTERNAL_GET_EXTSIZE ( toast_pointer ) < ( toast_pointer ) . va_rawsize - VARHDRSZ )
@@ -1406,7 +1406,7 @@ macro_rules! VARATT_EXTERNAL_IS_COMPRESSED {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function VARATT_EXTERNAL_IS_COMPRESSED from varatt.h:535 (PostgreSQL 19)
+/// Typed call adapter for C inline function VARATT_EXTERNAL_IS_COMPRESSED from varatt.h:536 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -1445,7 +1445,7 @@ macro_rules! VARATT_EXTERNAL_IS_COMPRESSED {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD from varatt.h:339 (PostgreSQL 16–18), varatt.h:520 (PostgreSQL 19)
+/// C macro VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD from varatt.h:340 (PostgreSQL 16–18), varatt.h:521 (PostgreSQL 19)
 ///
 /// ```text
 /// #define VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD( toast_pointer , len , cm ) do { Assert ( ( cm ) == TOAST_PGLZ_COMPRESSION_ID || ( cm ) == TOAST_LZ4_COMPRESSION_ID ) ; ( ( toast_pointer ) . va_extinfo = ( len ) | ( ( uint32 ) ( cm ) << VARLENA_EXTSIZE_BITS ) ) ; } while ( 0 )
@@ -1480,7 +1480,7 @@ macro_rules! VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro VARATT_IS_1B from varatt.h:217 (PostgreSQL 16–18)
+/// C macro VARATT_IS_1B from varatt.h:218 (PostgreSQL 16–18)
 ///
 /// ```text
 /// #define VARATT_IS_1B( PTR ) ( ( ( ( varattrib_1b * ) ( PTR ) ) -> va_header & 0x01 ) == 0x01 )
@@ -1514,7 +1514,7 @@ macro_rules! VARATT_IS_1B {
     };
 }
 #[cfg(feature = "pg19")]
-/// C macro VARATT_IS_1B from varatt.h:234 (PostgreSQL 19)
+/// C macro VARATT_IS_1B from varatt.h:235 (PostgreSQL 19)
 ///
 /// ```text
 /// #define VARATT_IS_1B( PTR ) ( ( ( ( const varattrib_1b * ) ( PTR ) ) -> va_header & 0x01 ) == 0x01 )
@@ -1548,7 +1548,7 @@ macro_rules! VARATT_IS_1B {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro VARATT_IS_1B_E from varatt.h:219 (PostgreSQL 16–18)
+/// C macro VARATT_IS_1B_E from varatt.h:220 (PostgreSQL 16–18)
 ///
 /// ```text
 /// #define VARATT_IS_1B_E( PTR ) ( ( ( ( varattrib_1b * ) ( PTR ) ) -> va_header ) == 0x01 )
@@ -1582,7 +1582,7 @@ macro_rules! VARATT_IS_1B_E {
     };
 }
 #[cfg(feature = "pg19")]
-/// C macro VARATT_IS_1B_E from varatt.h:236 (PostgreSQL 19)
+/// C macro VARATT_IS_1B_E from varatt.h:237 (PostgreSQL 19)
 ///
 /// ```text
 /// #define VARATT_IS_1B_E( PTR ) ( ( ( ( const varattrib_1b * ) ( PTR ) ) -> va_header ) == 0x01 )
@@ -1616,7 +1616,7 @@ macro_rules! VARATT_IS_1B_E {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro VARATT_IS_4B from varatt.h:211 (PostgreSQL 16–18)
+/// C macro VARATT_IS_4B from varatt.h:212 (PostgreSQL 16–18)
 ///
 /// ```text
 /// #define VARATT_IS_4B( PTR ) ( ( ( ( varattrib_1b * ) ( PTR ) ) -> va_header & 0x01 ) == 0x00 )
@@ -1650,7 +1650,7 @@ macro_rules! VARATT_IS_4B {
     };
 }
 #[cfg(feature = "pg19")]
-/// C macro VARATT_IS_4B from varatt.h:228 (PostgreSQL 19)
+/// C macro VARATT_IS_4B from varatt.h:229 (PostgreSQL 19)
 ///
 /// ```text
 /// #define VARATT_IS_4B( PTR ) ( ( ( ( const varattrib_1b * ) ( PTR ) ) -> va_header & 0x01 ) == 0x00 )
@@ -1684,7 +1684,7 @@ macro_rules! VARATT_IS_4B {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro VARATT_IS_4B_C from varatt.h:215 (PostgreSQL 16–18)
+/// C macro VARATT_IS_4B_C from varatt.h:216 (PostgreSQL 16–18)
 ///
 /// ```text
 /// #define VARATT_IS_4B_C( PTR ) ( ( ( ( varattrib_1b * ) ( PTR ) ) -> va_header & 0x03 ) == 0x02 )
@@ -1718,7 +1718,7 @@ macro_rules! VARATT_IS_4B_C {
     };
 }
 #[cfg(feature = "pg19")]
-/// C macro VARATT_IS_4B_C from varatt.h:232 (PostgreSQL 19)
+/// C macro VARATT_IS_4B_C from varatt.h:233 (PostgreSQL 19)
 ///
 /// ```text
 /// #define VARATT_IS_4B_C( PTR ) ( ( ( ( const varattrib_1b * ) ( PTR ) ) -> va_header & 0x03 ) == 0x02 )
@@ -1752,7 +1752,7 @@ macro_rules! VARATT_IS_4B_C {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro VARATT_IS_4B_U from varatt.h:213 (PostgreSQL 16–18)
+/// C macro VARATT_IS_4B_U from varatt.h:214 (PostgreSQL 16–18)
 ///
 /// ```text
 /// #define VARATT_IS_4B_U( PTR ) ( ( ( ( varattrib_1b * ) ( PTR ) ) -> va_header & 0x03 ) == 0x00 )
@@ -1786,7 +1786,7 @@ macro_rules! VARATT_IS_4B_U {
     };
 }
 #[cfg(feature = "pg19")]
-/// C macro VARATT_IS_4B_U from varatt.h:230 (PostgreSQL 19)
+/// C macro VARATT_IS_4B_U from varatt.h:231 (PostgreSQL 19)
 ///
 /// ```text
 /// #define VARATT_IS_4B_U( PTR ) ( ( ( ( const varattrib_1b * ) ( PTR ) ) -> va_header & 0x03 ) == 0x00 )
@@ -1820,7 +1820,7 @@ macro_rules! VARATT_IS_4B_U {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro VARATT_IS_COMPRESSED from varatt.h:288 (PostgreSQL 16–18)
+/// C macro VARATT_IS_COMPRESSED from varatt.h:289 (PostgreSQL 16–18)
 ///
 /// ```text
 /// #define VARATT_IS_COMPRESSED( PTR ) VARATT_IS_4B_C ( PTR )
@@ -1854,7 +1854,7 @@ macro_rules! VARATT_IS_COMPRESSED {
     };
 }
 #[cfg(feature = "pg19")]
-/// C inline function VARATT_IS_COMPRESSED from varatt.h:346 (PostgreSQL 19)
+/// C inline function VARATT_IS_COMPRESSED from varatt.h:347 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -1888,7 +1888,7 @@ macro_rules! VARATT_IS_COMPRESSED {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro VARATT_IS_EXTENDED from varatt.h:303 (PostgreSQL 16–18)
+/// C macro VARATT_IS_EXTENDED from varatt.h:304 (PostgreSQL 16–18)
 ///
 /// ```text
 /// #define VARATT_IS_EXTENDED( PTR ) ( ! VARATT_IS_4B_U ( PTR ) )
@@ -1922,7 +1922,7 @@ macro_rules! VARATT_IS_EXTENDED {
     };
 }
 #[cfg(feature = "pg19")]
-/// C inline function VARATT_IS_EXTENDED from varatt.h:409 (PostgreSQL 19)
+/// C inline function VARATT_IS_EXTENDED from varatt.h:410 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -1956,7 +1956,7 @@ macro_rules! VARATT_IS_EXTENDED {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro VARATT_IS_EXTERNAL from varatt.h:289 (PostgreSQL 16–18)
+/// C macro VARATT_IS_EXTERNAL from varatt.h:290 (PostgreSQL 16–18)
 ///
 /// ```text
 /// #define VARATT_IS_EXTERNAL( PTR ) VARATT_IS_1B_E ( PTR )
@@ -1990,7 +1990,7 @@ macro_rules! VARATT_IS_EXTERNAL {
     };
 }
 #[cfg(feature = "pg19")]
-/// C inline function VARATT_IS_EXTERNAL from varatt.h:353 (PostgreSQL 19)
+/// C inline function VARATT_IS_EXTERNAL from varatt.h:354 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -2024,7 +2024,7 @@ macro_rules! VARATT_IS_EXTERNAL {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro VARATT_IS_EXTERNAL_EXPANDED from varatt.h:298 (PostgreSQL 16–18)
+/// C macro VARATT_IS_EXTERNAL_EXPANDED from varatt.h:299 (PostgreSQL 16–18)
 ///
 /// ```text
 /// #define VARATT_IS_EXTERNAL_EXPANDED( PTR ) ( VARATT_IS_EXTERNAL ( PTR ) && VARTAG_IS_EXPANDED ( VARTAG_EXTERNAL ( PTR ) ) )
@@ -2058,7 +2058,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED {
     };
 }
 #[cfg(feature = "pg19")]
-/// C inline function VARATT_IS_EXTERNAL_EXPANDED from varatt.h:388 (PostgreSQL 19)
+/// C inline function VARATT_IS_EXTERNAL_EXPANDED from varatt.h:389 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -2092,7 +2092,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro VARATT_IS_EXTERNAL_EXPANDED_RO from varatt.h:294 (PostgreSQL 16–18)
+/// C macro VARATT_IS_EXTERNAL_EXPANDED_RO from varatt.h:295 (PostgreSQL 16–18)
 ///
 /// ```text
 /// #define VARATT_IS_EXTERNAL_EXPANDED_RO( PTR ) ( VARATT_IS_EXTERNAL ( PTR ) && VARTAG_EXTERNAL ( PTR ) == VARTAG_EXPANDED_RO )
@@ -2126,7 +2126,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RO {
     };
 }
 #[cfg(feature = "pg19")]
-/// C inline function VARATT_IS_EXTERNAL_EXPANDED_RO from varatt.h:374 (PostgreSQL 19)
+/// C inline function VARATT_IS_EXTERNAL_EXPANDED_RO from varatt.h:375 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -2160,7 +2160,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RO {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro VARATT_IS_EXTERNAL_EXPANDED_RW from varatt.h:296 (PostgreSQL 16–18)
+/// C macro VARATT_IS_EXTERNAL_EXPANDED_RW from varatt.h:297 (PostgreSQL 16–18)
 ///
 /// ```text
 /// #define VARATT_IS_EXTERNAL_EXPANDED_RW( PTR ) ( VARATT_IS_EXTERNAL ( PTR ) && VARTAG_EXTERNAL ( PTR ) == VARTAG_EXPANDED_RW )
@@ -2194,7 +2194,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RW {
     };
 }
 #[cfg(feature = "pg19")]
-/// C inline function VARATT_IS_EXTERNAL_EXPANDED_RW from varatt.h:381 (PostgreSQL 19)
+/// C inline function VARATT_IS_EXTERNAL_EXPANDED_RW from varatt.h:382 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -2228,7 +2228,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RW {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro VARATT_IS_EXTERNAL_INDIRECT from varatt.h:292 (PostgreSQL 16–18)
+/// C macro VARATT_IS_EXTERNAL_INDIRECT from varatt.h:293 (PostgreSQL 16–18)
 ///
 /// ```text
 /// #define VARATT_IS_EXTERNAL_INDIRECT( PTR ) ( VARATT_IS_EXTERNAL ( PTR ) && VARTAG_EXTERNAL ( PTR ) == VARTAG_INDIRECT )
@@ -2262,7 +2262,7 @@ macro_rules! VARATT_IS_EXTERNAL_INDIRECT {
     };
 }
 #[cfg(feature = "pg19")]
-/// C inline function VARATT_IS_EXTERNAL_INDIRECT from varatt.h:367 (PostgreSQL 19)
+/// C inline function VARATT_IS_EXTERNAL_INDIRECT from varatt.h:368 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -2296,7 +2296,7 @@ macro_rules! VARATT_IS_EXTERNAL_INDIRECT {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro VARATT_IS_EXTERNAL_NON_EXPANDED from varatt.h:300 (PostgreSQL 16–18)
+/// C macro VARATT_IS_EXTERNAL_NON_EXPANDED from varatt.h:301 (PostgreSQL 16–18)
 ///
 /// ```text
 /// #define VARATT_IS_EXTERNAL_NON_EXPANDED( PTR ) ( VARATT_IS_EXTERNAL ( PTR ) && ! VARTAG_IS_EXPANDED ( VARTAG_EXTERNAL ( PTR ) ) )
@@ -2330,7 +2330,7 @@ macro_rules! VARATT_IS_EXTERNAL_NON_EXPANDED {
     };
 }
 #[cfg(feature = "pg19")]
-/// C inline function VARATT_IS_EXTERNAL_NON_EXPANDED from varatt.h:395 (PostgreSQL 19)
+/// C inline function VARATT_IS_EXTERNAL_NON_EXPANDED from varatt.h:396 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -2364,7 +2364,7 @@ macro_rules! VARATT_IS_EXTERNAL_NON_EXPANDED {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro VARATT_IS_EXTERNAL_ONDISK from varatt.h:290 (PostgreSQL 16–18)
+/// C macro VARATT_IS_EXTERNAL_ONDISK from varatt.h:291 (PostgreSQL 16–18)
 ///
 /// ```text
 /// #define VARATT_IS_EXTERNAL_ONDISK( PTR ) ( VARATT_IS_EXTERNAL ( PTR ) && VARTAG_EXTERNAL ( PTR ) == VARTAG_ONDISK )
@@ -2398,7 +2398,7 @@ macro_rules! VARATT_IS_EXTERNAL_ONDISK {
     };
 }
 #[cfg(feature = "pg19")]
-/// C inline function VARATT_IS_EXTERNAL_ONDISK from varatt.h:360 (PostgreSQL 19)
+/// C inline function VARATT_IS_EXTERNAL_ONDISK from varatt.h:361 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -2432,7 +2432,7 @@ macro_rules! VARATT_IS_EXTERNAL_ONDISK {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro VARATT_IS_SHORT from varatt.h:302 (PostgreSQL 16–18)
+/// C macro VARATT_IS_SHORT from varatt.h:303 (PostgreSQL 16–18)
 ///
 /// ```text
 /// #define VARATT_IS_SHORT( PTR ) VARATT_IS_1B ( PTR )
@@ -2466,7 +2466,7 @@ macro_rules! VARATT_IS_SHORT {
     };
 }
 #[cfg(feature = "pg19")]
-/// C inline function VARATT_IS_SHORT from varatt.h:402 (PostgreSQL 19)
+/// C inline function VARATT_IS_SHORT from varatt.h:403 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -2500,7 +2500,7 @@ macro_rules! VARATT_IS_SHORT {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro VARATT_NOT_PAD_BYTE from varatt.h:221 (PostgreSQL 16–18)
+/// C macro VARATT_NOT_PAD_BYTE from varatt.h:222 (PostgreSQL 16–18)
 ///
 /// ```text
 /// #define VARATT_NOT_PAD_BYTE( PTR ) ( * ( ( uint8 * ) ( PTR ) ) != 0 )
@@ -2534,7 +2534,7 @@ macro_rules! VARATT_NOT_PAD_BYTE {
     };
 }
 #[cfg(feature = "pg19")]
-/// C macro VARATT_NOT_PAD_BYTE from varatt.h:238 (PostgreSQL 19)
+/// C macro VARATT_NOT_PAD_BYTE from varatt.h:239 (PostgreSQL 19)
 ///
 /// ```text
 /// #define VARATT_NOT_PAD_BYTE( PTR ) ( * ( ( const uint8 * ) ( PTR ) ) != 0 )
@@ -2568,7 +2568,7 @@ macro_rules! VARATT_NOT_PAD_BYTE {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro VARDATA from varatt.h:278 (PostgreSQL 16–18)
+/// C macro VARDATA from varatt.h:279 (PostgreSQL 16–18)
 ///
 /// ```text
 /// #define VARDATA( PTR ) VARDATA_4B ( PTR )
@@ -2627,7 +2627,7 @@ macro_rules! VARDATA {
     };
 }
 #[cfg(feature = "pg19")]
-/// C inline function VARDATA from varatt.h:304 (PostgreSQL 19)
+/// C inline function VARDATA from varatt.h:305 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline char *
@@ -2665,7 +2665,7 @@ macro_rules! VARDATA {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro VARDATA_1B from varatt.h:246 (PostgreSQL 16–18), varatt.h:263 (PostgreSQL 19)
+/// C macro VARDATA_1B from varatt.h:247 (PostgreSQL 16–18), varatt.h:264 (PostgreSQL 19)
 ///
 /// ```text
 /// #define VARDATA_1B( PTR ) ( ( ( varattrib_1b * ) ( PTR ) ) -> va_data )
@@ -2718,7 +2718,7 @@ macro_rules! VARDATA_1B {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro VARDATA_1B_E from varatt.h:247 (PostgreSQL 16–18), varatt.h:264 (PostgreSQL 19)
+/// C macro VARDATA_1B_E from varatt.h:248 (PostgreSQL 16–18), varatt.h:265 (PostgreSQL 19)
 ///
 /// ```text
 /// #define VARDATA_1B_E( PTR ) ( ( ( varattrib_1b_e * ) ( PTR ) ) -> va_data )
@@ -2771,7 +2771,7 @@ macro_rules! VARDATA_1B_E {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro VARDATA_4B from varatt.h:244 (PostgreSQL 16–18), varatt.h:261 (PostgreSQL 19)
+/// C macro VARDATA_4B from varatt.h:245 (PostgreSQL 16–18), varatt.h:262 (PostgreSQL 19)
 ///
 /// ```text
 /// #define VARDATA_4B( PTR ) ( ( ( varattrib_4b * ) ( PTR ) ) -> va_4byte . va_data )
@@ -2830,7 +2830,7 @@ macro_rules! VARDATA_4B {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro VARDATA_4B_C from varatt.h:245 (PostgreSQL 16–18), varatt.h:262 (PostgreSQL 19)
+/// C macro VARDATA_4B_C from varatt.h:246 (PostgreSQL 16–18), varatt.h:263 (PostgreSQL 19)
 ///
 /// ```text
 /// #define VARDATA_4B_C( PTR ) ( ( ( varattrib_4b * ) ( PTR ) ) -> va_compressed . va_data )
@@ -2889,7 +2889,7 @@ macro_rules! VARDATA_4B_C {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro VARDATA_ANY from varatt.h:324 (PostgreSQL 16–18)
+/// C macro VARDATA_ANY from varatt.h:325 (PostgreSQL 16–18)
 ///
 /// ```text
 /// #define VARDATA_ANY( PTR ) ( VARATT_IS_1B ( PTR ) ? VARDATA_1B ( PTR ) : VARDATA_4B ( PTR ) )
@@ -3003,7 +3003,7 @@ macro_rules! VARDATA_ANY {
     };
 }
 #[cfg(feature = "pg19")]
-/// C inline function VARDATA_ANY from varatt.h:485 (PostgreSQL 19)
+/// C inline function VARDATA_ANY from varatt.h:486 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline char *
@@ -3041,7 +3041,7 @@ macro_rules! VARDATA_ANY {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro VARDATA_COMPRESSED_GET_COMPRESS_METHOD from varatt.h:330 (PostgreSQL 16–18)
+/// C macro VARDATA_COMPRESSED_GET_COMPRESS_METHOD from varatt.h:331 (PostgreSQL 16–18)
 ///
 /// ```text
 /// #define VARDATA_COMPRESSED_GET_COMPRESS_METHOD( PTR ) ( ( ( varattrib_4b * ) ( PTR ) ) -> va_compressed . va_tcinfo >> VARLENA_EXTSIZE_BITS )
@@ -3109,7 +3109,7 @@ macro_rules! VARDATA_COMPRESSED_GET_COMPRESS_METHOD {
     };
 }
 #[cfg(feature = "pg19")]
-/// C inline function VARDATA_COMPRESSED_GET_COMPRESS_METHOD from varatt.h:499 (PostgreSQL 19)
+/// C inline function VARDATA_COMPRESSED_GET_COMPRESS_METHOD from varatt.h:500 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline uint32
@@ -3143,7 +3143,7 @@ macro_rules! VARDATA_COMPRESSED_GET_COMPRESS_METHOD {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro VARDATA_COMPRESSED_GET_EXTSIZE from varatt.h:328 (PostgreSQL 16–18)
+/// C macro VARDATA_COMPRESSED_GET_EXTSIZE from varatt.h:329 (PostgreSQL 16–18)
 ///
 /// ```text
 /// #define VARDATA_COMPRESSED_GET_EXTSIZE( PTR ) ( ( ( varattrib_4b * ) ( PTR ) ) -> va_compressed . va_tcinfo & VARLENA_EXTSIZE_MASK )
@@ -3211,7 +3211,7 @@ macro_rules! VARDATA_COMPRESSED_GET_EXTSIZE {
     };
 }
 #[cfg(feature = "pg19")]
-/// C inline function VARDATA_COMPRESSED_GET_EXTSIZE from varatt.h:492 (PostgreSQL 19)
+/// C inline function VARDATA_COMPRESSED_GET_EXTSIZE from varatt.h:493 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline Size
@@ -3245,7 +3245,7 @@ macro_rules! VARDATA_COMPRESSED_GET_EXTSIZE {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro VARDATA_EXTERNAL from varatt.h:286 (PostgreSQL 16–18)
+/// C macro VARDATA_EXTERNAL from varatt.h:287 (PostgreSQL 16–18)
 ///
 /// ```text
 /// #define VARDATA_EXTERNAL( PTR ) VARDATA_1B_E ( PTR )
@@ -3298,7 +3298,7 @@ macro_rules! VARDATA_EXTERNAL {
     };
 }
 #[cfg(feature = "pg19")]
-/// C inline function VARDATA_EXTERNAL from varatt.h:339 (PostgreSQL 19)
+/// C inline function VARDATA_EXTERNAL from varatt.h:340 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline char *
@@ -3336,7 +3336,7 @@ macro_rules! VARDATA_EXTERNAL {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro VARDATA_SHORT from varatt.h:282 (PostgreSQL 16–18)
+/// C macro VARDATA_SHORT from varatt.h:283 (PostgreSQL 16–18)
 ///
 /// ```text
 /// #define VARDATA_SHORT( PTR ) VARDATA_1B ( PTR )
@@ -3389,7 +3389,7 @@ macro_rules! VARDATA_SHORT {
     };
 }
 #[cfg(feature = "pg19")]
-/// C inline function VARDATA_SHORT from varatt.h:318 (PostgreSQL 19)
+/// C inline function VARDATA_SHORT from varatt.h:319 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline char *
@@ -3427,7 +3427,7 @@ macro_rules! VARDATA_SHORT {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro VARSIZE from varatt.h:279 (PostgreSQL 16–18)
+/// C macro VARSIZE from varatt.h:280 (PostgreSQL 16–18)
 ///
 /// ```text
 /// #define VARSIZE( PTR ) VARSIZE_4B ( PTR )
@@ -3512,7 +3512,7 @@ macro_rules! VARSIZE {
     };
 }
 #[cfg(feature = "pg19")]
-/// C inline function VARSIZE from varatt.h:297 (PostgreSQL 19)
+/// C inline function VARSIZE from varatt.h:298 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline Size
@@ -3546,7 +3546,7 @@ macro_rules! VARSIZE {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro VARSIZE_1B from varatt.h:227 (PostgreSQL 16–18)
+/// C macro VARSIZE_1B from varatt.h:228 (PostgreSQL 16–18)
 ///
 /// ```text
 /// #define VARSIZE_1B( PTR ) ( ( ( ( varattrib_1b * ) ( PTR ) ) -> va_header >> 1 ) & 0x7F )
@@ -3625,7 +3625,7 @@ macro_rules! VARSIZE_1B {
     };
 }
 #[cfg(feature = "pg19")]
-/// C macro VARSIZE_1B from varatt.h:244 (PostgreSQL 19)
+/// C macro VARSIZE_1B from varatt.h:245 (PostgreSQL 19)
 ///
 /// ```text
 /// #define VARSIZE_1B( PTR ) ( ( ( ( const varattrib_1b * ) ( PTR ) ) -> va_header >> 1 ) & 0x7F )
@@ -3704,7 +3704,7 @@ macro_rules! VARSIZE_1B {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro VARSIZE_4B from varatt.h:225 (PostgreSQL 16–18)
+/// C macro VARSIZE_4B from varatt.h:226 (PostgreSQL 16–18)
 ///
 /// ```text
 /// #define VARSIZE_4B( PTR ) ( ( ( ( varattrib_4b * ) ( PTR ) ) -> va_4byte . va_header >> 2 ) & 0x3FFFFFFF )
@@ -3789,7 +3789,7 @@ macro_rules! VARSIZE_4B {
     };
 }
 #[cfg(feature = "pg19")]
-/// C macro VARSIZE_4B from varatt.h:242 (PostgreSQL 19)
+/// C macro VARSIZE_4B from varatt.h:243 (PostgreSQL 19)
 ///
 /// ```text
 /// #define VARSIZE_4B( PTR ) ( ( ( ( const varattrib_4b * ) ( PTR ) ) -> va_4byte . va_header >> 2 ) & 0x3FFFFFFF )
@@ -3874,7 +3874,7 @@ macro_rules! VARSIZE_4B {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro VARSIZE_ANY from varatt.h:311 (PostgreSQL 16–18)
+/// C macro VARSIZE_ANY from varatt.h:312 (PostgreSQL 16–18)
 ///
 /// ```text
 /// #define VARSIZE_ANY( PTR ) ( VARATT_IS_1B_E ( PTR ) ? VARSIZE_EXTERNAL ( PTR ) : ( VARATT_IS_1B ( PTR ) ? VARSIZE_1B ( PTR ) : VARSIZE_4B ( PTR ) ) )
@@ -4222,7 +4222,7 @@ macro_rules! VARSIZE_ANY {
     };
 }
 #[cfg(feature = "pg19")]
-/// C inline function VARSIZE_ANY from varatt.h:459 (PostgreSQL 19)
+/// C inline function VARSIZE_ANY from varatt.h:460 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline Size
@@ -4261,7 +4261,7 @@ macro_rules! VARSIZE_ANY {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro VARSIZE_ANY_EXHDR from varatt.h:317 (PostgreSQL 16–18)
+/// C macro VARSIZE_ANY_EXHDR from varatt.h:318 (PostgreSQL 16–18)
 ///
 /// ```text
 /// #define VARSIZE_ANY_EXHDR( PTR ) ( VARATT_IS_1B_E ( PTR ) ? VARSIZE_EXTERNAL ( PTR ) - VARHDRSZ_EXTERNAL : ( VARATT_IS_1B ( PTR ) ? VARSIZE_1B ( PTR ) - VARHDRSZ_SHORT : VARSIZE_4B ( PTR ) - VARHDRSZ ) )
@@ -4671,7 +4671,7 @@ macro_rules! VARSIZE_ANY_EXHDR {
     };
 }
 #[cfg(feature = "pg19")]
-/// C inline function VARSIZE_ANY_EXHDR from varatt.h:471 (PostgreSQL 19)
+/// C inline function VARSIZE_ANY_EXHDR from varatt.h:472 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline Size
@@ -4710,7 +4710,7 @@ macro_rules! VARSIZE_ANY_EXHDR {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro VARSIZE_EXTERNAL from varatt.h:285 (PostgreSQL 16–18)
+/// C macro VARSIZE_EXTERNAL from varatt.h:286 (PostgreSQL 16–18)
 ///
 /// ```text
 /// #define VARSIZE_EXTERNAL( PTR ) ( VARHDRSZ_EXTERNAL + VARTAG_SIZE ( VARTAG_EXTERNAL ( PTR ) ) )
@@ -4869,7 +4869,7 @@ macro_rules! VARSIZE_EXTERNAL {
     };
 }
 #[cfg(feature = "pg19")]
-/// C inline function VARSIZE_EXTERNAL from varatt.h:332 (PostgreSQL 19)
+/// C inline function VARSIZE_EXTERNAL from varatt.h:333 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline Size
@@ -4903,7 +4903,7 @@ macro_rules! VARSIZE_EXTERNAL {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro VARSIZE_SHORT from varatt.h:281 (PostgreSQL 16–18)
+/// C macro VARSIZE_SHORT from varatt.h:282 (PostgreSQL 16–18)
 ///
 /// ```text
 /// #define VARSIZE_SHORT( PTR ) VARSIZE_1B ( PTR )
@@ -4982,7 +4982,7 @@ macro_rules! VARSIZE_SHORT {
     };
 }
 #[cfg(feature = "pg19")]
-/// C inline function VARSIZE_SHORT from varatt.h:311 (PostgreSQL 19)
+/// C inline function VARSIZE_SHORT from varatt.h:312 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline Size
@@ -5016,7 +5016,7 @@ macro_rules! VARSIZE_SHORT {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro VARTAG_1B_E from varatt.h:229 (PostgreSQL 16–18)
+/// C macro VARTAG_1B_E from varatt.h:230 (PostgreSQL 16–18)
 ///
 /// ```text
 /// #define VARTAG_1B_E( PTR ) ( ( ( varattrib_1b_e * ) ( PTR ) ) -> va_tag )
@@ -5069,7 +5069,7 @@ macro_rules! VARTAG_1B_E {
     };
 }
 #[cfg(feature = "pg19")]
-/// C macro VARTAG_1B_E from varatt.h:246 (PostgreSQL 19)
+/// C macro VARTAG_1B_E from varatt.h:247 (PostgreSQL 19)
 ///
 /// ```text
 /// #define VARTAG_1B_E( PTR ) ( ( vartag_external ) ( ( const varattrib_1b_e * ) ( PTR ) ) -> va_tag )
@@ -5104,7 +5104,7 @@ macro_rules! VARTAG_1B_E {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro VARTAG_EXTERNAL from varatt.h:284 (PostgreSQL 16–18)
+/// C macro VARTAG_EXTERNAL from varatt.h:285 (PostgreSQL 16–18)
 ///
 /// ```text
 /// #define VARTAG_EXTERNAL( PTR ) VARTAG_1B_E ( PTR )
@@ -5157,7 +5157,7 @@ macro_rules! VARTAG_EXTERNAL {
     };
 }
 #[cfg(feature = "pg19")]
-/// C inline function VARTAG_EXTERNAL from varatt.h:325 (PostgreSQL 19)
+/// C inline function VARTAG_EXTERNAL from varatt.h:326 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline vartag_external
@@ -5196,7 +5196,7 @@ macro_rules! VARTAG_EXTERNAL {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro VARTAG_IS_EXPANDED from varatt.h:93 (PostgreSQL 16–18)
+/// C macro VARTAG_IS_EXPANDED from varatt.h:94 (PostgreSQL 16–18)
 ///
 /// ```text
 /// #define VARTAG_IS_EXPANDED( tag ) ( ( ( tag ) & ~ 1 ) == VARTAG_EXPANDED_RO )
@@ -5226,7 +5226,7 @@ macro_rules! VARTAG_IS_EXPANDED {
     };
 }
 #[cfg(feature = "pg19")]
-/// C inline function VARTAG_IS_EXPANDED from varatt.h:94 (PostgreSQL 19)
+/// C inline function VARTAG_IS_EXPANDED from varatt.h:95 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -5256,7 +5256,7 @@ macro_rules! VARTAG_IS_EXPANDED {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro VARTAG_SIZE from varatt.h:96 (PostgreSQL 16–18)
+/// C macro VARTAG_SIZE from varatt.h:97 (PostgreSQL 16–18)
 ///
 /// ```text
 /// #define VARTAG_SIZE( tag ) ( ( tag ) == VARTAG_INDIRECT ? sizeof ( varatt_indirect ) : VARTAG_IS_EXPANDED ( tag ) ? sizeof ( varatt_expanded ) : ( tag ) == VARTAG_ONDISK ? sizeof ( varatt_external ) : ( AssertMacro ( false ) , 0 ) )
@@ -5389,7 +5389,7 @@ macro_rules! VARTAG_SIZE {
     };
 }
 #[cfg(feature = "pg19")]
-/// C inline function VARTAG_SIZE from varatt.h:101 (PostgreSQL 19)
+/// C inline function VARTAG_SIZE from varatt.h:102 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline Size

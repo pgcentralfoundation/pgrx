@@ -119,8 +119,7 @@ macro_rules! pg_abs_s64 {
         )
     };
 }
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function pg_add_s16_overflow from int.h:46 (PostgreSQL 17), int.h:66 (PostgreSQL 18–19)
+/// Typed call adapter for C inline function pg_add_s16_overflow from int.h:46 (PostgreSQL 15–17), int.h:66 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline bool
@@ -171,8 +170,7 @@ macro_rules! pg_add_s16_overflow {
         )
     };
 }
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function pg_add_s32_overflow from int.h:103 (PostgreSQL 17), int.h:150 (PostgreSQL 18–19)
+/// Typed call adapter for C inline function pg_add_s32_overflow from int.h:103 (PostgreSQL 15–17), int.h:150 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline bool
@@ -223,8 +221,7 @@ macro_rules! pg_add_s32_overflow {
         )
     };
 }
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function pg_add_s64_overflow from int.h:160 (PostgreSQL 17), int.h:234 (PostgreSQL 18–19)
+/// Typed call adapter for C inline function pg_add_s64_overflow from int.h:160 (PostgreSQL 15–17), int.h:234 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline bool
@@ -284,8 +281,7 @@ macro_rules! pg_add_s64_overflow {
         )
     };
 }
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function pg_add_size_overflow from int.h:444 (PostgreSQL 17), int.h:607 (PostgreSQL 18–19)
+/// Typed call adapter for C inline function pg_add_size_overflow from int.h:444 (PostgreSQL 15–17), int.h:607 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline bool
@@ -336,8 +332,7 @@ macro_rules! pg_add_size_overflow {
         )
     };
 }
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function pg_add_u16_overflow from int.h:269 (PostgreSQL 17), int.h:367 (PostgreSQL 18–19)
+/// Typed call adapter for C inline function pg_add_u16_overflow from int.h:269 (PostgreSQL 15–17), int.h:367 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline bool
@@ -388,8 +383,7 @@ macro_rules! pg_add_u16_overflow {
         )
     };
 }
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function pg_add_u32_overflow from int.h:324 (PostgreSQL 17), int.h:440 (PostgreSQL 18–19)
+/// Typed call adapter for C inline function pg_add_u32_overflow from int.h:324 (PostgreSQL 15–17), int.h:440 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline bool
@@ -440,8 +434,7 @@ macro_rules! pg_add_u32_overflow {
         )
     };
 }
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function pg_add_u64_overflow from int.h:379 (PostgreSQL 17), int.h:513 (PostgreSQL 18–19)
+/// Typed call adapter for C inline function pg_add_u64_overflow from int.h:379 (PostgreSQL 15–17), int.h:513 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline bool
@@ -737,8 +730,7 @@ macro_rules! pg_cmp_u64 {
         )
     };
 }
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function pg_mul_s16_overflow from int.h:82 (PostgreSQL 17), int.h:102 (PostgreSQL 18–19)
+/// Typed call adapter for C inline function pg_mul_s16_overflow from int.h:82 (PostgreSQL 15–17), int.h:102 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline bool
@@ -789,8 +781,7 @@ macro_rules! pg_mul_s16_overflow {
         )
     };
 }
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function pg_mul_s32_overflow from int.h:139 (PostgreSQL 17), int.h:186 (PostgreSQL 18–19)
+/// Typed call adapter for C inline function pg_mul_s32_overflow from int.h:139 (PostgreSQL 15–17), int.h:186 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline bool
@@ -841,8 +832,7 @@ macro_rules! pg_mul_s32_overflow {
         )
     };
 }
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function pg_mul_s64_overflow from int.h:218 (PostgreSQL 17), int.h:292 (PostgreSQL 18–19)
+/// Typed call adapter for C inline function pg_mul_s64_overflow from int.h:218 (PostgreSQL 15–17), int.h:292 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline bool
@@ -918,8 +908,7 @@ macro_rules! pg_mul_s64_overflow {
         )
     };
 }
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function pg_mul_size_overflow from int.h:478 (PostgreSQL 17), int.h:641 (PostgreSQL 18–19)
+/// Typed call adapter for C inline function pg_mul_size_overflow from int.h:478 (PostgreSQL 15–17), int.h:641 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline bool
@@ -970,8 +959,7 @@ macro_rules! pg_mul_size_overflow {
         )
     };
 }
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function pg_mul_u16_overflow from int.h:303 (PostgreSQL 17), int.h:401 (PostgreSQL 18–19)
+/// Typed call adapter for C inline function pg_mul_u16_overflow from int.h:303 (PostgreSQL 15–17), int.h:401 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline bool
@@ -1022,8 +1010,7 @@ macro_rules! pg_mul_u16_overflow {
         )
     };
 }
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function pg_mul_u32_overflow from int.h:358 (PostgreSQL 17), int.h:474 (PostgreSQL 18–19)
+/// Typed call adapter for C inline function pg_mul_u32_overflow from int.h:358 (PostgreSQL 15–17), int.h:474 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline bool
@@ -1074,8 +1061,7 @@ macro_rules! pg_mul_u32_overflow {
         )
     };
 }
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function pg_mul_u64_overflow from int.h:413 (PostgreSQL 17), int.h:547 (PostgreSQL 18–19)
+/// Typed call adapter for C inline function pg_mul_u64_overflow from int.h:413 (PostgreSQL 15–17), int.h:547 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline bool
@@ -1447,8 +1433,7 @@ macro_rules! pg_neg_u64_overflow {
         )
     };
 }
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function pg_sub_s16_overflow from int.h:64 (PostgreSQL 17), int.h:84 (PostgreSQL 18–19)
+/// Typed call adapter for C inline function pg_sub_s16_overflow from int.h:64 (PostgreSQL 15–17), int.h:84 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline bool
@@ -1499,8 +1484,7 @@ macro_rules! pg_sub_s16_overflow {
         )
     };
 }
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function pg_sub_s32_overflow from int.h:121 (PostgreSQL 17), int.h:168 (PostgreSQL 18–19)
+/// Typed call adapter for C inline function pg_sub_s32_overflow from int.h:121 (PostgreSQL 15–17), int.h:168 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline bool
@@ -1551,8 +1535,7 @@ macro_rules! pg_sub_s32_overflow {
         )
     };
 }
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function pg_sub_s64_overflow from int.h:187 (PostgreSQL 17), int.h:261 (PostgreSQL 18–19)
+/// Typed call adapter for C inline function pg_sub_s64_overflow from int.h:187 (PostgreSQL 15–17), int.h:261 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline bool
@@ -1616,8 +1599,7 @@ macro_rules! pg_sub_s64_overflow {
         )
     };
 }
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function pg_sub_size_overflow from int.h:462 (PostgreSQL 17), int.h:625 (PostgreSQL 18–19)
+/// Typed call adapter for C inline function pg_sub_size_overflow from int.h:462 (PostgreSQL 15–17), int.h:625 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline bool
@@ -1666,8 +1648,7 @@ macro_rules! pg_sub_size_overflow {
         )
     };
 }
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function pg_sub_u16_overflow from int.h:287 (PostgreSQL 17), int.h:385 (PostgreSQL 18–19)
+/// Typed call adapter for C inline function pg_sub_u16_overflow from int.h:287 (PostgreSQL 15–17), int.h:385 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline bool
@@ -1716,8 +1697,7 @@ macro_rules! pg_sub_u16_overflow {
         )
     };
 }
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function pg_sub_u32_overflow from int.h:342 (PostgreSQL 17), int.h:458 (PostgreSQL 18–19)
+/// Typed call adapter for C inline function pg_sub_u32_overflow from int.h:342 (PostgreSQL 15–17), int.h:458 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline bool
@@ -1766,8 +1746,7 @@ macro_rules! pg_sub_u32_overflow {
         )
     };
 }
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function pg_sub_u64_overflow from int.h:397 (PostgreSQL 17), int.h:531 (PostgreSQL 18–19)
+/// Typed call adapter for C inline function pg_sub_u64_overflow from int.h:397 (PostgreSQL 15–17), int.h:531 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline bool
@@ -1822,19 +1801,12 @@ pub use pg_abs_s16;
 pub use pg_abs_s32;
 #[cfg(any(feature = "pg18", feature = "pg19"))]
 pub use pg_abs_s64;
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
 pub use pg_add_s16_overflow;
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
 pub use pg_add_s32_overflow;
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
 pub use pg_add_s64_overflow;
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
 pub use pg_add_size_overflow;
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
 pub use pg_add_u16_overflow;
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
 pub use pg_add_u32_overflow;
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
 pub use pg_add_u64_overflow;
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
 pub use pg_cmp_s16;
@@ -1850,19 +1822,12 @@ pub use pg_cmp_u16;
 pub use pg_cmp_u32;
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
 pub use pg_cmp_u64;
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
 pub use pg_mul_s16_overflow;
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
 pub use pg_mul_s32_overflow;
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
 pub use pg_mul_s64_overflow;
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
 pub use pg_mul_size_overflow;
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
 pub use pg_mul_u16_overflow;
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
 pub use pg_mul_u32_overflow;
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
 pub use pg_mul_u64_overflow;
 #[cfg(any(feature = "pg18", feature = "pg19"))]
 pub use pg_neg_s16_overflow;
@@ -1876,17 +1841,10 @@ pub use pg_neg_u16_overflow;
 pub use pg_neg_u32_overflow;
 #[cfg(any(feature = "pg18", feature = "pg19"))]
 pub use pg_neg_u64_overflow;
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
 pub use pg_sub_s16_overflow;
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
 pub use pg_sub_s32_overflow;
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
 pub use pg_sub_s64_overflow;
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
 pub use pg_sub_size_overflow;
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
 pub use pg_sub_u16_overflow;
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
 pub use pg_sub_u32_overflow;
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
 pub use pg_sub_u64_overflow;

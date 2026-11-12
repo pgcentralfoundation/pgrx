@@ -30,6 +30,35 @@ macro_rules! RELKIND_HAS_PARTITIONS {
         )
     };
 }
+/// C macro RELKIND_HAS_ROWTYPE from pg_class_d.h:132 (PostgreSQL 15–16), pg_class_d.h:134 (PostgreSQL 17), pg_class_d.h:139 (PostgreSQL 18–19)
+///
+/// ```text
+/// #define RELKIND_HAS_ROWTYPE( relkind ) ( ( relkind ) == RELKIND_RELATION || ( relkind ) == RELKIND_VIEW || ( relkind ) == RELKIND_MATVIEW || ( relkind ) == RELKIND_COMPOSITE_TYPE || ( relkind ) == RELKIND_FOREIGN_TABLE || ( relkind ) == RELKIND_PARTITIONED_TABLE )
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_truth_result!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+#[macro_export]
+macro_rules! RELKIND_HAS_ROWTYPE {
+    ($relkind:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @truth {
+                let _ = &$relkind;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
+    };
+}
 /// C macro RELKIND_HAS_STORAGE from pg_class_d.h:97 (PostgreSQL 15–17), pg_class_d.h:102 (PostgreSQL 18–19)
 ///
 /// ```text
@@ -118,6 +147,7 @@ macro_rules! RELKIND_HAS_TABLE_AM {
     };
 }
 pub use RELKIND_HAS_PARTITIONS;
+pub use RELKIND_HAS_ROWTYPE;
 pub use RELKIND_HAS_STORAGE;
 pub use RELKIND_HAS_TABLE_AM;
 pub use RELKIND_HAS_TABLESPACE;

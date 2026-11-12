@@ -357,7 +357,7 @@ dependencies = [
 
 [[package]]
 name = "cargo-pgrx"
-version = "0.20.0-beta.1"
+version = "0.20.0"
 dependencies = [
  "arx-pack",
  "cargo_metadata",
@@ -1854,7 +1854,7 @@ dependencies = [
 
 [[package]]
 name = "pgrx"
-version = "0.20.0-beta.1"
+version = "0.20.0"
 dependencies = [
  "bitflags",
  "libc",
@@ -1870,7 +1870,7 @@ dependencies = [
 
 [[package]]
 name = "pgrx-bench"
-version = "0.20.0-beta.1"
+version = "0.20.0"
 dependencies = [
  "criterion",
  "oorandom",
@@ -1881,7 +1881,7 @@ dependencies = [
 
 [[package]]
 name = "pgrx-bindgen"
-version = "0.20.0-beta.1"
+version = "0.20.0"
 dependencies = [
  "bindgen",
  "eyre",
@@ -1900,7 +1900,7 @@ dependencies = [
 
 [[package]]
 name = "pgrx-c-macros"
-version = "0.20.0-beta.1"
+version = "0.20.0"
 dependencies = [
  "bindgen",
  "clang",
@@ -1922,7 +1922,7 @@ dependencies = [
 
 [[package]]
 name = "pgrx-ci"
-version = "0.20.0-beta.1"
+version = "0.20.0"
 dependencies = [
  "cargo_metadata",
  "eyre",
@@ -1932,7 +1932,7 @@ dependencies = [
 
 [[package]]
 name = "pgrx-macros"
-version = "0.20.0-beta.1"
+version = "0.20.0"
 dependencies = [
  "pgrx-sql-entity-graph",
  "proc-macro2",
@@ -1943,7 +1943,7 @@ dependencies = [
 
 [[package]]
 name = "pgrx-pg-config"
-version = "0.20.0-beta.1"
+version = "0.20.0"
 dependencies = [
  "codepage",
  "encoding_rs",
@@ -1958,7 +1958,7 @@ dependencies = [
 
 [[package]]
 name = "pgrx-pg-sys"
-version = "0.20.0-beta.1"
+version = "0.20.0"
 dependencies = [
  "cee-scape",
  "libc",
@@ -1974,7 +1974,7 @@ dependencies = [
 
 [[package]]
 name = "pgrx-sql-entity-graph"
-version = "0.20.0-beta.1"
+version = "0.20.0"
 dependencies = [
  "eyre",
  "proc-macro2",
@@ -1985,7 +1985,7 @@ dependencies = [
 
 [[package]]
 name = "pgrx-tests"
-version = "0.20.0-beta.1"
+version = "0.20.0"
 dependencies = [
  "eyre",
  "libc",
@@ -2005,7 +2005,7 @@ dependencies = [
 
 [[package]]
 name = "pgrx-unit-tests"
-version = "0.20.0-beta.1"
+version = "0.20.0"
 dependencies = [
  "eyre",
  "libc",

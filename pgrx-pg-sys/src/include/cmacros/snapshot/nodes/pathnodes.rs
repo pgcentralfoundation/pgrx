@@ -32,7 +32,7 @@ macro_rules! EC_MUST_BE_REDUNDANT {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro EC_MUST_BE_REDUNDANT from pathnodes.h:1391 (PostgreSQL 16), pathnodes.h:1406 (PostgreSQL 17), pathnodes.h:1473 (PostgreSQL 18), pathnodes.h:1684 (PostgreSQL 19)
+/// C macro EC_MUST_BE_REDUNDANT from pathnodes.h:1391 (PostgreSQL 16), pathnodes.h:1406 (PostgreSQL 17), pathnodes.h:1473 (PostgreSQL 18), pathnodes.h:1687 (PostgreSQL 19)
 ///
 /// ```text
 /// #define EC_MUST_BE_REDUNDANT( eclass ) ( ( eclass ) -> ec_has_const )
@@ -76,7 +76,7 @@ macro_rules! EC_MUST_BE_REDUNDANT {
         )
     };
 }
-/// C macro IS_DUMMY_APPEND from pathnodes.h:1464 (PostgreSQL 15), pathnodes.h:1899 (PostgreSQL 16), pathnodes.h:1941 (PostgreSQL 17), pathnodes.h:2073 (PostgreSQL 18), pathnodes.h:2291 (PostgreSQL 19)
+/// C macro IS_DUMMY_APPEND from pathnodes.h:1464 (PostgreSQL 15), pathnodes.h:1918 (PostgreSQL 16), pathnodes.h:1960 (PostgreSQL 17), pathnodes.h:2092 (PostgreSQL 18), pathnodes.h:2313 (PostgreSQL 19)
 ///
 /// ```text
 /// #define IS_DUMMY_APPEND( p ) ( IsA ( ( p ) , AppendPath ) && ( ( AppendPath * ) ( p ) ) -> subpaths == NIL )
@@ -109,7 +109,7 @@ macro_rules! IS_DUMMY_APPEND {
         )
     };
 }
-/// C macro IS_DUMMY_REL from pathnodes.h:1472 (PostgreSQL 15), pathnodes.h:1907 (PostgreSQL 16), pathnodes.h:1949 (PostgreSQL 17), pathnodes.h:2081 (PostgreSQL 18), pathnodes.h:2299 (PostgreSQL 19)
+/// C macro IS_DUMMY_REL from pathnodes.h:1472 (PostgreSQL 15), pathnodes.h:1926 (PostgreSQL 16), pathnodes.h:1968 (PostgreSQL 17), pathnodes.h:2100 (PostgreSQL 18), pathnodes.h:2321 (PostgreSQL 19)
 ///
 /// ```text
 /// #define IS_DUMMY_REL( r ) is_dummy_rel ( r )
@@ -141,7 +141,7 @@ macro_rules! IS_DUMMY_REL {
     };
 }
 #[cfg(feature = "pg19")]
-/// C macro IS_GROUPED_REL from pathnodes.h:1257 (PostgreSQL 19)
+/// C macro IS_GROUPED_REL from pathnodes.h:1260 (PostgreSQL 19)
 ///
 /// ```text
 /// #define IS_GROUPED_REL( rel ) ( ( rel ) -> agg_info != NULL )
@@ -174,7 +174,7 @@ macro_rules! IS_GROUPED_REL {
         )
     };
 }
-/// C macro IS_JOIN_REL from pathnodes.h:660 (PostgreSQL 15), pathnodes.h:829 (PostgreSQL 16), pathnodes.h:838 (PostgreSQL 17), pathnodes.h:868 (PostgreSQL 18), pathnodes.h:994 (PostgreSQL 19)
+/// C macro IS_JOIN_REL from pathnodes.h:660 (PostgreSQL 15), pathnodes.h:829 (PostgreSQL 16), pathnodes.h:838 (PostgreSQL 17), pathnodes.h:868 (PostgreSQL 18), pathnodes.h:997 (PostgreSQL 19)
 ///
 /// ```text
 /// #define IS_JOIN_REL( rel ) ( ( rel ) -> reloptkind == RELOPT_JOINREL || ( rel ) -> reloptkind == RELOPT_OTHER_JOINREL )
@@ -203,7 +203,7 @@ macro_rules! IS_JOIN_REL {
         )
     };
 }
-/// C macro IS_OTHER_REL from pathnodes.h:670 (PostgreSQL 15), pathnodes.h:839 (PostgreSQL 16), pathnodes.h:848 (PostgreSQL 17), pathnodes.h:878 (PostgreSQL 18), pathnodes.h:1004 (PostgreSQL 19)
+/// C macro IS_OTHER_REL from pathnodes.h:670 (PostgreSQL 15), pathnodes.h:839 (PostgreSQL 16), pathnodes.h:848 (PostgreSQL 17), pathnodes.h:878 (PostgreSQL 18), pathnodes.h:1007 (PostgreSQL 19)
 ///
 /// ```text
 /// #define IS_OTHER_REL( rel ) ( ( rel ) -> reloptkind == RELOPT_OTHER_MEMBER_REL || ( rel ) -> reloptkind == RELOPT_OTHER_JOINREL || ( rel ) -> reloptkind == RELOPT_OTHER_UPPER_REL )
@@ -232,7 +232,7 @@ macro_rules! IS_OTHER_REL {
         )
     };
 }
-/// C macro IS_PARTITIONED_REL from pathnodes.h:787 (PostgreSQL 15), pathnodes.h:1041 (PostgreSQL 16), pathnodes.h:1056 (PostgreSQL 17), pathnodes.h:1086 (PostgreSQL 18), pathnodes.h:1231 (PostgreSQL 19)
+/// C macro IS_PARTITIONED_REL from pathnodes.h:787 (PostgreSQL 15), pathnodes.h:1041 (PostgreSQL 16), pathnodes.h:1056 (PostgreSQL 17), pathnodes.h:1086 (PostgreSQL 18), pathnodes.h:1234 (PostgreSQL 19)
 ///
 /// ```text
 /// #define IS_PARTITIONED_REL( rel ) ( ( rel ) -> part_scheme && ( rel ) -> boundinfo && ( rel ) -> nparts > 0 && ( rel ) -> part_rels && ! IS_DUMMY_REL ( rel ) )
@@ -265,7 +265,7 @@ macro_rules! IS_PARTITIONED_REL {
         )
     };
 }
-/// C macro IS_SIMPLE_REL from pathnodes.h:655 (PostgreSQL 15), pathnodes.h:824 (PostgreSQL 16), pathnodes.h:833 (PostgreSQL 17), pathnodes.h:863 (PostgreSQL 18), pathnodes.h:989 (PostgreSQL 19)
+/// C macro IS_SIMPLE_REL from pathnodes.h:655 (PostgreSQL 15), pathnodes.h:824 (PostgreSQL 16), pathnodes.h:833 (PostgreSQL 17), pathnodes.h:863 (PostgreSQL 18), pathnodes.h:992 (PostgreSQL 19)
 ///
 /// ```text
 /// #define IS_SIMPLE_REL( rel ) ( ( rel ) -> reloptkind == RELOPT_BASEREL || ( rel ) -> reloptkind == RELOPT_OTHER_MEMBER_REL )
@@ -294,7 +294,7 @@ macro_rules! IS_SIMPLE_REL {
         )
     };
 }
-/// C macro IS_UPPER_REL from pathnodes.h:665 (PostgreSQL 15), pathnodes.h:834 (PostgreSQL 16), pathnodes.h:843 (PostgreSQL 17), pathnodes.h:873 (PostgreSQL 18), pathnodes.h:999 (PostgreSQL 19)
+/// C macro IS_UPPER_REL from pathnodes.h:665 (PostgreSQL 15), pathnodes.h:834 (PostgreSQL 16), pathnodes.h:843 (PostgreSQL 17), pathnodes.h:873 (PostgreSQL 18), pathnodes.h:1002 (PostgreSQL 19)
 ///
 /// ```text
 /// #define IS_UPPER_REL( rel ) ( ( rel ) -> reloptkind == RELOPT_UPPER_REL || ( rel ) -> reloptkind == RELOPT_OTHER_UPPER_REL )
@@ -323,7 +323,7 @@ macro_rules! IS_UPPER_REL {
         )
     };
 }
-/// C macro PATH_REQ_OUTER from pathnodes.h:1204 (PostgreSQL 15), pathnodes.h:1640 (PostgreSQL 16), pathnodes.h:1672 (PostgreSQL 17), pathnodes.h:1804 (PostgreSQL 18), pathnodes.h:2015 (PostgreSQL 19)
+/// C macro PATH_REQ_OUTER from pathnodes.h:1204 (PostgreSQL 15), pathnodes.h:1659 (PostgreSQL 16), pathnodes.h:1691 (PostgreSQL 17), pathnodes.h:1823 (PostgreSQL 18), pathnodes.h:2037 (PostgreSQL 19)
 ///
 /// ```text
 /// #define PATH_REQ_OUTER( path ) ( ( path ) -> param_info ? ( path ) -> param_info -> ppi_req_outer : ( Relids ) NULL )
@@ -431,7 +431,7 @@ macro_rules! PATH_REQ_OUTER {
     };
 }
 #[cfg(feature = "pg19")]
-/// C macro RELATION_WAS_MADE_UNIQUE from pathnodes.h:1250 (PostgreSQL 19)
+/// C macro RELATION_WAS_MADE_UNIQUE from pathnodes.h:1253 (PostgreSQL 19)
 ///
 /// ```text
 /// #define RELATION_WAS_MADE_UNIQUE( rel , sjinfo , nominal_jointype ) ( ( nominal_jointype ) == JOIN_INNER && ( sjinfo ) -> jointype == JOIN_SEMI && bms_equal ( ( sjinfo ) -> syn_righthand , ( rel ) -> relids ) )
@@ -466,7 +466,7 @@ macro_rules! RELATION_WAS_MADE_UNIQUE {
         )
     };
 }
-/// C macro REL_HAS_ALL_PART_PROPS from pathnodes.h:795 (PostgreSQL 15), pathnodes.h:1049 (PostgreSQL 16), pathnodes.h:1064 (PostgreSQL 17), pathnodes.h:1094 (PostgreSQL 18), pathnodes.h:1239 (PostgreSQL 19)
+/// C macro REL_HAS_ALL_PART_PROPS from pathnodes.h:795 (PostgreSQL 15), pathnodes.h:1049 (PostgreSQL 16), pathnodes.h:1064 (PostgreSQL 17), pathnodes.h:1094 (PostgreSQL 18), pathnodes.h:1242 (PostgreSQL 19)
 ///
 /// ```text
 /// #define REL_HAS_ALL_PART_PROPS( rel ) ( ( rel ) -> part_scheme && ( rel ) -> boundinfo && ( rel ) -> nparts > 0 && ( rel ) -> part_rels && ( rel ) -> partexprs && ( rel ) -> nullable_partexprs )
@@ -495,7 +495,7 @@ macro_rules! REL_HAS_ALL_PART_PROPS {
         )
     };
 }
-/// C macro RINFO_IS_PUSHED_DOWN from pathnodes.h:2153 (PostgreSQL 15), pathnodes.h:2676 (PostgreSQL 16), pathnodes.h:2724 (PostgreSQL 17), pathnodes.h:2863 (PostgreSQL 18), pathnodes.h:3057 (PostgreSQL 19)
+/// C macro RINFO_IS_PUSHED_DOWN from pathnodes.h:2153 (PostgreSQL 15), pathnodes.h:2698 (PostgreSQL 16), pathnodes.h:2746 (PostgreSQL 17), pathnodes.h:2885 (PostgreSQL 18), pathnodes.h:3082 (PostgreSQL 19)
 ///
 /// ```text
 /// #define RINFO_IS_PUSHED_DOWN( rinfo , joinrelids ) ( ( rinfo ) -> is_pushed_down || ! bms_is_subset ( ( rinfo ) -> required_relids , joinrelids ) )
@@ -529,7 +529,7 @@ macro_rules! RINFO_IS_PUSHED_DOWN {
         )
     };
 }
-/// C macro get_pathtarget_sortgroupref from pathnodes.h:1122 (PostgreSQL 15), pathnodes.h:1520 (PostgreSQL 16), pathnodes.h:1552 (PostgreSQL 17), pathnodes.h:1683 (PostgreSQL 18), pathnodes.h:1894 (PostgreSQL 19)
+/// C macro get_pathtarget_sortgroupref from pathnodes.h:1122 (PostgreSQL 15), pathnodes.h:1520 (PostgreSQL 16), pathnodes.h:1552 (PostgreSQL 17), pathnodes.h:1683 (PostgreSQL 18), pathnodes.h:1897 (PostgreSQL 19)
 ///
 /// ```text
 /// #define get_pathtarget_sortgroupref( target , colno ) ( ( target ) -> sortgrouprefs ? ( target ) -> sortgrouprefs [ colno ] : ( Index ) 0 )
@@ -640,7 +640,7 @@ macro_rules! get_pathtarget_sortgroupref {
         )
     };
 }
-/// C macro planner_rt_fetch from pathnodes.h:389 (PostgreSQL 15), pathnodes.h:555 (PostgreSQL 16), pathnodes.h:564 (PostgreSQL 17), pathnodes.h:594 (PostgreSQL 18), pathnodes.h:704 (PostgreSQL 19)
+/// C macro planner_rt_fetch from pathnodes.h:389 (PostgreSQL 15), pathnodes.h:555 (PostgreSQL 16), pathnodes.h:564 (PostgreSQL 17), pathnodes.h:594 (PostgreSQL 18), pathnodes.h:707 (PostgreSQL 19)
 ///
 /// ```text
 /// #define planner_rt_fetch( rti , root ) ( ( root ) -> simple_rte_array ? ( root ) -> simple_rte_array [ rti ] : rt_fetch ( rti , ( root ) -> parse -> rtable ) )

@@ -1,5 +1,53 @@
 // Shared generated C macro support.
 
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::GrantRoleStmt {
+    type Type = Self;
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_GrantRoleStmt as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::GrantStmt {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::GrantStmt {
+    type Type = Self;
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_GrantStmt as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::Group {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::Group {
+    type Type = Self;
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_Group as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::GroupPath {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::GroupPath {
+    type Type = Self;
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_GroupPath as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::GroupResultPath {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::GroupResultPath {
+    type Type = Self;
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_GroupResultPath as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::GroupState {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::GroupState {
+    type Type = Self;
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_GroupState as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::GroupingFunc {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::GroupingFunc {
+    type Type = Self;
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_GroupingFunc as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::GroupingSet {}
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::GroupingSet {
+    type Type = Self;
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_GroupingSet as i32);
+}
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::GroupingSetData {}
 impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::GroupingSetData {
     type Type = Self;
     const VALUE: c::CValue<c::CInt> =
@@ -6111,42 +6159,3 @@ unsafe impl c::expression::OrdinaryField<Field_srctape>
     type Declared = FieldReadWrite;
     const OFFSET: usize = 20;
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
-const _: Projection<
-    crate::__pgrx_c_bindings::SortTuple,
-    <<c::expression::CRecord<crate::__pgrx_c_bindings::SortTuple> as c::expression::OrdinaryField<
-        Field_srctape,
-    >>::Member as c::expression::CType>::Storage,
-> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).srctape) };
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-#[doc(hidden)]
-pub struct Field_haveDatum1;
-#[cfg(feature = "pg16")]
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::TuplesortPublic>() == 104);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::TuplesortPublic>() == 8);
-};
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::TuplesortPublic {}
-#[cfg(feature = "pg16")]
-const _: () =
-    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::TuplesortPublic, haveDatum1) == 64);
-#[cfg(feature = "pg16")]
-// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
-unsafe impl c::expression::OrdinaryField<Field_haveDatum1>
-    for c::expression::CRecord<crate::__pgrx_c_bindings::TuplesortPublic>
-{
-    type Member = c::CBool;
-    type Declared = FieldReadWrite;
-    const OFFSET: usize = 64;
-}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
-const _: Projection<crate::__pgrx_c_bindings::TuplesortPublic, <<c::expression::CRecord<crate::__pgrx_c_bindings::TuplesortPublic> as c::expression::OrdinaryField<Field_haveDatum1>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).haveDatum1) };
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-#[doc(hidden)]
-pub struct Field_nKeys;
-#[cfg(feature = "pg16")]
-const _: () =
-    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::TuplesortPublic, nKeys) == 68);
