@@ -9,8 +9,38 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use std::fmt::{Display, Formatter};
 
-/// This list of SQL Error Codes is taken directly from Postgres 12's generated "utils/errcodes.h"
+/// Compute the error code of `sqlstate` as PostgreSQL's `MAKE_SQLSTATE` does, for a code that
+/// the headers of some supported PostgreSQL releases do not define.
+const fn make_sqlstate(sqlstate: &[u8; 5]) -> isize {
+    let mut code = 0;
+    let mut i = 0;
+    while i < sqlstate.len() {
+        // PGSIXBIT(ch) is ((ch - '0') & 0x3F), and each character takes the next six bits.
+        code += (((sqlstate[i] - b'0') & 0x3F) as isize) << (6 * i);
+        i += 1;
+    }
+    code
+}
+
+// Where the headers define a computed code, the two must agree.
+#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
+const _: () = assert!(make_sqlstate(b"25P04") == crate::ERRCODE_TRANSACTION_TIMEOUT as isize);
+#[cfg(any(feature = "pg18", feature = "pg19"))]
+const _: () = {
+    assert!(make_sqlstate(b"10608") == crate::ERRCODE_INVALID_ARGUMENT_FOR_XQUERY as isize);
+    assert!(make_sqlstate(b"58P03") == crate::ERRCODE_FILE_NAME_TOO_LONG as isize);
+};
+
+/// SQLSTATE error codes, as PostgreSQL's `src/backend/utils/errcodes.txt` lists them.
+///
+/// `ERRCODE_SNAPSHOT_TOO_OLD` exists only for PG15 and PG16. Every other variant exists for
+/// every supported version, even where that release never raises it: PostgreSQL added
+/// `ERRCODE_TRANSACTION_TIMEOUT` in 17, `ERRCODE_INVALID_ARGUMENT_FOR_XQUERY` and
+/// `ERRCODE_FILE_NAME_TOO_LONG` in 18, and `ERRCODE_DATUM_VERSION_MISMATCH` in 15.20, 16.16,
+/// 17.12, 18.7, and 19rc2. Converting a code that this enum lacks with `From` returns
+/// `ERRCODE_INTERNAL_ERROR`.
 #[allow(non_camel_case_types)]
+#[non_exhaustive]
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Hash, Ord, PartialOrd)]
 pub enum PgSqlErrorCode {
     /// Class 00 - Successful Completion
@@ -73,6 +103,9 @@ pub enum PgSqlErrorCode {
     ERRCODE_DIAGNOSTICS_EXCEPTION = crate::ERRCODE_DIAGNOSTICS_EXCEPTION as isize,
     ERRCODE_STACKED_DIAGNOSTICS_ACCESSED_WITHOUT_ACTIVE_HANDLER =
         crate::ERRCODE_STACKED_DIAGNOSTICS_ACCESSED_WITHOUT_ACTIVE_HANDLER as isize,
+
+    /// Class 10 - XQuery Error
+    ERRCODE_INVALID_ARGUMENT_FOR_XQUERY = make_sqlstate(b"10608"),
 
     /// Class 20 - Case Not Found
     ERRCODE_CASE_NOT_FOUND = crate::ERRCODE_CASE_NOT_FOUND as isize,
@@ -141,6 +174,7 @@ pub enum PgSqlErrorCode {
     ERRCODE_INVALID_BINARY_REPRESENTATION = crate::ERRCODE_INVALID_BINARY_REPRESENTATION as isize,
     ERRCODE_BAD_COPY_FILE_FORMAT = crate::ERRCODE_BAD_COPY_FILE_FORMAT as isize,
     ERRCODE_UNTRANSLATABLE_CHARACTER = crate::ERRCODE_UNTRANSLATABLE_CHARACTER as isize,
+    ERRCODE_DATUM_VERSION_MISMATCH = make_sqlstate(b"22P07"),
     ERRCODE_NOT_AN_XML_DOCUMENT = crate::ERRCODE_NOT_AN_XML_DOCUMENT as isize,
     ERRCODE_INVALID_XML_DOCUMENT = crate::ERRCODE_INVALID_XML_DOCUMENT as isize,
     ERRCODE_INVALID_XML_CONTENT = crate::ERRCODE_INVALID_XML_CONTENT as isize,
@@ -149,6 +183,8 @@ pub enum PgSqlErrorCode {
         crate::ERRCODE_INVALID_XML_PROCESSING_INSTRUCTION as isize,
     ERRCODE_DUPLICATE_JSON_OBJECT_KEY_VALUE =
         crate::ERRCODE_DUPLICATE_JSON_OBJECT_KEY_VALUE as isize,
+    ERRCODE_INVALID_ARGUMENT_FOR_SQL_JSON_DATETIME_FUNCTION =
+        crate::ERRCODE_INVALID_ARGUMENT_FOR_SQL_JSON_DATETIME_FUNCTION as isize,
     ERRCODE_INVALID_JSON_TEXT = crate::ERRCODE_INVALID_JSON_TEXT as isize,
     ERRCODE_INVALID_SQL_JSON_SUBSCRIPT = crate::ERRCODE_INVALID_SQL_JSON_SUBSCRIPT as isize,
     ERRCODE_MORE_THAN_ONE_SQL_JSON_ITEM = crate::ERRCODE_MORE_THAN_ONE_SQL_JSON_ITEM as isize,
@@ -165,6 +201,8 @@ pub enum PgSqlErrorCode {
     ERRCODE_TOO_MANY_JSON_ARRAY_ELEMENTS = crate::ERRCODE_TOO_MANY_JSON_ARRAY_ELEMENTS as isize,
     ERRCODE_TOO_MANY_JSON_OBJECT_MEMBERS = crate::ERRCODE_TOO_MANY_JSON_OBJECT_MEMBERS as isize,
     ERRCODE_SQL_JSON_SCALAR_REQUIRED = crate::ERRCODE_SQL_JSON_SCALAR_REQUIRED as isize,
+    ERRCODE_SQL_JSON_ITEM_CANNOT_BE_CAST_TO_TARGET_TYPE =
+        crate::ERRCODE_SQL_JSON_ITEM_CANNOT_BE_CAST_TO_TARGET_TYPE as isize,
 
     /// Class 23 - Integrity Constraint Violation
     ERRCODE_INTEGRITY_CONSTRAINT_VIOLATION = crate::ERRCODE_INTEGRITY_CONSTRAINT_VIOLATION as isize,
@@ -198,6 +236,7 @@ pub enum PgSqlErrorCode {
     ERRCODE_IN_FAILED_SQL_TRANSACTION = crate::ERRCODE_IN_FAILED_SQL_TRANSACTION as isize,
     ERRCODE_IDLE_IN_TRANSACTION_SESSION_TIMEOUT =
         crate::ERRCODE_IDLE_IN_TRANSACTION_SESSION_TIMEOUT as isize,
+    ERRCODE_TRANSACTION_TIMEOUT = make_sqlstate(b"25P04"),
 
     /// Class 26 - Invalid SQL Statement Name
     ERRCODE_INVALID_SQL_STATEMENT_NAME = crate::ERRCODE_INVALID_SQL_STATEMENT_NAME as isize,
@@ -358,12 +397,14 @@ pub enum PgSqlErrorCode {
     ERRCODE_CRASH_SHUTDOWN = crate::ERRCODE_CRASH_SHUTDOWN as isize,
     ERRCODE_CANNOT_CONNECT_NOW = crate::ERRCODE_CANNOT_CONNECT_NOW as isize,
     ERRCODE_DATABASE_DROPPED = crate::ERRCODE_DATABASE_DROPPED as isize,
+    ERRCODE_IDLE_SESSION_TIMEOUT = crate::ERRCODE_IDLE_SESSION_TIMEOUT as isize,
 
     /// Class 58 - System Error (errors external to PostgreSQL itself) as isize,
     ERRCODE_SYSTEM_ERROR = crate::ERRCODE_SYSTEM_ERROR as isize,
     ERRCODE_IO_ERROR = crate::ERRCODE_IO_ERROR as isize,
     ERRCODE_UNDEFINED_FILE = crate::ERRCODE_UNDEFINED_FILE as isize,
     ERRCODE_DUPLICATE_FILE = crate::ERRCODE_DUPLICATE_FILE as isize,
+    ERRCODE_FILE_NAME_TOO_LONG = make_sqlstate(b"58P03"),
 
     /// Class 72 - Snapshot Failure
     #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -548,6 +589,10 @@ impl From<isize> for PgSqlErrorCode {
                 PgSqlErrorCode::ERRCODE_STACKED_DIAGNOSTICS_ACCESSED_WITHOUT_ACTIVE_HANDLER
             }
 
+            x if x == PgSqlErrorCode::ERRCODE_INVALID_ARGUMENT_FOR_XQUERY as isize => {
+                PgSqlErrorCode::ERRCODE_INVALID_ARGUMENT_FOR_XQUERY
+            }
+
             x if x == PgSqlErrorCode::ERRCODE_CASE_NOT_FOUND as isize => {
                 PgSqlErrorCode::ERRCODE_CASE_NOT_FOUND
             }
@@ -702,6 +747,9 @@ impl From<isize> for PgSqlErrorCode {
             x if x == PgSqlErrorCode::ERRCODE_UNTRANSLATABLE_CHARACTER as isize => {
                 PgSqlErrorCode::ERRCODE_UNTRANSLATABLE_CHARACTER
             }
+            x if x == PgSqlErrorCode::ERRCODE_DATUM_VERSION_MISMATCH as isize => {
+                PgSqlErrorCode::ERRCODE_DATUM_VERSION_MISMATCH
+            }
             x if x == PgSqlErrorCode::ERRCODE_NOT_AN_XML_DOCUMENT as isize => {
                 PgSqlErrorCode::ERRCODE_NOT_AN_XML_DOCUMENT
             }
@@ -719,6 +767,12 @@ impl From<isize> for PgSqlErrorCode {
             }
             x if x == PgSqlErrorCode::ERRCODE_DUPLICATE_JSON_OBJECT_KEY_VALUE as isize => {
                 PgSqlErrorCode::ERRCODE_DUPLICATE_JSON_OBJECT_KEY_VALUE
+            }
+            x if x
+                == PgSqlErrorCode::ERRCODE_INVALID_ARGUMENT_FOR_SQL_JSON_DATETIME_FUNCTION
+                    as isize =>
+            {
+                PgSqlErrorCode::ERRCODE_INVALID_ARGUMENT_FOR_SQL_JSON_DATETIME_FUNCTION
             }
             x if x == PgSqlErrorCode::ERRCODE_INVALID_JSON_TEXT as isize => {
                 PgSqlErrorCode::ERRCODE_INVALID_JSON_TEXT
@@ -761,6 +815,11 @@ impl From<isize> for PgSqlErrorCode {
             }
             x if x == PgSqlErrorCode::ERRCODE_SQL_JSON_SCALAR_REQUIRED as isize => {
                 PgSqlErrorCode::ERRCODE_SQL_JSON_SCALAR_REQUIRED
+            }
+            x if x
+                == PgSqlErrorCode::ERRCODE_SQL_JSON_ITEM_CANNOT_BE_CAST_TO_TARGET_TYPE as isize =>
+            {
+                PgSqlErrorCode::ERRCODE_SQL_JSON_ITEM_CANNOT_BE_CAST_TO_TARGET_TYPE
             }
 
             x if x == PgSqlErrorCode::ERRCODE_INTEGRITY_CONSTRAINT_VIOLATION as isize => {
@@ -843,6 +902,9 @@ impl From<isize> for PgSqlErrorCode {
             }
             x if x == PgSqlErrorCode::ERRCODE_IDLE_IN_TRANSACTION_SESSION_TIMEOUT as isize => {
                 PgSqlErrorCode::ERRCODE_IDLE_IN_TRANSACTION_SESSION_TIMEOUT
+            }
+            x if x == PgSqlErrorCode::ERRCODE_TRANSACTION_TIMEOUT as isize => {
+                PgSqlErrorCode::ERRCODE_TRANSACTION_TIMEOUT
             }
 
             x if x == PgSqlErrorCode::ERRCODE_INVALID_SQL_STATEMENT_NAME as isize => {
@@ -1171,6 +1233,9 @@ impl From<isize> for PgSqlErrorCode {
             x if x == PgSqlErrorCode::ERRCODE_DATABASE_DROPPED as isize => {
                 PgSqlErrorCode::ERRCODE_DATABASE_DROPPED
             }
+            x if x == PgSqlErrorCode::ERRCODE_IDLE_SESSION_TIMEOUT as isize => {
+                PgSqlErrorCode::ERRCODE_IDLE_SESSION_TIMEOUT
+            }
 
             x if x == PgSqlErrorCode::ERRCODE_SYSTEM_ERROR as isize => {
                 PgSqlErrorCode::ERRCODE_SYSTEM_ERROR
@@ -1181,6 +1246,9 @@ impl From<isize> for PgSqlErrorCode {
             }
             x if x == PgSqlErrorCode::ERRCODE_DUPLICATE_FILE as isize => {
                 PgSqlErrorCode::ERRCODE_DUPLICATE_FILE
+            }
+            x if x == PgSqlErrorCode::ERRCODE_FILE_NAME_TOO_LONG as isize => {
+                PgSqlErrorCode::ERRCODE_FILE_NAME_TOO_LONG
             }
 
             #[cfg(any(feature = "pg15", feature = "pg16"))]
