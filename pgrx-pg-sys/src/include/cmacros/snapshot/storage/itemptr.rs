@@ -2,7 +2,7 @@
 // C macros from itemptr.h.
 
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C inline function DatumGetItemPointer from itemptr.h:230 (PostgreSQL 16–19)
+/// C inline function DatumGetItemPointer from itemptr.h:239 (PostgreSQL 16–19)
 ///
 /// ```c
 /// static inline ItemPointer
@@ -42,7 +42,7 @@ macro_rules! DatumGetItemPointer {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro ItemPointerCopy from itemptr.h:161 (PostgreSQL 15)
+/// C macro ItemPointerCopy from itemptr.h:170 (PostgreSQL 15)
 ///
 /// ```text
 /// #define ItemPointerCopy( fromPointer , toPointer ) ( AssertMacro ( PointerIsValid ( toPointer ) ) , AssertMacro ( PointerIsValid ( fromPointer ) ) , * ( toPointer ) = * ( fromPointer ) )
@@ -110,7 +110,7 @@ macro_rules! ItemPointerCopy {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C inline function ItemPointerCopy from itemptr.h:171 (PostgreSQL 16–18)
+/// C inline function ItemPointerCopy from itemptr.h:180 (PostgreSQL 16–18)
 ///
 /// ```c
 /// static inline void
@@ -151,7 +151,7 @@ macro_rules! ItemPointerCopy {
     };
 }
 #[cfg(feature = "pg19")]
-/// C inline function ItemPointerCopy from itemptr.h:171 (PostgreSQL 19)
+/// C inline function ItemPointerCopy from itemptr.h:180 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -188,7 +188,7 @@ macro_rules! ItemPointerCopy {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro ItemPointerGetBlockNumber from itemptr.h:98 (PostgreSQL 15)
+/// C macro ItemPointerGetBlockNumber from itemptr.h:107 (PostgreSQL 15)
 ///
 /// ```text
 /// #define ItemPointerGetBlockNumber( pointer ) ( AssertMacro ( ItemPointerIsValid ( pointer ) ) , ItemPointerGetBlockNumberNoCheck ( pointer ) )
@@ -274,7 +274,7 @@ macro_rules! ItemPointerGetBlockNumber {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C inline function ItemPointerGetBlockNumber from itemptr.h:102 (PostgreSQL 16–19)
+/// C inline function ItemPointerGetBlockNumber from itemptr.h:111 (PostgreSQL 16–19)
 ///
 /// ```c
 /// static inline BlockNumber
@@ -315,7 +315,7 @@ macro_rules! ItemPointerGetBlockNumber {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro ItemPointerGetBlockNumberNoCheck from itemptr.h:89 (PostgreSQL 15)
+/// C macro ItemPointerGetBlockNumberNoCheck from itemptr.h:98 (PostgreSQL 15)
 ///
 /// ```text
 /// #define ItemPointerGetBlockNumberNoCheck( pointer ) ( BlockIdGetBlockNumber ( & ( pointer ) -> ip_blkid ) )
@@ -383,7 +383,7 @@ macro_rules! ItemPointerGetBlockNumberNoCheck {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C inline function ItemPointerGetBlockNumberNoCheck from itemptr.h:92 (PostgreSQL 16–19)
+/// C inline function ItemPointerGetBlockNumberNoCheck from itemptr.h:101 (PostgreSQL 16–19)
 ///
 /// ```c
 /// static inline BlockNumber
@@ -419,7 +419,7 @@ macro_rules! ItemPointerGetBlockNumberNoCheck {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C inline function ItemPointerGetDatum from itemptr.h:236 (PostgreSQL 16–19)
+/// C inline function ItemPointerGetDatum from itemptr.h:245 (PostgreSQL 16–19)
 ///
 /// ```c
 /// static inline Datum
@@ -453,7 +453,7 @@ macro_rules! ItemPointerGetDatum {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro ItemPointerGetOffsetNumber from itemptr.h:117 (PostgreSQL 15)
+/// C macro ItemPointerGetOffsetNumber from itemptr.h:126 (PostgreSQL 15)
 ///
 /// ```text
 /// #define ItemPointerGetOffsetNumber( pointer ) ( AssertMacro ( ItemPointerIsValid ( pointer ) ) , ItemPointerGetOffsetNumberNoCheck ( pointer ) )
@@ -514,7 +514,7 @@ macro_rules! ItemPointerGetOffsetNumber {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C inline function ItemPointerGetOffsetNumber from itemptr.h:123 (PostgreSQL 16–18)
+/// C inline function ItemPointerGetOffsetNumber from itemptr.h:132 (PostgreSQL 16–18)
 ///
 /// ```c
 /// static inline OffsetNumber
@@ -555,7 +555,7 @@ macro_rules! ItemPointerGetOffsetNumber {
     };
 }
 #[cfg(feature = "pg19")]
-/// C inline function ItemPointerGetOffsetNumber from itemptr.h:123 (PostgreSQL 19)
+/// C inline function ItemPointerGetOffsetNumber from itemptr.h:132 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline OffsetNumber
@@ -592,7 +592,7 @@ macro_rules! ItemPointerGetOffsetNumber {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro ItemPointerGetOffsetNumberNoCheck from itemptr.h:108 (PostgreSQL 15)
+/// C macro ItemPointerGetOffsetNumberNoCheck from itemptr.h:117 (PostgreSQL 15)
 ///
 /// ```text
 /// #define ItemPointerGetOffsetNumberNoCheck( pointer ) ( ( pointer ) -> ip_posid )
@@ -637,7 +637,7 @@ macro_rules! ItemPointerGetOffsetNumberNoCheck {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C inline function ItemPointerGetOffsetNumberNoCheck from itemptr.h:113 (PostgreSQL 16–19)
+/// C inline function ItemPointerGetOffsetNumberNoCheck from itemptr.h:122 (PostgreSQL 16–19)
 ///
 /// ```c
 /// static inline OffsetNumber
@@ -669,7 +669,7 @@ macro_rules! ItemPointerGetOffsetNumberNoCheck {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro ItemPointerIndicatesMovedPartitions from itemptr.h:184 (PostgreSQL 15)
+/// C macro ItemPointerIndicatesMovedPartitions from itemptr.h:193 (PostgreSQL 15)
 ///
 /// ```text
 /// #define ItemPointerIndicatesMovedPartitions( pointer ) ( ItemPointerGetOffsetNumber ( pointer ) == MovedPartitionsOffsetNumber && ItemPointerGetBlockNumberNoCheck ( pointer ) == MovedPartitionsBlockNumber )
@@ -709,7 +709,7 @@ macro_rules! ItemPointerIndicatesMovedPartitions {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C inline function ItemPointerIndicatesMovedPartitions from itemptr.h:196 (PostgreSQL 16–19)
+/// C inline function ItemPointerIndicatesMovedPartitions from itemptr.h:205 (PostgreSQL 16–19)
 ///
 /// ```c
 /// static inline bool
@@ -745,7 +745,7 @@ macro_rules! ItemPointerIndicatesMovedPartitions {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro ItemPointerIsValid from itemptr.h:82 (PostgreSQL 15)
+/// C macro ItemPointerIsValid from itemptr.h:91 (PostgreSQL 15)
 ///
 /// ```text
 /// #define ItemPointerIsValid( pointer ) ( ( bool ) ( PointerIsValid ( pointer ) && ( ( pointer ) -> ip_posid != 0 ) ) )
@@ -779,7 +779,7 @@ macro_rules! ItemPointerIsValid {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C inline function ItemPointerIsValid from itemptr.h:82 (PostgreSQL 16–18)
+/// C inline function ItemPointerIsValid from itemptr.h:91 (PostgreSQL 16–18)
 ///
 /// ```c
 /// static inline bool
@@ -813,7 +813,7 @@ macro_rules! ItemPointerIsValid {
     };
 }
 #[cfg(feature = "pg19")]
-/// C inline function ItemPointerIsValid from itemptr.h:82 (PostgreSQL 19)
+/// C inline function ItemPointerIsValid from itemptr.h:91 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -843,7 +843,7 @@ macro_rules! ItemPointerIsValid {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro ItemPointerSet from itemptr.h:127 (PostgreSQL 15)
+/// C macro ItemPointerSet from itemptr.h:136 (PostgreSQL 15)
 ///
 /// ```text
 /// #define ItemPointerSet( pointer , blockNumber , offNum ) ( AssertMacro ( PointerIsValid ( pointer ) ) , BlockIdSet ( & ( ( pointer ) -> ip_blkid ) , blockNumber ) , ( pointer ) -> ip_posid = offNum )
@@ -909,7 +909,7 @@ macro_rules! ItemPointerSet {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C inline function ItemPointerSet from itemptr.h:134 (PostgreSQL 16–18)
+/// C inline function ItemPointerSet from itemptr.h:143 (PostgreSQL 16–18)
 ///
 /// ```c
 /// static inline void
@@ -951,7 +951,7 @@ macro_rules! ItemPointerSet {
     };
 }
 #[cfg(feature = "pg19")]
-/// C inline function ItemPointerSet from itemptr.h:134 (PostgreSQL 19)
+/// C inline function ItemPointerSet from itemptr.h:143 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -993,7 +993,7 @@ macro_rules! ItemPointerSet {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro ItemPointerSetBlockNumber from itemptr.h:138 (PostgreSQL 15)
+/// C macro ItemPointerSetBlockNumber from itemptr.h:147 (PostgreSQL 15)
 ///
 /// ```text
 /// #define ItemPointerSetBlockNumber( pointer , blockNumber ) ( AssertMacro ( PointerIsValid ( pointer ) ) , BlockIdSet ( & ( ( pointer ) -> ip_blkid ) , blockNumber ) )
@@ -1112,7 +1112,7 @@ macro_rules! ItemPointerSetBlockNumber {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C inline function ItemPointerSetBlockNumber from itemptr.h:146 (PostgreSQL 16–18)
+/// C inline function ItemPointerSetBlockNumber from itemptr.h:155 (PostgreSQL 16–18)
 ///
 /// ```c
 /// static inline void
@@ -1150,7 +1150,7 @@ macro_rules! ItemPointerSetBlockNumber {
     };
 }
 #[cfg(feature = "pg19")]
-/// C inline function ItemPointerSetBlockNumber from itemptr.h:146 (PostgreSQL 19)
+/// C inline function ItemPointerSetBlockNumber from itemptr.h:155 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -1188,7 +1188,7 @@ macro_rules! ItemPointerSetBlockNumber {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro ItemPointerSetInvalid from itemptr.h:172 (PostgreSQL 15)
+/// C macro ItemPointerSetInvalid from itemptr.h:181 (PostgreSQL 15)
 ///
 /// ```text
 /// #define ItemPointerSetInvalid( pointer ) ( AssertMacro ( PointerIsValid ( pointer ) ) , BlockIdSet ( & ( ( pointer ) -> ip_blkid ) , InvalidBlockNumber ) , ( pointer ) -> ip_posid = InvalidOffsetNumber )
@@ -1256,7 +1256,7 @@ macro_rules! ItemPointerSetInvalid {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C inline function ItemPointerSetInvalid from itemptr.h:183 (PostgreSQL 16–18)
+/// C inline function ItemPointerSetInvalid from itemptr.h:192 (PostgreSQL 16–18)
 ///
 /// ```c
 /// static inline void
@@ -1294,7 +1294,7 @@ macro_rules! ItemPointerSetInvalid {
     };
 }
 #[cfg(feature = "pg19")]
-/// C inline function ItemPointerSetInvalid from itemptr.h:183 (PostgreSQL 19)
+/// C inline function ItemPointerSetInvalid from itemptr.h:192 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -1332,7 +1332,7 @@ macro_rules! ItemPointerSetInvalid {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro ItemPointerSetMovedPartitions from itemptr.h:195 (PostgreSQL 15)
+/// C macro ItemPointerSetMovedPartitions from itemptr.h:204 (PostgreSQL 15)
 ///
 /// ```text
 /// #define ItemPointerSetMovedPartitions( pointer ) ItemPointerSet ( ( pointer ) , MovedPartitionsBlockNumber , MovedPartitionsOffsetNumber )
@@ -1400,7 +1400,7 @@ macro_rules! ItemPointerSetMovedPartitions {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C inline function ItemPointerSetMovedPartitions from itemptr.h:209 (PostgreSQL 16–19)
+/// C inline function ItemPointerSetMovedPartitions from itemptr.h:218 (PostgreSQL 16–19)
 ///
 /// ```c
 /// static inline void
@@ -1432,7 +1432,7 @@ macro_rules! ItemPointerSetMovedPartitions {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro ItemPointerSetOffsetNumber from itemptr.h:148 (PostgreSQL 15)
+/// C macro ItemPointerSetOffsetNumber from itemptr.h:157 (PostgreSQL 15)
 ///
 /// ```text
 /// #define ItemPointerSetOffsetNumber( pointer , offsetNumber ) ( AssertMacro ( PointerIsValid ( pointer ) ) , ( pointer ) -> ip_posid = ( offsetNumber ) )
@@ -1502,7 +1502,7 @@ macro_rules! ItemPointerSetOffsetNumber {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C inline function ItemPointerSetOffsetNumber from itemptr.h:157 (PostgreSQL 16–18)
+/// C inline function ItemPointerSetOffsetNumber from itemptr.h:166 (PostgreSQL 16–18)
 ///
 /// ```c
 /// static inline void
@@ -1542,7 +1542,7 @@ macro_rules! ItemPointerSetOffsetNumber {
     };
 }
 #[cfg(feature = "pg19")]
-/// C inline function ItemPointerSetOffsetNumber from itemptr.h:157 (PostgreSQL 19)
+/// C inline function ItemPointerSetOffsetNumber from itemptr.h:166 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -1578,7 +1578,7 @@ macro_rules! ItemPointerSetOffsetNumber {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro PG_GETARG_ITEMPOINTER from itemptr.h:242 (PostgreSQL 16–19)
+/// C macro PG_GETARG_ITEMPOINTER from itemptr.h:251 (PostgreSQL 16–19)
 ///
 /// ```text
 /// #define PG_GETARG_ITEMPOINTER( n ) DatumGetItemPointer ( PG_GETARG_DATUM ( n ) )
@@ -1615,7 +1615,7 @@ macro_rules! PG_GETARG_ITEMPOINTER {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro PG_RETURN_ITEMPOINTER from itemptr.h:243 (PostgreSQL 16–19)
+/// C macro PG_RETURN_ITEMPOINTER from itemptr.h:252 (PostgreSQL 16–19)
 ///
 /// ```text
 /// #define PG_RETURN_ITEMPOINTER( x ) return ItemPointerGetDatum ( x )

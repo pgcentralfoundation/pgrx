@@ -37,7 +37,7 @@ macro_rules! ReorderBufferTupleBufData {
         )
     };
 }
-/// C macro rbtxn_distr_inval_overflowed from reorderbuffer.h:238 (PostgreSQL 15), reorderbuffer.h:254 (PostgreSQL 16), reorderbuffer.h:236 (PostgreSQL 17), reorderbuffer.h:270 (PostgreSQL 18–19)
+/// C macro rbtxn_distr_inval_overflowed from reorderbuffer.h:243 (PostgreSQL 15), reorderbuffer.h:259 (PostgreSQL 16), reorderbuffer.h:241 (PostgreSQL 17), reorderbuffer.h:275 (PostgreSQL 18–19)
 ///
 /// ```text
 /// #define rbtxn_distr_inval_overflowed( txn ) ( ( ( txn ) -> txn_flags & RBTXN_DISTR_INVAL_OVERFLOWED ) != 0 )
@@ -67,7 +67,7 @@ macro_rules! rbtxn_distr_inval_overflowed {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro rbtxn_get_toptxn from reorderbuffer.h:272 (PostgreSQL 16), reorderbuffer.h:254 (PostgreSQL 17), reorderbuffer.h:288 (PostgreSQL 18–19)
+/// C macro rbtxn_get_toptxn from reorderbuffer.h:277 (PostgreSQL 16), reorderbuffer.h:259 (PostgreSQL 17), reorderbuffer.h:293 (PostgreSQL 18–19)
 ///
 /// ```text
 /// #define rbtxn_get_toptxn( txn ) ( rbtxn_is_subtxn ( txn ) ? ( txn ) -> toptxn : ( txn ) )
@@ -145,7 +145,7 @@ macro_rules! rbtxn_get_toptxn {
         )
     };
 }
-/// C macro rbtxn_has_catalog_changes from reorderbuffer.h:182 (PostgreSQL 15), reorderbuffer.h:192 (PostgreSQL 16), reorderbuffer.h:174 (PostgreSQL 17), reorderbuffer.h:184 (PostgreSQL 18–19)
+/// C macro rbtxn_has_catalog_changes from reorderbuffer.h:187 (PostgreSQL 15), reorderbuffer.h:197 (PostgreSQL 16), reorderbuffer.h:179 (PostgreSQL 17), reorderbuffer.h:189 (PostgreSQL 18–19)
 ///
 /// ```text
 /// #define rbtxn_has_catalog_changes( txn ) ( ( ( txn ) -> txn_flags & RBTXN_HAS_CATALOG_CHANGES ) != 0 )
@@ -174,7 +174,7 @@ macro_rules! rbtxn_has_catalog_changes {
         )
     };
 }
-/// C macro rbtxn_has_partial_change from reorderbuffer.h:206 (PostgreSQL 15), reorderbuffer.h:216 (PostgreSQL 16), reorderbuffer.h:198 (PostgreSQL 17), reorderbuffer.h:208 (PostgreSQL 18–19)
+/// C macro rbtxn_has_partial_change from reorderbuffer.h:211 (PostgreSQL 15), reorderbuffer.h:221 (PostgreSQL 16), reorderbuffer.h:203 (PostgreSQL 17), reorderbuffer.h:213 (PostgreSQL 18–19)
 ///
 /// ```text
 /// #define rbtxn_has_partial_change( txn ) ( ( ( txn ) -> txn_flags & RBTXN_HAS_PARTIAL_CHANGE ) != 0 )
@@ -204,7 +204,7 @@ macro_rules! rbtxn_has_partial_change {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro rbtxn_has_streamable_change from reorderbuffer.h:222 (PostgreSQL 16), reorderbuffer.h:204 (PostgreSQL 17), reorderbuffer.h:214 (PostgreSQL 18–19)
+/// C macro rbtxn_has_streamable_change from reorderbuffer.h:227 (PostgreSQL 16), reorderbuffer.h:209 (PostgreSQL 17), reorderbuffer.h:219 (PostgreSQL 18–19)
 ///
 /// ```text
 /// #define rbtxn_has_streamable_change( txn ) ( ( ( txn ) -> txn_flags & RBTXN_HAS_STREAMABLE_CHANGE ) != 0 )
@@ -234,7 +234,7 @@ macro_rules! rbtxn_has_streamable_change {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C macro rbtxn_is_aborted from reorderbuffer.h:258 (PostgreSQL 18–19)
+/// C macro rbtxn_is_aborted from reorderbuffer.h:263 (PostgreSQL 18–19)
 ///
 /// ```text
 /// #define rbtxn_is_aborted( txn ) ( ( ( txn ) -> txn_flags & RBTXN_IS_ABORTED ) != 0 )
@@ -264,7 +264,7 @@ macro_rules! rbtxn_is_aborted {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C macro rbtxn_is_committed from reorderbuffer.h:252 (PostgreSQL 18–19)
+/// C macro rbtxn_is_committed from reorderbuffer.h:257 (PostgreSQL 18–19)
 ///
 /// ```text
 /// #define rbtxn_is_committed( txn ) ( ( ( txn ) -> txn_flags & RBTXN_IS_COMMITTED ) != 0 )
@@ -293,7 +293,7 @@ macro_rules! rbtxn_is_committed {
         )
     };
 }
-/// C macro rbtxn_is_known_subxact from reorderbuffer.h:188 (PostgreSQL 15), reorderbuffer.h:198 (PostgreSQL 16), reorderbuffer.h:180 (PostgreSQL 17), reorderbuffer.h:190 (PostgreSQL 18–19)
+/// C macro rbtxn_is_known_subxact from reorderbuffer.h:193 (PostgreSQL 15), reorderbuffer.h:203 (PostgreSQL 16), reorderbuffer.h:185 (PostgreSQL 17), reorderbuffer.h:195 (PostgreSQL 18–19)
 ///
 /// ```text
 /// #define rbtxn_is_known_subxact( txn ) ( ( ( txn ) -> txn_flags & RBTXN_IS_SUBXACT ) != 0 )
@@ -323,7 +323,7 @@ macro_rules! rbtxn_is_known_subxact {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C macro rbtxn_is_prepared from reorderbuffer.h:240 (PostgreSQL 18–19)
+/// C macro rbtxn_is_prepared from reorderbuffer.h:245 (PostgreSQL 18–19)
 ///
 /// ```text
 /// #define rbtxn_is_prepared( txn ) ( ( ( txn ) -> txn_flags & RBTXN_IS_PREPARED ) != 0 )
@@ -352,7 +352,7 @@ macro_rules! rbtxn_is_prepared {
         )
     };
 }
-/// C macro rbtxn_is_serialized from reorderbuffer.h:194 (PostgreSQL 15), reorderbuffer.h:204 (PostgreSQL 16), reorderbuffer.h:186 (PostgreSQL 17), reorderbuffer.h:196 (PostgreSQL 18–19)
+/// C macro rbtxn_is_serialized from reorderbuffer.h:199 (PostgreSQL 15), reorderbuffer.h:209 (PostgreSQL 16), reorderbuffer.h:191 (PostgreSQL 17), reorderbuffer.h:201 (PostgreSQL 18–19)
 ///
 /// ```text
 /// #define rbtxn_is_serialized( txn ) ( ( ( txn ) -> txn_flags & RBTXN_IS_SERIALIZED ) != 0 )
@@ -381,7 +381,7 @@ macro_rules! rbtxn_is_serialized {
         )
     };
 }
-/// C macro rbtxn_is_serialized_clear from reorderbuffer.h:200 (PostgreSQL 15), reorderbuffer.h:210 (PostgreSQL 16), reorderbuffer.h:192 (PostgreSQL 17), reorderbuffer.h:202 (PostgreSQL 18–19)
+/// C macro rbtxn_is_serialized_clear from reorderbuffer.h:205 (PostgreSQL 15), reorderbuffer.h:215 (PostgreSQL 16), reorderbuffer.h:197 (PostgreSQL 17), reorderbuffer.h:207 (PostgreSQL 18–19)
 ///
 /// ```text
 /// #define rbtxn_is_serialized_clear( txn ) ( ( ( txn ) -> txn_flags & RBTXN_IS_SERIALIZED_CLEAR ) != 0 )
@@ -410,7 +410,7 @@ macro_rules! rbtxn_is_serialized_clear {
         )
     };
 }
-/// C macro rbtxn_is_streamed from reorderbuffer.h:220 (PostgreSQL 15), reorderbuffer.h:236 (PostgreSQL 16), reorderbuffer.h:218 (PostgreSQL 17), reorderbuffer.h:228 (PostgreSQL 18–19)
+/// C macro rbtxn_is_streamed from reorderbuffer.h:225 (PostgreSQL 15), reorderbuffer.h:241 (PostgreSQL 16), reorderbuffer.h:223 (PostgreSQL 17), reorderbuffer.h:233 (PostgreSQL 18–19)
 ///
 /// ```text
 /// #define rbtxn_is_streamed( txn ) ( ( ( txn ) -> txn_flags & RBTXN_IS_STREAMED ) != 0 )
@@ -440,7 +440,7 @@ macro_rules! rbtxn_is_streamed {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro rbtxn_is_subtxn from reorderbuffer.h:266 (PostgreSQL 16), reorderbuffer.h:248 (PostgreSQL 17), reorderbuffer.h:282 (PostgreSQL 18–19)
+/// C macro rbtxn_is_subtxn from reorderbuffer.h:271 (PostgreSQL 16), reorderbuffer.h:253 (PostgreSQL 17), reorderbuffer.h:287 (PostgreSQL 18–19)
 ///
 /// ```text
 /// #define rbtxn_is_subtxn( txn ) ( ( txn ) -> toptxn != NULL )
@@ -474,7 +474,7 @@ macro_rules! rbtxn_is_subtxn {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro rbtxn_is_toptxn from reorderbuffer.h:260 (PostgreSQL 16), reorderbuffer.h:242 (PostgreSQL 17), reorderbuffer.h:276 (PostgreSQL 18–19)
+/// C macro rbtxn_is_toptxn from reorderbuffer.h:265 (PostgreSQL 16), reorderbuffer.h:247 (PostgreSQL 17), reorderbuffer.h:281 (PostgreSQL 18–19)
 ///
 /// ```text
 /// #define rbtxn_is_toptxn( txn ) ( ( txn ) -> toptxn == NULL )
@@ -508,7 +508,7 @@ macro_rules! rbtxn_is_toptxn {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro rbtxn_prepared from reorderbuffer.h:226 (PostgreSQL 15), reorderbuffer.h:242 (PostgreSQL 16), reorderbuffer.h:224 (PostgreSQL 17)
+/// C macro rbtxn_prepared from reorderbuffer.h:231 (PostgreSQL 15), reorderbuffer.h:247 (PostgreSQL 16), reorderbuffer.h:229 (PostgreSQL 17)
 ///
 /// ```text
 /// #define rbtxn_prepared( txn ) ( ( ( txn ) -> txn_flags & RBTXN_PREPARE ) != 0 )
@@ -538,7 +538,7 @@ macro_rules! rbtxn_prepared {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C macro rbtxn_sent_prepare from reorderbuffer.h:246 (PostgreSQL 18–19)
+/// C macro rbtxn_sent_prepare from reorderbuffer.h:251 (PostgreSQL 18–19)
 ///
 /// ```text
 /// #define rbtxn_sent_prepare( txn ) ( ( ( txn ) -> txn_flags & RBTXN_SENT_PREPARE ) != 0 )
@@ -567,7 +567,7 @@ macro_rules! rbtxn_sent_prepare {
         )
     };
 }
-/// C macro rbtxn_skip_prepared from reorderbuffer.h:232 (PostgreSQL 15), reorderbuffer.h:248 (PostgreSQL 16), reorderbuffer.h:230 (PostgreSQL 17), reorderbuffer.h:264 (PostgreSQL 18–19)
+/// C macro rbtxn_skip_prepared from reorderbuffer.h:237 (PostgreSQL 15), reorderbuffer.h:253 (PostgreSQL 16), reorderbuffer.h:235 (PostgreSQL 17), reorderbuffer.h:269 (PostgreSQL 18–19)
 ///
 /// ```text
 /// #define rbtxn_skip_prepared( txn ) ( ( ( txn ) -> txn_flags & RBTXN_SKIPPED_PREPARE ) != 0 )

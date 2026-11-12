@@ -136,7 +136,7 @@ macro_rules! GIST_LEAF {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro GistClearFollowRight from gist.h:184 (PostgreSQL 15)
+/// C macro GistClearFollowRight from gist.h:180 (PostgreSQL 15)
 ///
 /// ```text
 /// #define GistClearFollowRight( page ) ( GistPageGetOpaque ( page ) -> flags &= ~ F_FOLLOW_RIGHT )
@@ -209,7 +209,7 @@ macro_rules! GistClearFollowRight {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro GistClearFollowRight from gist.h:184 (PostgreSQL 16–17), gist.h:187 (PostgreSQL 18), gist.h:183 (PostgreSQL 19)
+/// C macro GistClearFollowRight from gist.h:180 (PostgreSQL 16–17), gist.h:183 (PostgreSQL 18–19)
 ///
 /// ```text
 /// #define GistClearFollowRight( page ) ( GistPageGetOpaque ( page ) -> flags &= ~ F_FOLLOW_RIGHT )
@@ -276,7 +276,7 @@ macro_rules! GistClearFollowRight {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro GistClearPageHasGarbage from gist.h:180 (PostgreSQL 15)
+/// C macro GistClearPageHasGarbage from gist.h:176 (PostgreSQL 15)
 ///
 /// ```text
 /// #define GistClearPageHasGarbage( page ) ( GistPageGetOpaque ( page ) -> flags &= ~ F_HAS_GARBAGE )
@@ -349,7 +349,7 @@ macro_rules! GistClearPageHasGarbage {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro GistClearPageHasGarbage from gist.h:180 (PostgreSQL 16–17), gist.h:183 (PostgreSQL 18), gist.h:179 (PostgreSQL 19)
+/// C macro GistClearPageHasGarbage from gist.h:176 (PostgreSQL 16–17), gist.h:179 (PostgreSQL 18–19)
 ///
 /// ```text
 /// #define GistClearPageHasGarbage( page ) ( GistPageGetOpaque ( page ) -> flags &= ~ F_HAS_GARBAGE )
@@ -416,147 +416,7 @@ macro_rules! GistClearPageHasGarbage {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro GistClearTuplesDeleted from gist.h:176 (PostgreSQL 15)
-///
-/// ```text
-/// #define GistClearTuplesDeleted( page ) ( GistPageGetOpaque ( page ) -> flags &= ~ F_TUPLES_DELETED )
-/// ```
-///
-///
-#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
-///
-/// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
-///
-#[doc = crate::__pgrx_c_doc_assertions!()]
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! GistClearTuplesDeleted {
-    ($page:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$page;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::modify(
-                            $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field_flags,
-                                _,
-                                _
-                            >(
-                                $crate::__pgrx_c_macros::expression::pointee(
-                                    (
-                                        $crate::__pgrx_c_macros::expression::profile_value::<
-                                            true,
-                                            _
-                                        >(
-                                            $crate::__pgrx_c_macros::expression::type_witness::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::GISTPageOpaqueData
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>()
-                                        )
-                                    )
-                                )
-                            ),
-                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                $crate::__pgrx_c_macros::expression::bitnot(
-                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::CValue::<
-                                            $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::__pgrx_c_bindings::F_TUPLES_DELETED as i32)
-                                    )
-                                )
-                            ),
-                            |__pgrx_old,
-                            __pgrx_rhs| $crate::__pgrx_c_macros::expression::bitand(
-                                __pgrx_old,
-                                __pgrx_rhs
-                            )
-                        )
-                    )
-                )
-            }
-        )
-    };
-}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro GistClearTuplesDeleted from gist.h:176 (PostgreSQL 16–17), gist.h:179 (PostgreSQL 18)
-///
-/// ```text
-/// #define GistClearTuplesDeleted( page ) ( GistPageGetOpaque ( page ) -> flags &= ~ F_TUPLES_DELETED )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! GistClearTuplesDeleted {
-    ($page:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$page;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::modify(
-                            $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field_flags,
-                                _,
-                                _
-                            >(
-                                $crate::__pgrx_c_macros::expression::pointee(
-                                    (
-                                        $crate::__pgrx_c_macros::expression::profile_value::<
-                                            true,
-                                            _
-                                        >(
-                                            $crate::__pgrx_c_macros::expression::type_witness::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::GISTPageOpaqueData
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>()
-                                        )
-                                    )
-                                )
-                            ),
-                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                $crate::__pgrx_c_macros::expression::bitnot(
-                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::CValue::<
-                                            $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::__pgrx_c_bindings::F_TUPLES_DELETED as i32)
-                                    )
-                                )
-                            ),
-                            |__pgrx_old,
-                            __pgrx_rhs| $crate::__pgrx_c_macros::expression::bitand(
-                                __pgrx_old,
-                                __pgrx_rhs
-                            )
-                        )
-                    )
-                )
-            }
-        )
-    };
-}
-#[cfg(feature = "pg15")]
-/// C macro GistFollowRight from gist.h:182 (PostgreSQL 15)
+/// C macro GistFollowRight from gist.h:178 (PostgreSQL 15)
 ///
 /// ```text
 /// #define GistFollowRight( page ) ( GistPageGetOpaque ( page ) -> flags & F_FOLLOW_RIGHT )
@@ -624,7 +484,7 @@ macro_rules! GistFollowRight {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro GistFollowRight from gist.h:182 (PostgreSQL 16–17), gist.h:185 (PostgreSQL 18), gist.h:181 (PostgreSQL 19)
+/// C macro GistFollowRight from gist.h:178 (PostgreSQL 16–17), gist.h:181 (PostgreSQL 18–19)
 ///
 /// ```text
 /// #define GistFollowRight( page ) ( GistPageGetOpaque ( page ) -> flags & F_FOLLOW_RIGHT )
@@ -686,7 +546,7 @@ macro_rules! GistFollowRight {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro GistMarkFollowRight from gist.h:183 (PostgreSQL 15)
+/// C macro GistMarkFollowRight from gist.h:179 (PostgreSQL 15)
 ///
 /// ```text
 /// #define GistMarkFollowRight( page ) ( GistPageGetOpaque ( page ) -> flags |= F_FOLLOW_RIGHT )
@@ -755,7 +615,7 @@ macro_rules! GistMarkFollowRight {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro GistMarkFollowRight from gist.h:183 (PostgreSQL 16–17), gist.h:186 (PostgreSQL 18), gist.h:182 (PostgreSQL 19)
+/// C macro GistMarkFollowRight from gist.h:179 (PostgreSQL 16–17), gist.h:182 (PostgreSQL 18–19)
 ///
 /// ```text
 /// #define GistMarkFollowRight( page ) ( GistPageGetOpaque ( page ) -> flags |= F_FOLLOW_RIGHT )
@@ -818,7 +678,7 @@ macro_rules! GistMarkFollowRight {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro GistMarkPageHasGarbage from gist.h:179 (PostgreSQL 15)
+/// C macro GistMarkPageHasGarbage from gist.h:175 (PostgreSQL 15)
 ///
 /// ```text
 /// #define GistMarkPageHasGarbage( page ) ( GistPageGetOpaque ( page ) -> flags |= F_HAS_GARBAGE )
@@ -887,7 +747,7 @@ macro_rules! GistMarkPageHasGarbage {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro GistMarkPageHasGarbage from gist.h:179 (PostgreSQL 16–17), gist.h:182 (PostgreSQL 18), gist.h:178 (PostgreSQL 19)
+/// C macro GistMarkPageHasGarbage from gist.h:175 (PostgreSQL 16–17), gist.h:178 (PostgreSQL 18–19)
 ///
 /// ```text
 /// #define GistMarkPageHasGarbage( page ) ( GistPageGetOpaque ( page ) -> flags |= F_HAS_GARBAGE )
@@ -949,139 +809,7 @@ macro_rules! GistMarkPageHasGarbage {
         )
     };
 }
-#[cfg(feature = "pg15")]
-/// C macro GistMarkTuplesDeleted from gist.h:175 (PostgreSQL 15)
-///
-/// ```text
-/// #define GistMarkTuplesDeleted( page ) ( GistPageGetOpaque ( page ) -> flags |= F_TUPLES_DELETED )
-/// ```
-///
-///
-#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
-///
-/// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
-///
-#[doc = crate::__pgrx_c_doc_assertions!()]
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! GistMarkTuplesDeleted {
-    ($page:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$page;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::modify(
-                            $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field_flags,
-                                _,
-                                _
-                            >(
-                                $crate::__pgrx_c_macros::expression::pointee(
-                                    (
-                                        $crate::__pgrx_c_macros::expression::profile_value::<
-                                            true,
-                                            _
-                                        >(
-                                            $crate::__pgrx_c_macros::expression::type_witness::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::GISTPageOpaqueData
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>()
-                                        )
-                                    )
-                                )
-                            ),
-                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::__pgrx_c_bindings::F_TUPLES_DELETED as i32
-                                )
-                            ),
-                            |__pgrx_old,
-                            __pgrx_rhs| $crate::__pgrx_c_macros::expression::bitor(
-                                __pgrx_old,
-                                __pgrx_rhs
-                            )
-                        )
-                    )
-                )
-            }
-        )
-    };
-}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro GistMarkTuplesDeleted from gist.h:175 (PostgreSQL 16–17), gist.h:178 (PostgreSQL 18)
-///
-/// ```text
-/// #define GistMarkTuplesDeleted( page ) ( GistPageGetOpaque ( page ) -> flags |= F_TUPLES_DELETED )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! GistMarkTuplesDeleted {
-    ($page:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$page;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::modify(
-                            $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field_flags,
-                                _,
-                                _
-                            >(
-                                $crate::__pgrx_c_macros::expression::pointee(
-                                    (
-                                        $crate::__pgrx_c_macros::expression::profile_value::<
-                                            true,
-                                            _
-                                        >(
-                                            $crate::__pgrx_c_macros::expression::type_witness::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::GISTPageOpaqueData
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>()
-                                        )
-                                    )
-                                )
-                            ),
-                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::__pgrx_c_bindings::F_TUPLES_DELETED as i32
-                                )
-                            ),
-                            |__pgrx_old,
-                            __pgrx_rhs| $crate::__pgrx_c_macros::expression::bitor(
-                                __pgrx_old,
-                                __pgrx_rhs
-                            )
-                        )
-                    )
-                )
-            }
-        )
-    };
-}
-/// Typed call adapter for C inline function GistPageGetDeleteXid from gist.h:214 (PostgreSQL 15–17), gist.h:217 (PostgreSQL 18), gist.h:213 (PostgreSQL 19)
+/// Typed call adapter for C inline function GistPageGetDeleteXid from gist.h:210 (PostgreSQL 15–17), gist.h:213 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline FullTransactionId
@@ -1129,7 +857,7 @@ macro_rules! GistPageGetDeleteXid {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro GistPageGetNSN from gist.h:186 (PostgreSQL 15)
+/// C macro GistPageGetNSN from gist.h:182 (PostgreSQL 15)
 ///
 /// ```text
 /// #define GistPageGetNSN( page ) ( PageXLogRecPtrGet ( GistPageGetOpaque ( page ) -> nsn ) )
@@ -1226,7 +954,7 @@ macro_rules! GistPageGetNSN {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro GistPageGetNSN from gist.h:186 (PostgreSQL 16–17), gist.h:189 (PostgreSQL 18)
+/// C macro GistPageGetNSN from gist.h:182 (PostgreSQL 16–17), gist.h:185 (PostgreSQL 18)
 ///
 /// ```text
 /// #define GistPageGetNSN( page ) ( PageXLogRecPtrGet ( GistPageGetOpaque ( page ) -> nsn ) )
@@ -1368,7 +1096,7 @@ macro_rules! GistPageGetOpaque {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro GistPageHasGarbage from gist.h:178 (PostgreSQL 15)
+/// C macro GistPageHasGarbage from gist.h:174 (PostgreSQL 15)
 ///
 /// ```text
 /// #define GistPageHasGarbage( page ) ( GistPageGetOpaque ( page ) -> flags & F_HAS_GARBAGE )
@@ -1436,7 +1164,7 @@ macro_rules! GistPageHasGarbage {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro GistPageHasGarbage from gist.h:178 (PostgreSQL 16–17), gist.h:181 (PostgreSQL 18), gist.h:177 (PostgreSQL 19)
+/// C macro GistPageHasGarbage from gist.h:174 (PostgreSQL 16–17), gist.h:177 (PostgreSQL 18–19)
 ///
 /// ```text
 /// #define GistPageHasGarbage( page ) ( GistPageGetOpaque ( page ) -> flags & F_HAS_GARBAGE )
@@ -1757,7 +1485,7 @@ macro_rules! GistPageIsLeaf {
         )
     };
 }
-/// Typed call adapter for C inline function GistPageSetDeleted from gist.h:203 (PostgreSQL 15–17), gist.h:206 (PostgreSQL 18), gist.h:202 (PostgreSQL 19)
+/// Typed call adapter for C inline function GistPageSetDeleted from gist.h:199 (PostgreSQL 15–17), gist.h:202 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline void
@@ -1797,7 +1525,7 @@ macro_rules! GistPageSetDeleted {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro GistPageSetNSN from gist.h:187 (PostgreSQL 15)
+/// C macro GistPageSetNSN from gist.h:183 (PostgreSQL 15)
 ///
 /// ```text
 /// #define GistPageSetNSN( page , val ) ( PageXLogRecPtrSet ( GistPageGetOpaque ( page ) -> nsn , val ) )
@@ -1879,7 +1607,7 @@ macro_rules! GistPageSetNSN {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro GistPageSetNSN from gist.h:187 (PostgreSQL 16–17), gist.h:190 (PostgreSQL 18)
+/// C macro GistPageSetNSN from gist.h:183 (PostgreSQL 16–17), gist.h:186 (PostgreSQL 18)
 ///
 /// ```text
 /// #define GistPageSetNSN( page , val ) ( PageXLogRecPtrSet ( GistPageGetOpaque ( page ) -> nsn , val ) )
@@ -1981,137 +1709,7 @@ macro_rules! GistPageSetNSN {
         )
     };
 }
-#[cfg(feature = "pg15")]
-/// C macro GistTuplesDeleted from gist.h:174 (PostgreSQL 15)
-///
-/// ```text
-/// #define GistTuplesDeleted( page ) ( GistPageGetOpaque ( page ) -> flags & F_TUPLES_DELETED )
-/// ```
-///
-///
-#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
-///
-/// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
-///
-#[doc = crate::__pgrx_c_doc_assertions!()]
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! GistTuplesDeleted {
-    ($page:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$page;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::bitand(
-                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                $crate::__pgrx_c_macros::expression::load(
-                                    $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field_flags,
-                                        _,
-                                        _
-                                    >(
-                                        $crate::__pgrx_c_macros::expression::pointee(
-                                            (
-                                                $crate::__pgrx_c_macros::expression::profile_value::<
-                                                    true,
-                                                    _
-                                                >(
-                                                    $crate::__pgrx_c_macros::expression::type_witness::<
-                                                        $crate::__pgrx_c_macros::expression::CPointer<
-                                                            $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::__pgrx_c_bindings::GISTPageOpaqueData
-                                                            >,
-                                                            $crate::__pgrx_c_macros::expression::ReadWrite
-                                                        >>()
-                                                )
-                                            )
-                                        )
-                                    )
-                                )
-                            ),
-                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::__pgrx_c_bindings::F_TUPLES_DELETED as i32
-                                )
-                            )
-                        )
-                    )
-                )
-            }
-        )
-    };
-}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro GistTuplesDeleted from gist.h:174 (PostgreSQL 16–17), gist.h:177 (PostgreSQL 18)
-///
-/// ```text
-/// #define GistTuplesDeleted( page ) ( GistPageGetOpaque ( page ) -> flags & F_TUPLES_DELETED )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! GistTuplesDeleted {
-    ($page:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$page;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::bitand(
-                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                $crate::__pgrx_c_macros::expression::load(
-                                    $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field_flags,
-                                        _,
-                                        _
-                                    >(
-                                        $crate::__pgrx_c_macros::expression::pointee(
-                                            (
-                                                $crate::__pgrx_c_macros::expression::profile_value::<
-                                                    true,
-                                                    _
-                                                >(
-                                                    $crate::__pgrx_c_macros::expression::type_witness::<
-                                                        $crate::__pgrx_c_macros::expression::CPointer<
-                                                            $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::__pgrx_c_bindings::GISTPageOpaqueData
-                                                            >,
-                                                            $crate::__pgrx_c_macros::expression::ReadWrite
-                                                        >>()
-                                                )
-                                            )
-                                        )
-                                    )
-                                )
-                            ),
-                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::__pgrx_c_bindings::F_TUPLES_DELETED as i32
-                                )
-                            )
-                        )
-                    )
-                )
-            }
-        )
-    };
-}
-/// C macro gistentryinit from gist.h:244 (PostgreSQL 15–17), gist.h:247 (PostgreSQL 18), gist.h:243 (PostgreSQL 19)
+/// C macro gistentryinit from gist.h:240 (PostgreSQL 15–17), gist.h:243 (PostgreSQL 18–19)
 ///
 /// ```text
 /// #define gistentryinit( e , k , r , pg , o , l ) do { ( e ) . key = ( k ) ; ( e ) . rel = ( r ) ; ( e ) . page = ( pg ) ; ( e ) . offset = ( o ) ; ( e ) . leafkey = ( l ) ; } while ( 0 )
@@ -2141,13 +1739,9 @@ macro_rules! gistentryinit {
 pub use GIST_LEAF;
 pub use GistClearFollowRight;
 pub use GistClearPageHasGarbage;
-#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-pub use GistClearTuplesDeleted;
 pub use GistFollowRight;
 pub use GistMarkFollowRight;
 pub use GistMarkPageHasGarbage;
-#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-pub use GistMarkTuplesDeleted;
 pub use GistPageGetDeleteXid;
 pub use GistPageGetNSN;
 pub use GistPageGetOpaque;
@@ -2156,6 +1750,4 @@ pub use GistPageIsDeleted;
 pub use GistPageIsLeaf;
 pub use GistPageSetDeleted;
 pub use GistPageSetNSN;
-#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-pub use GistTuplesDeleted;
 pub use gistentryinit;

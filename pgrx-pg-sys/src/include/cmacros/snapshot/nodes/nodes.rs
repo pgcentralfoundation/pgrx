@@ -347,38 +347,6 @@ macro_rules! castNode {
         )
     };
 }
-#[cfg(feature = "pg19")]
-/// C macro copyObject from nodes.h:230 (PostgreSQL 19)
-///
-/// ```text
-/// #define copyObject( obj ) copyObjectImpl ( obj )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! copyObject {
-    ($obj:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$obj;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CVoid,
-                            $crate::__pgrx_c_macros::expression::ReadWrite
-                        >>()
-                )
-            }
-        )
-    };
-}
 #[cfg(any(feature = "pg15", feature = "pg16"))]
 /// C macro makeNode from nodes.h:593 (PostgreSQL 15), nodes.h:176 (PostgreSQL 16)
 ///
@@ -625,8 +593,6 @@ pub use IS_OUTER_JOIN;
 pub use IsA;
 pub use NodeSetTag;
 pub use castNode;
-#[cfg(feature = "pg19")]
-pub use copyObject;
 pub use makeNode;
 pub use newNode;
 pub use nodeTag;

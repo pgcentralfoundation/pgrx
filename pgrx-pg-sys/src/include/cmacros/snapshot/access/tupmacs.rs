@@ -2,7 +2,7 @@
 // C macros from tupmacs.h.
 
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function align_fetch_then_add from tupmacs.h:171 (PostgreSQL 19)
+/// Typed call adapter for C inline function align_fetch_then_add from tupmacs.h:172 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline Datum
@@ -94,7 +94,7 @@ macro_rules! align_fetch_then_add {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro att_addlength_datum from tupmacs.h:164 (PostgreSQL 15)
+/// C macro att_addlength_datum from tupmacs.h:168 (PostgreSQL 15)
 ///
 /// ```text
 /// #define att_addlength_datum( cur_offset , attlen , attdatum ) att_addlength_pointer ( cur_offset , attlen , DatumGetPointer ( attdatum ) )
@@ -626,7 +626,7 @@ macro_rules! att_addlength_datum {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro att_addlength_datum from tupmacs.h:145 (PostgreSQL 16–17), tupmacs.h:173 (PostgreSQL 18)
+/// C macro att_addlength_datum from tupmacs.h:150 (PostgreSQL 16–17), tupmacs.h:178 (PostgreSQL 18)
 ///
 /// ```text
 /// #define att_addlength_datum( cur_offset , attlen , attdatum ) att_addlength_pointer ( cur_offset , attlen , DatumGetPointer ( attdatum ) )
@@ -1169,7 +1169,7 @@ macro_rules! att_addlength_datum {
     };
 }
 #[cfg(feature = "pg19")]
-/// C macro att_addlength_datum from tupmacs.h:419 (PostgreSQL 19)
+/// C macro att_addlength_datum from tupmacs.h:423 (PostgreSQL 19)
 ///
 /// ```text
 /// #define att_addlength_datum( cur_offset , attlen , attdatum ) att_addlength_pointer ( cur_offset , attlen , DatumGetPointer ( attdatum ) )
@@ -1388,8 +1388,42 @@ macro_rules! att_addlength_datum {
         )
     };
 }
+/// C macro att_addlength_datum_overflow from tupmacs.h:170 (PostgreSQL 15), tupmacs.h:152 (PostgreSQL 16–17), tupmacs.h:180 (PostgreSQL 18), tupmacs.h:425 (PostgreSQL 19)
+///
+/// ```text
+/// #define att_addlength_datum_overflow( cur_offset , attlen , attdatum , overflow ) att_addlength_pointer_overflow ( cur_offset , attlen , DatumGetPointer ( attdatum ) , overflow )
+/// ```
+///
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! att_addlength_datum_overflow {
+    ($cur_offset:expr, $attlen:expr, $attdatum:expr, $overflow:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$cur_offset;
+                let _ = &$attlen;
+                let _ = &$attdatum;
+                let _ = &$overflow;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            usize
+                        >>()
+                )
+            }
+        )
+    };
+}
 #[cfg(feature = "pg15")]
-/// C macro att_addlength_pointer from tupmacs.h:176 (PostgreSQL 15)
+/// C macro att_addlength_pointer from tupmacs.h:182 (PostgreSQL 15)
 ///
 /// ```text
 /// #define att_addlength_pointer( cur_offset , attlen , attptr ) ( ( ( attlen ) > 0 ) ? ( ( cur_offset ) + ( attlen ) ) : ( ( ( attlen ) == - 1 ) ? ( ( cur_offset ) + VARSIZE_ANY ( attptr ) ) : ( AssertMacro ( ( attlen ) == - 2 ) , ( cur_offset ) + ( strlen ( ( char * ) ( attptr ) ) + 1 ) ) ) )
@@ -1921,7 +1955,7 @@ macro_rules! att_addlength_pointer {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro att_addlength_pointer from tupmacs.h:157 (PostgreSQL 16–17), tupmacs.h:185 (PostgreSQL 18)
+/// C macro att_addlength_pointer from tupmacs.h:164 (PostgreSQL 16–17), tupmacs.h:192 (PostgreSQL 18)
 ///
 /// ```text
 /// #define att_addlength_pointer( cur_offset , attlen , attptr ) ( ( ( attlen ) > 0 ) ? ( ( cur_offset ) + ( attlen ) ) : ( ( ( attlen ) == - 1 ) ? ( ( cur_offset ) + VARSIZE_ANY ( attptr ) ) : ( AssertMacro ( ( attlen ) == - 2 ) , ( cur_offset ) + ( strlen ( ( char * ) ( attptr ) ) + 1 ) ) ) )
@@ -2464,7 +2498,7 @@ macro_rules! att_addlength_pointer {
     };
 }
 #[cfg(feature = "pg19")]
-/// C macro att_addlength_pointer from tupmacs.h:431 (PostgreSQL 19)
+/// C macro att_addlength_pointer from tupmacs.h:437 (PostgreSQL 19)
 ///
 /// ```text
 /// #define att_addlength_pointer( cur_offset , attlen , attptr ) ( ( ( attlen ) > 0 ) ? ( ( cur_offset ) + ( attlen ) ) : ( ( ( attlen ) == - 1 ) ? ( ( cur_offset ) + VARSIZE_ANY ( attptr ) ) : ( AssertMacro ( ( attlen ) == - 2 ) , ( cur_offset ) + ( strlen ( ( const char * ) ( attptr ) ) + 1 ) ) ) )
@@ -2683,8 +2717,63 @@ macro_rules! att_addlength_pointer {
         )
     };
 }
+/// Typed call adapter for C inline function att_addlength_pointer_overflow from tupmacs.h:204 (PostgreSQL 15), tupmacs.h:186 (PostgreSQL 16–17), tupmacs.h:214 (PostgreSQL 18), tupmacs.h:459 (PostgreSQL 19)
+///
+/// ```c
+/// static inline Size
+/// att_addlength_pointer_overflow(Size cur_offset, int16 attlen,
+/// 							   const void *attptr, bool *overflow)
+/// {
+/// 	Size		add;
+///
+/// 	if (attlen > 0)
+/// 		add = attlen;
+/// 	else if (attlen == -1)
+/// 		add = VARSIZE_ANY(attptr);
+/// 	else if (attlen == -2)
+/// 		add = strlen((const char *) attptr) + 1;
+/// 	else
+/// 		elog(ERROR, "invalid attlen %d", attlen);
+///
+/// 	*overflow = pg_add_size_overflow(cur_offset, add, &cur_offset);
+/// 	return cur_offset;
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_call!()]
+///
+#[doc = crate::__pgrx_c_doc_inline_result!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! att_addlength_pointer_overflow {
+    ($cur_offset:expr, $attlen:expr, $attptr:expr, $overflow:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$cur_offset;
+                let _ = &$attlen;
+                let _ = &$attptr;
+                let _ = &$overflow;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            usize
+                        >>()
+                )
+            }
+        )
+    };
+}
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro att_align_datum from tupmacs.h:105 (PostgreSQL 15), tupmacs.h:86 (PostgreSQL 16–17), tupmacs.h:87 (PostgreSQL 18)
+/// C macro att_align_datum from tupmacs.h:106 (PostgreSQL 15), tupmacs.h:88 (PostgreSQL 16–17), tupmacs.h:89 (PostgreSQL 18)
 ///
 /// ```text
 /// #define att_align_datum( cur_offset , attalign , attlen , attdatum ) ( ( ( attlen ) == - 1 && VARATT_IS_SHORT ( DatumGetPointer ( attdatum ) ) ) ? ( uintptr_t ) ( cur_offset ) : att_align_nominal ( cur_offset , attalign ) )
@@ -3088,7 +3177,7 @@ macro_rules! att_align_datum {
     };
 }
 #[cfg(feature = "pg19")]
-/// C macro att_align_datum from tupmacs.h:341 (PostgreSQL 19)
+/// C macro att_align_datum from tupmacs.h:342 (PostgreSQL 19)
 ///
 /// ```text
 /// #define att_align_datum( cur_offset , attalign , attlen , attdatum ) ( ( ( attlen ) == - 1 && VARATT_IS_SHORT ( DatumGetPointer ( attdatum ) ) ) ? ( uintptr_t ) ( cur_offset ) : att_align_nominal ( cur_offset , attalign ) )
@@ -3220,7 +3309,7 @@ macro_rules! att_align_datum {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro att_align_nominal from tupmacs.h:148 (PostgreSQL 15), tupmacs.h:129 (PostgreSQL 16–17), tupmacs.h:150 (PostgreSQL 18)
+/// C macro att_align_nominal from tupmacs.h:149 (PostgreSQL 15), tupmacs.h:131 (PostgreSQL 16–17), tupmacs.h:152 (PostgreSQL 18)
 ///
 /// ```text
 /// #define att_align_nominal( cur_offset , attalign ) ( ( ( attalign ) == TYPALIGN_INT ) ? INTALIGN ( cur_offset ) : ( ( ( attalign ) == TYPALIGN_CHAR ) ? ( uintptr_t ) ( cur_offset ) : ( ( ( attalign ) == TYPALIGN_DOUBLE ) ? DOUBLEALIGN ( cur_offset ) : ( AssertMacro ( ( attalign ) == TYPALIGN_SHORT ) , SHORTALIGN ( cur_offset ) ) ) ) )
@@ -3588,7 +3677,7 @@ macro_rules! att_align_nominal {
     };
 }
 #[cfg(feature = "pg19")]
-/// C macro att_align_nominal from tupmacs.h:404 (PostgreSQL 19)
+/// C macro att_align_nominal from tupmacs.h:405 (PostgreSQL 19)
 ///
 /// ```text
 /// #define att_align_nominal( cur_offset , attalign ) att_nominal_alignby ( cur_offset , typalign_to_alignby ( attalign ) )
@@ -3683,7 +3772,7 @@ macro_rules! att_align_nominal {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro att_align_pointer from tupmacs.h:126 (PostgreSQL 15), tupmacs.h:107 (PostgreSQL 16–17), tupmacs.h:118 (PostgreSQL 18)
+/// C macro att_align_pointer from tupmacs.h:127 (PostgreSQL 15), tupmacs.h:109 (PostgreSQL 16–17), tupmacs.h:120 (PostgreSQL 18)
 ///
 /// ```text
 /// #define att_align_pointer( cur_offset , attalign , attlen , attptr ) ( ( ( attlen ) == - 1 && VARATT_NOT_PAD_BYTE ( attptr ) ) ? ( uintptr_t ) ( cur_offset ) : att_align_nominal ( cur_offset , attalign ) )
@@ -4087,7 +4176,7 @@ macro_rules! att_align_pointer {
     };
 }
 #[cfg(feature = "pg19")]
-/// C macro att_align_pointer from tupmacs.h:372 (PostgreSQL 19)
+/// C macro att_align_pointer from tupmacs.h:373 (PostgreSQL 19)
 ///
 /// ```text
 /// #define att_align_pointer( cur_offset , attalign , attlen , attptr ) ( ( ( attlen ) == - 1 && VARATT_NOT_PAD_BYTE ( attptr ) ) ? ( uintptr_t ) ( cur_offset ) : att_align_nominal ( cur_offset , attalign ) )
@@ -4219,7 +4308,7 @@ macro_rules! att_align_pointer {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C macro att_datum_alignby from tupmacs.h:98 (PostgreSQL 18), tupmacs.h:352 (PostgreSQL 19)
+/// C macro att_datum_alignby from tupmacs.h:100 (PostgreSQL 18), tupmacs.h:353 (PostgreSQL 19)
 ///
 /// ```text
 /// #define att_datum_alignby( cur_offset , attalignby , attlen , attdatum ) ( ( ( attlen ) == - 1 && VARATT_IS_SHORT ( DatumGetPointer ( attdatum ) ) ) ? ( uintptr_t ) ( cur_offset ) : TYPEALIGN ( attalignby , cur_offset ) )
@@ -4355,7 +4444,7 @@ macro_rules! att_datum_alignby {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro att_isnull from tupmacs.h:25 (PostgreSQL 15)
+/// C macro att_isnull from tupmacs.h:26 (PostgreSQL 15)
 ///
 /// ```text
 /// #define att_isnull( ATT , BITS ) ( ! ( ( BITS ) [ ( ATT ) >> 3 ] & ( 1 << ( ( ATT ) & 0x07 ) ) ) )
@@ -4390,7 +4479,7 @@ macro_rules! att_isnull {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C inline function att_isnull from tupmacs.h:25 (PostgreSQL 16–18)
+/// C inline function att_isnull from tupmacs.h:27 (PostgreSQL 16–18)
 ///
 /// ```c
 /// static inline bool
@@ -4425,7 +4514,7 @@ macro_rules! att_isnull {
     };
 }
 #[cfg(feature = "pg19")]
-/// C inline function att_isnull from tupmacs.h:27 (PostgreSQL 19)
+/// C inline function att_isnull from tupmacs.h:28 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -4460,7 +4549,7 @@ macro_rules! att_isnull {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C macro att_nominal_alignby from tupmacs.h:165 (PostgreSQL 18), tupmacs.h:411 (PostgreSQL 19)
+/// C macro att_nominal_alignby from tupmacs.h:167 (PostgreSQL 18), tupmacs.h:412 (PostgreSQL 19)
 ///
 /// ```text
 /// #define att_nominal_alignby( cur_offset , attalignby ) TYPEALIGN ( attalignby , cur_offset )
@@ -4555,7 +4644,7 @@ macro_rules! att_nominal_alignby {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C macro att_pointer_alignby from tupmacs.h:129 (PostgreSQL 18), tupmacs.h:383 (PostgreSQL 19)
+/// C macro att_pointer_alignby from tupmacs.h:131 (PostgreSQL 18), tupmacs.h:384 (PostgreSQL 19)
 ///
 /// ```text
 /// #define att_pointer_alignby( cur_offset , attalignby , attlen , attptr ) ( ( ( attlen ) == - 1 && VARATT_NOT_PAD_BYTE ( attptr ) ) ? ( uintptr_t ) ( cur_offset ) : TYPEALIGN ( attalignby , cur_offset ) )
@@ -4691,7 +4780,7 @@ macro_rules! att_pointer_alignby {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro fetch_att from tupmacs.h:48 (PostgreSQL 15)
+/// C macro fetch_att from tupmacs.h:49 (PostgreSQL 15)
 ///
 /// ```text
 /// #define fetch_att( T , attbyval , attlen ) ( ( attbyval ) ? ( ( attlen ) == ( int ) sizeof ( Datum ) ? * ( ( Datum * ) ( T ) ) : ( ( attlen ) == ( int ) sizeof ( int32 ) ? Int32GetDatum ( * ( ( int32 * ) ( T ) ) ) : ( ( attlen ) == ( int ) sizeof ( int16 ) ? Int16GetDatum ( * ( ( int16 * ) ( T ) ) ) : ( AssertMacro ( ( attlen ) == 1 ) , CharGetDatum ( * ( ( char * ) ( T ) ) ) ) ) ) ) : PointerGetDatum ( ( char * ) ( T ) ) )
@@ -4899,7 +4988,7 @@ macro_rules! fetch_att {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function fetch_att from tupmacs.h:51 (PostgreSQL 16–17), tupmacs.h:52 (PostgreSQL 18)
+/// Typed call adapter for C inline function fetch_att from tupmacs.h:53 (PostgreSQL 16–17), tupmacs.h:54 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline Datum
@@ -4961,7 +5050,7 @@ macro_rules! fetch_att {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function fetch_att from tupmacs.h:107 (PostgreSQL 19)
+/// Typed call adapter for C inline function fetch_att from tupmacs.h:108 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline Datum
@@ -5021,7 +5110,7 @@ macro_rules! fetch_att {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function fetch_att_noerr from tupmacs.h:136 (PostgreSQL 19)
+/// Typed call adapter for C inline function fetch_att_noerr from tupmacs.h:137 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline Datum
@@ -5079,7 +5168,7 @@ macro_rules! fetch_att_noerr {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro fetchatt from tupmacs.h:41 (PostgreSQL 15)
+/// C macro fetchatt from tupmacs.h:42 (PostgreSQL 15)
 ///
 /// ```text
 /// #define fetchatt( A , T ) fetch_att ( T , ( A ) -> attbyval , ( A ) -> attlen )
@@ -5303,7 +5392,7 @@ macro_rules! fetchatt {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro fetchatt from tupmacs.h:46 (PostgreSQL 16–17), tupmacs.h:47 (PostgreSQL 18), tupmacs.h:102 (PostgreSQL 19)
+/// C macro fetchatt from tupmacs.h:48 (PostgreSQL 16–17), tupmacs.h:49 (PostgreSQL 18), tupmacs.h:103 (PostgreSQL 19)
 ///
 /// ```text
 /// #define fetchatt( A , T ) fetch_att ( T , ( A ) -> attbyval , ( A ) -> attlen )
@@ -5336,7 +5425,7 @@ macro_rules! fetchatt {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function first_null_attr from tupmacs.h:243 (PostgreSQL 19)
+/// Typed call adapter for C inline function first_null_attr from tupmacs.h:244 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline int
@@ -5421,7 +5510,7 @@ macro_rules! first_null_attr {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function populate_isnull_array from tupmacs.h:42 (PostgreSQL 19)
+/// Typed call adapter for C inline function populate_isnull_array from tupmacs.h:43 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -5498,7 +5587,7 @@ macro_rules! populate_isnull_array {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function store_att_byval from tupmacs.h:182 (PostgreSQL 16–17), tupmacs.h:210 (PostgreSQL 18)
+/// Typed call adapter for C inline function store_att_byval from tupmacs.h:213 (PostgreSQL 16–17), tupmacs.h:241 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline void
@@ -5552,7 +5641,7 @@ macro_rules! store_att_byval {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function store_att_byval from tupmacs.h:456 (PostgreSQL 19)
+/// Typed call adapter for C inline function store_att_byval from tupmacs.h:486 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -5604,7 +5693,7 @@ macro_rules! store_att_byval {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function typalign_to_alignby from tupmacs.h:301 (PostgreSQL 19)
+/// Typed call adapter for C inline function typalign_to_alignby from tupmacs.h:302 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline uint8
@@ -5670,7 +5759,9 @@ macro_rules! typalign_to_alignby {
 #[cfg(feature = "pg19")]
 pub use align_fetch_then_add;
 pub use att_addlength_datum;
+pub use att_addlength_datum_overflow;
 pub use att_addlength_pointer;
+pub use att_addlength_pointer_overflow;
 pub use att_align_datum;
 pub use att_align_nominal;
 pub use att_align_pointer;

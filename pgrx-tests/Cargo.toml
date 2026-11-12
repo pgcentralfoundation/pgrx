@@ -62,7 +62,7 @@ sysinfo = { version = "0.40.1", default-features = false, features = ["system"] 
 [dependencies.pgrx] # Not unified in workspace due to default-features key
 path = "../pgrx"
 default-features = false
-version = "=0.20.0-beta.1"
+version = "=0.20.0"
 
 [dev-dependencies]
 tempfile = "3.27.0"

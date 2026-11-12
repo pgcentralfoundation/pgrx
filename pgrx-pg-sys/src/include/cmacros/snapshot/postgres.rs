@@ -2,7 +2,7 @@
 // C macros from postgres.h.
 
 #[cfg(feature = "pg15")]
-/// C macro BoolGetDatum from postgres.h:446 (PostgreSQL 15)
+/// C macro BoolGetDatum from postgres.h:447 (PostgreSQL 15)
 ///
 /// ```text
 /// #define BoolGetDatum( X ) ( ( Datum ) ( ( X ) ? 1 : 0 ) )
@@ -70,7 +70,7 @@ macro_rules! BoolGetDatum {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro CStringGetDatum from postgres.h:622 (PostgreSQL 15)
+/// C macro CStringGetDatum from postgres.h:623 (PostgreSQL 15)
 ///
 /// ```text
 /// #define CStringGetDatum( X ) PointerGetDatum ( X )
@@ -138,7 +138,7 @@ macro_rules! CStringGetDatum {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro CharGetDatum from postgres.h:460 (PostgreSQL 15)
+/// C macro CharGetDatum from postgres.h:461 (PostgreSQL 15)
 ///
 /// ```text
 /// #define CharGetDatum( X ) ( ( Datum ) ( X ) )
@@ -206,7 +206,7 @@ macro_rules! CharGetDatum {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro CommandIdGetDatum from postgres.h:586 (PostgreSQL 15)
+/// C macro CommandIdGetDatum from postgres.h:587 (PostgreSQL 15)
 ///
 /// ```text
 /// #define CommandIdGetDatum( X ) ( ( Datum ) ( X ) )
@@ -274,7 +274,7 @@ macro_rules! CommandIdGetDatum {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro DatumGetBool from postgres.h:437 (PostgreSQL 15)
+/// C macro DatumGetBool from postgres.h:438 (PostgreSQL 15)
 ///
 /// ```text
 /// #define DatumGetBool( X ) ( ( bool ) ( ( X ) != 0 ) )
@@ -338,7 +338,7 @@ macro_rules! DatumGetBool {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro DatumGetCString from postgres.h:610 (PostgreSQL 15)
+/// C macro DatumGetCString from postgres.h:611 (PostgreSQL 15)
 ///
 /// ```text
 /// #define DatumGetCString( X ) ( ( char * ) DatumGetPointer ( X ) )
@@ -410,7 +410,7 @@ macro_rules! DatumGetCString {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro DatumGetChar from postgres.h:453 (PostgreSQL 15)
+/// C macro DatumGetChar from postgres.h:454 (PostgreSQL 15)
 ///
 /// ```text
 /// #define DatumGetChar( X ) ( ( char ) ( X ) )
@@ -476,7 +476,7 @@ macro_rules! DatumGetChar {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro DatumGetCommandId from postgres.h:579 (PostgreSQL 15)
+/// C macro DatumGetCommandId from postgres.h:580 (PostgreSQL 15)
 ///
 /// ```text
 /// #define DatumGetCommandId( X ) ( ( CommandId ) ( X ) )
@@ -543,7 +543,7 @@ macro_rules! DatumGetCommandId {
         )
     };
 }
-/// Typed call adapter for C inline function DatumGetFloat4 from postgres.h:707 (PostgreSQL 15), postgres.h:457 (PostgreSQL 16–17), postgres.h:462 (PostgreSQL 18), postgres.h:463 (PostgreSQL 19)
+/// Typed call adapter for C inline function DatumGetFloat4 from postgres.h:708 (PostgreSQL 15), postgres.h:457 (PostgreSQL 16–17), postgres.h:462 (PostgreSQL 18), postgres.h:463 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline float4
@@ -588,7 +588,7 @@ macro_rules! DatumGetFloat4 {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg19"))]
-/// Typed call adapter for C inline function DatumGetFloat8 from postgres.h:745 (PostgreSQL 15), postgres.h:497 (PostgreSQL 19)
+/// Typed call adapter for C inline function DatumGetFloat8 from postgres.h:746 (PostgreSQL 15), postgres.h:497 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline float8
@@ -682,7 +682,7 @@ macro_rules! DatumGetFloat8 {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro DatumGetInt16 from postgres.h:488 (PostgreSQL 15)
+/// C macro DatumGetInt16 from postgres.h:489 (PostgreSQL 15)
 ///
 /// ```text
 /// #define DatumGetInt16( X ) ( ( int16 ) ( X ) )
@@ -748,7 +748,7 @@ macro_rules! DatumGetInt16 {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro DatumGetInt32 from postgres.h:516 (PostgreSQL 15)
+/// C macro DatumGetInt32 from postgres.h:517 (PostgreSQL 15)
 ///
 /// ```text
 /// #define DatumGetInt32( X ) ( ( int32 ) ( X ) )
@@ -814,7 +814,7 @@ macro_rules! DatumGetInt32 {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro DatumGetInt64 from postgres.h:649 (PostgreSQL 15)
+/// C macro DatumGetInt64 from postgres.h:650 (PostgreSQL 15)
 ///
 /// ```text
 /// #define DatumGetInt64( X ) ( ( int64 ) ( X ) )
@@ -918,7 +918,7 @@ macro_rules! DatumGetInt64 {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro DatumGetName from postgres.h:629 (PostgreSQL 15)
+/// C macro DatumGetName from postgres.h:630 (PostgreSQL 15)
 ///
 /// ```text
 /// #define DatumGetName( X ) ( ( Name ) DatumGetPointer ( X ) )
@@ -994,7 +994,7 @@ macro_rules! DatumGetName {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro DatumGetObjectId from postgres.h:544 (PostgreSQL 15)
+/// C macro DatumGetObjectId from postgres.h:545 (PostgreSQL 15)
 ///
 /// ```text
 /// #define DatumGetObjectId( X ) ( ( Oid ) ( X ) )
@@ -1096,7 +1096,7 @@ macro_rules! DatumGetObjectId8 {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro DatumGetPointer from postgres.h:593 (PostgreSQL 15)
+/// C macro DatumGetPointer from postgres.h:594 (PostgreSQL 15)
 ///
 /// ```text
 /// #define DatumGetPointer( X ) ( ( Pointer ) ( X ) )
@@ -1209,7 +1209,7 @@ macro_rules! DatumGetPointer {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro DatumGetTransactionId from postgres.h:558 (PostgreSQL 15)
+/// C macro DatumGetTransactionId from postgres.h:559 (PostgreSQL 15)
 ///
 /// ```text
 /// #define DatumGetTransactionId( X ) ( ( TransactionId ) ( X ) )
@@ -1279,7 +1279,7 @@ macro_rules! DatumGetTransactionId {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro DatumGetUInt16 from postgres.h:502 (PostgreSQL 15)
+/// C macro DatumGetUInt16 from postgres.h:503 (PostgreSQL 15)
 ///
 /// ```text
 /// #define DatumGetUInt16( X ) ( ( uint16 ) ( X ) )
@@ -1345,7 +1345,7 @@ macro_rules! DatumGetUInt16 {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro DatumGetUInt32 from postgres.h:530 (PostgreSQL 15)
+/// C macro DatumGetUInt32 from postgres.h:531 (PostgreSQL 15)
 ///
 /// ```text
 /// #define DatumGetUInt32( X ) ( ( uint32 ) ( X ) )
@@ -1411,7 +1411,7 @@ macro_rules! DatumGetUInt32 {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro DatumGetUInt64 from postgres.h:676 (PostgreSQL 15)
+/// C macro DatumGetUInt64 from postgres.h:677 (PostgreSQL 15)
 ///
 /// ```text
 /// #define DatumGetUInt64( X ) ( ( uint64 ) ( X ) )
@@ -1515,7 +1515,7 @@ macro_rules! DatumGetUInt64 {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro DatumGetUInt8 from postgres.h:474 (PostgreSQL 15)
+/// C macro DatumGetUInt8 from postgres.h:475 (PostgreSQL 15)
 ///
 /// ```text
 /// #define DatumGetUInt8( X ) ( ( uint8 ) ( X ) )
@@ -1580,7 +1580,7 @@ macro_rules! DatumGetUInt8 {
         )
     };
 }
-/// Typed call adapter for C inline function Float4GetDatum from postgres.h:724 (PostgreSQL 15), postgres.h:474 (PostgreSQL 16–17), postgres.h:479 (PostgreSQL 18), postgres.h:480 (PostgreSQL 19)
+/// Typed call adapter for C inline function Float4GetDatum from postgres.h:725 (PostgreSQL 15), postgres.h:474 (PostgreSQL 16–17), postgres.h:479 (PostgreSQL 18), postgres.h:480 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline Datum
@@ -1626,7 +1626,7 @@ macro_rules! Float4GetDatum {
         )
     };
 }
-/// Typed call adapter for C inline function Float8GetDatum from postgres.h:770 (PostgreSQL 15), postgres.h:518 (PostgreSQL 16–17), postgres.h:523 (PostgreSQL 18), postgres.h:514 (PostgreSQL 19)
+/// Typed call adapter for C inline function Float8GetDatum from postgres.h:771 (PostgreSQL 15), postgres.h:518 (PostgreSQL 16–17), postgres.h:523 (PostgreSQL 18), postgres.h:514 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline Datum
@@ -1673,7 +1673,7 @@ macro_rules! Float8GetDatum {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro Float8GetDatumFast from postgres.h:802 (PostgreSQL 15)
+/// C macro Float8GetDatumFast from postgres.h:803 (PostgreSQL 15)
 ///
 /// ```text
 /// #define Float8GetDatumFast( X ) Float8GetDatum ( X )
@@ -1705,7 +1705,7 @@ macro_rules! Float8GetDatumFast {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro Int16GetDatum from postgres.h:495 (PostgreSQL 15)
+/// C macro Int16GetDatum from postgres.h:496 (PostgreSQL 15)
 ///
 /// ```text
 /// #define Int16GetDatum( X ) ( ( Datum ) ( X ) )
@@ -1773,7 +1773,7 @@ macro_rules! Int16GetDatum {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro Int32GetDatum from postgres.h:523 (PostgreSQL 15)
+/// C macro Int32GetDatum from postgres.h:524 (PostgreSQL 15)
 ///
 /// ```text
 /// #define Int32GetDatum( X ) ( ( Datum ) ( X ) )
@@ -1841,7 +1841,7 @@ macro_rules! Int32GetDatum {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro Int64GetDatum from postgres.h:663 (PostgreSQL 15)
+/// C macro Int64GetDatum from postgres.h:664 (PostgreSQL 15)
 ///
 /// ```text
 /// #define Int64GetDatum( X ) ( ( Datum ) ( X ) )
@@ -1909,7 +1909,7 @@ macro_rules! Int64GetDatum {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro Int64GetDatumFast from postgres.h:801 (PostgreSQL 15)
+/// C macro Int64GetDatumFast from postgres.h:802 (PostgreSQL 15)
 ///
 /// ```text
 /// #define Int64GetDatumFast( X ) Int64GetDatum ( X )
@@ -1943,7 +1943,7 @@ macro_rules! Int64GetDatumFast {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro Int8GetDatum from postgres.h:467 (PostgreSQL 15)
+/// C macro Int8GetDatum from postgres.h:468 (PostgreSQL 15)
 ///
 /// ```text
 /// #define Int8GetDatum( X ) ( ( Datum ) ( X ) )
@@ -2011,7 +2011,7 @@ macro_rules! Int8GetDatum {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro MultiXactIdGetDatum from postgres.h:572 (PostgreSQL 15)
+/// C macro MultiXactIdGetDatum from postgres.h:573 (PostgreSQL 15)
 ///
 /// ```text
 /// #define MultiXactIdGetDatum( X ) ( ( Datum ) ( X ) )
@@ -2079,7 +2079,7 @@ macro_rules! MultiXactIdGetDatum {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro NameGetDatum from postgres.h:639 (PostgreSQL 15)
+/// C macro NameGetDatum from postgres.h:640 (PostgreSQL 15)
 ///
 /// ```text
 /// #define NameGetDatum( X ) CStringGetDatum ( NameStr ( * ( X ) ) )
@@ -2181,7 +2181,7 @@ macro_rules! ObjectId8GetDatum {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro ObjectIdGetDatum from postgres.h:551 (PostgreSQL 15)
+/// C macro ObjectIdGetDatum from postgres.h:552 (PostgreSQL 15)
 ///
 /// ```text
 /// #define ObjectIdGetDatum( X ) ( ( Datum ) ( X ) )
@@ -2249,7 +2249,7 @@ macro_rules! ObjectIdGetDatum {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro PointerGetDatum from postgres.h:600 (PostgreSQL 15)
+/// C macro PointerGetDatum from postgres.h:601 (PostgreSQL 15)
 ///
 /// ```text
 /// #define PointerGetDatum( X ) ( ( Datum ) ( X ) )
@@ -2351,7 +2351,7 @@ macro_rules! PointerGetDatum {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro SET_VARSIZE from postgres.h:342 (PostgreSQL 15)
+/// C macro SET_VARSIZE from postgres.h:343 (PostgreSQL 15)
 ///
 /// ```text
 /// #define SET_VARSIZE( PTR , len ) SET_VARSIZE_4B ( PTR , len )
@@ -2439,7 +2439,7 @@ macro_rules! SET_VARSIZE {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro SET_VARSIZE_1B from postgres.h:273 (PostgreSQL 15)
+/// C macro SET_VARSIZE_1B from postgres.h:274 (PostgreSQL 15)
 ///
 /// ```text
 /// #define SET_VARSIZE_1B( PTR , len ) ( ( ( varattrib_1b * ) ( PTR ) ) -> va_header = ( ( ( uint8 ) ( len ) ) << 1 ) | 0x01 )
@@ -2533,7 +2533,7 @@ macro_rules! SET_VARSIZE_1B {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro SET_VARSIZE_4B from postgres.h:269 (PostgreSQL 15)
+/// C macro SET_VARSIZE_4B from postgres.h:270 (PostgreSQL 15)
 ///
 /// ```text
 /// #define SET_VARSIZE_4B( PTR , len ) ( ( ( varattrib_4b * ) ( PTR ) ) -> va_4byte . va_header = ( ( ( uint32 ) ( len ) ) << 2 ) )
@@ -2621,7 +2621,7 @@ macro_rules! SET_VARSIZE_4B {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro SET_VARSIZE_4B_C from postgres.h:271 (PostgreSQL 15)
+/// C macro SET_VARSIZE_4B_C from postgres.h:272 (PostgreSQL 15)
 ///
 /// ```text
 /// #define SET_VARSIZE_4B_C( PTR , len ) ( ( ( varattrib_4b * ) ( PTR ) ) -> va_4byte . va_header = ( ( ( uint32 ) ( len ) ) << 2 ) | 0x02 )
@@ -2721,7 +2721,7 @@ macro_rules! SET_VARSIZE_4B_C {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro SET_VARSIZE_COMPRESSED from postgres.h:344 (PostgreSQL 15)
+/// C macro SET_VARSIZE_COMPRESSED from postgres.h:345 (PostgreSQL 15)
 ///
 /// ```text
 /// #define SET_VARSIZE_COMPRESSED( PTR , len ) SET_VARSIZE_4B_C ( PTR , len )
@@ -2821,7 +2821,7 @@ macro_rules! SET_VARSIZE_COMPRESSED {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro SET_VARSIZE_SHORT from postgres.h:343 (PostgreSQL 15)
+/// C macro SET_VARSIZE_SHORT from postgres.h:344 (PostgreSQL 15)
 ///
 /// ```text
 /// #define SET_VARSIZE_SHORT( PTR , len ) SET_VARSIZE_1B ( PTR , len )
@@ -2915,7 +2915,7 @@ macro_rules! SET_VARSIZE_SHORT {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro SET_VARTAG_1B_E from postgres.h:275 (PostgreSQL 15)
+/// C macro SET_VARTAG_1B_E from postgres.h:276 (PostgreSQL 15)
 ///
 /// ```text
 /// #define SET_VARTAG_1B_E( PTR , tag ) ( ( ( varattrib_1b_e * ) ( PTR ) ) -> va_header = 0x01 , ( ( varattrib_1b_e * ) ( PTR ) ) -> va_tag = ( tag ) )
@@ -2983,7 +2983,7 @@ macro_rules! SET_VARTAG_1B_E {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro SET_VARTAG_EXTERNAL from postgres.h:346 (PostgreSQL 15)
+/// C macro SET_VARTAG_EXTERNAL from postgres.h:347 (PostgreSQL 15)
 ///
 /// ```text
 /// #define SET_VARTAG_EXTERNAL( PTR , tag ) SET_VARTAG_1B_E ( PTR , tag )
@@ -3051,7 +3051,7 @@ macro_rules! SET_VARTAG_EXTERNAL {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro TransactionIdGetDatum from postgres.h:565 (PostgreSQL 15)
+/// C macro TransactionIdGetDatum from postgres.h:566 (PostgreSQL 15)
 ///
 /// ```text
 /// #define TransactionIdGetDatum( X ) ( ( Datum ) ( X ) )
@@ -3119,7 +3119,7 @@ macro_rules! TransactionIdGetDatum {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro UInt16GetDatum from postgres.h:509 (PostgreSQL 15)
+/// C macro UInt16GetDatum from postgres.h:510 (PostgreSQL 15)
 ///
 /// ```text
 /// #define UInt16GetDatum( X ) ( ( Datum ) ( X ) )
@@ -3187,7 +3187,7 @@ macro_rules! UInt16GetDatum {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro UInt32GetDatum from postgres.h:537 (PostgreSQL 15)
+/// C macro UInt32GetDatum from postgres.h:538 (PostgreSQL 15)
 ///
 /// ```text
 /// #define UInt32GetDatum( X ) ( ( Datum ) ( X ) )
@@ -3255,7 +3255,7 @@ macro_rules! UInt32GetDatum {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro UInt64GetDatum from postgres.h:690 (PostgreSQL 15)
+/// C macro UInt64GetDatum from postgres.h:691 (PostgreSQL 15)
 ///
 /// ```text
 /// #define UInt64GetDatum( X ) ( ( Datum ) ( X ) )
@@ -3361,7 +3361,7 @@ macro_rules! UInt64GetDatum {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro UInt8GetDatum from postgres.h:481 (PostgreSQL 15)
+/// C macro UInt8GetDatum from postgres.h:482 (PostgreSQL 15)
 ///
 /// ```text
 /// #define UInt8GetDatum( X ) ( ( Datum ) ( X ) )
@@ -3429,7 +3429,7 @@ macro_rules! UInt8GetDatum {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro VARATT_CAN_MAKE_SHORT from postgres.h:295 (PostgreSQL 15)
+/// C macro VARATT_CAN_MAKE_SHORT from postgres.h:296 (PostgreSQL 15)
 ///
 /// ```text
 /// #define VARATT_CAN_MAKE_SHORT( PTR ) ( VARATT_IS_4B_U ( PTR ) && ( VARSIZE ( PTR ) - VARHDRSZ + VARHDRSZ_SHORT ) <= VARATT_SHORT_MAX )
@@ -3463,7 +3463,7 @@ macro_rules! VARATT_CAN_MAKE_SHORT {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro VARATT_CONVERTED_SHORT_SIZE from postgres.h:298 (PostgreSQL 15)
+/// C macro VARATT_CONVERTED_SHORT_SIZE from postgres.h:299 (PostgreSQL 15)
 ///
 /// ```text
 /// #define VARATT_CONVERTED_SHORT_SIZE( PTR ) ( VARSIZE ( PTR ) - VARHDRSZ + VARHDRSZ_SHORT )
@@ -3590,7 +3590,7 @@ macro_rules! VARATT_CONVERTED_SHORT_SIZE {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro VARATT_EXTERNAL_GET_COMPRESS_METHOD from postgres.h:373 (PostgreSQL 15)
+/// C macro VARATT_EXTERNAL_GET_COMPRESS_METHOD from postgres.h:374 (PostgreSQL 15)
 ///
 /// ```text
 /// #define VARATT_EXTERNAL_GET_COMPRESS_METHOD( toast_pointer ) ( ( toast_pointer ) . va_extinfo >> VARLENA_EXTSIZE_BITS )
@@ -3707,7 +3707,7 @@ macro_rules! VARATT_EXTERNAL_GET_COMPRESS_METHOD {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro VARATT_EXTERNAL_GET_EXTSIZE from postgres.h:371 (PostgreSQL 15)
+/// C macro VARATT_EXTERNAL_GET_EXTSIZE from postgres.h:372 (PostgreSQL 15)
 ///
 /// ```text
 /// #define VARATT_EXTERNAL_GET_EXTSIZE( toast_pointer ) ( ( toast_pointer ) . va_extinfo & VARLENA_EXTSIZE_MASK )
@@ -3820,7 +3820,7 @@ macro_rules! VARATT_EXTERNAL_GET_EXTSIZE {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro VARATT_EXTERNAL_IS_COMPRESSED from postgres.h:391 (PostgreSQL 15)
+/// C macro VARATT_EXTERNAL_IS_COMPRESSED from postgres.h:392 (PostgreSQL 15)
 ///
 /// ```text
 /// #define VARATT_EXTERNAL_IS_COMPRESSED( toast_pointer ) ( VARATT_EXTERNAL_GET_EXTSIZE ( toast_pointer ) < ( toast_pointer ) . va_rawsize - VARHDRSZ )
@@ -3854,7 +3854,7 @@ macro_rules! VARATT_EXTERNAL_IS_COMPRESSED {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD from postgres.h:376 (PostgreSQL 15)
+/// C macro VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD from postgres.h:377 (PostgreSQL 15)
 ///
 /// ```text
 /// #define VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD( toast_pointer , len , cm ) do { Assert ( ( cm ) == TOAST_PGLZ_COMPRESSION_ID || ( cm ) == TOAST_LZ4_COMPRESSION_ID ) ; ( ( toast_pointer ) . va_extinfo = ( len ) | ( ( uint32 ) ( cm ) << VARLENA_EXTSIZE_BITS ) ) ; } while ( 0 )
@@ -3889,7 +3889,7 @@ macro_rules! VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro VARATT_IS_1B from postgres.h:254 (PostgreSQL 15)
+/// C macro VARATT_IS_1B from postgres.h:255 (PostgreSQL 15)
 ///
 /// ```text
 /// #define VARATT_IS_1B( PTR ) ( ( ( ( varattrib_1b * ) ( PTR ) ) -> va_header & 0x01 ) == 0x01 )
@@ -3923,7 +3923,7 @@ macro_rules! VARATT_IS_1B {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro VARATT_IS_1B_E from postgres.h:256 (PostgreSQL 15)
+/// C macro VARATT_IS_1B_E from postgres.h:257 (PostgreSQL 15)
 ///
 /// ```text
 /// #define VARATT_IS_1B_E( PTR ) ( ( ( ( varattrib_1b * ) ( PTR ) ) -> va_header ) == 0x01 )
@@ -3957,7 +3957,7 @@ macro_rules! VARATT_IS_1B_E {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro VARATT_IS_4B from postgres.h:248 (PostgreSQL 15)
+/// C macro VARATT_IS_4B from postgres.h:249 (PostgreSQL 15)
 ///
 /// ```text
 /// #define VARATT_IS_4B( PTR ) ( ( ( ( varattrib_1b * ) ( PTR ) ) -> va_header & 0x01 ) == 0x00 )
@@ -3991,7 +3991,7 @@ macro_rules! VARATT_IS_4B {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro VARATT_IS_4B_C from postgres.h:252 (PostgreSQL 15)
+/// C macro VARATT_IS_4B_C from postgres.h:253 (PostgreSQL 15)
 ///
 /// ```text
 /// #define VARATT_IS_4B_C( PTR ) ( ( ( ( varattrib_1b * ) ( PTR ) ) -> va_header & 0x03 ) == 0x02 )
@@ -4025,7 +4025,7 @@ macro_rules! VARATT_IS_4B_C {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro VARATT_IS_4B_U from postgres.h:250 (PostgreSQL 15)
+/// C macro VARATT_IS_4B_U from postgres.h:251 (PostgreSQL 15)
 ///
 /// ```text
 /// #define VARATT_IS_4B_U( PTR ) ( ( ( ( varattrib_1b * ) ( PTR ) ) -> va_header & 0x03 ) == 0x00 )
@@ -4059,7 +4059,7 @@ macro_rules! VARATT_IS_4B_U {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro VARATT_IS_COMPRESSED from postgres.h:325 (PostgreSQL 15)
+/// C macro VARATT_IS_COMPRESSED from postgres.h:326 (PostgreSQL 15)
 ///
 /// ```text
 /// #define VARATT_IS_COMPRESSED( PTR ) VARATT_IS_4B_C ( PTR )
@@ -4093,7 +4093,7 @@ macro_rules! VARATT_IS_COMPRESSED {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro VARATT_IS_EXTENDED from postgres.h:340 (PostgreSQL 15)
+/// C macro VARATT_IS_EXTENDED from postgres.h:341 (PostgreSQL 15)
 ///
 /// ```text
 /// #define VARATT_IS_EXTENDED( PTR ) ( ! VARATT_IS_4B_U ( PTR ) )
@@ -4127,7 +4127,7 @@ macro_rules! VARATT_IS_EXTENDED {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro VARATT_IS_EXTERNAL from postgres.h:326 (PostgreSQL 15)
+/// C macro VARATT_IS_EXTERNAL from postgres.h:327 (PostgreSQL 15)
 ///
 /// ```text
 /// #define VARATT_IS_EXTERNAL( PTR ) VARATT_IS_1B_E ( PTR )
@@ -4161,7 +4161,7 @@ macro_rules! VARATT_IS_EXTERNAL {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro VARATT_IS_EXTERNAL_EXPANDED from postgres.h:335 (PostgreSQL 15)
+/// C macro VARATT_IS_EXTERNAL_EXPANDED from postgres.h:336 (PostgreSQL 15)
 ///
 /// ```text
 /// #define VARATT_IS_EXTERNAL_EXPANDED( PTR ) ( VARATT_IS_EXTERNAL ( PTR ) && VARTAG_IS_EXPANDED ( VARTAG_EXTERNAL ( PTR ) ) )
@@ -4195,7 +4195,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro VARATT_IS_EXTERNAL_EXPANDED_RO from postgres.h:331 (PostgreSQL 15)
+/// C macro VARATT_IS_EXTERNAL_EXPANDED_RO from postgres.h:332 (PostgreSQL 15)
 ///
 /// ```text
 /// #define VARATT_IS_EXTERNAL_EXPANDED_RO( PTR ) ( VARATT_IS_EXTERNAL ( PTR ) && VARTAG_EXTERNAL ( PTR ) == VARTAG_EXPANDED_RO )
@@ -4229,7 +4229,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RO {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro VARATT_IS_EXTERNAL_EXPANDED_RW from postgres.h:333 (PostgreSQL 15)
+/// C macro VARATT_IS_EXTERNAL_EXPANDED_RW from postgres.h:334 (PostgreSQL 15)
 ///
 /// ```text
 /// #define VARATT_IS_EXTERNAL_EXPANDED_RW( PTR ) ( VARATT_IS_EXTERNAL ( PTR ) && VARTAG_EXTERNAL ( PTR ) == VARTAG_EXPANDED_RW )
@@ -4263,7 +4263,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RW {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro VARATT_IS_EXTERNAL_INDIRECT from postgres.h:329 (PostgreSQL 15)
+/// C macro VARATT_IS_EXTERNAL_INDIRECT from postgres.h:330 (PostgreSQL 15)
 ///
 /// ```text
 /// #define VARATT_IS_EXTERNAL_INDIRECT( PTR ) ( VARATT_IS_EXTERNAL ( PTR ) && VARTAG_EXTERNAL ( PTR ) == VARTAG_INDIRECT )
@@ -4297,7 +4297,7 @@ macro_rules! VARATT_IS_EXTERNAL_INDIRECT {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro VARATT_IS_EXTERNAL_NON_EXPANDED from postgres.h:337 (PostgreSQL 15)
+/// C macro VARATT_IS_EXTERNAL_NON_EXPANDED from postgres.h:338 (PostgreSQL 15)
 ///
 /// ```text
 /// #define VARATT_IS_EXTERNAL_NON_EXPANDED( PTR ) ( VARATT_IS_EXTERNAL ( PTR ) && ! VARTAG_IS_EXPANDED ( VARTAG_EXTERNAL ( PTR ) ) )
@@ -4331,7 +4331,7 @@ macro_rules! VARATT_IS_EXTERNAL_NON_EXPANDED {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro VARATT_IS_EXTERNAL_ONDISK from postgres.h:327 (PostgreSQL 15)
+/// C macro VARATT_IS_EXTERNAL_ONDISK from postgres.h:328 (PostgreSQL 15)
 ///
 /// ```text
 /// #define VARATT_IS_EXTERNAL_ONDISK( PTR ) ( VARATT_IS_EXTERNAL ( PTR ) && VARTAG_EXTERNAL ( PTR ) == VARTAG_ONDISK )
@@ -4365,7 +4365,7 @@ macro_rules! VARATT_IS_EXTERNAL_ONDISK {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro VARATT_IS_SHORT from postgres.h:339 (PostgreSQL 15)
+/// C macro VARATT_IS_SHORT from postgres.h:340 (PostgreSQL 15)
 ///
 /// ```text
 /// #define VARATT_IS_SHORT( PTR ) VARATT_IS_1B ( PTR )
@@ -4399,7 +4399,7 @@ macro_rules! VARATT_IS_SHORT {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro VARATT_NOT_PAD_BYTE from postgres.h:258 (PostgreSQL 15)
+/// C macro VARATT_NOT_PAD_BYTE from postgres.h:259 (PostgreSQL 15)
 ///
 /// ```text
 /// #define VARATT_NOT_PAD_BYTE( PTR ) ( * ( ( uint8 * ) ( PTR ) ) != 0 )
@@ -4433,7 +4433,7 @@ macro_rules! VARATT_NOT_PAD_BYTE {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro VARDATA from postgres.h:315 (PostgreSQL 15)
+/// C macro VARDATA from postgres.h:316 (PostgreSQL 15)
 ///
 /// ```text
 /// #define VARDATA( PTR ) VARDATA_4B ( PTR )
@@ -4492,7 +4492,7 @@ macro_rules! VARDATA {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro VARDATA_1B from postgres.h:283 (PostgreSQL 15)
+/// C macro VARDATA_1B from postgres.h:284 (PostgreSQL 15)
 ///
 /// ```text
 /// #define VARDATA_1B( PTR ) ( ( ( varattrib_1b * ) ( PTR ) ) -> va_data )
@@ -4545,7 +4545,7 @@ macro_rules! VARDATA_1B {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro VARDATA_1B_E from postgres.h:284 (PostgreSQL 15)
+/// C macro VARDATA_1B_E from postgres.h:285 (PostgreSQL 15)
 ///
 /// ```text
 /// #define VARDATA_1B_E( PTR ) ( ( ( varattrib_1b_e * ) ( PTR ) ) -> va_data )
@@ -4598,7 +4598,7 @@ macro_rules! VARDATA_1B_E {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro VARDATA_4B from postgres.h:281 (PostgreSQL 15)
+/// C macro VARDATA_4B from postgres.h:282 (PostgreSQL 15)
 ///
 /// ```text
 /// #define VARDATA_4B( PTR ) ( ( ( varattrib_4b * ) ( PTR ) ) -> va_4byte . va_data )
@@ -4657,7 +4657,7 @@ macro_rules! VARDATA_4B {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro VARDATA_4B_C from postgres.h:282 (PostgreSQL 15)
+/// C macro VARDATA_4B_C from postgres.h:283 (PostgreSQL 15)
 ///
 /// ```text
 /// #define VARDATA_4B_C( PTR ) ( ( ( varattrib_4b * ) ( PTR ) ) -> va_compressed . va_data )
@@ -4716,7 +4716,7 @@ macro_rules! VARDATA_4B_C {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro VARDATA_ANY from postgres.h:361 (PostgreSQL 15)
+/// C macro VARDATA_ANY from postgres.h:362 (PostgreSQL 15)
 ///
 /// ```text
 /// #define VARDATA_ANY( PTR ) ( VARATT_IS_1B ( PTR ) ? VARDATA_1B ( PTR ) : VARDATA_4B ( PTR ) )
@@ -4830,7 +4830,7 @@ macro_rules! VARDATA_ANY {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro VARDATA_COMPRESSED_GET_COMPRESS_METHOD from postgres.h:367 (PostgreSQL 15)
+/// C macro VARDATA_COMPRESSED_GET_COMPRESS_METHOD from postgres.h:368 (PostgreSQL 15)
 ///
 /// ```text
 /// #define VARDATA_COMPRESSED_GET_COMPRESS_METHOD( PTR ) ( ( ( varattrib_4b * ) ( PTR ) ) -> va_compressed . va_tcinfo >> VARLENA_EXTSIZE_BITS )
@@ -4898,7 +4898,7 @@ macro_rules! VARDATA_COMPRESSED_GET_COMPRESS_METHOD {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro VARDATA_COMPRESSED_GET_EXTSIZE from postgres.h:365 (PostgreSQL 15)
+/// C macro VARDATA_COMPRESSED_GET_EXTSIZE from postgres.h:366 (PostgreSQL 15)
 ///
 /// ```text
 /// #define VARDATA_COMPRESSED_GET_EXTSIZE( PTR ) ( ( ( varattrib_4b * ) ( PTR ) ) -> va_compressed . va_tcinfo & VARLENA_EXTSIZE_MASK )
@@ -4966,7 +4966,7 @@ macro_rules! VARDATA_COMPRESSED_GET_EXTSIZE {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro VARDATA_EXTERNAL from postgres.h:323 (PostgreSQL 15)
+/// C macro VARDATA_EXTERNAL from postgres.h:324 (PostgreSQL 15)
 ///
 /// ```text
 /// #define VARDATA_EXTERNAL( PTR ) VARDATA_1B_E ( PTR )
@@ -5019,7 +5019,7 @@ macro_rules! VARDATA_EXTERNAL {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro VARDATA_SHORT from postgres.h:319 (PostgreSQL 15)
+/// C macro VARDATA_SHORT from postgres.h:320 (PostgreSQL 15)
 ///
 /// ```text
 /// #define VARDATA_SHORT( PTR ) VARDATA_1B ( PTR )
@@ -5072,7 +5072,7 @@ macro_rules! VARDATA_SHORT {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro VARSIZE from postgres.h:316 (PostgreSQL 15)
+/// C macro VARSIZE from postgres.h:317 (PostgreSQL 15)
 ///
 /// ```text
 /// #define VARSIZE( PTR ) VARSIZE_4B ( PTR )
@@ -5157,7 +5157,7 @@ macro_rules! VARSIZE {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro VARSIZE_1B from postgres.h:264 (PostgreSQL 15)
+/// C macro VARSIZE_1B from postgres.h:265 (PostgreSQL 15)
 ///
 /// ```text
 /// #define VARSIZE_1B( PTR ) ( ( ( ( varattrib_1b * ) ( PTR ) ) -> va_header >> 1 ) & 0x7F )
@@ -5236,7 +5236,7 @@ macro_rules! VARSIZE_1B {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro VARSIZE_4B from postgres.h:262 (PostgreSQL 15)
+/// C macro VARSIZE_4B from postgres.h:263 (PostgreSQL 15)
 ///
 /// ```text
 /// #define VARSIZE_4B( PTR ) ( ( ( ( varattrib_4b * ) ( PTR ) ) -> va_4byte . va_header >> 2 ) & 0x3FFFFFFF )
@@ -5321,7 +5321,7 @@ macro_rules! VARSIZE_4B {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro VARSIZE_ANY from postgres.h:348 (PostgreSQL 15)
+/// C macro VARSIZE_ANY from postgres.h:349 (PostgreSQL 15)
 ///
 /// ```text
 /// #define VARSIZE_ANY( PTR ) ( VARATT_IS_1B_E ( PTR ) ? VARSIZE_EXTERNAL ( PTR ) : ( VARATT_IS_1B ( PTR ) ? VARSIZE_1B ( PTR ) : VARSIZE_4B ( PTR ) ) )
@@ -5658,7 +5658,7 @@ macro_rules! VARSIZE_ANY {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro VARSIZE_ANY_EXHDR from postgres.h:354 (PostgreSQL 15)
+/// C macro VARSIZE_ANY_EXHDR from postgres.h:355 (PostgreSQL 15)
 ///
 /// ```text
 /// #define VARSIZE_ANY_EXHDR( PTR ) ( VARATT_IS_1B_E ( PTR ) ? VARSIZE_EXTERNAL ( PTR ) - VARHDRSZ_EXTERNAL : ( VARATT_IS_1B ( PTR ) ? VARSIZE_1B ( PTR ) - VARHDRSZ_SHORT : VARSIZE_4B ( PTR ) - VARHDRSZ ) )
@@ -6057,7 +6057,7 @@ macro_rules! VARSIZE_ANY_EXHDR {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro VARSIZE_EXTERNAL from postgres.h:322 (PostgreSQL 15)
+/// C macro VARSIZE_EXTERNAL from postgres.h:323 (PostgreSQL 15)
 ///
 /// ```text
 /// #define VARSIZE_EXTERNAL( PTR ) ( VARHDRSZ_EXTERNAL + VARTAG_SIZE ( VARTAG_EXTERNAL ( PTR ) ) )
@@ -6205,7 +6205,7 @@ macro_rules! VARSIZE_EXTERNAL {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro VARSIZE_SHORT from postgres.h:318 (PostgreSQL 15)
+/// C macro VARSIZE_SHORT from postgres.h:319 (PostgreSQL 15)
 ///
 /// ```text
 /// #define VARSIZE_SHORT( PTR ) VARSIZE_1B ( PTR )
@@ -6284,7 +6284,7 @@ macro_rules! VARSIZE_SHORT {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro VARTAG_1B_E from postgres.h:266 (PostgreSQL 15)
+/// C macro VARTAG_1B_E from postgres.h:267 (PostgreSQL 15)
 ///
 /// ```text
 /// #define VARTAG_1B_E( PTR ) ( ( ( varattrib_1b_e * ) ( PTR ) ) -> va_tag )
@@ -6337,7 +6337,7 @@ macro_rules! VARTAG_1B_E {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro VARTAG_EXTERNAL from postgres.h:321 (PostgreSQL 15)
+/// C macro VARTAG_EXTERNAL from postgres.h:322 (PostgreSQL 15)
 ///
 /// ```text
 /// #define VARTAG_EXTERNAL( PTR ) VARTAG_1B_E ( PTR )
@@ -6390,7 +6390,7 @@ macro_rules! VARTAG_EXTERNAL {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro VARTAG_IS_EXPANDED from postgres.h:130 (PostgreSQL 15)
+/// C macro VARTAG_IS_EXPANDED from postgres.h:131 (PostgreSQL 15)
 ///
 /// ```text
 /// #define VARTAG_IS_EXPANDED( tag ) ( ( ( tag ) & ~ 1 ) == VARTAG_EXPANDED_RO )
@@ -6420,7 +6420,7 @@ macro_rules! VARTAG_IS_EXPANDED {
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro VARTAG_SIZE from postgres.h:133 (PostgreSQL 15)
+/// C macro VARTAG_SIZE from postgres.h:134 (PostgreSQL 15)
 ///
 /// ```text
 /// #define VARTAG_SIZE( tag ) ( ( tag ) == VARTAG_INDIRECT ? sizeof ( varatt_indirect ) : VARTAG_IS_EXPANDED ( tag ) ? sizeof ( varatt_expanded ) : ( tag ) == VARTAG_ONDISK ? sizeof ( varatt_external ) : TrapMacro ( true , "unrecognized TOAST vartag" ) )

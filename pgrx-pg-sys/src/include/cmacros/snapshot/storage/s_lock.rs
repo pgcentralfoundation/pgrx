@@ -26,7 +26,7 @@ macro_rules! SPIN_DELAY {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro S_LOCK_FREE from s_lock.h:1023 (PostgreSQL 15), s_lock.h:780 (PostgreSQL 16), s_lock.h:761 (PostgreSQL 17), s_lock.h:669 (PostgreSQL 18)
+/// C macro S_LOCK_FREE from s_lock.h:1029 (PostgreSQL 15), s_lock.h:786 (PostgreSQL 16), s_lock.h:767 (PostgreSQL 17), s_lock.h:669 (PostgreSQL 18)
 ///
 /// ```text
 /// #define S_LOCK_FREE( lock ) ( * ( lock ) == 0 )
@@ -146,7 +146,7 @@ macro_rules! TAS_SPIN {
         )
     };
 }
-/// C inline function init_spin_delay from s_lock.h:1094 (PostgreSQL 15), s_lock.h:851 (PostgreSQL 16), s_lock.h:831 (PostgreSQL 17), s_lock.h:739 (PostgreSQL 18), s_lock.h:737 (PostgreSQL 19)
+/// C inline function init_spin_delay from s_lock.h:1100 (PostgreSQL 15), s_lock.h:857 (PostgreSQL 16), s_lock.h:837 (PostgreSQL 17), s_lock.h:739 (PostgreSQL 18), s_lock.h:737 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void

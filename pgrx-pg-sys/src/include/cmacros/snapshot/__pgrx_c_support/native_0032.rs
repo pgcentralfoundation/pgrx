@@ -1,33 +1,5 @@
 // Shared generated C macro support.
 
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
-const _: Projection<crate::__pgrx_c_bindings::PruneFreezeResult, <<c::expression::CRecord<crate::__pgrx_c_bindings::PruneFreezeResult> as c::expression::OrdinaryField<Field_recently_dead_tuples>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).recently_dead_tuples) };
-#[cfg(any(feature = "pg17", feature = "pg18"))]
-#[doc(hidden)]
-pub struct Field_all_visible;
-#[cfg(any(feature = "pg17", feature = "pg18"))]
-const _: () = assert!(
-    ::core::mem::offset_of!(crate::__pgrx_c_bindings::PruneFreezeResult, all_visible) == 20
-);
-#[cfg(any(feature = "pg17", feature = "pg18"))]
-// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
-unsafe impl c::expression::OrdinaryField<Field_all_visible>
-    for c::expression::CRecord<crate::__pgrx_c_bindings::PruneFreezeResult>
-{
-    type Member = c::CBool;
-    type Declared = FieldReadWrite;
-    const OFFSET: usize = 20;
-}
-#[cfg(any(feature = "pg17", feature = "pg18"))]
-// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
-const _: Projection<crate::__pgrx_c_bindings::PruneFreezeResult, <<c::expression::CRecord<crate::__pgrx_c_bindings::PruneFreezeResult> as c::expression::OrdinaryField<Field_all_visible>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).all_visible) };
-#[cfg(any(feature = "pg17", feature = "pg18"))]
-#[doc(hidden)]
-pub struct Field_all_frozen;
-#[cfg(any(feature = "pg17", feature = "pg18"))]
-const _: () =
-    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::PruneFreezeResult, all_frozen) == 21);
 #[cfg(any(feature = "pg17", feature = "pg18"))]
 // SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
 unsafe impl c::expression::OrdinaryField<Field_all_frozen>
@@ -4815,3 +4787,41 @@ impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::AlterReplicationSlotCmd {
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
 impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::GroupByOrdering {}
+#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::GroupByOrdering {
+    type Type = Self;
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_GroupByOrdering as i32);
+}
+#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::JsonArgument {}
+#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::JsonArgument {
+    type Type = Self;
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_JsonArgument as i32);
+}
+#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::JsonBehavior {}
+#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::JsonBehavior {
+    type Type = Self;
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_JsonBehavior as i32);
+}
+#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::JsonExpr {}
+#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::JsonExpr {
+    type Type = Self;
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_JsonExpr as i32);
+}
+#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
+impl type_enumerator_seals::Seal_T_ for crate::__pgrx_c_bindings::JsonFuncExpr {}
+#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
+impl TypeEnumerator_T_ for crate::__pgrx_c_bindings::JsonFuncExpr {
+    type Type = Self;
+    const VALUE: c::CValue<c::CInt> =
+        c::CValue::<c::CInt>::new(crate::__pgrx_c_bindings::NodeTag::T_JsonFuncExpr as i32);
+}
