@@ -4,9 +4,11 @@ on:
   push:
     branches:
       - develop
+      - v0.19.x
   pull_request:
     branches:
       - develop
+      - v0.19.x
 
 env:
   # NB: Don't modify `RUSTFLAGS` here, since it would override the ones
