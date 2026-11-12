@@ -19,16 +19,17 @@ use std::num::NonZeroUsize;
 /// Given a `pg_sys::Datum` representing a composite row type, return a boxed `HeapTupleData`,
 /// which can be used by the various `heap_getattr` methods
 ///
-/// Like PostgreSQL's `DatumGetHeapTupleHeader`, this fully detoasts `row`, so a
-/// packed, compressed, or external composite is first copied into an ordinary
-/// value allocated in `CurrentMemoryContext`.
+/// This reads `row` with PostgreSQL's `DatumGetHeapTupleHeader`, which fully detoasts it, so a
+/// packed, compressed, or external composite is first copied into an ordinary value allocated
+/// in `CurrentMemoryContext`. On releases that version composite datums, it also copies and
+/// marks a datum formed by an earlier release, so that [`heap_getattr_raw()`] checks it.
 ///
 /// # Safety
 ///
 /// `row` must be a composite (row type) Datum: a pointer to a live varlena whose
 /// detoasted payload is a `HeapTupleHeader` datum. The call must run on the
-/// PostgreSQL backend thread. The returned tuple points into `row`, or into its
-/// detoasted copy, so it is valid only while that memory is.
+/// PostgreSQL backend thread. The returned tuple points into `row`, or into a copy
+/// allocated in `CurrentMemoryContext`, so it is valid only while that memory is.
 ///
 /// # Panics
 ///
@@ -41,11 +42,11 @@ pub unsafe fn composite_row_type_make_tuple(
     if row.is_null() {
         panic!("Attempt to dereference a null HeapTupleHeader");
     }
-    // SAFETY: the caller supplies a live composite varlena. pg_detoast_datum,
-    // unlike pg_detoast_datum_packed, also converts a one-byte header to the
-    // four-byte form that HeapTupleHeaderGetDatumLength reads.
-    let htup_header =
-        unsafe { pg_sys::pg_detoast_datum(row.cast_mut_ptr()) } as pg_sys::HeapTupleHeader;
+    // SAFETY: the caller supplies a live composite varlena on the backend thread.
+    // DatumGetHeapTupleHeader detoasts with pg_detoast_datum, which, unlike
+    // pg_detoast_datum_packed, also converts a one-byte header to the four-byte form that
+    // HeapTupleHeaderGetDatumLength reads.
+    let htup_header = unsafe { datum_get_heap_tuple_header(row) };
     // SAFETY: alloc0 returns zeroed, aligned storage for the plain C struct.
     let mut tuple = unsafe { PgBox::<pg_sys::HeapTupleData>::alloc0() };
 
@@ -56,6 +57,71 @@ pub unsafe fn composite_row_type_make_tuple(
 
     tuple
 }
+
+// PostgreSQL 15.20, 16.16, 17.12, 18.7, and 19rc2 record a version in each composite datum and
+// check it before reading an attribute, so a datum formed under a definition of its row type
+// that the reader's descriptor cannot read raises an ERROR instead of being misread
+// (CVE-2026-6460). These releases turn `DatumGetHeapTupleHeader` from a macro into a function
+// that marks a datum formed by an earlier release, and `heap_getattr` calls `heap_datum_check`
+// on a versioned datum. `heap_getattr_raw` does not call `heap_getattr`, so it repeats that check.
+pg_sys::if_c_macro! { HeapTupleHeaderIsVersionedDatum {
+    /// Return the tuple header of composite `datum`, as PostgreSQL's `DatumGetHeapTupleHeader`
+    /// function does.
+    ///
+    /// # Safety
+    ///
+    /// `datum` must point to a live composite varlena, and the call must run on the PostgreSQL
+    /// backend thread.
+    #[inline]
+    pub(crate) unsafe fn datum_get_heap_tuple_header(
+        datum: pg_sys::Datum,
+    ) -> pg_sys::HeapTupleHeader {
+        // SAFETY: the caller supplies a live composite varlena on the backend thread. The
+        // function marks only a copy it allocates in CurrentMemoryContext, never `datum`.
+        unsafe { pg_sys::DatumGetHeapTupleHeader(datum) }
+    }
+
+    /// Raise an ERROR if `tup` is a versioned composite datum that `tupdesc` cannot read, as
+    /// PostgreSQL's `heap_getattr` does before it reads an attribute.
+    ///
+    /// # Safety
+    ///
+    /// `tup` must point to a live tuple header and `tupdesc` to a live descriptor, and the
+    /// call must run on the PostgreSQL backend thread.
+    #[inline]
+    unsafe fn check_datum_version(tup: pg_sys::HeapTupleHeader, tupdesc: pg_sys::TupleDesc) {
+        // SAFETY: the caller supplies a live tuple header and descriptor on the backend
+        // thread. heap_datum_check requires a versioned datum, which the condition confirms.
+        unsafe {
+            if pg_sys::HeapTupleHeaderIsVersionedDatum!(tup) {
+                pg_sys::heap_datum_check(tup, tupdesc);
+            }
+        }
+    }
+}}
+
+// Earlier releases define `DatumGetHeapTupleHeader` as a macro and do not version composite
+// datums.
+pg_sys::if_c_macro! { DatumGetHeapTupleHeader {
+    /// Return the tuple header of composite `datum`, as PostgreSQL's `DatumGetHeapTupleHeader`
+    /// macro does.
+    ///
+    /// # Safety
+    ///
+    /// `datum` must point to a live composite varlena, and the call must run on the PostgreSQL
+    /// backend thread.
+    #[inline]
+    pub(crate) unsafe fn datum_get_heap_tuple_header(
+        datum: pg_sys::Datum,
+    ) -> pg_sys::HeapTupleHeader {
+        // SAFETY: the caller supplies a live composite varlena on the backend thread.
+        unsafe { pg_sys::DatumGetHeapTupleHeader!(datum).get() }
+    }
+
+    /// Releases without composite datum versioning have no check to run.
+    #[inline(always)]
+    fn check_datum_version(_tup: pg_sys::HeapTupleHeader, _tupdesc: pg_sys::TupleDesc) {}
+}}
 
 /// Extract user attribute `attno` (1-based) of a heap tuple and return it as Rust type.
 ///
@@ -133,6 +199,11 @@ pub unsafe fn heap_getattr<T: FromDatum, AllocatedBy: WhoAllocated>(
 /// lists for each version, may be live across it. A pass-by-reference result can point into
 /// the tuple or, on PostgreSQL 15.0 through 15.4, into `tupdesc`, and is valid only while both
 /// are.
+///
+/// On releases that version composite datums (PostgreSQL 15.20, 16.16, 17.12, 18.7, 19rc2, and
+/// later), this first checks a versioned composite datum against `tupdesc` with PostgreSQL's
+/// `heap_datum_check`, as `heap_getattr` does. That raises an ERROR if the datum was formed
+/// under a definition of its row type that `tupdesc` cannot read.
 #[inline]
 pub unsafe fn heap_getattr_raw(
     tuple: *mut pg_sys::HeapTupleData,
@@ -141,7 +212,11 @@ pub unsafe fn heap_getattr_raw(
 ) -> Option<pg_sys::Datum> {
     // PostgreSQL 15 through 19 define `heap_getattr` and `fastgetattr` as static inline
     // functions with this logic for a positive attribute number (PG18 and later read the
-    // `CompactAttribute` instead of the `FormData_pg_attribute`):
+    // `CompactAttribute` instead of the `FormData_pg_attribute`). Releases that version
+    // composite datums begin with the version check:
+    //
+    //     if (HeapTupleHeaderIsVersionedDatum(tup->t_data))
+    //         heap_datum_check(tup->t_data, tupleDesc);
     //
     //     if (attnum > (int) HeapTupleHeaderGetNatts(tup->t_data))
     //         return getmissingattr(tupleDesc, attnum, isnull);
@@ -176,6 +251,7 @@ pub unsafe fn heap_getattr_raw(
     // stored ones in length, alignment, and pass-by-value flag, and an in-range attno.
     unsafe {
         let t_data = (*tuple).t_data;
+        check_datum_version(t_data, tupdesc);
         if attno.get() > pg_sys::HeapTupleHeaderGetNatts!(t_data).get() as usize {
             let mut isnull = false;
             let datum = pg_sys::getmissingattr(tupdesc, attnum, &mut isnull);
