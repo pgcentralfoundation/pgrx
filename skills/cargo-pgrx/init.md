@@ -8,7 +8,7 @@ init downloads all supported defaults.
 
 On Unix, downloaded installations live under
 `$PGRX_HOME/<full-version>/pgrx-install`. Windows uses downloaded binaries under
-the version directory. The current PG19 download is PostgreSQL 19rc1.
+the version directory. The current PG19 download is PostgreSQL 19rc2.
 
 ## Effects
 
@@ -57,7 +57,7 @@ A worktree can have its own `config.toml`, managed data directories, and logs
 without rebuilding PostgreSQL. Save the source home before setting a private
 `PGRX_HOME`, then register an existing
 `$source_pgrx_home/<full-version>/pgrx-install/bin/pg_config`. The directory uses
-the full version, such as `18.4` or `19rc1`, rather than the feature label
+the full version, such as `18.4` or `19rc2`, rather than the feature label
 `pg18` or `pg19`. Read the source home's `config.toml` or use
 `cargo pgrx info pg-config 18` to find its actual path.
 
