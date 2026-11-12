@@ -113,6 +113,29 @@ mod tests {
         }
     }
 
+    /// PostgreSQL spells each SQLSTATE that pgrx added after PostgreSQL 12 the way
+    /// errcodes.txt does, and converting the code back returns the same variant rather than
+    /// `ERRCODE_INTERNAL_ERROR`.
+    #[pg_test]
+    fn test_sql_error_codes_match_postgres_sqlstates() {
+        for (sqlstate, code) in [
+            ("10608", PgSqlErrorCode::ERRCODE_INVALID_ARGUMENT_FOR_XQUERY),
+            ("22P07", PgSqlErrorCode::ERRCODE_DATUM_VERSION_MISMATCH),
+            ("22031", PgSqlErrorCode::ERRCODE_INVALID_ARGUMENT_FOR_SQL_JSON_DATETIME_FUNCTION),
+            ("2203G", PgSqlErrorCode::ERRCODE_SQL_JSON_ITEM_CANNOT_BE_CAST_TO_TARGET_TYPE),
+            ("25P04", PgSqlErrorCode::ERRCODE_TRANSACTION_TIMEOUT),
+            ("57P05", PgSqlErrorCode::ERRCODE_IDLE_SESSION_TIMEOUT),
+            ("58P03", PgSqlErrorCode::ERRCODE_FILE_NAME_TOO_LONG),
+        ] {
+            // SAFETY: unpack_sql_state writes the five characters and a NUL to a static
+            // buffer, which this reads before the next call.
+            let unpacked =
+                unsafe { core::ffi::CStr::from_ptr(pg_sys::unpack_sql_state(code as i32)) };
+            assert_eq!(unpacked.to_str(), Ok(sqlstate));
+            assert_eq!(PgSqlErrorCode::from(code as i32), code);
+        }
+    }
+
     #[pg_test(error = "panic message")]
     fn test_panic() {
         panic!("panic message")
