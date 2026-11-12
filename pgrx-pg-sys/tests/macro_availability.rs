@@ -114,6 +114,11 @@ const ALLOWANCES: &[Allowance] = &[
         majors: 15..=15,
         skip: Some("unsupported_literal"),
     },
+    // PostgreSQL 15.20, 16.16, 17.12, 18.7, and 19rc2 version composite datums and turn the
+    // DatumGetHeapTupleHeader macro into a function, so each build has exactly one of these.
+    // pgrx/src/htup.rs defines its helpers under both gates, so losing both fails to compile.
+    Allowance { name: "DatumGetHeapTupleHeader", majors: 15..=19, skip: None },
+    Allowance { name: "HeapTupleHeaderIsVersionedDatum", majors: 15..=19, skip: None },
 ];
 
 /// Require every gated test's macro, and every generated macro pgrx calls, to exist in this build
@@ -340,9 +345,10 @@ fn gated_names(build: &Build) -> BTreeMap<String, Vec<PathBuf>> {
     gated
 }
 
-/// Generated support macros that pgrx calls. They translate no C macro, so the report never
-/// lists them; every build that generates macros emits them.
-const SUPPORT_MACROS: &[&str] = &["__pgrx_c_inline_functions"];
+/// Support macros that pgrx calls. They translate no C macro, so the report never lists them;
+/// every build that generates macros emits `__pgrx_c_inline_functions`, and `if_c_macro` is
+/// written by hand beside the generated modules in `src/include`.
+const SUPPORT_MACROS: &[&str] = &["__pgrx_c_inline_functions", "if_c_macro"];
 
 /// Map each generated macro that pgrx, or pgrx-macros' output templates, calls as
 /// `pg_sys::NAME!` or `pgrx_pg_sys::NAME!` in code `build` compiles to the files that call it.
