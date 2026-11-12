@@ -13,7 +13,7 @@
 
 `pgrx` is a framework for developing PostgreSQL extensions in Rust and strives to be as idiomatic and safe as possible.
 
-`pgrx` supports Postgres 15 through Postgres 18, plus Postgres 19rc1.
+`pgrx` supports Postgres 15 through Postgres 18, plus Postgres 19rc2.
 
 ## Want to chat with us or get a question answered?
 
