@@ -1159,6 +1159,76 @@ mod tests {
         })
     }
 
+    // PostgreSQL 15.20, 16.16, 17.12, 18.7, and 19rc2 version composite datums. Earlier
+    // releases have no check to exercise.
+    pgrx::if_c_macro! { HeapTupleHeaderIsVersionedDatum {
+        /// Reads attribute 2 of any composite as `int8`, as an extension function reads a
+        /// composite whose type its caller defined.
+        #[pg_extern]
+        fn second_attribute_as_int8(row: pgrx::composite_type!("record")) -> Option<i64> {
+            row.get_by_index(NonZeroUsize::new(2).unwrap()).unwrap()
+        }
+
+        /// A composite formed while a rolled-back `ALTER TYPE` was in effect keeps that
+        /// definition's layout after a different attribute takes the same position. Reading
+        /// it with the current descriptor would interpret the stored text as `int8`.
+        #[pg_test(error = "row type of datum tuple was altered after the datum's creation")]
+        fn test_get_by_index_rejects_composite_from_rolled_back_alter() {
+            Spi::run(
+                "CREATE TYPE StaleDog AS (name text);
+                 DO $$
+                 DECLARE dog record;
+                 BEGIN
+                     BEGIN
+                         ALTER TYPE StaleDog ADD ATTRIBUTE scritches text;
+                         dog := ROW('Nami', repeat('A', 32))::StaleDog;
+                         RAISE EXCEPTION 'roll back the ALTER TYPE';
+                     EXCEPTION WHEN raise_exception THEN NULL;
+                     END;
+                     ALTER TYPE StaleDog ADD ATTRIBUTE scritches int8;
+                     PERFORM tests.second_attribute_as_int8(dog);
+                 END $$;",
+            )
+            .unwrap();
+        }
+
+        /// Return a Dog datum without the composite datum marking, like one formed by a
+        /// release before composite datum versioning.
+        fn unmarked_dog() -> pg_sys::Datum {
+            let mut dog = PgHeapTuple::new_composite_type("Dog").unwrap();
+            dog.set_by_name("scritches", 3_i32).unwrap();
+            let datum = dog.into_composite_datum().unwrap();
+            // SAFETY: `datum` is the marked Dog composite that into_composite_datum just
+            // allocated in CurrentMemoryContext, and nothing else refers to it.
+            unsafe {
+                pg_sys::HeapTupleHeaderClearDatum!(
+                    datum.cast_mut_ptr::<pg_sys::HeapTupleHeaderData>()
+                );
+            }
+            datum
+        }
+
+        /// `DatumGetHeapTupleHeader` gives an unmarked datum version 0. Dog was created with a
+        /// later version, so reading the datum raises an ERROR instead of skipping the check.
+        #[pg_test(error = "row type of datum tuple was altered after the datum's creation")]
+        fn test_from_composite_datum_marks_datum_from_earlier_release() {
+            // SAFETY: `unmarked_dog` returns a live Dog composite datum.
+            let dog = unsafe { PgHeapTuple::from_composite_datum(unmarked_dog()) };
+            let _ = dog.get_by_name::<i32>("scritches");
+        }
+
+        /// As above, through `composite_row_type_make_tuple` and `htup::heap_getattr`.
+        #[pg_test(error = "row type of datum tuple was altered after the datum's creation")]
+        fn test_composite_row_type_make_tuple_marks_datum_from_earlier_release() {
+            let tupdesc = pgrx::PgTupleDesc::for_composite_type("Dog").unwrap();
+            // SAFETY: `unmarked_dog` returns a live Dog composite datum.
+            let tuple = unsafe { pgrx::htup::composite_row_type_make_tuple(unmarked_dog()) };
+            let scritches = NonZeroUsize::new(2).unwrap();
+            // SAFETY: `tuple` is a live Dog row that `tupdesc` describes.
+            let _ = unsafe { pgrx::htup::heap_getattr::<i32, _>(&tuple, scritches, &tupdesc) };
+        }
+    }}
+
     /// Reading a NULL attribute returns `Ok(None)` without asking `T` for its type OID, which
     /// can raise an ERROR. Before converting a value, `get_by_index` asks `T` for its type only
     /// for a row-type attribute, so only the row-type case catches that lookup moving ahead of
