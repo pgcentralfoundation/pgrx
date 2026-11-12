@@ -2,9 +2,9 @@ name: cargo pgrx test --runas
 
 on:
   push:
-    branches: [ develop, v0.19.x ]
+    branches: [ v0.19.x ]
   pull_request:
-    branches: [ develop, v0.19.x ]
+    branches: [ v0.19.x ]
 
 env:
   CARGO_TERM_COLOR: always
