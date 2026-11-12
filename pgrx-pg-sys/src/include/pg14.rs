@@ -182,18 +182,18 @@ pub const MAXIMUM_ALIGNOF: u32 = 8;
 pub const MEMSET_LOOP_LIMIT: u32 = 1024;
 pub const PACKAGE_BUGREPORT: &::core::ffi::CStr = c"pgsql-bugs@lists.postgresql.org";
 pub const PACKAGE_NAME: &::core::ffi::CStr = c"PostgreSQL";
-pub const PACKAGE_STRING: &::core::ffi::CStr = c"PostgreSQL 14.24";
+pub const PACKAGE_STRING: &::core::ffi::CStr = c"PostgreSQL 14.25";
 pub const PACKAGE_TARNAME: &::core::ffi::CStr = c"postgresql";
 pub const PACKAGE_URL: &::core::ffi::CStr = c"https://www.postgresql.org/";
-pub const PACKAGE_VERSION: &::core::ffi::CStr = c"14.24";
+pub const PACKAGE_VERSION: &::core::ffi::CStr = c"14.25";
 pub const PG_KRB_SRVNAM: &::core::ffi::CStr = c"postgres";
 pub const PG_MAJORVERSION: &::core::ffi::CStr = c"14";
 pub const PG_MAJORVERSION_NUM: u32 = 14;
-pub const PG_MINORVERSION_NUM: u32 = 24;
+pub const PG_MINORVERSION_NUM: u32 = 25;
 pub const PG_USE_STDBOOL: u32 = 1;
-pub const PG_VERSION: &::core::ffi::CStr = c"14.24";
-pub const PG_VERSION_NUM: u32 = 140024;
-pub const PG_VERSION_STR : & :: core :: ffi :: CStr = c"PostgreSQL 14.24 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0, 64-bit" ;
+pub const PG_VERSION: &::core::ffi::CStr = c"14.25";
+pub const PG_VERSION_NUM: u32 = 140025;
+pub const PG_VERSION_STR : & :: core :: ffi :: CStr = c"PostgreSQL 14.25 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0, 64-bit" ;
 pub const RELSEG_SIZE: u32 = 131072;
 pub const SIZEOF_BOOL: u32 = 1;
 pub const SIZEOF_LONG: u32 = 8;
@@ -251,7 +251,7 @@ pub const PG_BINARY_A: &::core::ffi::CStr = c"a";
 pub const PG_BINARY_R: &::core::ffi::CStr = c"r";
 pub const PG_BINARY_W: &::core::ffi::CStr = c"w";
 pub const PGINVALID_SOCKET: i32 = -1;
-pub const PG_BACKEND_VERSIONSTR: &::core::ffi::CStr = c"postgres (PostgreSQL) 14.24\n";
+pub const PG_BACKEND_VERSIONSTR: &::core::ffi::CStr = c"postgres (PostgreSQL) 14.25\n";
 pub const EXE: &::core::ffi::CStr = c"";
 pub const DEVNULL: &::core::ffi::CStr = c"/dev/null";
 pub const USE_REPL_SNPRINTF: u32 = 1;
@@ -347,6 +347,7 @@ pub const LP_REDIRECT: u32 = 2;
 pub const LP_DEAD: u32 = 3;
 pub const SpecTokenOffsetNumber: u32 = 65534;
 pub const MovedPartitionsOffsetNumber: u32 = 65533;
+pub const VersionedDatumOffsetNumber: u32 = 65532;
 pub const DSM_IMPL_POSIX: u32 = 1;
 pub const DSM_IMPL_SYSV: u32 = 2;
 pub const DSM_IMPL_WINDOWS: u32 = 3;
@@ -372,6 +373,10 @@ pub const ExclusiveLock: u32 = 7;
 pub const AccessExclusiveLock: u32 = 8;
 pub const MaxLockMode: u32 = 8;
 pub const InplaceUpdateTupleLock: u32 = 7;
+pub const InvalidXLogRecPtr: u32 = 0;
+pub const PG_O_DIRECT: u32 = 16384;
+pub const OPEN_SYNC_FLAG: u32 = 1052672;
+pub const OPEN_DATASYNC_FLAG: u32 = 4096;
 pub const AttributeRelationId: Oid = Oid(1249);
 pub const AttributeRelation_Rowtype_Id: u32 = 75;
 pub const Anum_pg_attribute_attrelid: u32 = 1;
@@ -404,6 +409,7 @@ pub const Natts_pg_attribute: u32 = 26;
 pub const ATTRIBUTE_IDENTITY_ALWAYS: u8 = 97u8;
 pub const ATTRIBUTE_IDENTITY_BY_DEFAULT: u8 = 100u8;
 pub const ATTRIBUTE_GENERATED_STORED: u8 = 115u8;
+pub const ATTRIBUTE_VERSION_ATTOPTION: &::core::ffi::CStr = c"pg_attver";
 pub const AttributeRelidNameIndexId: u32 = 2658;
 pub const AttributeRelidNumIndexId: u32 = 2659;
 pub const AGGSPLITOP_COMBINE: u32 = 1;
@@ -413,10 +419,6 @@ pub const AGGSPLITOP_DESERIALIZE: u32 = 8;
 pub const BITS_PER_BITMAPWORD: u32 = 64;
 pub const RELCACHE_INIT_FILENAME: &::core::ffi::CStr = c"pg_internal.init";
 pub const FIELDNO_HEAPTUPLEDATA_DATA: u32 = 3;
-pub const InvalidXLogRecPtr: u32 = 0;
-pub const PG_O_DIRECT: u32 = 16384;
-pub const OPEN_SYNC_FLAG: u32 = 1052672;
-pub const OPEN_DATASYNC_FLAG: u32 = 4096;
 pub const MAX_TIMESTAMP_PRECISION: u32 = 6;
 pub const MAX_INTERVAL_PRECISION: u32 = 6;
 pub const TS_PREC_INV: f64 = 1000000.0;
@@ -741,6 +743,7 @@ pub const HEAP_MOVED_OFF: u32 = 16384;
 pub const HEAP_MOVED_IN: u32 = 32768;
 pub const HEAP_MOVED: u32 = 49152;
 pub const HEAP_XACT_MASK: u32 = 65520;
+pub const HEAP_IS_DATUM: u32 = 3072;
 pub const HEAP_XMAX_BITS: u32 = 7376;
 pub const HEAP_NATTS_MASK: u32 = 2047;
 pub const HEAP_KEYS_UPDATED: u32 = 8192;
@@ -6260,6 +6263,7 @@ pub const F_RANGE_INTERSECT_AGG_ANYRANGE: u32 = 4450;
 pub const F_RANGE_CONTAINS_MULTIRANGE: u32 = 4541;
 pub const F_MULTIRANGE_CONTAINED_BY_RANGE: u32 = 4542;
 pub const F_PG_LOG_BACKEND_MEMORY_CONTEXTS: u32 = 4543;
+pub const F_BINARY_UPGRADE_SET_NEXT_ATTRIBUTE_VERSIONS: u32 = 4551;
 pub const F_PG_EVENT_TRIGGER_TABLE_REWRITE_OID: Oid = Oid(4566);
 pub const F_PG_EVENT_TRIGGER_TABLE_REWRITE_REASON: u32 = 4567;
 pub const F_PG_EVENT_TRIGGER_DDL_COMMANDS: u32 = 4568;
@@ -7449,6 +7453,10 @@ impl Default for xl_standby_lock {
         }
     }
 }
+pub type XLogRecPtr = uint64;
+pub type XLogSegNo = uint64;
+pub type TimeLineID = uint32;
+pub type RepOriginId = uint16;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct FormData_pg_attribute {
@@ -8256,10 +8264,6 @@ impl Default for HeapTupleData {
     }
 }
 pub type HeapTuple = *mut HeapTupleData;
-pub type XLogRecPtr = uint64;
-pub type XLogSegNo = uint64;
-pub type TimeLineID = uint32;
-pub type RepOriginId = uint16;
 pub type Timestamp = int64;
 pub type TimestampTz = int64;
 pub type TimeOffset = int64;
@@ -9045,6 +9049,12 @@ pub struct MinimalTupleData {
     pub t_infomask: uint16,
     pub t_hoff: uint8,
     pub t_bits: __IncompleteArrayField<bits8>,
+}
+pub mod CompositeTypeMismatchOptions {
+    pub type Type = ::core::ffi::c_uint;
+    pub const COMPOSITE_TYPE_MISMATCH_ERROR: Type = 0;
+    pub const COMPOSITE_TYPE_MISMATCH_WARN: Type = 1;
+    pub const COMPOSITE_TYPE_MISMATCH_DISABLED: Type = 2;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -12454,6 +12464,7 @@ pub struct SubPlanState {
     pub hashnulls: TupleHashTable,
     pub havehashrows: bool,
     pub havenullrows: bool,
+    pub hashtablestale: bool,
     pub hashtablecxt: MemoryContext,
     pub hashtempcxt: MemoryContext,
     pub innerecontext: *mut ExprContext,
@@ -15473,6 +15484,7 @@ pub mod WCOKind {
     pub const WCO_RLS_INSERT_CHECK: Type = 1;
     pub const WCO_RLS_UPDATE_CHECK: Type = 2;
     pub const WCO_RLS_CONFLICT_CHECK: Type = 3;
+    pub const WCO_VIEW_CONFLICT_CHECK: Type = 4;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -25993,6 +26005,12 @@ pub mod XLogRedoAction {
     pub const BLK_RESTORED: Type = 2;
     pub const BLK_NOTFOUND: Type = 3;
 }
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct BinaryUpgradeAttributeVersions {
+    pub natts: ::core::ffi::c_int,
+    pub versions: __IncompleteArrayField<XLogRecPtr>,
+}
 pub mod DependencyType {
     pub type Type = ::core::ffi::c_uint;
     pub const DEPENDENCY_NORMAL: Type = 110;
@@ -29330,10 +29348,9 @@ impl Default for ExprEvalStep__bindgen_ty_1__bindgen_ty_25 {
 #[derive(Debug, Copy, Clone)]
 pub struct ExprEvalStep__bindgen_ty_1__bindgen_ty_26 {
     pub fstore: *mut FieldStore,
-    pub rowcache: *mut ExprEvalRowtypeCache,
+    pub tupdesc: TupleDesc,
     pub values: *mut Datum,
     pub nulls: *mut bool,
-    pub ncolumns: ::core::ffi::c_int,
 }
 impl Default for ExprEvalStep__bindgen_ty_1__bindgen_ty_26 {
     fn default() -> Self {
@@ -34772,6 +34789,7 @@ pub struct ReorderBufferChange__bindgen_ty_1__bindgen_ty_4 {
     pub cmin: CommandId,
     pub cmax: CommandId,
     pub combocid: CommandId,
+    pub subxid: TransactionId,
 }
 impl Default for ReorderBufferChange__bindgen_ty_1__bindgen_ty_4 {
     fn default() -> Self {
@@ -38879,6 +38897,7 @@ unsafe extern "C-unwind" {
     pub fn ReThrowError(edata: *mut ErrorData) -> !;
     pub fn ThrowErrorData(edata: *mut ErrorData);
     pub fn GetErrorContextStack() -> *mut ::core::ffi::c_char;
+    pub fn HaveCompleteError() -> bool;
     pub static mut emit_log_hook: emit_log_hook_type;
     pub static mut Log_error_verbosity: ::core::ffi::c_int;
     pub static mut Log_line_prefix: *mut ::core::ffi::c_char;
@@ -38976,6 +38995,9 @@ unsafe extern "C-unwind" {
     pub fn pg_detoast_datum_copy(datum: *mut varlena) -> *mut varlena;
     pub fn pg_detoast_datum_slice(datum: *mut varlena, first: int32, count: int32) -> *mut varlena;
     pub fn pg_detoast_datum_packed(datum: *mut varlena) -> *mut varlena;
+    pub fn DatumGetHeapTupleHeader(t: Datum) -> *mut HeapTupleHeaderData;
+    pub fn DatumGetHeapTupleHeaderExt(t: Datum, was_datum: *mut bool) -> *mut HeapTupleHeaderData;
+    pub fn DatumGetHeapTupleHeaderCopy(t: Datum) -> *mut HeapTupleHeaderData;
     pub fn DirectFunctionCall1Coll(func: PGFunction, collation: Oid, arg1: Datum) -> Datum;
     pub fn DirectFunctionCall2Coll(
         func: PGFunction,
@@ -39689,6 +39711,8 @@ unsafe extern "C-unwind" {
     pub fn CreateTupleDescCopy(tupdesc: TupleDesc) -> TupleDesc;
     pub fn CreateTupleDescCopyConstr(tupdesc: TupleDesc) -> TupleDesc;
     pub fn TupleDescCopy(dst: TupleDesc, src: TupleDesc);
+    pub fn TupleDescCopySize(src: TupleDesc) -> Size;
+    pub fn TupleDescCopySized(dst: TupleDesc, dstsize: Size, src: TupleDesc);
     pub fn TupleDescCopyEntry(
         dst: TupleDesc,
         dstAttno: AttrNumber,
@@ -39698,6 +39722,10 @@ unsafe extern "C-unwind" {
     pub fn FreeTupleDesc(tupdesc: TupleDesc);
     pub fn IncrTupleDescRefCount(tupdesc: TupleDesc);
     pub fn DecrTupleDescRefCount(tupdesc: TupleDesc);
+    pub fn TupleDescGetVersion(tupdesc: TupleDesc) -> XLogRecPtr;
+    pub fn TupleDescSetVersion(tupdesc: TupleDesc, version: XLogRecPtr);
+    pub fn TupleDescGetAttrVersion(tupdesc: TupleDesc, attnum: AttrNumber) -> XLogRecPtr;
+    pub fn TupleDescSetAttrVersion(tupdesc: TupleDesc, attnum: AttrNumber, version: XLogRecPtr);
     pub fn equalTupleDescs(tupdesc1: TupleDesc, tupdesc2: TupleDesc) -> bool;
     pub fn hashTupleDesc(tupdesc: TupleDesc) -> uint32;
     pub fn TupleDescInitEntry(
@@ -40220,6 +40248,55 @@ unsafe extern "C-unwind" {
     pub fn NormalTransactionIdOlder(a: TransactionId, b: TransactionId) -> TransactionId;
     #[link_name = "FullTransactionIdNewer__pgrx_cshim"]
     pub fn FullTransactionIdNewer(a: FullTransactionId, b: FullTransactionId) -> FullTransactionId;
+    #[link_name = "pg_add_s16_overflow__pgrx_cshim"]
+    pub fn pg_add_s16_overflow(a: int16, b: int16, result: *mut int16) -> bool;
+    #[link_name = "pg_sub_s16_overflow__pgrx_cshim"]
+    pub fn pg_sub_s16_overflow(a: int16, b: int16, result: *mut int16) -> bool;
+    #[link_name = "pg_mul_s16_overflow__pgrx_cshim"]
+    pub fn pg_mul_s16_overflow(a: int16, b: int16, result: *mut int16) -> bool;
+    #[link_name = "pg_add_s32_overflow__pgrx_cshim"]
+    pub fn pg_add_s32_overflow(a: int32, b: int32, result: *mut int32) -> bool;
+    #[link_name = "pg_sub_s32_overflow__pgrx_cshim"]
+    pub fn pg_sub_s32_overflow(a: int32, b: int32, result: *mut int32) -> bool;
+    #[link_name = "pg_mul_s32_overflow__pgrx_cshim"]
+    pub fn pg_mul_s32_overflow(a: int32, b: int32, result: *mut int32) -> bool;
+    #[link_name = "pg_add_s64_overflow__pgrx_cshim"]
+    pub fn pg_add_s64_overflow(a: int64, b: int64, result: *mut int64) -> bool;
+    #[link_name = "pg_sub_s64_overflow__pgrx_cshim"]
+    pub fn pg_sub_s64_overflow(a: int64, b: int64, result: *mut int64) -> bool;
+    #[link_name = "pg_mul_s64_overflow__pgrx_cshim"]
+    pub fn pg_mul_s64_overflow(a: int64, b: int64, result: *mut int64) -> bool;
+    #[link_name = "pg_add_u16_overflow__pgrx_cshim"]
+    pub fn pg_add_u16_overflow(a: uint16, b: uint16, result: *mut uint16) -> bool;
+    #[link_name = "pg_sub_u16_overflow__pgrx_cshim"]
+    pub fn pg_sub_u16_overflow(a: uint16, b: uint16, result: *mut uint16) -> bool;
+    #[link_name = "pg_mul_u16_overflow__pgrx_cshim"]
+    pub fn pg_mul_u16_overflow(a: uint16, b: uint16, result: *mut uint16) -> bool;
+    #[link_name = "pg_add_u32_overflow__pgrx_cshim"]
+    pub fn pg_add_u32_overflow(a: uint32, b: uint32, result: *mut uint32) -> bool;
+    #[link_name = "pg_sub_u32_overflow__pgrx_cshim"]
+    pub fn pg_sub_u32_overflow(a: uint32, b: uint32, result: *mut uint32) -> bool;
+    #[link_name = "pg_mul_u32_overflow__pgrx_cshim"]
+    pub fn pg_mul_u32_overflow(a: uint32, b: uint32, result: *mut uint32) -> bool;
+    #[link_name = "pg_add_u64_overflow__pgrx_cshim"]
+    pub fn pg_add_u64_overflow(a: uint64, b: uint64, result: *mut uint64) -> bool;
+    #[link_name = "pg_sub_u64_overflow__pgrx_cshim"]
+    pub fn pg_sub_u64_overflow(a: uint64, b: uint64, result: *mut uint64) -> bool;
+    #[link_name = "pg_mul_u64_overflow__pgrx_cshim"]
+    pub fn pg_mul_u64_overflow(a: uint64, b: uint64, result: *mut uint64) -> bool;
+    #[link_name = "pg_add_size_overflow__pgrx_cshim"]
+    pub fn pg_add_size_overflow(a: usize, b: usize, result: *mut usize) -> bool;
+    #[link_name = "pg_sub_size_overflow__pgrx_cshim"]
+    pub fn pg_sub_size_overflow(a: usize, b: usize, result: *mut usize) -> bool;
+    #[link_name = "pg_mul_size_overflow__pgrx_cshim"]
+    pub fn pg_mul_size_overflow(a: usize, b: usize, result: *mut usize) -> bool;
+    #[link_name = "att_addlength_pointer_overflow__pgrx_cshim"]
+    pub fn att_addlength_pointer_overflow(
+        cur_offset: Size,
+        attlen: int16,
+        attptr: *const ::core::ffi::c_void,
+        overflow: *mut bool,
+    ) -> Size;
     pub fn PageInit(page: Page, pageSize: Size, specialSize: Size);
     pub fn PageIsVerifiedExtended(
         page: Page,
@@ -40254,10 +40331,33 @@ unsafe extern "C-unwind" {
     ) -> bool;
     pub fn PageSetChecksumCopy(page: Page, blkno: BlockNumber) -> *mut ::core::ffi::c_char;
     pub fn PageSetChecksumInplace(page: Page, blkno: BlockNumber);
+    #[link_name = "HeapTupleHeaderIsDatum__pgrx_cshim"]
+    pub fn HeapTupleHeaderIsDatum(tup: *const HeapTupleHeaderData) -> bool;
+    #[link_name = "HeapTupleHeaderSetDatum__pgrx_cshim"]
+    pub fn HeapTupleHeaderSetDatum(tup: *mut HeapTupleHeaderData);
+    #[link_name = "HeapTupleHeaderClearDatum__pgrx_cshim"]
+    pub fn HeapTupleHeaderClearDatum(tup: *mut HeapTupleHeaderData);
+    #[link_name = "HeapTupleHeaderGetTypMod__pgrx_cshim"]
+    pub fn HeapTupleHeaderGetTypMod(tup: *const HeapTupleHeaderData) -> int32;
+    #[link_name = "HeapTupleHeaderReallyIsDatum__pgrx_cshim"]
+    pub fn HeapTupleHeaderReallyIsDatum(tup: *const HeapTupleHeaderData) -> bool;
+    #[link_name = "HeapTupleHeaderIsVersionedDatum__pgrx_cshim"]
+    pub fn HeapTupleHeaderIsVersionedDatum(tup: *const HeapTupleHeaderData) -> bool;
+    #[link_name = "HeapTupleHeaderSetVersion__pgrx_cshim"]
+    pub fn HeapTupleHeaderSetVersion(tup: *mut HeapTupleHeaderData, version: XLogRecPtr);
+    #[link_name = "HeapTupleHeaderGetVersion__pgrx_cshim"]
+    pub fn HeapTupleHeaderGetVersion(tup: *const HeapTupleHeaderData) -> XLogRecPtr;
+    pub static mut composite_type_mismatch: ::core::ffi::c_int;
     pub fn heap_compute_data_size(
         tupleDesc: TupleDesc,
         values: *mut Datum,
         isnull: *mut bool,
+    ) -> Size;
+    pub fn heap_compute_data_size_ext(
+        tupleDesc: TupleDesc,
+        values: *const Datum,
+        isnull: *const bool,
+        allow_huge: bool,
     ) -> Size;
     pub fn heap_fill_tuple(
         tupleDesc: TupleDesc,
@@ -40268,6 +40368,8 @@ unsafe extern "C-unwind" {
         infomask: *mut uint16,
         bit: *mut bits8,
     );
+    pub fn heap_tuple_set_datum(tup: HeapTupleHeader, tupleDesc: TupleDesc, len: uint32);
+    pub fn heap_datum_update_type(tup: HeapTupleHeader, tupleDesc: TupleDesc);
     pub fn heap_attisnull(tup: HeapTuple, attnum: ::core::ffi::c_int, tupleDesc: TupleDesc)
     -> bool;
     pub fn nocachegetattr(tup: HeapTuple, attnum: ::core::ffi::c_int, att: TupleDesc) -> Datum;
@@ -40305,6 +40407,7 @@ unsafe extern "C-unwind" {
         replValues: *mut Datum,
         replIsnull: *mut bool,
     ) -> HeapTuple;
+    pub fn heap_datum_check(tup: HeapTupleHeader, tupleDesc: TupleDesc);
     pub fn heap_deform_tuple(
         tuple: HeapTuple,
         tupleDesc: TupleDesc,
@@ -42774,7 +42877,7 @@ unsafe extern "C-unwind" {
     );
     pub fn ginInsertCleanup(
         ginstate: *mut GinState,
-        full_clean: bool,
+        must_empty_list: bool,
         fill_fsm: bool,
         forceCleanup: bool,
         stats: *mut IndexBulkDeleteResult,
@@ -45090,6 +45193,7 @@ unsafe extern "C-unwind" {
     );
     pub fn PortalGetPrimaryStmt(portal: Portal) -> *mut PlannedStmt;
     pub fn PortalCreateHoldStore(portal: Portal);
+    pub fn DropQueryEnvPortals(queryEnv: *mut QueryEnvironment);
     pub fn PortalHashTableDeleteAll();
     pub fn ThereAreNoReadyPortals() -> bool;
     pub fn HoldPinnedPortals();
@@ -45202,6 +45306,8 @@ unsafe extern "C-unwind" {
         filler: fill_string_relopt,
         offset: ::core::ffi::c_int,
     );
+    pub fn attoptions_get_version(attoptions: Datum, isnull: bool) -> XLogRecPtr;
+    pub fn attoptions_set_version(attoptions: Datum, isnull: bool, version: XLogRecPtr) -> Datum;
     pub fn transformRelOptions(
         oldOptions: Datum,
         defList: *mut List,
@@ -45769,6 +45875,7 @@ unsafe extern "C-unwind" {
     pub static mut binary_upgrade_next_heap_pg_class_oid: Oid;
     pub static mut binary_upgrade_next_index_pg_class_oid: Oid;
     pub static mut binary_upgrade_next_toast_pg_class_oid: Oid;
+    pub static mut binary_upgrade_next_attribute_versions: *mut BinaryUpgradeAttributeVersions;
     pub static mut binary_upgrade_next_pg_enum_oid: Oid;
     pub static mut binary_upgrade_next_pg_authid_oid: Oid;
     pub static mut binary_upgrade_record_init_privs: bool;
@@ -45776,6 +45883,7 @@ unsafe extern "C-unwind" {
     pub fn IsToastRelation(relation: Relation) -> bool;
     pub fn IsCatalogRelation(relation: Relation) -> bool;
     pub fn IsInplaceUpdateRelation(relation: Relation) -> bool;
+    pub fn HasVersionedAttributes(relation: Relation) -> bool;
     pub fn IsSystemClass(relid: Oid, reltuple: Form_pg_class) -> bool;
     pub fn IsToastClass(reltuple: Form_pg_class) -> bool;
     pub fn IsCatalogRelationOid(relid: Oid) -> bool;
@@ -45819,6 +45927,8 @@ unsafe extern "C-unwind" {
     pub fn getObjectClass(object: *const ObjectAddress) -> ObjectClass::Type;
     pub fn CheckUsageOnTypesInExpr(expr: *mut Node, rtable: *mut List, roleid: Oid);
     pub fn CheckUsageOnTypesInSingleRelExpr(expr: *mut Node, relId: Oid, roleid: Oid);
+    pub fn CheckTypeDependencyInExpr(expr: *mut Node, rtable: *mut List, typeId: Oid) -> bool;
+    pub fn CheckTypeDependencyInSingleRelExpr(expr: *mut Node, relId: Oid, typeId: Oid) -> bool;
     pub fn new_object_addresses() -> *mut ObjectAddresses;
     pub fn add_exact_object_address(object: *const ObjectAddress, addrs: *mut ObjectAddresses);
     pub fn object_address_present(
@@ -46023,6 +46133,18 @@ unsafe extern "C-unwind" {
         attoptions: *mut Datum,
         indstate: CatalogIndexState,
     );
+    pub fn GetNextAttributeVersion() -> XLogRecPtr;
+    pub fn SetAttributeVersionInTuple(
+        attrelation: Relation,
+        tuple: HeapTuple,
+        version: XLogRecPtr,
+    ) -> HeapTuple;
+    pub fn SetAttributeVersions(rel: Relation, fromAttnum: AttrNumber, version: XLogRecPtr);
+    pub fn CheckAttributeVersions(
+        td: TupleDesc,
+        relname: *const ::core::ffi::c_char,
+        elevel: ::core::ffi::c_int,
+    ) -> bool;
     pub fn InsertPgClassTuple(
         pg_class_desc: Relation,
         new_rel_desc: Relation,
@@ -46809,6 +46931,13 @@ unsafe extern "C-unwind" {
         makeExtensionDep: bool,
         isUpdate: bool,
     ) -> ObjectAddress;
+    pub fn UpdateOperatorLinks(
+        baseId: Oid,
+        commId: Oid,
+        negId: Oid,
+        oprResultId: Oid,
+        isDelete: bool,
+    );
     pub fn OperatorUpd(baseId: Oid, commId: Oid, negId: Oid, isDelete: bool);
     pub fn ProcedureCreate(
         procedureName: *const ::core::ffi::c_char,
@@ -47293,6 +47422,7 @@ unsafe extern "C-unwind" {
     pub fn RI_Initial_Check(trigger: *mut Trigger, fk_rel: Relation, pk_rel: Relation) -> bool;
     pub fn RI_PartitionRemove_Check(trigger: *mut Trigger, fk_rel: Relation, pk_rel: Relation);
     pub fn RI_FKey_trigger_type(tgfoid: Oid) -> ::core::ffi::c_int;
+    pub fn AtEOXact_RI(isCommit: bool);
     pub fn ReceiveCopyBegin(cstate: CopyFromState);
     pub fn ReceiveCopyBinaryHeader(cstate: CopyFromState);
     pub fn ExecCreateTableAs(
@@ -47322,6 +47452,7 @@ unsafe extern "C-unwind" {
     -> ObjectAddress;
     pub fn get_database_oid(dbname: *const ::core::ffi::c_char, missing_ok: bool) -> Oid;
     pub fn get_database_name(dbid: Oid) -> *mut ::core::ffi::c_char;
+    pub fn have_createdb_privilege() -> bool;
     pub fn check_encoding_locale_matches(
         encoding: ::core::ffi::c_int,
         collate: *const ::core::ffi::c_char,
@@ -48105,6 +48236,11 @@ unsafe extern "C-unwind" {
     pub fn CheckCmdReplicaIdentity(rel: Relation, cmd: CmdType::Type);
     pub fn CheckSubscriptionRelkind(
         relkind: ::core::ffi::c_char,
+        nspname: *const ::core::ffi::c_char,
+        relname: *const ::core::ffi::c_char,
+    );
+    pub fn CheckSubscriptionTargetRel(
+        relid: Oid,
         nspname: *const ::core::ffi::c_char,
         relname: *const ::core::ffi::c_char,
     );
@@ -51226,6 +51362,7 @@ unsafe extern "C-unwind" {
     pub fn pull_vars_of_level(node: *mut Node, levelsup: ::core::ffi::c_int) -> *mut List;
     pub fn contain_var_clause(node: *mut Node) -> bool;
     pub fn contain_vars_of_level(node: *mut Node, levelsup: ::core::ffi::c_int) -> bool;
+    pub fn contain_var_or_representative(node: *mut Node) -> bool;
     pub fn locate_var_of_level(node: *mut Node, levelsup: ::core::ffi::c_int)
     -> ::core::ffi::c_int;
     pub fn pull_var_clause(node: *mut Node, flags: ::core::ffi::c_int) -> *mut List;
@@ -53847,6 +53984,12 @@ unsafe extern "C-unwind" {
     pub fn ReorderBufferAbort(arg1: *mut ReorderBuffer, arg2: TransactionId, lsn: XLogRecPtr);
     pub fn ReorderBufferAbortOld(arg1: *mut ReorderBuffer, xid: TransactionId);
     pub fn ReorderBufferForget(arg1: *mut ReorderBuffer, arg2: TransactionId, lsn: XLogRecPtr);
+    pub fn ReorderBufferCleanupAbortedTupleCids(
+        rb: *mut ReorderBuffer,
+        xid: TransactionId,
+        nsubxacts: ::core::ffi::c_int,
+        subxacts: *mut TransactionId,
+    );
     pub fn ReorderBufferInvalidate(arg1: *mut ReorderBuffer, arg2: TransactionId, lsn: XLogRecPtr);
     pub fn ReorderBufferSetBaseSnapshot(
         arg1: *mut ReorderBuffer,
@@ -53867,11 +54010,12 @@ unsafe extern "C-unwind" {
         cid: CommandId,
     );
     pub fn ReorderBufferAddNewTupleCids(
-        arg1: *mut ReorderBuffer,
-        arg2: TransactionId,
+        rb: *mut ReorderBuffer,
+        xid: TransactionId,
+        subxid: TransactionId,
         lsn: XLogRecPtr,
         node: RelFileNode,
-        pt: ItemPointerData,
+        tid: ItemPointerData,
         cmin: CommandId,
         cmax: CommandId,
         combocid: CommandId,
@@ -58154,6 +58298,7 @@ unsafe extern "C-unwind" {
     pub fn range_contains_multirange(fcinfo: FunctionCallInfo) -> Datum;
     pub fn multirange_contained_by_range(fcinfo: FunctionCallInfo) -> Datum;
     pub fn pg_log_backend_memory_contexts(fcinfo: FunctionCallInfo) -> Datum;
+    pub fn binary_upgrade_set_next_attribute_versions(fcinfo: FunctionCallInfo) -> Datum;
     pub fn pg_event_trigger_table_rewrite_oid(fcinfo: FunctionCallInfo) -> Datum;
     pub fn pg_event_trigger_table_rewrite_reason(fcinfo: FunctionCallInfo) -> Datum;
     pub fn pg_event_trigger_ddl_commands(fcinfo: FunctionCallInfo) -> Datum;
