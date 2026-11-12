@@ -105,6 +105,25 @@ mod tests {
     }
 
     #[pg_test]
+    fn test_leak_and_drop_setup_panic_drops_value() {
+        let did_drop = Arc::new(AtomicBool::new(false));
+        let result = std::panic::catch_unwind(|| {
+            // An unresolved transient context panics before calling PostgreSQL.
+            let mut context = PgMemoryContexts::Transient {
+                parent: std::ptr::null_mut(),
+                name: "test",
+                min_context_size: 4096,
+                initial_block_size: 4096,
+                max_block_size: 4096,
+            };
+            context.leak_and_drop_on_delete(TestObject { did_drop: did_drop.clone() });
+        });
+
+        assert!(result.is_err());
+        assert!(did_drop.load(Ordering::SeqCst));
+    }
+
+    #[pg_test]
     fn parent() {
         unsafe {
             // SAFETY:  We know these two PgMemoryContext variants are valid b/c pgrx sets them up for us

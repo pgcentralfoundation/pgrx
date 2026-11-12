@@ -585,18 +585,19 @@ impl PgMemoryContexts {
             drop(boxed);
         }
 
-        let leaked_ptr = Box::leak(Box::new(v));
         unsafe {
             // SAFETY:  we know the result of `self.palloc_struct()` is a valid pointer and its
             // okay that it's uninitialized because its fields are just pointers and we set them
             // immediately after
             let callback = self.palloc_struct::<pg_sys::MemoryContextCallback>();
+            // Keep Rust ownership until callback allocation succeeds.
+            let leaked_ptr = Box::leak(Box::new(v));
             (*callback).func = Some(drop_on_delete::<T>);
             (*callback).arg = leaked_ptr as *mut T as void_mut_ptr;
 
             pg_sys::MemoryContextRegisterResetCallback(self.value(), callback);
+            leaked_ptr
         }
-        leaked_ptr
     }
 
     /// Execute in a context and restore its predecessor after a normal return.
