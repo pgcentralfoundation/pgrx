@@ -289,13 +289,17 @@ impl<'mcx> PgHeapTuple<'mcx, AllocatedByRust> {
     /// CREATE TYPE my_composite AS (name text, age i32);
     /// ```
     ///
+    /// The Datum is read with [`pg_sys::datum_get_heap_tuple_header`]. When built against a
+    /// release that versions composite datums (PostgreSQL 14.25, 15.20, 16.16, 17.12, 18.7,
+    /// 19rc2, and later), reading an attribute of a datum formed under a definition of its type
+    /// that the current one cannot read raises an ERROR.
+    ///
     /// ## Safety
     ///
     /// This function is unsafe as we cannot guarantee that the provided Datum is a valid [pg_sys::HeapTupleHeader]
     /// pointer.
     pub unsafe fn from_composite_datum(composite: pg_sys::Datum) -> Self {
-        let htup_header =
-            pg_sys::pg_detoast_datum(composite.cast_mut_ptr()) as pg_sys::HeapTupleHeader;
+        let htup_header = pg_sys::datum_get_heap_tuple_header(composite);
         let tup_type = crate::heap_tuple_header_get_type_id(htup_header);
         let tup_typmod = crate::heap_tuple_header_get_typmod(htup_header);
         let tupdesc = pg_sys::lookup_rowtype_tupdesc(tup_type, tup_typmod);

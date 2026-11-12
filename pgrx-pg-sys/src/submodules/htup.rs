@@ -310,6 +310,12 @@ unsafe fn fetch_att(T: *mut std::os::raw::c_char, attbyval: bool, attlen: i16) -
 /// - `tupleDesc` is a pointer to the structure describing the row and all its fields.
 ///
 /// These things must complement each other correctly
+///
+/// When built against a release that versions composite datums (PostgreSQL 14.25, 15.20,
+/// 16.16, 17.12, 18.7, 19rc2, and later), this first checks a versioned composite datum against
+/// `tupleDesc` with PostgreSQL's `heap_datum_check`, as `heap_getattr` does. That raises an
+/// ERROR if the datum was formed under a definition of its row type that `tupleDesc` cannot
+/// read.
 #[inline(always)]
 pub unsafe fn heap_getattr(
     tup: *mut HeapTupleData,
@@ -320,6 +326,9 @@ pub unsafe fn heap_getattr(
     // static inline Datum
     // heap_getattr(HeapTuple tup, int attnum, TupleDesc tupleDesc, bool *isnull)
     // {
+    // 	if (HeapTupleHeaderIsVersionedDatum(tup->t_data))
+    // 		heap_datum_check(tup->t_data, tupleDesc);
+    //
     // 	if (attnum > 0)
     // 	{
     // 		if (attnum > (int) HeapTupleHeaderGetNatts(tup->t_data))
@@ -330,9 +339,13 @@ pub unsafe fn heap_getattr(
     // 	else
     // 		return heap_getsysattr(tup, attnum, tupleDesc, isnull);
     // }
+    //
+    // Releases before composite datum versioning have no version check.
 
     unsafe {
         // SAFETY:  caller has asserted that `tup` and `tupleDesc` are valid pointers
+        #[cfg(pgrx_composite_datum_versioning)]
+        check_datum_version((*tup).t_data, tupleDesc);
         if attnum > 0 {
             if attnum > HeapTupleHeaderGetNatts((*tup).t_data) as i32 {
                 getmissingattr(tupleDesc, attnum, isnull)
@@ -343,6 +356,80 @@ pub unsafe fn heap_getattr(
             heap_getsysattr(tup, attnum, tupleDesc, isnull)
         }
     }
+}
+
+/// Raise an ERROR if `tup` is a versioned composite datum that `tupdesc` cannot read, as
+/// PostgreSQL's `heap_getattr` does before it reads an attribute.
+///
+/// # Safety
+///
+/// `tup` must point to a live tuple header and `tupdesc` to a live descriptor, and the call
+/// must run on the PostgreSQL backend thread.
+#[cfg(pgrx_composite_datum_versioning)]
+#[inline(always)]
+unsafe fn check_datum_version(tup: *mut HeapTupleHeaderData, tupdesc: TupleDesc) {
+    // HeapTupleHeaderIsVersionedDatum: the tuple is marked as a datum, and its t_ctid's offset
+    // is the version marker rather than a real offset.
+    // SAFETY: the caller supplies a live tuple header and descriptor on the backend thread.
+    // heap_datum_check requires a versioned datum, which the condition confirms.
+    unsafe {
+        let is_datum =
+            (*tup).t_infomask & crate::HEAP_IS_DATUM as u16 == crate::HEAP_IS_DATUM as u16;
+        if is_datum && (*tup).t_ctid.ip_posid == crate::VersionedDatumOffsetNumber as u16 {
+            crate::heap_datum_check(tup, tupdesc);
+        }
+    }
+}
+
+/// Return the tuple header of composite `datum`, as PostgreSQL's `DatumGetHeapTupleHeader`
+/// does. It fully detoasts `datum`, and when built against a release that versions composite
+/// datums, it also copies and marks a datum formed by an earlier release, so that
+/// [`heap_getattr`] checks it.
+///
+/// # Safety
+///
+/// `datum` must point to a live composite varlena, and the call must run on the PostgreSQL
+/// backend thread. The result points into `datum` or into a copy allocated in
+/// `CurrentMemoryContext`, and is valid only while that memory is.
+#[cfg(pgrx_composite_datum_versioning)]
+#[inline]
+pub unsafe fn datum_get_heap_tuple_header(datum: Datum) -> *mut HeapTupleHeaderData {
+    // SAFETY: the caller supplies a live composite varlena on the backend thread. The
+    // function marks only a copy it allocates in CurrentMemoryContext, never `datum`.
+    unsafe { crate::DatumGetHeapTupleHeader(datum) }
+}
+
+/// Return the tuple header of composite `datum`, as PostgreSQL's `DatumGetHeapTupleHeader`
+/// macro does: it fully detoasts `datum`.
+///
+/// # Safety
+///
+/// `datum` must point to a live composite varlena, and the call must run on the PostgreSQL
+/// backend thread. The result points into `datum` or into a copy allocated in
+/// `CurrentMemoryContext`, and is valid only while that memory is.
+#[cfg(not(pgrx_composite_datum_versioning))]
+#[inline]
+pub unsafe fn datum_get_heap_tuple_header(datum: Datum) -> *mut HeapTupleHeaderData {
+    // SAFETY: the caller supplies a live composite varlena on the backend thread.
+    unsafe { crate::pg_detoast_datum(datum.cast_mut_ptr()).cast() }
+}
+
+/// Expand to the given items only when built against a release that versions composite
+/// datums, for tests of that check.
+#[doc(hidden)]
+#[cfg(pgrx_composite_datum_versioning)]
+#[macro_export]
+macro_rules! __pgrx_if_composite_datum_versioning {
+    ($($items:tt)*) => { $($items)* };
+}
+
+/// Expand to the given items only when built against a release that versions composite
+/// datums, for tests of that check.
+#[doc(hidden)]
+#[cfg(not(pgrx_composite_datum_versioning))]
+#[macro_export]
+macro_rules! __pgrx_if_composite_datum_versioning {
+    ($($items:tt)*) => {};
 }
 
 /// Fetch a user attribute's value as a Datum (might be either a

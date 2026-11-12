@@ -14,6 +14,10 @@ use std::num::NonZeroUsize;
 /// Given a `pg_sys::Datum` representing a composite row type, return a boxed `HeapTupleData`,
 /// which can be used by the various `heap_getattr` methods
 ///
+/// This reads `row` with [`pg_sys::datum_get_heap_tuple_header`], which fully detoasts it and,
+/// when built against a release that versions composite datums, marks a datum formed by an
+/// earlier release so that [`heap_getattr`] checks it.
+///
 /// ## Safety
 ///
 /// This function is safe, but if the provided `HeapTupleHeader` is null, it will `panic!()`
@@ -21,8 +25,7 @@ use std::num::NonZeroUsize;
 pub fn composite_row_type_make_tuple(
     row: pg_sys::Datum,
 ) -> PgBox<pg_sys::HeapTupleData, AllocatedByRust> {
-    let htup_header =
-        unsafe { pg_sys::pg_detoast_datum_packed(row.cast_mut_ptr()) } as pg_sys::HeapTupleHeader;
+    let htup_header = unsafe { pg_sys::datum_get_heap_tuple_header(row) };
     let mut tuple = unsafe { PgBox::<pg_sys::HeapTupleData>::alloc0() };
 
     tuple.t_len = heap_tuple_header_get_datum_length(htup_header) as u32;
@@ -61,14 +64,21 @@ pub unsafe fn heap_tuple_header_get_type_id(htup_header: pg_sys::HeapTupleHeader
 }
 
 /// ```c
-/// #define HeapTupleHeaderGetTypMod(tup) \
-/// ( \
-/// (tup)->t_choice.t_datum.datum_typmod \
-/// )
+/// static inline int32
+/// HeapTupleHeaderGetTypMod(const HeapTupleHeaderData *tup)
+/// {
+///     if (HeapTupleHeaderGetTypeId(tup) != RECORDOID)
+///         return -1;
+///     return tup->t_choice.t_datum.datum_typmod;
+/// }
 /// ```
+///
+/// PostgreSQL 14.25, 15.20, 16.16, 17.12, 18.7, and 19rc2 store part of a named composite
+/// datum's version in `datum_typmod`, where earlier releases always stored -1.
 #[inline]
 pub unsafe fn heap_tuple_header_get_typmod(htup_header: pg_sys::HeapTupleHeader) -> i32 {
-    htup_header.as_ref().unwrap().t_choice.t_datum.datum_typmod
+    let datum = &htup_header.as_ref().unwrap().t_choice.t_datum;
+    if datum.datum_typeid != pg_sys::RECORDOID { -1 } else { datum.datum_typmod }
 }
 
 /// Extract an attribute of a heap tuple and return it as Rust type.

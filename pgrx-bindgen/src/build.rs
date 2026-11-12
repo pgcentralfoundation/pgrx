@@ -147,6 +147,7 @@ impl bindgen::callbacks::ParseCallbacks for BindingOverride {
 
 pub fn main() -> eyre::Result<()> {
     println!("cargo:rustc-check-cfg=cfg(docsrs)");
+    println!("cargo:rustc-check-cfg=cfg(pgrx_composite_datum_versioning)");
     println!("cargo:rerun-if-env-changed=DOCS_RS");
 
     if env_tracked("DOCS_RS").as_deref() == Some("1") {
@@ -210,6 +211,14 @@ pub fn main() -> eyre::Result<()> {
         results.into_iter().try_for_each(|r| r)
     })?;
 
+    if let Ok(active_major_version) = active_pg_major_version()
+        && let Some((_, pg_config)) =
+            pg_configs.iter().find(|(major_version, _)| *major_version == active_major_version)
+        && versions_composite_datums(pg_config)?
+    {
+        println!("cargo:rustc-cfg=pgrx_composite_datum_versioning");
+    }
+
     if compile_cshim {
         let active_major_version = active_pg_major_version()?;
         let pg_config = pg_configs
@@ -223,6 +232,18 @@ pub fn main() -> eyre::Result<()> {
     }
 
     Ok(())
+}
+
+/// Whether `pg_config`'s headers version composite datums, as PostgreSQL 14.25, 15.20, 16.16,
+/// 17.12, 18.7, and 19rc2 began to (CVE-2026-6460). pgrx-pg-sys then checks a composite
+/// datum's version before reading its attributes, as PostgreSQL's `heap_getattr` does.
+fn versions_composite_datums(pg_config: &PgConfig) -> eyre::Result<bool> {
+    let header = pg_config.includedir_server()?.join("access").join("htup_details.h");
+    // A minor upgrade in place changes this header without changing pg_config's path.
+    println!("cargo:rerun-if-changed={}", header.display());
+    let text = fs::read_to_string(&header)
+        .wrap_err_with(|| format!("unable to read {}", header.display()))?;
+    Ok(text.contains("HeapTupleHeaderIsVersionedDatum"))
 }
 
 fn active_pg_major_version() -> eyre::Result<u16> {
