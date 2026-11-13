@@ -225,10 +225,7 @@ For more details on how to manage pgrx extensions see [Managing pgrx extensions]
 
 ## Cross-compiling
 
-So far, cross-compiling extensions with pgrx has only been demonstrated under [nix](https://nixos.org/).
-Proper support in nixpkgs is still in flux, so watch this space.
-
-In order to cross-compile outside of nix, you will need these ingredients:
+Cross-compiling requires a toolchain and PostgreSQL configuration for the target:
 
 1) A sysroot for the cross architecture, with rust configured to invoke the linker with flags to link against this sysroot.
 2) PostgreSQL server headers configured for the target, from the same build as the server that will load the extension.
@@ -252,6 +249,12 @@ When building with a `pg_config` program, modify the standard build process in t
 2) Pass one of the `--pgXX` flags to `cargo pgrx init` with the aforementioned `pg_config`.
 3) Pass the `--pg-config` flag to `cargo pgrx package` with the aforementioned `pg_config`.
 4) Pass the `--target` flag to `cargo pgrx package` with the rust triple of the cross machine.
+
+Pass a built-in Rust target triple explicitly to cargo-pgrx. Library names,
+package layout, universal Mach-O slice selection, and RPM/DEB generation follow
+that target, falling back to the host when it is omitted. Cargo's `build.target`,
+`CARGO_BUILD_TARGET`, forwarded Cargo flags, and custom JSON target specifications
+do not replace cargo-pgrx's explicit `--target`.
 
 `cargo pgrx run` will not work.
 

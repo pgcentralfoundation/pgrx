@@ -2984,29 +2984,39 @@ pub(crate) fn validate_driver_configuration(verbose: &str) -> Result<(), Fronten
 /// An MSVC target also keeps incompatible pointer types a warning, as its own compiler does.
 pub(crate) fn prepare_arguments(arguments: &[String]) -> Result<Vec<String>, FrontendError> {
     let normalized = normalize_arguments(arguments)?;
-    let mut msvc = cfg!(target_env = "msvc");
-    let mut arguments = normalized.iter();
-    while let Some(argument) = arguments.next() {
-        if matches!(argument.as_str(), "-target" | "--target") {
-            if let Some(triple) = arguments.next() {
-                msvc = crate::model::is_msvc_triple(triple);
-            }
-        } else if VALUE_OPTIONS.contains(&argument.as_str())
-            || matches!(argument.as_str(), "-x" | "-Xclang" | "-Xpreprocessor" | "-mllvm")
-        {
-            let _operand = arguments.next();
-        } else if let Some(triple) =
-            argument.strip_prefix("--target=").or_else(|| argument.strip_prefix("-target="))
-        {
-            msvc = crate::model::is_msvc_triple(triple);
-        }
-    }
+    let msvc = explicit_target(&normalized)
+        .map_or(cfg!(target_env = "msvc"), crate::model::is_msvc_triple);
     let mut prepared = crate::lower_msvc_runtime_flags(&normalized, msvc)?;
     if msvc && !prepared.iter().any(|argument| argument == MSVC_POINTER_TYPE_WARNING) {
         // First, so an explicit warning option later in the profile still decides.
         prepared.insert(0, MSVC_POINTER_TYPE_WARNING.into());
     }
     Ok(prepared)
+}
+
+/// Find the last explicit target without treating another option's operand as a selector.
+pub(crate) fn explicit_target(arguments: &[String]) -> Option<&str> {
+    let mut target = None;
+    let mut arguments = arguments.iter();
+    while let Some(argument) = arguments.next() {
+        if matches!(argument.as_str(), "-target" | "--target") {
+            if let Some(triple) = arguments.next() {
+                target = Some(triple.as_str());
+            }
+        } else if VALUE_OPTIONS.contains(&argument.as_str())
+            || matches!(
+                argument.as_str(),
+                "-x" | "-Xclang" | "-Xpreprocessor" | "-mllvm" | "/I" | "/D" | "/U" | "/FI"
+            )
+        {
+            let _operand = arguments.next();
+        } else if let Some(triple) =
+            argument.strip_prefix("--target=").or_else(|| argument.strip_prefix("-target="))
+        {
+            target = Some(triple);
+        }
+    }
+    target
 }
 
 /// Keeps an incompatible pointer type a warning for an MSVC target, as Microsoft's C compiler
@@ -3021,10 +3031,7 @@ pub const MSVC_POINTER_TYPE_WARNING: &str = "-Wno-error=incompatible-pointer-typ
 /// refused rather than silently changing the inspected inputs.
 fn normalize_arguments(arguments: &[String]) -> Result<Vec<String>, FrontendError> {
     let mut normalized = Vec::with_capacity(arguments.len());
-    let windows = cfg!(windows)
-        || arguments.iter().any(|arg| {
-            arg.contains("-windows-") || arg.ends_with("-win32") || arg.ends_with("-mingw32")
-        });
+    let windows = explicit_target(arguments).map_or(cfg!(windows), crate::model::is_windows_triple);
     let mut arguments = arguments.iter();
     while let Some(argument) = arguments.next() {
         // Option operands are paths or definitions, not independent switches.
@@ -3336,6 +3343,45 @@ mod tests {
         expected.extend(crate::postgres_clang_flags(recorded, true).unwrap());
         assert_eq!(normalize_arguments(&raw).unwrap(), expected);
         validate_arguments(&expected).unwrap();
+    }
+
+    /// Only real target options choose metadata conventions; the last one overrides the host.
+    #[test]
+    fn explicit_targets_ignore_other_option_operands() {
+        for selector in ["-target", "--target", "-target=", "--target="] {
+            let mut arguments = vec!["--target=x86_64-pc-windows-msvc".to_owned()];
+            if selector.ends_with('=') {
+                arguments.push(format!("{selector}aarch64-unknown-linux-gnu"));
+            } else {
+                arguments.extend([selector.into(), "aarch64-unknown-linux-gnu".into()]);
+            }
+            for option in ["-I", "-D", "-Xclang", "--gcc-triple", "/I", "/D", "/FI"] {
+                arguments.extend([option.into(), "--target=x86_64-pc-windows-msvc".into()]);
+            }
+            assert_eq!(explicit_target(&arguments), Some("aarch64-unknown-linux-gnu"));
+        }
+        assert_eq!(explicit_target(&["-I".into(), "--target=x86_64-pc-windows-msvc".into()]), None);
+    }
+
+    /// A Windows-looking operand cannot enable CL translation for an explicit Unix target.
+    #[test]
+    fn explicit_unix_targets_disable_windows_argument_normalization() {
+        let arguments = [
+            "--target=x86_64-pc-windows-msvc",
+            "--target=aarch64-unknown-linux-gnu",
+            "-I",
+            "/sdk/x86_64-pc-windows-msvc",
+            "/DVALUE=7",
+        ]
+        .map(str::to_owned);
+        for arguments in [&arguments[..], &arguments[1..]] {
+            assert_eq!(normalize_arguments(arguments).unwrap(), arguments);
+            assert_eq!(prepare_arguments(arguments).unwrap(), arguments);
+            assert!(
+                validate_arguments(arguments).is_err(),
+                "a GNU profile must not accept raw CL switches"
+            );
+        }
     }
 
     /// Raw CL runtime controls fold after base normalization, preserving forwarded user overrides

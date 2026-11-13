@@ -22,6 +22,22 @@ use std::path::{Path, PathBuf};
 mod configuration;
 pub use configuration::{ConfigurationError, LayoutDisagreement, verify_postgres_configuration};
 
+/// Decode recorded PostgreSQL flags using the installation's target conventions.
+///
+/// Windows GNU installations use Windows quoting without MSVC option translation. `None`
+/// selects the generator's native platform, for metadata read from a local `pg_config`.
+pub fn postgres_clang_flags_for_target(
+    flags: &str,
+    target: Option<&str>,
+) -> Result<Vec<String>, FrontendError> {
+    if target.map_or(cfg!(target_env = "msvc"), crate::model::is_msvc_triple) {
+        postgres_clang_flags(flags, true)
+    } else {
+        let windows = target.map_or(cfg!(windows), crate::model::is_windows_triple);
+        Ok(crate::split_recorded_cflags(flags, windows)?.unwrap_or_default())
+    }
+}
+
 /// PostgreSQL function macros and the other definitions needed to interpret them.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PostgresInventory {
@@ -46,6 +62,8 @@ pub struct PostgresConfig {
     /// Installation compiler flags and include arguments forwarded consistently into discovery and
     /// analysis.
     clang_args: Vec<String>,
+    /// Platform that recorded the installation's flags, independent of header-root overrides.
+    metadata_target: Option<String>,
 }
 
 /// Resolve the installation once and reuse its wrapper header, flags, and ownership root across
@@ -56,18 +74,44 @@ impl PostgresConfig {
     /// Uses the same `Pgrx::from_config().get(...)` resolution as cargo-pgrx's
     /// explicit version selector, including `PGRX_HOME` and `PGRX_PG_CONFIG_PATH`.
     pub fn resolve(version: &str) -> Result<Self, PostgresError> {
+        Self::resolve_with_clang_args(version, &[])
+    }
+
+    /// Resolve metadata using the last explicit Clang target in `arguments`, if present.
+    ///
+    /// Cross-compilation callers must select the target before recorded flags and include
+    /// directories are decoded. Arguments used here must also be passed to discovery/inspection.
+    pub fn resolve_with_clang_args(
+        version: &str,
+        arguments: &[String],
+    ) -> Result<Self, PostgresError> {
         let label =
             if version.starts_with("pg") { version.to_owned() } else { format!("pg{version}") };
-        Self::from_pg_config(Pgrx::from_config()?.get(&label)?)
+        Self::from_pg_config_with_target(
+            Pgrx::from_config()?.get(&label)?,
+            crate::frontend::explicit_target(arguments),
+        )
     }
 
     /// Use a PostgreSQL configuration already selected by a binding generator.
     pub fn from_pg_config(pg_config: PgConfig) -> Result<Self, PostgresError> {
+        Self::from_pg_config_with_target(pg_config, None)
+    }
+
+    /// Use target PostgreSQL metadata, applying its OS quoting and compiler environment.
+    ///
+    /// `None` retains the generator's native platform. This selects metadata conventions;
+    /// the complete Clang arguments select the compilation target. A binding generator can
+    /// inspect an overridden target header tree while reading metadata from a native server.
+    pub fn from_pg_config_with_target(
+        pg_config: PgConfig,
+        target: Option<&str>,
+    ) -> Result<Self, PostgresError> {
         let include_dir = pg_config.includedir_server()?;
         let server_include_dir = include_dir.clone();
         let major_version = pg_config.major_version()?;
         let mut directories = vec![include_dir];
-        if cfg!(target_env = "msvc") {
+        if target.map_or(cfg!(target_env = "msvc"), crate::model::is_msvc_triple) {
             directories.push(pg_config.pkgincludedir()?);
             directories.push(pg_config.includedir_server_port_win32()?);
             directories.push(pg_config.includedir_server_port_win32_msvc()?);
@@ -76,7 +120,7 @@ impl PostgresConfig {
         let flags = pg_config.cppflags()?;
         let flags = flags.to_str().ok_or(PostgresError::InvalidCppFlags)?;
         clang_args.extend(
-            postgres_clang_flags(flags, cfg!(target_env = "msvc")).map_err(|error| {
+            postgres_clang_flags_for_target(flags, target).map_err(|error| {
                 FrontendError::Arguments(format!("PostgreSQL CPPFLAGS: {error}"))
             })?,
         );
@@ -86,7 +130,13 @@ impl PostgresConfig {
                 .ok_or_else(|| PostgresError::InvalidIncludeDirectory(directory.clone()))?;
             clang_args.push(format!("-I{path}"));
         }
-        Ok(Self { pg_config, major_version, server_include_dir, clang_args })
+        Ok(Self {
+            pg_config,
+            major_version,
+            server_include_dir,
+            clang_args,
+            metadata_target: target.map(str::to_owned),
+        })
     }
 
     /// Take macro ownership from another server header root, such as a binding generator's
@@ -263,7 +313,7 @@ impl PostgresConfig {
         let Some(cflags) = self.pg_config.optional_cflags()? else { return Ok(None) };
         let cflags = cflags.to_str().ok_or(PostgresError::InvalidCFlags)?;
         Ok(Some(
-            postgres_clang_flags(cflags, cfg!(target_env = "msvc"))
+            postgres_clang_flags_for_target(cflags, self.metadata_target.as_deref())
                 .map_err(|error| FrontendError::Arguments(format!("PostgreSQL CFLAGS: {error}")))?,
         ))
     }
@@ -279,7 +329,10 @@ impl PostgresConfig {
             (Ok(inspected), Ok(installed)) => inspected == installed,
             _ => false,
         };
-        let Some(cflags) = self.recorded_cflags()?.filter(|_| own_headers) else {
+        if !own_headers {
+            return Ok(Vec::new());
+        }
+        let Some(cflags) = self.recorded_cflags()? else {
             return Ok(Vec::new());
         };
         Ok(separate_architecture_flags(cflags).1.into_iter().skip(1).step_by(2).collect())
@@ -632,6 +685,124 @@ pub enum PostgresError {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// Metadata syntax belongs to the selected server, including Windows GNU installations.
+    #[test]
+    fn recorded_flags_follow_the_selected_target() {
+        assert_eq!(
+            postgres_clang_flags_for_target(
+                r"/IC:\O'Brien\include /DVALUE=7 /O2",
+                Some("x86_64-pc-windows-msvc")
+            )
+            .unwrap(),
+            [
+                r"-IC:\O'Brien\include",
+                "-DVALUE=7",
+                "-O3",
+                "-fomit-frame-pointer",
+                "-ffunction-sections"
+            ]
+        );
+        assert_eq!(
+            postgres_clang_flags_for_target(
+                r"-IC:\O'Brien\include -O2",
+                Some("x86_64-pc-windows-gnu")
+            )
+            .unwrap(),
+            [r"-IC:\O'Brien\include", "-O2"]
+        );
+        assert_eq!(
+            postgres_clang_flags_for_target(
+                "-isysroot '/sdk path' -fwrapv",
+                Some("aarch64-apple-darwin")
+            )
+            .unwrap(),
+            ["-isysroot", "/sdk path", "-fwrapv"]
+        );
+        assert_eq!(
+            postgres_clang_flags_for_target("-I'/a b' -fPIC", Some("x86_64-unknown-linux-gnu"))
+                .unwrap(),
+            ["-I/a b", "-fPIC"]
+        );
+    }
+
+    /// Construction and later CFLAGS decoding use the same imported metadata conventions.
+    #[cfg(unix)]
+    #[test]
+    fn target_metadata_controls_constructor_includes_and_recorded_cflags() {
+        let directory = tempfile::tempdir().unwrap();
+        let server = directory.path().join("server");
+        std::fs::create_dir(&server).unwrap();
+        let pg_config = directory.path().join("pg_config");
+        crate::test_script::write_script(
+            &pg_config,
+            &format!(
+                "#!/bin/sh\ncase \"$1\" in\n\
+                 --version) echo 'PostgreSQL 18.4' ;;\n\
+                 --includedir-server|--pkgincludedir) printf '%s\\n' '{}' ;;\n\
+                 --cppflags) printf '%s\\n' \"/IC:\\\\O'Brien\\\\include /DVALUE=7\" ;;\n\
+                 --cflags) printf '%s\\n' '/MDd /O2' ;;\n\
+                 *) exit 1 ;;\nesac\n",
+                server.display()
+            ),
+        );
+        let postgres = PostgresConfig::from_pg_config_with_target(
+            PgConfig::new_with_defaults(pg_config.clone()),
+            Some("x86_64-pc-windows-msvc"),
+        )
+        .unwrap();
+        assert_eq!(&postgres.clang_args()[..2], [r"-IC:\O'Brien\include", "-DVALUE=7"]);
+        assert!(
+            postgres.clang_args().contains(&format!("-I{}", server.join("port/win32").display()))
+        );
+        assert!(
+            postgres
+                .clang_args()
+                .contains(&format!("-I{}", server.join("port/win32_msvc").display()))
+        );
+        assert_eq!(
+            postgres.recorded_cflags().unwrap().unwrap(),
+            ["-fms-runtime-lib=dll_dbg", "-O3", "-fomit-frame-pointer", "-ffunction-sections"]
+        );
+
+        crate::test_script::write_script(
+            &pg_config,
+            &format!(
+                "#!/bin/sh\ncase \"$1\" in\n\
+                 --version) echo 'PostgreSQL 18.4' ;;\n\
+                 --includedir-server) printf '%s\\n' '{}' ;;\n\
+                 --cppflags) printf '%s\\n' \"-isysroot '/sdk path'\" ;;\n\
+                 --cflags) printf '%s\\n' '-fwrapv -arch arm64 -arch x86_64' ;;\n\
+                 *) exit 1 ;;\nesac\n",
+                server.display()
+            ),
+        );
+        let postgres = PostgresConfig::from_pg_config_with_target(
+            PgConfig::new_with_defaults(pg_config),
+            Some("aarch64-apple-darwin"),
+        )
+        .unwrap();
+        assert_eq!(
+            postgres.clang_args(),
+            ["-isysroot", "/sdk path", &format!("-I{}", server.display())]
+        );
+        assert_eq!(postgres.compiled_architectures().unwrap(), ["arm64", "x86_64"]);
+        // An override must not query or decode the installation's unrelated CFLAGS.
+        let other = directory.path().join("other");
+        std::fs::create_dir(&other).unwrap();
+        crate::test_script::write_script(
+            &postgres.pg_config().path().unwrap(),
+            &format!(
+                "#!/bin/sh\ncase \"$1\" in\n\
+                 --includedir-server) printf '%s\\n' '{}' ;;\n\
+                 *) exit 1 ;;\nesac\n",
+                server.display()
+            ),
+        );
+        assert!(
+            postgres.with_server_include_dir(other).compiled_architectures().unwrap().is_empty()
+        );
+    }
 
     /// Require the embedded bytes to match every supported canonical pg-sys wrapper exactly,
     /// so a header update or a new PostgreSQL version cannot silently narrow CLI discovery.

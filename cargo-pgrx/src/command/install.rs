@@ -205,15 +205,15 @@ pub(crate) fn install_extension(
         find_library_file(&manifest, package_manifest_path, &build_command_messages, target)?;
 
     let relative_extdir = if let Some(prefix_directory) = prefix_directory.as_ref() {
-        make_relative_extdir(prefix_directory.to_path_buf())
+        make_relative_extdir(prefix_directory.to_path_buf(), target)
     } else {
-        make_relative_extdir(pg_config.extension_dir()?)
+        make_relative_extdir(pg_config.extension_dir()?, target)
     };
 
     let relative_pkglibdir = if let Some(prefix_directory) = prefix_directory.as_ref() {
-        make_relative_pkglibdir(prefix_directory.to_path_buf())
+        make_relative_pkglibdir(prefix_directory.to_path_buf(), target)
     } else {
-        make_relative_pkglibdir(pg_config.pkglibdir()?)
+        make_relative_pkglibdir(pg_config.pkglibdir()?, target)
     };
 
     let extdir = if let Some(base_directory) = base_directory.as_ref() {
@@ -655,36 +655,31 @@ fn get_git_hash(manifest_path: &Path) -> eyre::Result<String> {
     }
 }
 
-#[cfg(not(target_os = "windows"))]
-fn make_relative_pkglibdir(path: PathBuf) -> PathBuf {
+fn make_relative_pkglibdir(path: PathBuf, target: Option<&str>) -> PathBuf {
+    if TargetOs::from_target(target) == TargetOs::Windows {
+        "lib".into()
+    } else {
+        make_relative_path(path)
+    }
+}
+
+fn make_relative_extdir(path: PathBuf, target: Option<&str>) -> PathBuf {
+    if TargetOs::from_target(target) == TargetOs::Windows {
+        "share/extension".into()
+    } else {
+        make_relative_path(path)
+    }
+}
+
+fn make_relative_path(path: PathBuf) -> PathBuf {
     use std::path::Component;
-    if path.is_relative() {
+    // A Unix target's absolute path has a root but no drive prefix on a Windows host.
+    if !path.has_root() {
         return path;
     }
     path.components()
         .skip_while(|x| matches!(x, Component::Prefix(_) | Component::RootDir))
         .collect()
-}
-
-#[cfg(target_os = "windows")]
-fn make_relative_pkglibdir(_: PathBuf) -> PathBuf {
-    "lib".into()
-}
-
-#[cfg(not(target_os = "windows"))]
-fn make_relative_extdir(path: PathBuf) -> PathBuf {
-    use std::path::Component;
-    if path.is_relative() {
-        return path;
-    }
-    path.components()
-        .skip_while(|x| matches!(x, Component::Prefix(_) | Component::RootDir))
-        .collect()
-}
-
-#[cfg(target_os = "windows")]
-fn make_relative_extdir(_: PathBuf) -> PathBuf {
-    "share/extension".into()
 }
 
 pub(crate) fn format_display_path(path: &Path, target_dir: &Path) -> String {
@@ -715,7 +710,7 @@ pub(crate) fn filter_contents(
 
 #[cfg(test)]
 mod tests {
-    use super::manifest_path_for_build;
+    use super::{make_relative_extdir, make_relative_pkglibdir, manifest_path_for_build};
     use std::path::Path;
 
     #[test]
@@ -740,5 +735,74 @@ mod tests {
             Some(workspace_manifest)
         );
         assert_eq!(manifest_path_for_build(None, Some("tin"), package_manifest), None);
+    }
+
+    #[test]
+    fn staged_windows_paths_follow_target() {
+        for target in ["x86_64-pc-windows-msvc", "x86_64-pc-windows-gnu"] {
+            for path in [r"C:\Program Files\PostgreSQL\18\lib", "/usr/lib/postgresql/18/lib"] {
+                assert_eq!(make_relative_pkglibdir(path.into(), Some(target)), Path::new("lib"));
+            }
+            for path in [
+                r"C:\Program Files\PostgreSQL\18\share\extension",
+                "/usr/share/postgresql/18/extension",
+            ] {
+                assert_eq!(
+                    make_relative_extdir(path.into(), Some(target)),
+                    Path::new("share/extension")
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn staged_unix_paths_follow_target() {
+        for target in ["x86_64-unknown-linux-gnu", "aarch64-apple-darwin"] {
+            assert_eq!(
+                make_relative_pkglibdir("/usr/lib/postgresql/18/lib".into(), Some(target)),
+                Path::new("usr/lib/postgresql/18/lib")
+            );
+            assert_eq!(
+                make_relative_extdir("/opt/postgresql/share/extension".into(), Some(target)),
+                Path::new("opt/postgresql/share/extension")
+            );
+        }
+    }
+
+    #[test]
+    fn staged_relative_prefixes_follow_target() {
+        for target in ["x86_64-unknown-linux-gnu", "aarch64-apple-darwin"] {
+            assert_eq!(
+                make_relative_pkglibdir("relative/prefix".into(), Some(target)),
+                Path::new("relative/prefix")
+            );
+            assert_eq!(
+                make_relative_extdir("relative/prefix".into(), Some(target)),
+                Path::new("relative/prefix")
+            );
+        }
+        let target = Some("x86_64-pc-windows-msvc");
+        assert_eq!(make_relative_pkglibdir("relative/prefix".into(), target), Path::new("lib"));
+        assert_eq!(
+            make_relative_extdir("relative/prefix".into(), target),
+            Path::new("share/extension")
+        );
+    }
+
+    #[test]
+    fn staged_paths_default_to_host() {
+        let (library_dir, extension_dir) = if cfg!(target_os = "windows") {
+            ("lib", "share/extension")
+        } else {
+            ("usr/lib/postgresql/18/lib", "usr/share/postgresql/18/extension")
+        };
+        assert_eq!(
+            make_relative_pkglibdir("/usr/lib/postgresql/18/lib".into(), None),
+            Path::new(library_dir)
+        );
+        assert_eq!(
+            make_relative_extdir("/usr/share/postgresql/18/extension".into(), None),
+            Path::new(extension_dir)
+        );
     }
 }

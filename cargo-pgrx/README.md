@@ -881,7 +881,7 @@ installing extension
 `./target/[debug | release]/extension_name-PGVER` using the Postgres installation path information from the `pg_config`
 tool on your `$PATH`.
 
-The intent is that you'd then change into that directory and build a tarball or other package. On Linux,
+The intent is that you'd then change into that directory and build a tarball or other package. For Linux targets,
 `cargo pgrx package` can also build a .deb or .rpm package for you, as described in
 [Building RPM and DEB packages](#building-rpm-and-deb-packages).
 
@@ -922,7 +922,7 @@ Options:
 
 ### Extension Artifact Placement
 
-On Unix, `--prefix-dir <PREFIX_DIR>` overrides the installation paths obtained from `pg_config`, placing the control file,
+For Unix targets, `--prefix-dir <PREFIX_DIR>` overrides the installation paths obtained from `pg_config`, placing the control file,
 SQL files, and shared library in the same directory within the package output. Use `--out-dir` to choose the package output
 directory:
 
@@ -931,12 +931,20 @@ $ cargo pgrx package --out-dir ./package --prefix-dir /opt/my_extension
 ```
 
 This places the extension assets in `./package/opt/my_extension/`. An absolute prefix is made relative to the package output
-directory. If you omit `--prefix-dir`, the layout follows `pg_config`. On Windows, the package layout uses `lib` and
+directory. If you omit `--prefix-dir`, the layout follows `pg_config`. For Windows targets, the package layout uses `lib` and
 `share/extension` regardless of this option.
+
+For cross builds, pass a built-in Rust target triple directly to `cargo pgrx package
+--target`, with a `--pg-config` that reports the target's installation paths.
+The target selects library names, package layout, universal Mach-O architecture
+and distribution package formats. Without `--target`, these use the host.
+Cargo's `build.target`, `CARGO_BUILD_TARGET`, and targets hidden in `--cargo` flags
+do not select cargo-pgrx's target; pass `--target` explicitly. Custom JSON target
+specifications are not supported by cargo-pgrx packaging.
 
 ### Building RPM and DEB packages
 
-On Linux, `cargo pgrx package` can also build distribution packages from the
+For Linux targets, including cross builds, `cargo pgrx package` can also build distribution packages from the
 packaged files. Add an empty `[package.metadata.rpm]` or `[package.metadata.deb]`
 section to your extension's `Cargo.toml`:
 
@@ -957,8 +965,8 @@ The matching `.rpm` or `.deb` file is written to the output directory. Each
 section builds one package for the Postgres version selected by `pg_config`.
 An empty section uses the default specs below. The `description`, `license`,
 and first `authors` entry of `[package]` fill in the package fields of the same
-name, so `cargo pgrx package` reports an error if one of them is missing. On
-other platforms, `cargo pgrx package` prints a warning and skips these packages.
+name, so `cargo pgrx package` reports an error if one of them is missing. For
+other targets, `cargo pgrx package` prints a warning and skips these packages.
 `cargo pgrx install --sudo` never builds them, and `cargo pgrx package
 --no-distrib-packages` skips them when only the staged files are needed.
 

@@ -6,7 +6,11 @@
 
 Note that guide is fairly preliminary and does not cover many cases, most notably:
 
-1. This does not (yet) cover cross compiling with `cargo pgrx` (planned). Note that this means this documentation may only be useful to a small set of users.
+1. The examples below use Cargo directly. To stage an extension with `cargo pgrx package`,
+   pass a built-in Rust target triple with `--target` and a `--pg-config` that reports
+   the target's installation paths. See [Cross-compiling](https://github.com/pgcentralfoundation/pgrx#cross-compiling)
+   for setup. cargo-pgrx defaults to the host when `--target` is omitted; it does not
+   resolve Cargo's `build.target`, `CARGO_BUILD_TARGET`, or custom JSON target specifications.
 
 2. Generating bindings on the build host needs a Clang driver and `llvm-ar` matching `libclang`, the target's C library headers, and PostgreSQL server headers configured for the target. A complete target bundle needs none of these: it includes its native inline and macro adapters, plus the C shim when the producer enabled the `cshim` feature. Producer and consumer must select the same `cshim` feature.
 
@@ -74,7 +78,10 @@ distributions, check that host values such as `-D_GNU_SOURCE` or
 
 pgrx cannot tell a `pg_config` program for the target, run under emulation or
 replicated by a shell script, from a host one. It applies only the functional
-CFLAGS from such a program too. Use the next path to apply a target's full CFLAGS.
+CFLAGS from such a program too. Flags from a program use the host's quoting and
+compiler conventions; imported environment metadata uses the Cargo target's.
+Use the next path to apply a target's full CFLAGS or import flags written for a
+different platform, such as MSVC flags on a Unix host.
 
 ### PostgreSQL metadata in the environment
 

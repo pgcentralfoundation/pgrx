@@ -252,7 +252,7 @@ pub(crate) fn generate_schema_implicit(
     }
 
     let lib_so_data = load_section_data(profile, &lib_filename, target, target_dir)?;
-    let section_entities = decode_section_entities(&lib_so_data)?;
+    let section_entities = decode_section_entities(&lib_so_data, target)?;
     report_entity_counts(&section_entities);
 
     let mut entities = Vec::new();
@@ -329,8 +329,11 @@ fn load_section_data(
     std::fs::read(&lib_so).wrap_err("couldn't read extension shared object")
 }
 
-fn decode_section_entities<'a>(lib_so_data: &'a [u8]) -> eyre::Result<Vec<SqlGraphEntity<'a>>> {
-    let section = schema_section_data(lib_so_data)?.ok_or_else(|| {
+fn decode_section_entities<'a>(
+    lib_so_data: &'a [u8],
+    target: Option<&str>,
+) -> eyre::Result<Vec<SqlGraphEntity<'a>>> {
+    let section = schema_section_data(lib_so_data, target)?.ok_or_else(|| {
         eyre::eyre!(
             "no embedded pgrx schema section found; expected `.pgrxsc` on ELF/PE or `__DATA,__pgrxsc` on Mach-O. the artifact may have been built with an incompatible pgrx, stripped incorrectly, or selected from the wrong architecture slice",
         )
@@ -472,7 +475,7 @@ mod tests {
         let fixture_path = format!("{root_path}/tests/fixtures/macos-universal-binary");
         let bin = std::fs::read(fixture_path).unwrap();
 
-        let error = decode_section_entities(&bin).expect_err("missing section");
+        let error = decode_section_entities(&bin, None).expect_err("missing section");
         assert!(error.to_string().contains("no embedded pgrx schema section found"));
     }
 

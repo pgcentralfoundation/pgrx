@@ -285,7 +285,14 @@ storage bridge preserves its bytes. Raw `i8` and `u8` inputs retain the separate
 signed-char and unsigned-char identities, so a plain-char operand requires an
 explicit `CValue<CChar>` or `Pointer<CChar, _>` tag.
 Recorded MSVC flags use Windows quoting and explicit Clang translations; unknown
-options fail rather than disappearing. Inspection or native-generation failures
+options fail rather than disappearing. Standalone commands use the last explicit
+Clang `--target` or `-target` to interpret the selected PostgreSQL metadata,
+including its flags and include directories. Library callers can use
+`PostgresConfig::from_pg_config_with_target`; the existing constructors retain
+native defaults. Bindgen treats a runnable `pg_config` as host metadata and
+`PGRX_PG_CONFIG_AS_ENV` metadata as target metadata. It decodes each with its own
+platform's quoting rules before filtering host flags for cross-compilation.
+Inspection or native-generation failures
 stop the binding build; unsupported individual macros retain structured skips.
 The decoder retains runtime choices until `lower_msvc_runtime_flags` sees the
 combined flags: the last `/MD[d]` or `/MT[d]` choice determines the runtime
