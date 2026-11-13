@@ -11,6 +11,7 @@ mod command;
 mod manifest;
 mod metadata;
 mod object_utils;
+mod target;
 
 pub(crate) mod cargo;
 

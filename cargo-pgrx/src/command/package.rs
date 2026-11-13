@@ -268,7 +268,7 @@ fn build_distrib_packages(
     let manifest_dir = manifest_path.parent().expect("a manifest path names a file in a directory");
 
     // Built once and shared by every package kind
-    let lib_file = shared_library_filename(manifest_path, pg_config, cargo_flags)?;
+    let lib_file = shared_library_filename(manifest_path, pg_config, cargo_flags, target)?;
     let vars =
         Vars::new(pg_config, out_dir, manifest_dir, workspace_root, package, target, lib_file)?;
 

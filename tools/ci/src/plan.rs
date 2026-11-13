@@ -118,6 +118,7 @@ const JOBS: &[(&str, Subjects)] = &[
     ("init", Subjects::Artifacts(&["pgrx-tests"])),
     ("variants", Subjects::Packages(&["pgrx-unit-tests", "custom_types"])),
     ("schema_release", Subjects::Packages(&["pgrx-unit-tests"])),
+    ("cross_package", Subjects::Artifacts(&["cargo-pgrx", "versioned_so"])),
     ("beta", Subjects::Any),
     ("package", Subjects::Packaging),
     // The docs.rs builds of pgrx-pg-sys and pgrx, from their committed bindings.

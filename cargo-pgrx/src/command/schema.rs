@@ -236,7 +236,7 @@ pub(crate) fn generate_schema_implicit(
 ) -> eyre::Result<()> {
     let (control_file_path, extname) = find_control_file(package_manifest_path)?;
     let lib_name = manifest.lib_name()?;
-    let lib_filename = manifest.lib_filename()?;
+    let lib_filename = manifest.lib_filename(target)?;
     let versioned_so = get_property(package_manifest_path, "module_pathname")?.is_none();
     let extension_version = manifest.package_version()?;
 
