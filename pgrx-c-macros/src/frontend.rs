@@ -59,6 +59,7 @@ const OUTPUT_LIMIT: u64 = 16 * 1024 * 1024;
 pub(crate) const VALUE_OPTIONS: &[&str] = &[
     "-I",
     "-isystem",
+    "-cxx-isystem",
     "-iquote",
     "-idirafter",
     "-F",
@@ -2465,7 +2466,17 @@ fn build_inputs(
     }
     let mut arguments = arguments.iter();
     while let Some(argument) = arguments.next() {
-        let directory = if matches!(
+        let directory = if argument == "-Xclang" {
+            if arguments.next().is_some_and(|option| option == "-c-isystem") {
+                Some(forwarded_c_include(&mut arguments)?)
+            } else {
+                None
+            }
+        } else if argument == "-cxx-isystem" {
+            // This path is an operand, but it does not affect the inspected C search.
+            let _operand = arguments.next();
+            None
+        } else if matches!(
             argument.as_str(),
             "-I" | "-isystem"
                 | "-iquote"
@@ -3079,9 +3090,27 @@ fn normalize_arguments(arguments: &[String]) -> Result<Vec<String>, FrontendErro
     Ok(normalized)
 }
 
+/// Consume the remaining pair of `-Xclang -c-isystem -Xclang PATH` without reinterpreting the path.
+fn forwarded_c_include<'a>(
+    arguments: &mut impl Iterator<Item = &'a String>,
+) -> Result<&'a str, FrontendError> {
+    match (arguments.next().map(String::as_str), arguments.next().map(String::as_str)) {
+        (Some("-Xclang"), Some(path)) if !path.contains('\0') => Ok(path),
+        _ => Err(FrontendError::Arguments(
+            "-Xclang -c-isystem requires -Xclang and a path without NUL bytes".into(),
+        )),
+    }
+}
+
 /// Reject extra inputs, driver actions, and hidden configuration that could change or bypass the
 /// inspected C phase.
 fn validate_arguments(arguments: &[String]) -> Result<(), FrontendError> {
+    // Clang expands response files before parsing options, including their path operands.
+    if let Some(argument) = arguments.iter().find(|argument| argument.starts_with('@')) {
+        return Err(FrontendError::Arguments(format!(
+            "response file {argument} is unsupported for reproducible analysis"
+        )));
+    }
     let mut arguments = arguments.iter();
     while let Some(argument) = arguments.next() {
         if argument.contains('\0') {
@@ -3098,21 +3127,23 @@ fn validate_arguments(arguments: &[String]) -> Result<(), FrontendError> {
             }
         }
         if argument == "-Xclang" {
-            if arguments.next().is_some_and(|value| {
-                matches!(
-                    value.as_str(),
+            match arguments.next().map(String::as_str) {
+                Some("-c-isystem") => {
+                    forwarded_c_include(&mut arguments)?;
+                    continue;
+                }
+                Some(
                     "--dependent-lib=msvcrt"
-                        | "--dependent-lib=msvcrtd"
-                        | "--dependent-lib=libcmt"
-                        | "--dependent-lib=libcmtd"
-                        | "--dependent-lib=oldnames"
-                        | "-flto-visibility-public-std"
-                )
-            }) {
-                continue;
+                    | "--dependent-lib=msvcrtd"
+                    | "--dependent-lib=libcmt"
+                    | "--dependent-lib=libcmtd"
+                    | "--dependent-lib=oldnames"
+                    | "-flto-visibility-public-std",
+                ) => continue,
+                _ => {}
             }
             return Err(FrontendError::Arguments(
-                "only verified MSVC CRT cc1 options may be forwarded with -Xclang".into(),
+                "only C include paths and verified MSVC CRT cc1 options may be forwarded with -Xclang".into(),
             ));
         }
         if VALUE_OPTIONS.contains(&argument.as_str()) {
@@ -3156,8 +3187,7 @@ fn validate_arguments(arguments: &[String]) -> Result<(), FrontendError> {
                 | "-Xpreprocessor"
                 | "-cc1"
                 | "--"
-        ) || argument.starts_with('@')
-            || argument.starts_with("-o")
+        ) || argument.starts_with("-o")
             || argument.starts_with("--output")
             || argument.starts_with("-MF")
             || argument.starts_with("-MJ")
@@ -3270,6 +3300,87 @@ mod tests {
     use super::*;
 
     use crate::SCANNER_LOCK;
+
+    /// Zig supplies C++ search paths even when its bindgen consumer inspects C.
+    #[test]
+    fn zig_cxx_include_operands_remain_opaque() {
+        let arguments = [
+            "--target=x86_64-unknown-linux-gnu",
+            "-cxx-isystem",
+            r"D:\Zig SDK\lib\libcxx\include",
+            "-cxx-isystem",
+            "--target=x86_64-pc-windows-msvc",
+        ]
+        .map(str::to_owned);
+        assert_eq!(explicit_target(&arguments), Some("x86_64-unknown-linux-gnu"));
+        assert_eq!(prepare_arguments(&arguments).unwrap(), arguments);
+        validate_arguments(&arguments).unwrap();
+    }
+
+    /// Only the C-specific include forwarding emitted by Zig joins the reviewed cc1 options.
+    #[test]
+    fn zig_c_include_forwarding_requires_its_complete_operand() {
+        let arguments = [
+            "--target=x86_64-unknown-linux-gnu",
+            "-Xclang",
+            "-c-isystem",
+            "-Xclang",
+            r"D:\Zig SDK\lib\libc\include",
+        ]
+        .map(str::to_owned);
+        assert_eq!(prepare_arguments(&arguments).unwrap(), arguments);
+        validate_arguments(&arguments).unwrap();
+        for arguments in [
+            vec!["-Xclang", "-c-isystem"],
+            vec!["-Xclang", "-c-isystem", "-Xclang"],
+            vec!["-Xclang", "-c-isystem", "include"],
+            vec!["-Xclang", "-c-isystem", "-I", "include"],
+            vec!["-Xclang", "-c-isystem", "-Xclang", "bad\0path"],
+            vec!["-Xclang", "-D__STDC_VERSION__=1"],
+            vec!["-Xclang", "-cxx-isystem", "-Xclang", "include"],
+            vec!["-cxx-isystem"],
+            vec!["-cxx-isystem", "bad\0path"],
+        ] {
+            let arguments = arguments.into_iter().map(str::to_owned).collect::<Vec<_>>();
+            assert!(validate_arguments(&arguments).is_err(), "{arguments:?}");
+        }
+    }
+
+    /// Clang expands response files before consuming include operands, which could inject -D/-U.
+    #[test]
+    fn response_files_cannot_hide_in_option_operands() {
+        let directory = tempfile::tempdir().unwrap();
+        let response = directory.path().join("protected overrides.rsp");
+        std::fs::write(&response, "-D__STDC_VERSION__=1 -U__SIZE_TYPE__\n").unwrap();
+        let response = format!("@{}", response.display());
+        for arguments in [
+            vec![response.as_str()],
+            vec!["-isystem", response.as_str()],
+            vec!["-cxx-isystem", response.as_str()],
+            vec!["-Xclang", "-c-isystem", "-Xclang", response.as_str()],
+            vec!["-I", response.as_str()],
+            vec!["-D", response.as_str()],
+        ] {
+            let arguments = arguments.into_iter().map(str::to_owned).collect::<Vec<_>>();
+            assert!(validate_arguments(&arguments).is_err(), "{arguments:?}");
+        }
+    }
+
+    /// An absent C search directory can acquire a header after inspection.
+    #[test]
+    fn zig_c_include_forwarding_tracks_missing_search_roots() {
+        let directory = tempfile::tempdir().unwrap();
+        let missing = directory.path().join("not created yet");
+        let arguments = [
+            "-Xclang".into(),
+            "-c-isystem".into(),
+            "-Xclang".into(),
+            missing.to_str().unwrap().into(),
+        ];
+        let inputs =
+            build_inputs(&arguments, "", BTreeSet::new(), &CompilerSearch::default()).unwrap();
+        assert!(inputs.directories.contains(&missing));
+    }
 
     /// Native Windows switches retain definitions, paths, optimization, and plain-char choices,
     /// without reinterpreting option operands or allowing protected C fact overrides.
