@@ -58,8 +58,6 @@ pub(crate) struct Schema {
     /// A path to output a produced GraphViz DOT file
     #[clap(long, short, value_parser)]
     dot: Option<PathBuf>,
-    #[clap(long)]
-    target: Option<String>,
     #[clap(from_global, action = ArgAction::Count)]
     verbose: u8,
     /// Skip building a fresh extension shared object.
@@ -121,7 +119,7 @@ impl CommandExecute for Schema {
             &profile,
             self.test,
             &self.features,
-            self.target.as_deref(),
+            None,
             &target_dir,
             self.out.as_deref(),
             self.dot.as_deref(),

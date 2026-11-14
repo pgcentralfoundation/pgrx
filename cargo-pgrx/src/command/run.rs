@@ -45,8 +45,6 @@ pub(crate) struct Run {
     profile: Option<String>,
     #[clap(flatten)]
     features: clap_cargo::Features,
-    #[clap(long)]
-    target: Option<String>,
     #[clap(from_global, action = ArgAction::Count)]
     verbose: u8,
     /// Use an existing `pgcli` on the $PATH.
@@ -75,7 +73,6 @@ impl From<&Regress> for Run {
             release: regress.release,
             profile: regress.profile.clone(),
             features: regress.features.clone(),
-            target: None,
             verbose: regress.verbose,
             pgcli: false,
             install_only: false,
@@ -141,7 +138,7 @@ impl Run {
             &self.features,
             self.install_only,
             self.valgrind,
-            self.target.as_deref(),
+            None,
             &target_dir,
             postgresql_conf,
             unreleased_mode,

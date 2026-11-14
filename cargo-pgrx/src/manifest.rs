@@ -217,60 +217,10 @@ pub(crate) fn pg_config_and_version(
     }
 }
 
-/// Where `cargo pgrx install` and `cargo pgrx package` learn about the PostgreSQL they build for.
-#[derive(Debug, PartialEq)]
-enum PgConfigSource {
-    /// The `pg_config` program that `--pg-config` names.
-    Program(PathBuf),
-    /// The first `pg_config` on `PATH`.
-    Path,
-    /// `PGRX_PG_CONFIG_*` metadata, enabled by `PGRX_PG_CONFIG_AS_ENV=true`.
-    Environment,
-}
-
-impl PgConfigSource {
-    /// A `pg_config` program describes the machine it runs on. A build for this machine uses
-    /// one, `--pg-config` or else the first on `PATH`, and does not read environment metadata.
-    /// A `cross` build, given as its target and this host, accepts only that metadata.
-    fn select(
-        explicit: Option<PathBuf>,
-        environment: bool,
-        cross: Option<(&str, &str)>,
-    ) -> eyre::Result<Self> {
-        let Some((target, host)) = cross else {
-            return Ok(explicit.map_or(Self::Path, Self::Program));
-        };
-        eyre::ensure!(
-            explicit.is_none(),
-            "--pg-config names a program that describes this machine ({host}), not `--target {target}`; describe the target's PostgreSQL with PGRX_PG_CONFIG_AS_ENV=true and the PGRX_PG_CONFIG_* variables instead"
-        );
-        eyre::ensure!(
-            environment,
-            "`--target {target}` is not this machine ({host}), so `pg_config` cannot describe its PostgreSQL; set PGRX_PG_CONFIG_AS_ENV=true and the PGRX_PG_CONFIG_* variables"
-        );
-        Ok(Self::Environment)
-    }
-}
-
-/// The PostgreSQL that `cargo pgrx install` and `cargo pgrx package` build for.
-pub(crate) fn selected_pg_config(
-    explicit: Option<PathBuf>,
-    target: Option<&str>,
-) -> eyre::Result<PgConfig> {
-    let host = target.map(|_| crate::target::host_triple()).transpose()?;
-    let cross = target.zip(host.as_deref()).filter(|(target, host)| target != host);
-    match PgConfigSource::select(explicit, PgConfig::is_in_environment(), cross)? {
-        PgConfigSource::Program(program) => Ok(PgConfig::new_with_defaults(program)),
-        PgConfigSource::Path => Ok(PgConfig::from_path()),
-        PgConfigSource::Environment => {
-            let pg_config = PgConfig::from_env()?;
-            // Report what staging needs now, rather than after the cross build.
-            pg_config.major_version()?;
-            pg_config.pkglibdir()?;
-            pg_config.sharedir()?;
-            Ok(pg_config)
-        }
-    }
+/// The `pg_config` program for a build on this machine: `--pg-config` when given, otherwise
+/// the first `pg_config` on `PATH`.
+pub(crate) fn program_pg_config(explicit: Option<PathBuf>) -> PgConfig {
+    explicit.map_or_else(PgConfig::from_path, PgConfig::new_with_defaults)
 }
 
 pub(crate) fn display_version_info(pg_config: &PgConfig, pg_version: &PgVersionSource) {
@@ -283,10 +233,10 @@ pub(crate) fn display_version_info(pg_config: &PgConfig, pg_version: &PgVersionS
             path.display().cyan()
         ),
         None => eprintln!(
-            "{} {:?} and PostgreSQL metadata from {}",
+            "{} {:?} as described by {}",
             "       Using".bold().green(),
             pg_version.bold().white(),
-            "PGRX_PG_CONFIG_*".cyan()
+            "--pg-config-*".cyan()
         ),
     }
 }
@@ -390,39 +340,5 @@ impl PgrxManifestExt for Manifest {
         let os = TargetOs::from_target(target);
         let lib_name = &self.lib_name()?;
         Ok(format!("{}{lib_name}{}", os.dll_prefix(), os.dll_suffix()))
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::PgConfigSource;
-    use std::path::PathBuf;
-
-    #[test]
-    fn host_builds_use_a_program_and_ignore_environment_metadata() {
-        for environment in [false, true] {
-            assert_eq!(
-                PgConfigSource::select(Some("/pg/bin/pg_config".into()), environment, None)
-                    .unwrap(),
-                PgConfigSource::Program("/pg/bin/pg_config".into())
-            );
-            assert_eq!(
-                PgConfigSource::select(None, environment, None).unwrap(),
-                PgConfigSource::Path
-            );
-        }
-    }
-
-    #[test]
-    fn cross_builds_accept_only_environment_metadata() {
-        let cross = Some(("aarch64-unknown-linux-gnu", "x86_64-unknown-linux-gnu"));
-        assert_eq!(PgConfigSource::select(None, true, cross).unwrap(), PgConfigSource::Environment);
-        let program = || Some(PathBuf::from("/pg/bin/pg_config"));
-        for environment in [false, true] {
-            let error = PgConfigSource::select(program(), environment, cross).unwrap_err();
-            assert!(error.to_string().contains("--pg-config"), "{error}");
-        }
-        let error = PgConfigSource::select(None, false, cross).unwrap_err();
-        assert!(error.to_string().contains("PGRX_PG_CONFIG_AS_ENV=true"), "{error}");
     }
 }

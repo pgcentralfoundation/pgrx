@@ -80,8 +80,6 @@ pub(crate) struct Bench {
     profile: Option<String>,
     #[clap(flatten)]
     features: clap_cargo::Features,
-    #[clap(long)]
-    target: Option<String>,
     /// Extra cargo flags forwarded to every `cargo` invocation. Repeatable and split on whitespace: `--cargo=--config=foo` or `--cargo "--offline --frozen"`.
     #[clap(long = "cargo", value_name = "FLAG", allow_hyphen_values = true)]
     cargo: Vec<String>,
@@ -143,7 +141,7 @@ impl CommandExecute for Bench {
             &features,
             false,
             false,
-            self.target.as_deref(),
+            None,
             &target_dir,
             &postgresql_conf,
             crate::command::migrate::UnreleasedFragmentMode::for_development(

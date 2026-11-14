@@ -675,7 +675,6 @@ Options:
           Do not activate the `default` feature
   -F, --features <FEATURES>
           Space-separated list of features to activate
-      --target <TARGET>
       --cargo <FLAG>
           Extra cargo flags forwarded to every `cargo` invocation. Repeatable and split on whitespace: `--cargo=--config=foo` or `--cargo "--offline --frozen"`.
       --no-assemble-unreleased
@@ -900,24 +899,33 @@ Create an installation package directory
 Usage: cargo pgrx package [OPTIONS]
 
 Options:
-  -p, --package <PACKAGE>              Package to build (see `cargo help pkgid`)
-      --manifest-path <MANIFEST_PATH>  Path to Cargo.toml
-  -v, --verbose...                     Enable info logs, -vv for debug, -vvv for trace
-  -d, --debug                          Compile for debug mode (default is release)
-      --profile <PROFILE>              Specific profile to use (conflicts with `--debug`)
-      --test                           Build in test mode (for `cargo pgrx test`)
-  -c, --pg-config <PG_CONFIG>          The `pg_config` path (default is first in $PATH)
-      --out-dir <OUT_DIR>              The directory to output the package (default is `./target/[debug|release]/extname-pgXX/`)
-      --all-features                   Activate all available features
-      --no-default-features            Do not activate the `default` feature
-  -F, --features <FEATURES>            Space-separated list of features to activate
-      --cargo <FLAG>                   Extra cargo flags forwarded to every `cargo` invocation. Repeatable and split on whitespace: `--cargo=--config=foo` or `--cargo "--offline --frozen"`.
-      --assemble-unreleased            Assemble unreleased SQL fragments into the package instead of refusing to build it
-      --no-assemble-unreleased         Build the package without unreleased SQL fragments instead of refusing to build it
-      --no-distrib-packages            Skip the RPM and DEB packages that `[package.metadata.rpm]` and `[package.metadata.deb]` declare
-      --prefix-dir <PREFIX_DIR>        The directory within out_dir to put extension assets (default is based on pg_config path)
-  -h, --help                           Print help
-  -V, --version                        Print version
+  -p, --package <PACKAGE>                  Package to build (see `cargo help pkgid`)
+      --manifest-path <MANIFEST_PATH>      Path to Cargo.toml
+  -v, --verbose...                         Enable info logs, -vv for debug, -vvv for trace
+  -d, --debug                              Compile for debug mode (default is release)
+      --profile <PROFILE>                  Specific profile to use (conflicts with `--debug`)
+      --test                               Build in test mode (for `cargo pgrx test`)
+  -c, --pg-config <PG_CONFIG>              The `pg_config` path (default is first in $PATH)
+      --out-dir <OUT_DIR>                  The directory to output the package (default is `./target/[debug|release]/extname-pgXX/`)
+      --all-features                       Activate all available features
+      --no-default-features                Do not activate the `default` feature
+  -F, --features <FEATURES>                Space-separated list of features to activate
+      --target <TARGET>                    Build for this target triple; a platform other than this machine needs the `--pg-config-*` options
+      --pg-config-version <VERSION>        `pg_config --version` of the PostgreSQL to package for, such as "PostgreSQL 18.1"
+      --pg-config-includedir-server <DIR>  Where that PostgreSQL's server headers are on this machine
+      --pg-config-pkgincludedir <DIR>      Where its public headers are on this machine (MSVC targets)
+      --pg-config-libdir <DIR>             Its library directory, on this machine when linking reads it
+      --pg-config-pkglibdir <DIR>          Its `pg_config --pkglibdir`, where the extension library will be installed
+      --pg-config-sharedir <DIR>           Its `pg_config --sharedir`, where the extension's SQL and control files will be installed
+      --pg-config-cppflags <FLAGS>         Its `pg_config --cppflags`
+      --pg-config-cflags <FLAGS>           Its `pg_config --cflags`
+      --assemble-unreleased                Assemble unreleased SQL fragments into the package instead of refusing to build it
+      --no-assemble-unreleased             Build the package without unreleased SQL fragments instead of refusing to build it
+      --no-distrib-packages                Skip the RPM and DEB packages that `[package.metadata.rpm]` and `[package.metadata.deb]` declare
+      --cargo <FLAG>                       Extra cargo flags forwarded to every `cargo` invocation. Repeatable and split on whitespace: `--cargo=--config=foo` or `--cargo "--offline --frozen"`
+      --prefix-dir <PREFIX_DIR>            The directory within out_dir to put extension assets (default is based on pg_config path)
+  -h, --help                               Print help
+  -V, --version                            Print version
 ```
 
 ### Extension Artifact Placement
@@ -934,28 +942,25 @@ This places the extension assets in `./package/opt/my_extension/`. An absolute p
 directory. If you omit `--prefix-dir`, the layout follows `pg_config`. For Windows targets, the package layout uses `lib` and
 `share/extension` regardless of this option.
 
-For cross builds, pass a built-in Rust target triple directly to `cargo pgrx package
---target`. Set `PGRX_PG_CONFIG_AS_ENV=true` and supply the target's PostgreSQL
-metadata through `PGRX_PG_CONFIG_*` variables, as shown in
-[PostgreSQL metadata in the environment](../docs/src/extension/build/cross-compile.md#postgresql-metadata-in-the-environment).
+`cargo pgrx package` and `cargo pgrx install`, with or without `--sudo`, use
+`--pg-config` when given, otherwise the first `pg_config` on `PATH`. The
+`pgrx-pg-sys` build uses the same choice, so the extension is compiled against
+the PostgreSQL it is laid out for. That PostgreSQL's server headers must be
+installed. Neither command reads the `PGRX_PG_CONFIG_*` variables.
+
+For cross builds, pass a built-in Rust target triple to `cargo pgrx package
+--target`, which is the only command that has it. A `pg_config` program
+describes the machine it runs on, so a target other than the host rejects
+`--pg-config` and takes the target's PostgreSQL from the `--pg-config-*`
+options, as shown in
+[Packaging for the target](../docs/src/extension/build/cross-compile.md#packaging-for-the-target).
 Packaging then needs no `pg_config` executable, adapter, `cargo pgrx init`, or
-`$PGRX_HOME/config.toml`. Missing metadata produces an error; it does not fall
-back to a host installation.
+`$PGRX_HOME/config.toml`. Giving any `--pg-config-*` option requires all of them
+except `--pg-config-cflags` and `--pg-config-pkgincludedir`.
 
-`cargo pgrx package` and `cargo pgrx install`, with or without `--sudo`, choose
-PostgreSQL the same way. For this machine they use `--pg-config` when given,
-otherwise the first `pg_config` on `PATH`, and do not read the environment
-metadata. A `pg_config` program describes the machine it runs on, so when
-`--target` names a platform other than the host, both commands require the
-environment metadata and reject `--pg-config`.
-
-The `pgrx-pg-sys` build uses the same choice, so the extension is compiled
-against the PostgreSQL it is laid out for. That PostgreSQL's server headers
-must be installed.
-
-`PGRX_PG_CONFIG_PKGLIBDIR` and `PGRX_PG_CONFIG_SHAREDIR` describe the target's
+`--pg-config-pkglibdir` and `--pg-config-sharedir` describe the target's
 installation layout. Header paths and any libraries needed for linking must be
-accessible on the build host; for a Windows MSVC target, `PGRX_PG_CONFIG_LIBDIR` must
+accessible on the build host; for a Windows MSVC target, `--pg-config-libdir` must
 locate the target's `postgres.lib` there. Windows packages still use `lib` and
 `share/extension`, regardless of the target installation prefix.
 

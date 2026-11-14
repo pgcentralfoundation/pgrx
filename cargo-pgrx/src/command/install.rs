@@ -13,7 +13,7 @@ use crate::command::get::{find_control_file, get_property};
 use crate::command::migrate::{UnreleasedFragmentMode, plan_unreleased_fragments};
 use crate::command::sudo_install::SudoInstall;
 use crate::manifest::PgrxManifestExt;
-use crate::manifest::{PgVersionSource, display_version_info, selected_pg_config};
+use crate::manifest::{PgVersionSource, display_version_info, program_pg_config};
 use crate::target::TargetOs;
 use cargo_metadata::{CrateType, Message as CargoMessage};
 use cargo_toml::Manifest;
@@ -58,8 +58,6 @@ pub(crate) struct Install {
     sudo: bool,
     #[clap(flatten)]
     pub(crate) features: clap_cargo::Features,
-    #[clap(long)]
-    pub(crate) target: Option<String>,
     /// Don't assemble unreleased SQL fragments into the installed extension
     #[clap(long, env = "PGRX_NO_ASSEMBLE_UNRELEASED")]
     pub(crate) no_assemble_unreleased: bool,
@@ -92,8 +90,7 @@ impl CommandExecute for Install {
         let package_manifest =
             Manifest::from_path(&package_manifest_path).wrap_err("Couldn't parse manifest")?;
 
-        let pg_config =
-            selected_pg_config(self.pg_config.take().map(PathBuf::from), self.target.as_deref())?;
+        let pg_config = program_pg_config(self.pg_config.take().map(PathBuf::from));
         let pg_version = format!("pg{}", pg_config.major_version()?);
         let profile = CargoProfile::from_flags(
             self.profile.as_deref(),
@@ -120,7 +117,7 @@ impl CommandExecute for Install {
             self.test,
             None,
             &self.features,
-            self.target.as_deref(),
+            None,
             unreleased_mode,
             metadata.target_directory.as_std_path(),
             &cargo_flags,
@@ -391,11 +388,23 @@ pub(crate) struct EffectiveExtVersion<'a>(pub(crate) &'a str);
 /// Have the `pgrx-pg-sys` build script describe the same PostgreSQL as `pg_config`, which
 /// chose the feature flags and decides where the extension's files go.
 fn select_build_postgres(command: &mut std::process::Command, pg_config: &PgConfig) {
+    const METADATA: &str = "PGRX_PG_CONFIG_";
     let Some(program) = pg_config.path() else {
-        // The build script reads environment metadata from the same variables.
+        // A described installation reaches the build script as its environment metadata, with
+        // nothing left over from this process's own environment.
+        let Some(properties) = pg_config.properties() else { return };
+        for (name, _) in std::env::vars_os() {
+            if name.to_string_lossy().starts_with(METADATA) {
+                command.env_remove(name);
+            }
+        }
+        command.env("PGRX_PG_CONFIG_AS_ENV", "true");
+        for (name, value) in properties {
+            command.env(format!("{METADATA}{}", name.to_uppercase()), value);
+        }
         return;
     };
-    // A program was chosen over any metadata in the environment.
+    // The build script would prefer metadata in the environment to this program.
     command.env_remove("PGRX_PG_CONFIG_AS_ENV");
     let same_file = |other: PathBuf| match (program.canonicalize(), other.canonicalize()) {
         (Ok(program), Ok(other)) => program == other,

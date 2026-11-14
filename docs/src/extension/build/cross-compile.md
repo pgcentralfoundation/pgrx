@@ -7,8 +7,8 @@
 Note that guide is fairly preliminary and does not cover many cases, most notably:
 
 1. To stage an extension with `cargo pgrx package`, pass a built-in Rust target
-   triple with `--target` and supply the target's
-   [PostgreSQL metadata in the environment](#postgresql-metadata-in-the-environment).
+   triple with `--target` and describe the target's PostgreSQL with the
+   [`--pg-config-*` options](#packaging-for-the-target).
    This needs no `pg_config` executable or pgrx configuration file.
    cargo-pgrx defaults to the host when `--target` is omitted; it does not
    resolve Cargo's `build.target`, `CARGO_BUILD_TARGET`, or custom JSON target specifications.
@@ -90,8 +90,7 @@ Set `PGRX_PG_CONFIG_AS_ENV` to exactly `true` and describe the target's PostgreS
 build with `PGRX_PG_CONFIG_*` variables. Record its version and compiler flags
 from that build's `pg_config`; the target executable does not need to run on the
 build host. Relocate header paths and any libraries needed for linking to their
-locations on the build host. Package installation directories still describe
-the target:
+locations on the build host:
 
 | Variable | Value |
 | --- | --- |
@@ -101,8 +100,6 @@ the target:
 | `PGRX_PG_CONFIG_CPPFLAGS` | `pg_config --cppflags` |
 | `PGRX_PG_CONFIG_CFLAGS` | `pg_config --cflags` |
 | `PGRX_PG_CONFIG_LIBDIR` | target library search directory; relocate it to the build host when linking needs its files, such as Windows MSVC `postgres.lib` |
-| `PGRX_PG_CONFIG_PKGLIBDIR` | target `pg_config --pkglibdir`; needed for packaging |
-| `PGRX_PG_CONFIG_SHAREDIR` | target `pg_config --sharedir`; needed for packaging |
 
 pgrx then runs no `pg_config` program and applies every CFLAGS value except
 Darwin `-arch` selections, which the report lists under `cflags_dropped` (see
@@ -119,31 +116,50 @@ env PGRX_PG_CONFIG_AS_ENV=true \
     PGRX_PG_CONFIG_CPPFLAGS="$target_cppflags" \
     PGRX_PG_CONFIG_CFLAGS="$target_cflags" \
     PGRX_PG_CONFIG_LIBDIR=/usr/lib/aarch64-linux-gnu \
-    PGRX_PG_CONFIG_PKGLIBDIR=/usr/lib/postgresql/18/lib \
-    PGRX_PG_CONFIG_SHAREDIR=/usr/share/postgresql/18 \
-    cargo pgrx package --target aarch64-unknown-linux-gnu \
-        --no-default-features --features pg18 --out-dir ./package
+    cargo build --target aarch64-unknown-linux-gnu --release
 ```
 
 Here `target_cppflags` and `target_cflags` contain the target build's recorded
-flags. The same environment also works with `cargo build --target ...`.
-`cargo pgrx package` selects the PostgreSQL version and package layout from this
-metadata without consulting `PG_CONFIG`, `PGRX_PG_CONFIG_PATH`, or
-`$PGRX_HOME/config.toml`. There is no adapter to create and no `cargo pgrx init`
-step. Missing required properties cause an error instead of a fallback to the
-host's PostgreSQL installation. A `pg_config` program describes the machine it
-runs on, so for a `--target` other than the host, `cargo pgrx package` and
-`cargo pgrx install` reject `--pg-config` and never fall back to `pg_config` on
-`PATH`. Without `--target`, or when it names the host, they use a `pg_config`
-program and do not read this metadata.
+flags.
 
-For example, when targeting Windows from Linux, `INCLUDEDIR-SERVER`,
-`PKGINCLUDEDIR`, and `LIBDIR` refer to the Windows PostgreSQL headers and import
-libraries extracted onto Linux. `PKGLIBDIR` and `SHAREDIR` can retain Windows
+### Packaging for the target
+
+`cargo pgrx package` takes the same description as options, one per `pg_config`
+property, and passes it on to the `pgrx-pg-sys` build. It does not read the
+`PGRX_PG_CONFIG_*` variables:
+
+```sh
+cargo pgrx package --target aarch64-unknown-linux-gnu \
+    --pg-config-version "PostgreSQL 18.1" \
+    --pg-config-includedir-server "$HOME/pg-arm64/usr/include/postgresql/18/server" \
+    --pg-config-cppflags "$target_cppflags" \
+    --pg-config-cflags "$target_cflags" \
+    --pg-config-libdir /usr/lib/aarch64-linux-gnu \
+    --pg-config-pkglibdir /usr/lib/postgresql/18/lib \
+    --pg-config-sharedir /usr/share/postgresql/18 \
+    --no-default-features --features pg18 --out-dir ./package
+```
+
+`--pg-config-pkglibdir` and `--pg-config-sharedir` are the target's installation
+directories and decide the package layout. There is no adapter to create, no
+`cargo pgrx init` step, and no `$PGRX_HOME/config.toml`.
+
+A `pg_config` program describes the machine it runs on. For a `--target` other
+than the host, `cargo pgrx package` requires these options, rejects
+`--pg-config`, and never falls back to `pg_config` on `PATH`. Giving any one of
+the options means describing PostgreSQL in full: all are then required except
+`--pg-config-cflags` and `--pg-config-pkgincludedir`, which only MSVC targets
+need. Only `cargo pgrx package` has `--target`.
+
+For example, when targeting Windows from Linux, `--pg-config-includedir-server`,
+`--pg-config-pkgincludedir`, and `--pg-config-libdir` refer to the Windows
+PostgreSQL headers and import libraries extracted onto Linux.
+`--pg-config-pkglibdir` and `--pg-config-sharedir` can retain Windows
 installation paths. Windows packages always stage into `lib` and
 `share/extension`, so their installation prefix is not part of the package.
-When invoking from Git Bash or MSYS2, set
-`MSYS2_ENV_CONV_EXCL=PGRX_PG_CONFIG_` to preserve target paths in these variables.
+Git Bash and MSYS2 rewrite arguments that look like Unix paths; write each
+option as `--pg-config-name=value` and set `MSYS2_ARG_CONV_EXCL=--pg-config-`
+to preserve target paths.
 
 These variables are not target-scoped. Every build of `pgrx-pg-sys` in that
 Cargo invocation uses them, and the version must match the selected `pgNN`

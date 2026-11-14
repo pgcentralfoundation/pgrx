@@ -55,23 +55,21 @@ pg_source="$scratch/postgresql-18.7"
 )
 
 # The target pg_config executable cannot run here, and cargo-pgrx accepts no pg_config program
-# for another target. Describe the configured installation in the environment instead,
-# relocating only its headers; package destinations stay target paths. `env` sets the
-# variables because a shell cannot export a name that contains a hyphen.
+# for another target. Describe the configured installation with the --pg-config-* options
+# instead, relocating only its headers; package destinations stay target paths.
 export PGRX_HOME="$scratch/pgrx-home"
 mkdir -p "$PGRX_HOME"
 
 cargo build --locked --package cargo-pgrx
-env PGRX_PG_CONFIG_AS_ENV=true \
-    PGRX_PG_CONFIG_VERSION='PostgreSQL 18.7' \
-    "PGRX_PG_CONFIG_INCLUDEDIR-SERVER=$scratch/pg18/usr/local/pgsql/include/server" \
-    PGRX_PG_CONFIG_LIBDIR=/usr/local/pgsql/lib \
-    PGRX_PG_CONFIG_PKGLIBDIR=/usr/local/pgsql/lib \
-    PGRX_PG_CONFIG_SHAREDIR=/usr/local/pgsql/share \
-    "PGRX_PG_CONFIG_CPPFLAGS=-isysroot $OSXCROSS_SDKROOT" \
-    "PGRX_PG_CONFIG_CFLAGS=$(sed -n 's/^CFLAGS = //p' "$pg_source/src/Makefile.global")" \
-    "${CARGO_TARGET_DIR:-target}/debug/cargo-pgrx" pgrx package --package versioned_so \
+"${CARGO_TARGET_DIR:-target}/debug/cargo-pgrx" pgrx package --package versioned_so \
     --no-default-features --features pg18 --target aarch64-apple-darwin \
+    --pg-config-version 'PostgreSQL 18.7' \
+    --pg-config-includedir-server "$scratch/pg18/usr/local/pgsql/include/server" \
+    --pg-config-libdir /usr/local/pgsql/lib \
+    --pg-config-pkglibdir /usr/local/pgsql/lib \
+    --pg-config-sharedir /usr/local/pgsql/share \
+    --pg-config-cppflags "-isysroot $OSXCROSS_SDKROOT" \
+    --pg-config-cflags "$(sed -n 's/^CFLAGS = //p' "$pg_source/src/Makefile.global")" \
     --out-dir "$scratch/package" --debug --no-distrib-packages --cargo=--locked
 
 python3 - "$scratch/package" <<'PY'

@@ -242,18 +242,16 @@ replace items 2 and 4. Raw bindings alone cannot. The
 [cross-compilation guide](docs/src/extension/build/cross-compile.md#postgresql-headers-and-metadata-for-the-target)
 describes each path and what pgrx verifies.
 
-To package with recorded target metadata, set `PGRX_PG_CONFIG_AS_ENV=true` and
-the variables listed in
-[PostgreSQL metadata in the environment](docs/src/extension/build/cross-compile.md#postgresql-metadata-in-the-environment),
-then run `cargo pgrx package --target <target-triple>`. This needs no `pg_config`
-executable, adapter, `cargo pgrx init`, or pgrx configuration file. Header and
-link-library paths must be accessible on the build host; package installation
-paths describe the target.
+To package for another target, run `cargo pgrx package --target <target-triple>`
+with the `--pg-config-*` options described under
+[Packaging for the target](docs/src/extension/build/cross-compile.md#packaging-for-the-target).
+This needs no `pg_config` executable, adapter, `cargo pgrx init`, or pgrx
+configuration file. Header and link-library paths must be accessible on the
+build host; package installation paths describe the target.
 
-A `pg_config` program describes the machine it runs on. For a `--target` other
-than the host, `cargo pgrx package` requires this environment metadata and
-rejects `--pg-config`. For the host it uses a `pg_config` program and does not
-read the metadata.
+A `pg_config` program describes the machine it runs on, so for a `--target`
+other than the host, `cargo pgrx package` requires those options and rejects
+`--pg-config`. Only `cargo pgrx package` has `--target`.
 
 Pass a built-in Rust target triple explicitly to cargo-pgrx. Library names,
 package layout, universal Mach-O slice selection, and RPM/DEB generation follow

@@ -14,8 +14,8 @@ use crate::command::install::{
     format_display_path, install_extension, shared_library_filename, warn_if_pg_bench_enabled,
 };
 use crate::command::migrate::UnreleasedFragmentMode;
-use crate::manifest::{PgVersionSource, display_version_info, selected_pg_config};
-use crate::target::{TargetOs, target_arch};
+use crate::manifest::{PgVersionSource, display_version_info};
+use crate::target::{TargetOs, host_triple, target_arch};
 use cargo_toml::Manifest;
 use eyre::{WrapErr, eyre};
 use owo_colors::OwoColorize;
@@ -50,8 +50,11 @@ pub(crate) struct Package {
     pub(crate) out_dir: Option<PathBuf>,
     #[clap(flatten)]
     pub(crate) features: clap_cargo::Features,
+    /// Build for this target triple; a platform other than this machine needs the `--pg-config-*` options
     #[clap(long)]
     pub(crate) target: Option<String>,
+    #[clap(flatten)]
+    pub(crate) target_postgres: TargetPostgres,
     /// Assemble unreleased SQL fragments into the package instead of refusing to build it
     #[clap(long, conflicts_with = "no_assemble_unreleased")]
     pub(crate) assemble_unreleased: bool,
@@ -69,6 +72,106 @@ pub(crate) struct Package {
     /// The directory within out_dir to put extension assets (default is based on pg_config path)
     #[clap(long, value_parser)]
     pub(crate) prefix_dir: Option<PathBuf>,
+}
+
+/// A PostgreSQL described by the values its `pg_config` prints, in place of running one.
+/// A `--target` other than this machine needs it.
+#[derive(clap::Args, Debug, Default, Clone)]
+pub(crate) struct TargetPostgres {
+    /// `pg_config --version` of the PostgreSQL to package for, such as "PostgreSQL 18.1"
+    #[clap(long = "pg-config-version", value_name = "VERSION", conflicts_with = "pg_config")]
+    pg_config_version: Option<String>,
+    /// Where that PostgreSQL's server headers are on this machine
+    #[clap(long = "pg-config-includedir-server", value_name = "DIR", conflicts_with = "pg_config")]
+    pg_config_includedir_server: Option<String>,
+    /// Where its public headers are on this machine (MSVC targets)
+    #[clap(long = "pg-config-pkgincludedir", value_name = "DIR", conflicts_with = "pg_config")]
+    pg_config_pkgincludedir: Option<String>,
+    /// Its library directory, on this machine when linking reads it
+    #[clap(long = "pg-config-libdir", value_name = "DIR", conflicts_with = "pg_config")]
+    pg_config_libdir: Option<String>,
+    /// Its `pg_config --pkglibdir`, where the extension library will be installed
+    #[clap(long = "pg-config-pkglibdir", value_name = "DIR", conflicts_with = "pg_config")]
+    pg_config_pkglibdir: Option<String>,
+    /// Its `pg_config --sharedir`, where the extension's SQL and control files will be installed
+    #[clap(long = "pg-config-sharedir", value_name = "DIR", conflicts_with = "pg_config")]
+    pg_config_sharedir: Option<String>,
+    /// Its `pg_config --cppflags`
+    #[clap(
+        long = "pg-config-cppflags",
+        value_name = "FLAGS",
+        conflicts_with = "pg_config",
+        allow_hyphen_values = true
+    )]
+    pg_config_cppflags: Option<String>,
+    /// Its `pg_config --cflags`
+    #[clap(
+        long = "pg-config-cflags",
+        value_name = "FLAGS",
+        conflicts_with = "pg_config",
+        allow_hyphen_values = true
+    )]
+    pg_config_cflags: Option<String>,
+}
+
+impl TargetPostgres {
+    /// What the build and the package layout cannot do without.
+    const REQUIRED: [&str; 6] =
+        ["version", "includedir-server", "libdir", "pkglibdir", "sharedir", "cppflags"];
+
+    /// The given values by `pg_config` option name, which is also the option's suffix here.
+    fn properties(&self) -> Vec<(&'static str, &str)> {
+        [
+            ("version", &self.pg_config_version),
+            ("includedir-server", &self.pg_config_includedir_server),
+            ("pkgincludedir", &self.pg_config_pkgincludedir),
+            ("libdir", &self.pg_config_libdir),
+            ("pkglibdir", &self.pg_config_pkglibdir),
+            ("sharedir", &self.pg_config_sharedir),
+            ("cppflags", &self.pg_config_cppflags),
+            ("cflags", &self.pg_config_cflags),
+        ]
+        .into_iter()
+        .filter_map(|(name, value)| Some((name, value.as_deref()?)))
+        .collect()
+    }
+}
+
+/// Choose the PostgreSQL to package for. The `--pg-config-*` options describe one in place of a
+/// `pg_config` program, so giving any of them means giving all that the build and the layout
+/// need. A program describes the machine it runs on, so a `cross` build, given as its target
+/// and this host, accepts only that description.
+fn selected_pg_config(
+    explicit: Option<PathBuf>,
+    described: &TargetPostgres,
+    cross: Option<(&str, &str)>,
+) -> eyre::Result<PgConfig> {
+    let properties = described.properties();
+    if properties.is_empty() && cross.is_none() {
+        return Ok(crate::manifest::program_pg_config(explicit));
+    }
+    let missing: Vec<_> = TargetPostgres::REQUIRED
+        .into_iter()
+        .filter(|required| !properties.iter().any(|(name, _)| name == required))
+        .map(|name| format!("--pg-config-{name}"))
+        .collect();
+    if let Some((target, host)) = cross {
+        eyre::ensure!(
+            explicit.is_none(),
+            "--pg-config names a program that describes this machine ({host}), not `--target {target}`; describe the target's PostgreSQL with the --pg-config-* options instead"
+        );
+        eyre::ensure!(
+            missing.is_empty(),
+            "`--target {target}` is not this machine ({host}), so `pg_config` cannot describe its PostgreSQL; pass {}",
+            missing.join(", ")
+        );
+    }
+    eyre::ensure!(
+        missing.is_empty(),
+        "the --pg-config-* options describe PostgreSQL in place of a `pg_config` program, so all of them are needed; also pass {}",
+        missing.join(", ")
+    );
+    Ok(PgConfig::from_properties(properties))
 }
 
 impl Package {
@@ -96,7 +199,10 @@ impl Package {
         let package_manifest =
             Manifest::from_path(&package_manifest_path).wrap_err("Couldn't parse manifest")?;
 
-        let pg_config = selected_pg_config(self.pg_config.take(), self.target.as_deref())?;
+        let host = self.target.as_ref().map(|_| host_triple()).transpose()?;
+        let cross =
+            self.target.as_deref().zip(host.as_deref()).filter(|(target, host)| target != host);
+        let pg_config = selected_pg_config(self.pg_config.take(), &self.target_postgres, cross)?;
         let pg_version = format!("pg{}", pg_config.major_version()?);
 
         crate::manifest::modify_features_for_version(
