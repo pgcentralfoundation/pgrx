@@ -50,9 +50,6 @@ pub(crate) struct Schema {
     /// Specific profile to use (conflicts with `--release`)
     #[clap(long)]
     profile: Option<String>,
-    /// The `pg_config` path (default is first in $PATH)
-    #[clap(long, short = 'c', value_parser)]
-    pg_config: Option<PathBuf>,
     #[clap(flatten)]
     features: clap_cargo::Features,
     /// A path to output a produced SQL file (default is `stdout`)

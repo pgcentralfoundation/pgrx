@@ -1126,7 +1126,6 @@ Options:
       --test                           Build in test mode (for `cargo pgrx test`)
   -r, --release                        Compile for release mode (default is debug)
       --profile <PROFILE>              Specific profile to use (conflicts with `--release`)
-  -c, --pg-config <PG_CONFIG>          The `pg_config` path (default is first in $PATH)
       --all-features                   Activate all available features
       --no-default-features            Do not activate the `default` feature
   -F, --features <FEATURES>            Space-separated list of features to activate
