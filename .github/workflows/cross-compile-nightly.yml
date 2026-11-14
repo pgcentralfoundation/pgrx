@@ -456,36 +456,27 @@ jobs:
             echo 'TARGET_PG_CFLAGS=-Wall -O2 /wd4018 /wd4244 /wd4273 /wd4101 /wd4102 /wd4090 /wd4267'
           } >> "$GITHUB_ENV"
 
-      - name: Build a native pg_config adapter and select target metadata
+      - name: Select target PostgreSQL metadata without a pg_config program
         run: |
-          cat > "$CROSS_ROOT/pg_config.rs" <<'RS'
-          fn main() {
-              let option = std::env::args().nth(1).expect("pg_config option");
-              let property = option.strip_prefix("--").expect("long pg_config option");
-              let key = format!("PGRX_PG_CONFIG_{}", property.to_ascii_uppercase());
-              println!("{}", std::env::var(&key).unwrap_or_else(|_| panic!("missing {key}")));
-          }
-          RS
-          adapter="$CROSS_ROOT/pg_config"
-          if [[ "$RUNNER_OS" == Windows ]]; then adapter="$adapter.exe"; fi
-          rustc --edition=2024 "$CROSS_ROOT/pg_config.rs" -o "$adapter"
           python - <<'PY'
-          import json, os, sys
+          import json, os
           from pathlib import Path
           root = Path(os.environ['CROSS_ROOT'])
-          adapter = root / ('pg_config.exe' if sys.platform == 'win32' else 'pg_config')
+          assert not (root / 'pgrx-home/config.toml').exists()
+          missing_pg_config = (root / 'no-pg-config').as_posix()
+          assert not Path(missing_pg_config).exists()
           values = {
               'PGRX_PG_CONFIG_AS_ENV': 'true',
               'PGRX_PG_CONFIG_VERSION': 'PostgreSQL 18.7',
-              'PGRX_PG_CONFIG_CONFIGURE': '',
-              'PG_CONFIG': adapter.as_posix(),
+              # These must never be consulted while environment metadata is selected.
+              'PG_CONFIG': missing_pg_config,
+              'PGRX_PG_CONFIG_PATH': missing_pg_config,
           }
           for name in ('INCLUDEDIR_SERVER', 'PKGINCLUDEDIR', 'LIBDIR', 'PKGLIBDIR', 'SHAREDIR', 'CPPFLAGS', 'CFLAGS'):
               key = name.replace('INCLUDEDIR_SERVER', 'INCLUDEDIR-SERVER')
               if 'TARGET_PG_' + name in os.environ:
                   values['PGRX_PG_CONFIG_' + key] = os.environ['TARGET_PG_' + name]
           (root / 'diagnostics/pg-config.json').write_text(json.dumps(values, indent=2))
-          (root / 'pgrx-home/config.toml').write_text(f"[configs]\npg18 = '{adapter.as_posix()}'\n")
           with open(os.environ['GITHUB_ENV'], 'a') as env:
               for key, value in values.items():
                   env.write(f'{key}={value}\n')
@@ -497,7 +488,7 @@ jobs:
           if [[ -n "${CROSS_ENV_FILE:-}" ]]; then source "$CROSS_ENV_FILE"; fi
           target/debug/cargo-pgrx pgrx package --package versioned_so \
             --no-default-features --features pg18 --target "$CROSS_TARGET" \
-            --pg-config "$PG_CONFIG" --out-dir "$CROSS_ROOT/packages/versioned_so" \
+            --out-dir "$CROSS_ROOT/packages/versioned_so" \
             --debug --cargo=--locked
 
       - name: Package the extension with RPM and DEB metadata
@@ -506,8 +497,9 @@ jobs:
           if [[ -n "${CROSS_ENV_FILE:-}" ]]; then source "$CROSS_ENV_FILE"; fi
           target/debug/cargo-pgrx pgrx package --package packaging \
             --no-default-features --features pg18 --target "$CROSS_TARGET" \
-            --pg-config "$PG_CONFIG" --out-dir "$CROSS_ROOT/packages/packaging" \
+            --out-dir "$CROSS_ROOT/packages/packaging" \
             --debug --cargo=--locked
+          test ! -e "$PGRX_HOME/config.toml"
 
       - name: Check exact package names and SQL library references
         run: |
