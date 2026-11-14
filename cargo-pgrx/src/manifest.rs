@@ -222,36 +222,33 @@ pub(crate) fn pg_config_and_version(
 enum PgConfigSource {
     /// The `pg_config` program that `--pg-config` names.
     Program(PathBuf),
-    /// `PGRX_PG_CONFIG_*` metadata, enabled by `PGRX_PG_CONFIG_AS_ENV=true`.
-    Environment,
     /// The first `pg_config` on `PATH`.
     Path,
+    /// `PGRX_PG_CONFIG_*` metadata, enabled by `PGRX_PG_CONFIG_AS_ENV=true`.
+    Environment,
 }
 
 impl PgConfigSource {
-    /// `--pg-config` when given, then environment metadata, then `PATH`. A `pg_config` program
-    /// describes the machine it runs on, so a `cross` build, given as its target and this host,
-    /// accepts only environment metadata.
+    /// A `pg_config` program describes the machine it runs on. A build for this machine uses
+    /// one, `--pg-config` or else the first on `PATH`, and does not read environment metadata.
+    /// A `cross` build, given as its target and this host, accepts only that metadata.
     fn select(
         explicit: Option<PathBuf>,
         environment: bool,
         cross: Option<(&str, &str)>,
     ) -> eyre::Result<Self> {
-        if let Some((target, host)) = cross {
-            eyre::ensure!(
-                explicit.is_none(),
-                "--pg-config names a program that describes this machine ({host}), not `--target {target}`; describe the target's PostgreSQL with PGRX_PG_CONFIG_AS_ENV=true and the PGRX_PG_CONFIG_* variables instead"
-            );
-            eyre::ensure!(
-                environment,
-                "`--target {target}` is not this machine ({host}), so `pg_config` cannot describe its PostgreSQL; set PGRX_PG_CONFIG_AS_ENV=true and the PGRX_PG_CONFIG_* variables"
-            );
-        }
-        Ok(match explicit {
-            Some(program) => Self::Program(program),
-            None if environment => Self::Environment,
-            None => Self::Path,
-        })
+        let Some((target, host)) = cross else {
+            return Ok(explicit.map_or(Self::Path, Self::Program));
+        };
+        eyre::ensure!(
+            explicit.is_none(),
+            "--pg-config names a program that describes this machine ({host}), not `--target {target}`; describe the target's PostgreSQL with PGRX_PG_CONFIG_AS_ENV=true and the PGRX_PG_CONFIG_* variables instead"
+        );
+        eyre::ensure!(
+            environment,
+            "`--target {target}` is not this machine ({host}), so `pg_config` cannot describe its PostgreSQL; set PGRX_PG_CONFIG_AS_ENV=true and the PGRX_PG_CONFIG_* variables"
+        );
+        Ok(Self::Environment)
     }
 }
 
@@ -264,8 +261,15 @@ pub(crate) fn selected_pg_config(
     let cross = target.zip(host.as_deref()).filter(|(target, host)| target != host);
     match PgConfigSource::select(explicit, PgConfig::is_in_environment(), cross)? {
         PgConfigSource::Program(program) => Ok(PgConfig::new_with_defaults(program)),
-        PgConfigSource::Environment => PgConfig::from_env(),
         PgConfigSource::Path => Ok(PgConfig::from_path()),
+        PgConfigSource::Environment => {
+            let pg_config = PgConfig::from_env()?;
+            // Report what staging needs now, rather than after the cross build.
+            pg_config.major_version()?;
+            pg_config.pkglibdir()?;
+            pg_config.sharedir()?;
+            Ok(pg_config)
+        }
     }
 }
 
@@ -395,16 +399,18 @@ mod tests {
     use std::path::PathBuf;
 
     #[test]
-    fn pg_config_flag_precedes_environment_and_path() {
-        let program = || Some(PathBuf::from("/pg/bin/pg_config"));
+    fn host_builds_use_a_program_and_ignore_environment_metadata() {
         for environment in [false, true] {
             assert_eq!(
-                PgConfigSource::select(program(), environment, None).unwrap(),
+                PgConfigSource::select(Some("/pg/bin/pg_config".into()), environment, None)
+                    .unwrap(),
                 PgConfigSource::Program("/pg/bin/pg_config".into())
             );
+            assert_eq!(
+                PgConfigSource::select(None, environment, None).unwrap(),
+                PgConfigSource::Path
+            );
         }
-        assert_eq!(PgConfigSource::select(None, true, None).unwrap(), PgConfigSource::Environment);
-        assert_eq!(PgConfigSource::select(None, false, None).unwrap(), PgConfigSource::Path);
     }
 
     #[test]

@@ -252,7 +252,8 @@ paths describe the target.
 
 A `pg_config` program describes the machine it runs on. For a `--target` other
 than the host, `cargo pgrx package` requires this environment metadata and
-rejects `--pg-config`.
+rejects `--pg-config`. For the host it uses a `pg_config` program and does not
+read the metadata.
 
 Pass a built-in Rust target triple explicitly to cargo-pgrx. Library names,
 package layout, universal Mach-O slice selection, and RPM/DEB generation follow

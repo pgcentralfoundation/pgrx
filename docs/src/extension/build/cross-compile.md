@@ -134,7 +134,8 @@ step. Missing required properties cause an error instead of a fallback to the
 host's PostgreSQL installation. A `pg_config` program describes the machine it
 runs on, so for a `--target` other than the host, `cargo pgrx package` and
 `cargo pgrx install` reject `--pg-config` and never fall back to `pg_config` on
-`PATH`.
+`PATH`. Without `--target`, or when it names the host, they use a `pg_config`
+program and do not read this metadata.
 
 For example, when targeting Windows from Linux, `INCLUDEDIR-SERVER`,
 `PKGINCLUDEDIR`, and `LIBDIR` refer to the Windows PostgreSQL headers and import

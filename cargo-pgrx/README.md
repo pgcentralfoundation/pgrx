@@ -943,14 +943,15 @@ Packaging then needs no `pg_config` executable, adapter, `cargo pgrx init`, or
 back to a host installation.
 
 `cargo pgrx package` and `cargo pgrx install`, with or without `--sudo`, choose
-PostgreSQL in the same order: `--pg-config` when given, then this environment
-metadata, then the first `pg_config` on `PATH`. The `pgrx-pg-sys` build uses the
-same choice, so the extension is compiled against the PostgreSQL it is laid out
-for. That PostgreSQL's server headers must be installed.
+PostgreSQL the same way. For this machine they use `--pg-config` when given,
+otherwise the first `pg_config` on `PATH`, and do not read the environment
+metadata. A `pg_config` program describes the machine it runs on, so when
+`--target` names a platform other than the host, both commands require the
+environment metadata and reject `--pg-config`.
 
-A `pg_config` program describes the machine it runs on. When `--target` names a
-platform other than the host, both commands require the environment metadata
-and reject `--pg-config`.
+The `pgrx-pg-sys` build uses the same choice, so the extension is compiled
+against the PostgreSQL it is laid out for. That PostgreSQL's server headers
+must be installed.
 
 `PGRX_PG_CONFIG_PKGLIBDIR` and `PGRX_PG_CONFIG_SHAREDIR` describe the target's
 installation layout. Header paths and any libraries needed for linking must be

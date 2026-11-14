@@ -196,36 +196,29 @@ fn combined_output(output: &Output) -> String {
     )
 }
 
+/// A build for this machine uses a `pg_config` program, the first on `PATH` here, whether or
+/// not environment metadata is set, and the build is told to use that same program.
 #[test]
-fn package_uses_environment_metadata_without_managed_postgres() {
-    let fixture = Fixture::new();
-    let output = fixture.command().output().unwrap();
-    assert!(output.status.success(), "{}", combined_output(&output));
-    assert!(combined_output(&output).contains("PGRX_PG_CONFIG_*"), "{}", combined_output(&output));
-    fixture.assert_package("environment");
-    fixture.assert_no_pg_config_calls();
-    let build_saw = fs::read_to_string(fixture.directory.path().join("build-saw")).unwrap();
-    assert!(build_saw.ends_with(r#"Some("true")]"#), "{build_saw}");
+fn host_package_ignores_environment_metadata() {
+    for environment in [true, false] {
+        let fixture = Fixture::new();
+        let mut command = fixture.command();
+        if !environment {
+            command.env_remove("PGRX_PG_CONFIG_AS_ENV");
+        }
+        let output = command.output().unwrap();
+        assert!(output.status.success(), "{}", combined_output(&output));
+        fixture.assert_package("native");
+        fixture.assert_build_used_program();
+    }
 }
 
 #[test]
-fn explicit_pg_config_overrides_environment_metadata() {
+fn explicit_pg_config_chooses_layout_and_build() {
     let fixture = Fixture::new();
     let output = fixture.command().arg("--pg-config").arg(&fixture.pg_config).output().unwrap();
     assert!(output.status.success(), "{}", combined_output(&output));
     assert!(combined_output(&output).contains(fixture.pg_config.to_str().unwrap()));
-    fixture.assert_package("native");
-    assert!(fixture.directory.path().join("pg_config-called").is_file());
-    fixture.assert_build_used_program();
-}
-
-/// With no `--pg-config` and no environment metadata, the first `pg_config` on `PATH` chooses
-/// the layout, and the build is told to use that same program.
-#[test]
-fn path_pg_config_reaches_the_build() {
-    let fixture = Fixture::new();
-    let output = fixture.command().env_remove("PGRX_PG_CONFIG_AS_ENV").output().unwrap();
-    assert!(output.status.success(), "{}", combined_output(&output));
     fixture.assert_package("native");
     fixture.assert_build_used_program();
 }
@@ -267,6 +260,31 @@ fn cross_target_requires_environment_metadata() {
     assert!(output.contains("set PGRX_PG_CONFIG_AS_ENV=true"), "{output}");
     fixture.assert_no_pg_config_calls();
 
+    // Incomplete metadata is reported before the cross build, and never falls back.
+    for (property, option) in
+        [("VERSION", "--version"), ("PKGLIBDIR", "--pkglibdir"), ("SHAREDIR", "--sharedir")]
+    {
+        let output = fixture
+            .command()
+            .args(["--target", cross])
+            .env_remove(format!("PGRX_PG_CONFIG_{property}"))
+            .output()
+            .unwrap();
+        assert!(!output.status.success());
+        let output = combined_output(&output);
+        assert!(output.contains(&format!("has no known property named {option}")), "{output}");
+        assert!(!output.contains("Compiling"), "{output}");
+    }
+    fixture.assert_no_pg_config_calls();
+
+    // Complete metadata is accepted and reaches the build script, which runs on this machine
+    // even when the target's standard library is not installed for the rest of the build.
+    let output = fixture.command().args(["--target", cross]).output().unwrap();
+    let build_saw = fs::read_to_string(fixture.directory.path().join("build-saw"))
+        .unwrap_or_else(|error| panic!("{error}: {}", combined_output(&output)));
+    assert!(build_saw.ends_with(r#"Some("true")]"#), "{build_saw}");
+    fixture.assert_no_pg_config_calls();
+
     // Naming this machine's own triple is not a cross build.
     let output = fixture
         .command()
@@ -278,77 +296,14 @@ fn cross_target_requires_environment_metadata() {
     fixture.assert_build_used_program();
 }
 
-#[test]
-fn incomplete_environment_metadata_never_falls_back_to_pg_config() {
-    let fixture = Fixture::new();
-    for (property, option) in
-        [("VERSION", "--version"), ("PKGLIBDIR", "--pkglibdir"), ("SHAREDIR", "--sharedir")]
-    {
-        let output =
-            fixture.command().env_remove(format!("PGRX_PG_CONFIG_{property}")).output().unwrap();
-        assert!(!output.status.success());
-        let output = combined_output(&output);
-        assert!(output.contains(&format!("has no known property named {option}")), "{output}");
-        fixture.assert_no_pg_config_calls();
-    }
-}
-
-#[test]
-fn disabled_environment_metadata_preserves_explicit_pg_config() {
-    let fixture = Fixture::new();
-    for enabled in [None, Some("false")] {
-        let mut command = fixture.command();
-        command
-            .arg("--pg-config")
-            .arg(&fixture.pg_config)
-            .env("PGRX_PG_CONFIG_VERSION", "PostgreSQL 15.1");
-        match enabled {
-            Some(value) => {
-                command.env("PGRX_PG_CONFIG_AS_ENV", value);
-            }
-            None => {
-                command.env_remove("PGRX_PG_CONFIG_AS_ENV");
-            }
-        }
-        let output = command.output().unwrap();
-        assert!(output.status.success(), "{}", combined_output(&output));
-        assert!(combined_output(&output).contains(fixture.pg_config.to_str().unwrap()));
-        fixture.assert_package("native");
-        assert!(fixture.directory.path().join("pg_config-called").is_file());
-        fixture.assert_build_used_program();
-    }
-}
-
-/// `install` chooses its PostgreSQL as `package` does, and needs no `config.toml` to do it.
-#[test]
-fn install_uses_environment_metadata() {
-    let fixture = Fixture::new();
-    let installed = fixture.directory.path().join("installed");
-    let output = fixture
-        .cargo_pgrx(&["install"])
-        .env("PGRX_PG_CONFIG_PKGLIBDIR", installed.join("lib"))
-        .env("PGRX_PG_CONFIG_SHAREDIR", installed.join("share"))
-        .output()
-        .unwrap();
-    assert!(output.status.success(), "{}", combined_output(&output));
-    assert!(
-        installed
-            .join(format!("lib/package_environment_test{}", std::env::consts::DLL_SUFFIX))
-            .is_file()
-    );
-    assert!(installed.join("share/extension/package_environment_test.control").is_file());
-    assert!(installed.join("share/extension/package_environment_test--0.1.0.sql").is_file());
-    fixture.assert_no_pg_config_calls();
-}
-
-/// `install --sudo` stages through the package command, so it follows the same order:
-/// `--pg-config`, then environment metadata, then the `pg_config` on `PATH`.
+/// `install --sudo` stages through the package command, so it chooses PostgreSQL the same way.
+/// Environment metadata left set in the shell cannot redirect an install on this machine.
 #[cfg(unix)]
 #[test]
-fn sudo_install_selects_postgres_as_package_does() {
+fn sudo_install_ignores_environment_metadata() {
     use std::os::unix::fs::PermissionsExt;
-    for (explicit_pg_config, environment, prefix) in
-        [(false, true, "environment"), (true, true, "native"), (false, false, "native")]
+    for (explicit_pg_config, environment) in
+        [(false, true), (true, true), (false, false), (true, false)]
     {
         let fixture = Fixture::new();
         let root = fixture.directory.path();
@@ -367,10 +322,7 @@ fn sudo_install_selects_postgres_as_package_does() {
         }
         let output = command.output().unwrap();
         assert!(output.status.success(), "{}", combined_output(&output));
-        assert_eq!(root.join("pg_config-called").is_file(), prefix == "native");
-        if prefix == "native" {
-            fixture.assert_build_used_program();
-        }
+        fixture.assert_build_used_program();
         let copies = fs::read_to_string(&log).unwrap();
         let mut destinations: Vec<_> =
             copies.lines().map(|copy| copy.rsplit(' ').next().unwrap()).collect();
@@ -378,12 +330,9 @@ fn sudo_install_selects_postgres_as_package_does() {
         assert_eq!(
             destinations,
             [
-                format!(
-                    "/{prefix}/pg/lib/package_environment_test{}",
-                    std::env::consts::DLL_SUFFIX
-                ),
-                format!("/{prefix}/pg/share/extension/package_environment_test--0.1.0.sql"),
-                format!("/{prefix}/pg/share/extension/package_environment_test.control"),
+                format!("/native/pg/lib/package_environment_test{}", std::env::consts::DLL_SUFFIX),
+                "/native/pg/share/extension/package_environment_test--0.1.0.sql".to_owned(),
+                "/native/pg/share/extension/package_environment_test.control".to_owned(),
             ],
             "{copies}"
         );
