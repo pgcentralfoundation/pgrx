@@ -81,7 +81,16 @@ fn zig_language_specific_includes_preserve_c_search_order_and_freshness() {
             ]);
         }
         let frontend = inspect(&scanner, &header, &arguments, None).unwrap();
-        assert!(frontend.profile().arguments.starts_with(&arguments));
+        let mut expected_arguments = arguments.clone();
+        if cfg!(target_env = "msvc") {
+            // MSVC's default warning policy precedes the caller's arguments.
+            expected_arguments.insert(0, pgrx_c_macros::MSVC_POINTER_TYPE_WARNING.into());
+        }
+        assert!(
+            frontend.profile().arguments.starts_with(&expected_arguments),
+            "unexpected compiler arguments: {:?}",
+            frontend.profile().arguments
+        );
         let number = &frontend.environment().active["NUMBER"].definition;
         assert_eq!(number.tokens.last().unwrap().spelling, expected);
         let selected = earlier.join("selected.h");
