@@ -940,11 +940,14 @@ metadata through `PGRX_PG_CONFIG_*` variables, as shown in
 [PostgreSQL metadata in the environment](../docs/src/extension/build/cross-compile.md#postgresql-metadata-in-the-environment).
 Packaging then needs no `pg_config` executable, adapter, `cargo pgrx init`, or
 `$PGRX_HOME/config.toml`. Missing metadata produces an error; it does not fall
-back to a host installation. Combining environment mode with `--pg-config` is
-an error. With environment mode unset or `false`, `--pg-config` still selects
-a host-runnable program, defaulting to `pg_config` on `PATH`. Only `cargo pgrx package` reads this
-metadata: `cargo pgrx install`, with or without `--sudo`, installs into a
-PostgreSQL on this machine and always asks a `pg_config` program.
+back to a host installation.
+
+`cargo pgrx package` and `cargo pgrx install`, with or without `--sudo`, choose
+PostgreSQL in the same order: `--pg-config` when given, then this environment
+metadata, then the first `pg_config` on `PATH`. `--pg-config` chooses the
+PostgreSQL version and the staged layout. While `PGRX_PG_CONFIG_AS_ENV=true` is
+set, the `pgrx-pg-sys` build still reads its headers and flags from the
+environment, so unset the variable to build against a `pg_config` program.
 
 `PGRX_PG_CONFIG_PKGLIBDIR` and `PGRX_PG_CONFIG_SHAREDIR` describe the target's
 installation layout. Header paths and any libraries needed for linking must be

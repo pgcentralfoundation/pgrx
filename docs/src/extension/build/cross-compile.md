@@ -131,9 +131,10 @@ flags. The same environment also works with `cargo build --target ...`.
 metadata without consulting `PG_CONFIG`, `PGRX_PG_CONFIG_PATH`, or
 `$PGRX_HOME/config.toml`. There is no adapter to create and no `cargo pgrx init`
 step. Missing required properties cause an error instead of a fallback to the
-host's PostgreSQL installation. `--pg-config` conflicts with environment mode;
-unset `PGRX_PG_CONFIG_AS_ENV` or set it to `false` to use a host-runnable
-`pg_config` program instead.
+host's PostgreSQL installation. An explicit `--pg-config` takes precedence for
+the version and package layout, but the `pgrx-pg-sys` build keeps reading the
+environment; unset `PGRX_PG_CONFIG_AS_ENV` or set it to `false` to use a
+host-runnable `pg_config` program for both.
 
 For example, when targeting Windows from Linux, `INCLUDEDIR-SERVER`,
 `PKGINCLUDEDIR`, and `LIBDIR` refer to the Windows PostgreSQL headers and import

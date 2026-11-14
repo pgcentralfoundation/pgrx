@@ -14,7 +14,7 @@ use crate::command::install::{
     format_display_path, install_extension, shared_library_filename, warn_if_pg_bench_enabled,
 };
 use crate::command::migrate::UnreleasedFragmentMode;
-use crate::manifest::{PgVersionSource, display_version_info};
+use crate::manifest::{PgVersionSource, display_version_info, selected_pg_config};
 use crate::target::{TargetOs, target_arch};
 use cargo_toml::Manifest;
 use eyre::{WrapErr, eyre};
@@ -82,18 +82,7 @@ impl Package {
         }
     }
 
-    /// `--pg-config`, or the first `pg_config` on `PATH`: a program that runs on this machine.
-    pub(crate) fn host_pg_config(&self) -> PgConfig {
-        match &self.pg_config {
-            None => PgConfig::from_path(),
-            Some(config) => PgConfig::new_with_defaults(config.clone()),
-        }
-    }
-
-    /// Stage the extension for `pg_config`'s PostgreSQL. The caller chooses it, because
-    /// `cargo pgrx install --sudo` also stages through here and then copies the files into this
-    /// machine's PostgreSQL, which `PGRX_PG_CONFIG_*` target metadata must not select.
-    pub(crate) fn perform(mut self, pg_config: PgConfig) -> eyre::Result<(PathBuf, Vec<PathBuf>)> {
+    pub(crate) fn perform(mut self) -> eyre::Result<(PathBuf, Vec<PathBuf>)> {
         let unreleased_mode = self.unreleased_mode();
         warn_if_pg_bench_enabled(&self.features, "package");
         let cargo_flags = std::mem::take(&mut self.cargo);
@@ -107,6 +96,7 @@ impl Package {
         let package_manifest =
             Manifest::from_path(&package_manifest_path).wrap_err("Couldn't parse manifest")?;
 
+        let pg_config = selected_pg_config(self.pg_config.take())?;
         let pg_version = format!("pg{}", pg_config.major_version()?);
 
         crate::manifest::modify_features_for_version(
@@ -168,17 +158,7 @@ impl Package {
 impl CommandExecute for Package {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
-        // Recorded target metadata replaces a `pg_config` program for this command only.
-        let pg_config = if PgConfig::is_in_environment() {
-            eyre::ensure!(
-                self.pg_config.is_none(),
-                "cannot combine --pg-config with PGRX_PG_CONFIG_AS_ENV=true"
-            );
-            PgConfig::from_env()?
-        } else {
-            self.host_pg_config()
-        };
-        self.perform(pg_config)?;
+        self.perform()?;
         Ok(())
     }
 }

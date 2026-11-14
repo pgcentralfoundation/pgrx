@@ -248,7 +248,8 @@ the variables listed in
 then run `cargo pgrx package --target <target-triple>`. This needs no `pg_config`
 executable, adapter, `cargo pgrx init`, or pgrx configuration file. Header and
 link-library paths must be accessible on the build host; package installation
-paths describe the target. Do not combine this mode with `--pg-config`.
+paths describe the target. An explicit `--pg-config` takes precedence for the
+package layout; unset `PGRX_PG_CONFIG_AS_ENV` to build against that program too.
 
 When building with a host-runnable `pg_config` program instead, modify the standard build process in the following ways:
 

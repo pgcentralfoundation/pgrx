@@ -185,16 +185,13 @@ fn package_uses_environment_metadata_without_managed_postgres() {
 }
 
 #[test]
-fn package_rejects_environment_metadata_with_explicit_pg_config() {
+fn explicit_pg_config_overrides_environment_metadata() {
     let fixture = Fixture::new();
     let output = fixture.command().arg("--pg-config").arg(&fixture.pg_config).output().unwrap();
-    assert!(!output.status.success());
-    let output = combined_output(&output);
-    assert!(
-        output.contains("cannot combine --pg-config with PGRX_PG_CONFIG_AS_ENV=true"),
-        "{output}"
-    );
-    fixture.assert_no_pg_config_calls();
+    assert!(output.status.success(), "{}", combined_output(&output));
+    assert!(combined_output(&output).contains(fixture.pg_config.to_str().unwrap()));
+    fixture.assert_package("native");
+    assert!(fixture.directory.path().join("pg_config-called").is_file());
 }
 
 #[test]
@@ -237,13 +234,37 @@ fn disabled_environment_metadata_preserves_explicit_pg_config() {
     }
 }
 
-/// `install --sudo` stages through the package command and then copies into this machine's
-/// PostgreSQL, so target metadata in the environment must not choose where the files go.
+/// `install` chooses its PostgreSQL as `package` does, and needs no `config.toml` to do it.
+#[test]
+fn install_uses_environment_metadata() {
+    let fixture = Fixture::new();
+    let installed = fixture.directory.path().join("installed");
+    let output = fixture
+        .cargo_pgrx(&["install"])
+        .env("PGRX_PG_CONFIG_PKGLIBDIR", installed.join("lib"))
+        .env("PGRX_PG_CONFIG_SHAREDIR", installed.join("share"))
+        .output()
+        .unwrap();
+    assert!(output.status.success(), "{}", combined_output(&output));
+    assert!(
+        installed
+            .join(format!("lib/package_environment_test{}", std::env::consts::DLL_SUFFIX))
+            .is_file()
+    );
+    assert!(installed.join("share/extension/package_environment_test.control").is_file());
+    assert!(installed.join("share/extension/package_environment_test--0.1.0.sql").is_file());
+    fixture.assert_no_pg_config_calls();
+}
+
+/// `install --sudo` stages through the package command, so it follows the same order:
+/// `--pg-config`, then environment metadata, then the `pg_config` on `PATH`.
 #[cfg(unix)]
 #[test]
-fn sudo_install_ignores_environment_metadata() {
+fn sudo_install_selects_postgres_as_package_does() {
     use std::os::unix::fs::PermissionsExt;
-    for explicit_pg_config in [false, true] {
+    for (explicit_pg_config, environment, prefix) in
+        [(false, true, "environment"), (true, true, "native"), (false, false, "native")]
+    {
         let fixture = Fixture::new();
         let root = fixture.directory.path();
         // Record each copy instead of running it as root.
@@ -256,9 +277,12 @@ fn sudo_install_ignores_environment_metadata() {
         if explicit_pg_config {
             command.arg("--pg-config").arg(&fixture.pg_config);
         }
+        if !environment {
+            command.env_remove("PGRX_PG_CONFIG_AS_ENV");
+        }
         let output = command.output().unwrap();
         assert!(output.status.success(), "{}", combined_output(&output));
-        assert!(root.join("pg_config-called").is_file());
+        assert_eq!(root.join("pg_config-called").is_file(), prefix == "native");
         let copies = fs::read_to_string(&log).unwrap();
         let mut destinations: Vec<_> =
             copies.lines().map(|copy| copy.rsplit(' ').next().unwrap()).collect();
@@ -266,9 +290,12 @@ fn sudo_install_ignores_environment_metadata() {
         assert_eq!(
             destinations,
             [
-                format!("/native/pg/lib/package_environment_test{}", std::env::consts::DLL_SUFFIX),
-                "/native/pg/share/extension/package_environment_test--0.1.0.sql".to_owned(),
-                "/native/pg/share/extension/package_environment_test.control".to_owned(),
+                format!(
+                    "/{prefix}/pg/lib/package_environment_test{}",
+                    std::env::consts::DLL_SUFFIX
+                ),
+                format!("/{prefix}/pg/share/extension/package_environment_test--0.1.0.sql"),
+                format!("/{prefix}/pg/share/extension/package_environment_test.control"),
             ],
             "{copies}"
         );

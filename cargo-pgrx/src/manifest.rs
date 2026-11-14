@@ -217,6 +217,17 @@ pub(crate) fn pg_config_and_version(
     }
 }
 
+/// The PostgreSQL that `cargo pgrx install` and `cargo pgrx package` build for: `--pg-config`
+/// when given, otherwise `PGRX_PG_CONFIG_*` metadata when `PGRX_PG_CONFIG_AS_ENV=true`,
+/// otherwise the first `pg_config` on `PATH`.
+pub(crate) fn selected_pg_config(explicit: Option<PathBuf>) -> eyre::Result<PgConfig> {
+    match explicit {
+        Some(pg_config) => Ok(PgConfig::new_with_defaults(pg_config)),
+        None if PgConfig::is_in_environment() => PgConfig::from_env(),
+        None => Ok(PgConfig::from_path()),
+    }
+}
+
 pub(crate) fn display_version_info(pg_config: &PgConfig, pg_version: &PgVersionSource) {
     use owo_colors::OwoColorize;
     match pg_config.path() {

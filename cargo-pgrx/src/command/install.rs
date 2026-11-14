@@ -13,7 +13,7 @@ use crate::command::get::{find_control_file, get_property};
 use crate::command::migrate::{UnreleasedFragmentMode, plan_unreleased_fragments};
 use crate::command::sudo_install::SudoInstall;
 use crate::manifest::PgrxManifestExt;
-use crate::manifest::{PgVersionSource, display_version_info};
+use crate::manifest::{PgVersionSource, display_version_info, selected_pg_config};
 use crate::target::TargetOs;
 use cargo_metadata::{CrateType, Message as CargoMessage};
 use cargo_toml::Manifest;
@@ -92,10 +92,7 @@ impl CommandExecute for Install {
         let package_manifest =
             Manifest::from_path(&package_manifest_path).wrap_err("Couldn't parse manifest")?;
 
-        let pg_config = match self.pg_config {
-            None => PgConfig::from_path(),
-            Some(config) => PgConfig::new_with_defaults(PathBuf::from(config)),
-        };
+        let pg_config = selected_pg_config(self.pg_config.take().map(PathBuf::from))?;
         let pg_version = format!("pg{}", pg_config.major_version()?);
         let profile = CargoProfile::from_flags(
             self.profile.as_deref(),
@@ -103,7 +100,8 @@ impl CommandExecute for Install {
         )?;
 
         crate::manifest::modify_features_for_version(
-            &Pgrx::from_config()?,
+            // Only the feature names are needed, and environment metadata has no `config.toml`.
+            &Pgrx::default(),
             Some(&mut self.features),
             &package_manifest,
             &PgVersionSource::PgConfig(pg_version),
