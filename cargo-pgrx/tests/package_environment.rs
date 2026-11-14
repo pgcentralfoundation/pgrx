@@ -100,6 +100,10 @@ fn main() {
     }
 
     fn command(&self) -> Command {
+        self.cargo_pgrx(&["package", "--debug"])
+    }
+
+    fn cargo_pgrx(&self, subcommand: &[&str]) -> Command {
         let root = self.directory.path();
         let mut command = Command::new(env!("CARGO_BIN_EXE_cargo-pgrx"));
         // Limit environment metadata to this test, without changing the test process's environment.
@@ -115,7 +119,9 @@ fn main() {
         .unwrap();
         command
             .current_dir(root)
-            .args(["pgrx", "package", "--debug", "--cargo=--offline"])
+            .arg("pgrx")
+            .args(subcommand)
+            .arg("--cargo=--offline")
             .env("PATH", path)
             .env("PGRX_HOME", root.join("pgrx-home"))
             .env("PG_CONFIG", root.join("missing-pg-config"))
@@ -228,5 +234,43 @@ fn disabled_environment_metadata_preserves_explicit_pg_config() {
         assert!(combined_output(&output).contains(fixture.pg_config.to_str().unwrap()));
         fixture.assert_package("native");
         assert!(fixture.directory.path().join("pg_config-called").is_file());
+    }
+}
+
+/// `install --sudo` stages through the package command and then copies into this machine's
+/// PostgreSQL, so target metadata in the environment must not choose where the files go.
+#[cfg(unix)]
+#[test]
+fn sudo_install_ignores_environment_metadata() {
+    use std::os::unix::fs::PermissionsExt;
+    for explicit_pg_config in [false, true] {
+        let fixture = Fixture::new();
+        let root = fixture.directory.path();
+        // Record each copy instead of running it as root.
+        let sudo = root.join("bin/sudo");
+        fs::write(&sudo, "#!/bin/sh\nprintf '%s\\n' \"$*\" >> \"$PGRX_TEST_SUDO_LOG\"\n").unwrap();
+        fs::set_permissions(&sudo, fs::Permissions::from_mode(0o755)).unwrap();
+        let log = root.join("sudo-called");
+        let mut command = fixture.cargo_pgrx(&["install", "--sudo"]);
+        command.env("PGRX_TEST_SUDO_LOG", &log);
+        if explicit_pg_config {
+            command.arg("--pg-config").arg(&fixture.pg_config);
+        }
+        let output = command.output().unwrap();
+        assert!(output.status.success(), "{}", combined_output(&output));
+        assert!(root.join("pg_config-called").is_file());
+        let copies = fs::read_to_string(&log).unwrap();
+        let mut destinations: Vec<_> =
+            copies.lines().map(|copy| copy.rsplit(' ').next().unwrap()).collect();
+        destinations.sort_unstable();
+        assert_eq!(
+            destinations,
+            [
+                format!("/native/pg/lib/package_environment_test{}", std::env::consts::DLL_SUFFIX),
+                "/native/pg/share/extension/package_environment_test--0.1.0.sql".to_owned(),
+                "/native/pg/share/extension/package_environment_test.control".to_owned(),
+            ],
+            "{copies}"
+        );
     }
 }

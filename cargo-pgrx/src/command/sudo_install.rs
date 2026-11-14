@@ -78,7 +78,8 @@ impl CommandExecute for SudoInstall {
         // the extension as we want it to build out the directory structure in `./target/...`
         // from there we'll use sudo to copy each file created to the actual location on disk
         let package: Package = self.clone().into();
-        let (outdir, output_files) = package.perform()?;
+        let pg_config = package.host_pg_config();
+        let (outdir, output_files) = package.perform(pg_config)?;
 
         eprintln!();
         eprintln!("Using sudo to copy extension files from {}", outdir.display().cyan());
