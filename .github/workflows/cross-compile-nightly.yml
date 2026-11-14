@@ -123,8 +123,8 @@ jobs:
       - name: Install the repository Rust toolchain and target
         run: |
           toolchain="$(python -c 'import tomllib; print(tomllib.load(open("rust-toolchain.toml", "rb"))["toolchain"]["channel"])')"
-          rustup toolchain install "$toolchain" --profile minimal --component rustfmt --no-self-update
-          rustup target add "$CROSS_TARGET" --toolchain "$toolchain"
+          tools/ci/retry.sh rustup toolchain install "$toolchain" --profile minimal --component rustfmt --no-self-update
+          tools/ci/retry.sh rustup target add "$CROSS_TARGET" --toolchain "$toolchain"
           rustc -vV
 
       - name: Install native Linux LLVM and archive tools
@@ -138,8 +138,8 @@ jobs:
             echo 'deb [signed-by=/usr/share/keyrings/pgrx-nightly-llvm.asc] https://apt.llvm.org/noble/ llvm-toolchain-noble-21 main' \
               | sudo tee /etc/apt/sources.list.d/pgrx-nightly-llvm.list > /dev/null
           fi
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq --no-install-recommends \
+          tools/ci/retry.sh sudo apt-get update -qq
+          tools/ci/retry.sh sudo apt-get install -y -qq --no-install-recommends \
             "clang-$llvm" "libclang-$llvm-dev" "llvm-$llvm" "lld-$llvm" \
             bison flex make unzip libarchive-tools
           echo "CLANG_PATH=/usr/bin/clang-$llvm" >> "$GITHUB_ENV"
@@ -151,7 +151,7 @@ jobs:
       - name: Install native macOS LLVM and archive tools
         if: runner.os == 'macOS'
         run: |
-          brew install llvm make bison flex libarchive
+          tools/ci/retry.sh brew install llvm make bison flex libarchive
           llvm="$(brew --prefix llvm)"
           echo "CLANG_PATH=$llvm/bin/clang" >> "$GITHUB_ENV"
           echo "LIBCLANG_PATH=$llvm/lib" >> "$GITHUB_ENV"
@@ -203,11 +203,6 @@ jobs:
           $archiveTar = "$env:MSYS2_ROOT/usr/bin/bsdtar.exe"
           if (-not (Test-Path $archiveTar)) { throw 'Missing MSYS2 bsdtar.exe' }
           "ARCHIVE_TAR=$archiveTar" >> $env:GITHUB_ENV
-
-      - uses: Swatinem/rust-cache@v2
-        with:
-          shared-key: nightly-cross-${{ matrix.id }}
-          cache-on-failure: false
 
       - name: Build cargo-pgrx for the native host
         run: |
@@ -263,7 +258,7 @@ jobs:
       - name: Install the Linux ARM64 GNU cross compiler
         if: runner.os == 'Linux' && matrix.os == 'linux'
         run: |
-          sudo apt-get install -y -qq --no-install-recommends \
+          tools/ci/retry.sh sudo apt-get install -y -qq --no-install-recommends \
             gcc-aarch64-linux-gnu g++-aarch64-linux-gnu libc6-dev-arm64-cross
           {
             echo 'TARGET_CC=aarch64-linux-gnu-gcc'
@@ -279,9 +274,9 @@ jobs:
       - name: Install the macOS-hosted Linux GNU cross compiler
         if: runner.os == 'macOS'
         run: |
-          brew tap messense/macos-cross-toolchains
+          tools/ci/retry.sh brew tap messense/macos-cross-toolchains
           git -C "$(brew --repo messense/macos-cross-toolchains)" checkout 473d950430a5149f71a82e8c546638f581bb7e0d
-          brew install messense/macos-cross-toolchains/x86_64-unknown-linux-gnu
+          tools/ci/retry.sh brew install messense/macos-cross-toolchains/x86_64-unknown-linux-gnu
           cc="$(command -v x86_64-linux-gnu-gcc)"
           sysroot="$("$cc" -print-sysroot)"
           toolchain="$(brew --prefix x86_64-unknown-linux-gnu)/toolchain"
@@ -312,7 +307,7 @@ jobs:
           toolchain="$RUNNER_TEMP/osxcross"
           if [[ ! -x "$toolchain/bin/oa64-clang" ]]; then
             image=ghcr.io/crazy-max/osxcross:15.5-r0-ubuntu@sha256:ab9cb3c178279fb1c1d94b87d2ec860969f07ba154466aacc593ece6dcafd62f
-            docker pull "$image"
+            tools/ci/retry.sh docker pull "$image"
             container="$(docker create "$image" unused)"
             trap 'docker rm "$container" > /dev/null' EXIT
             docker cp "$container:/osxcross" "$toolchain"
