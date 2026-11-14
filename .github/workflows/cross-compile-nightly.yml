@@ -85,6 +85,7 @@ jobs:
       CARGO_PROFILE_DEV_BUILD_OVERRIDE_DEBUG: '0'
       # Linux installation paths describe the target, not MSYS2's host filesystem.
       MSYS2_ENV_CONV_EXCL: 'TARGET_PG_;PGRX_PG_CONFIG_'
+      MSYS2_ARG_CONV_EXCL: '--pg-config-'
       CROSS_TARGET: ${{ matrix.target }}
       CROSS_OS: ${{ matrix.os }}
       CROSS_ARCH: ${{ matrix.arch }}
@@ -451,31 +452,17 @@ jobs:
             echo 'TARGET_PG_CFLAGS=-Wall -O2 /wd4018 /wd4244 /wd4273 /wd4101 /wd4102 /wd4090 /wd4267'
           } >> "$GITHUB_ENV"
 
-      - name: Select target PostgreSQL metadata without a pg_config program
+      - name: Leave no pg_config program or pgrx configuration to fall back on
         run: |
-          python - <<'PY'
-          import json, os
-          from pathlib import Path
-          root = Path(os.environ['CROSS_ROOT'])
-          assert not (root / 'pgrx-home/config.toml').exists()
-          missing_pg_config = (root / 'no-pg-config').as_posix()
-          assert not Path(missing_pg_config).exists()
-          values = {
-              'PGRX_PG_CONFIG_AS_ENV': 'true',
-              'PGRX_PG_CONFIG_VERSION': 'PostgreSQL 18.7',
-              # These must never be consulted while environment metadata is selected.
-              'PG_CONFIG': missing_pg_config,
-              'PGRX_PG_CONFIG_PATH': missing_pg_config,
-          }
-          for name in ('INCLUDEDIR_SERVER', 'PKGINCLUDEDIR', 'LIBDIR', 'PKGLIBDIR', 'SHAREDIR', 'CPPFLAGS', 'CFLAGS'):
-              key = name.replace('INCLUDEDIR_SERVER', 'INCLUDEDIR-SERVER')
-              if 'TARGET_PG_' + name in os.environ:
-                  values['PGRX_PG_CONFIG_' + key] = os.environ['TARGET_PG_' + name]
-          (root / 'diagnostics/pg-config.json').write_text(json.dumps(values, indent=2))
-          with open(os.environ['GITHUB_ENV'], 'a') as env:
-              for key, value in values.items():
-                  env.write(f'{key}={value}\n')
-          PY
+          test ! -e "$PGRX_HOME/config.toml"
+          missing="$CROSS_ROOT/no-pg-config"
+          test ! -e "$missing"
+          # These must never be consulted while options describe the target's PostgreSQL.
+          {
+            echo "PG_CONFIG=$missing"
+            echo "PGRX_PG_CONFIG_PATH=$missing"
+          } >> "$GITHUB_ENV"
+          env | grep '^TARGET_PG_' | sort > "$CROSS_ROOT/diagnostics/pg-config.txt"
 
       - name: Package the versioned shared library
         run: |
@@ -483,6 +470,14 @@ jobs:
           if [[ -n "${CROSS_ENV_FILE:-}" ]]; then source "$CROSS_ENV_FILE"; fi
           target/debug/cargo-pgrx pgrx package --package versioned_so \
             --no-default-features --features pg18 --target "$CROSS_TARGET" \
+            "--pg-config-version=PostgreSQL 18.7" \
+            "--pg-config-includedir-server=$TARGET_PG_INCLUDEDIR_SERVER" \
+            "--pg-config-pkgincludedir=$TARGET_PG_PKGINCLUDEDIR" \
+            "--pg-config-libdir=$TARGET_PG_LIBDIR" \
+            "--pg-config-pkglibdir=$TARGET_PG_PKGLIBDIR" \
+            "--pg-config-sharedir=$TARGET_PG_SHAREDIR" \
+            "--pg-config-cppflags=$TARGET_PG_CPPFLAGS" \
+            "--pg-config-cflags=$TARGET_PG_CFLAGS" \
             --out-dir "$CROSS_ROOT/packages/versioned_so" \
             --debug --cargo=--locked
 
@@ -492,6 +487,14 @@ jobs:
           if [[ -n "${CROSS_ENV_FILE:-}" ]]; then source "$CROSS_ENV_FILE"; fi
           target/debug/cargo-pgrx pgrx package --package packaging \
             --no-default-features --features pg18 --target "$CROSS_TARGET" \
+            "--pg-config-version=PostgreSQL 18.7" \
+            "--pg-config-includedir-server=$TARGET_PG_INCLUDEDIR_SERVER" \
+            "--pg-config-pkgincludedir=$TARGET_PG_PKGINCLUDEDIR" \
+            "--pg-config-libdir=$TARGET_PG_LIBDIR" \
+            "--pg-config-pkglibdir=$TARGET_PG_PKGLIBDIR" \
+            "--pg-config-sharedir=$TARGET_PG_SHAREDIR" \
+            "--pg-config-cppflags=$TARGET_PG_CPPFLAGS" \
+            "--pg-config-cflags=$TARGET_PG_CFLAGS" \
             --out-dir "$CROSS_ROOT/packages/packaging" \
             --debug --cargo=--locked
           test ! -e "$PGRX_HOME/config.toml"
