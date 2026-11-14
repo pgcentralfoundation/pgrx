@@ -2168,8 +2168,9 @@ including compiler lookup, configuration verification, an unsupported runtime
 profile, the pg-sys integer bridges and native compilation, is a build error.
 In steps 2 to 8, its context names the PostgreSQL major, the Cargo target, the
 server header root and the metadata source (a `pg_config` path or
-`cargo pgrx package`'s `--pg-config-*` options). A configuration refusal also names the variables that
-supply target headers, target metadata or a complete bundle. A failure in steps
+`cargo pgrx package`'s `--pg-config-*` options). A configuration refusal also
+says what to correct, as a `pg_config` choice or a `cargo pgrx package` option,
+never as a variable to set. A failure in steps
 1 to 8 publishes no macro tree, report or native linkage for that version, and
 nothing guesses C semantics in its place. Per-macro skips are not failures;
 they remain in the report.

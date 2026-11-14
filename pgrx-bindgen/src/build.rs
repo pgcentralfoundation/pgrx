@@ -1559,10 +1559,11 @@ fn require_include_driver(include_driver: Option<&Path>, inspected: &Path) -> ey
 /// it from the options of `cargo pgrx package --target`.
 const DESCRIBED_METADATA: &str = "cargo pgrx package's --pg-config-* options";
 
-/// Name the supported ways to supply target headers when the selected headers were configured
-/// for another machine, ABI or major version. `described` headers came from the package
-/// options, so the remedy is to give those the right directory. Other inspection failures keep
-/// their general context.
+/// Say how to supply the right headers when the selected ones were configured for another
+/// machine, ABI or major version. `described` headers came from the package options, so the
+/// remedy is to give those the right directory; a `pg_config` program's headers are wrong for
+/// the whole installation. The remedies name commands and options, never the variables that
+/// carry them to this build script. Other inspection failures keep their general context.
 fn inspection_error(
     error: PostgresError,
     major_version: u16,
@@ -1573,12 +1574,11 @@ fn inspection_error(
         "could not establish the binding generator's C macro compilation profile".into()
     } else if described {
         format!(
-            "these server headers do not describe {target}; pass --pg-config-includedir-server the PostgreSQL {major_version} server headers configured for {target}, or import a target bundle with PGRX_TARGET_INFO_PATH_PG{major_version}"
+            "these server headers do not describe {target}; pass --pg-config-includedir-server the PostgreSQL {major_version} server headers configured for {target}"
         )
     } else {
         format!(
-            "these server headers do not describe {target}; set PGRX_INCLUDEDIR_SERVER_PG{major_version}_{target} (or PGRX_INCLUDEDIR_SERVER_PG{major_version}_{}) to PostgreSQL {major_version} server headers configured for {target}, describe the target with {DESCRIBED_METADATA}, or import a target bundle with PGRX_TARGET_INFO_PATH_PG{major_version}",
-            target.replace('-', "_")
+            "these server headers do not describe {target}; use the `pg_config` of a PostgreSQL {major_version} built for {target}, or package for another platform with `cargo pgrx package --target {target}` and its --pg-config-* options"
         )
     };
     eyre::Report::new(error).wrap_err(context)
@@ -2948,9 +2948,8 @@ mod macro_build_tests {
         );
     }
 
-    /// Headers configured for another machine name the variables that supply target headers,
-    /// in both spellings, above the configuration error itself. Other inspection failures keep
-    /// the general context.
+    /// Headers configured for another machine say how to supply the right ones, above the
+    /// configuration error itself. Other inspection failures keep the general context.
     #[test]
     fn foreign_headers_name_the_target_header_remedies() {
         let foreign = || {
@@ -2965,14 +2964,12 @@ mod macro_build_tests {
                 .map(|cause| cause.to_string())
                 .collect::<Vec<_>>()
         };
-        // A `pg_config` program's headers can be replaced by a variable.
+        // A `pg_config` program's installation is the wrong one for this target.
         let program = chain(false);
         assert_eq!(program.len(), 2, "{program:?}");
         for remedy in [
-            "PGRX_INCLUDEDIR_SERVER_PG17_aarch64-unknown-linux-gnu",
-            "PGRX_INCLUDEDIR_SERVER_PG17_aarch64_unknown_linux_gnu",
-            "cargo pgrx package's --pg-config-* options",
-            "PGRX_TARGET_INFO_PATH_PG17",
+            "the `pg_config` of a PostgreSQL 17 built for aarch64-unknown-linux-gnu",
+            "`cargo pgrx package --target aarch64-unknown-linux-gnu` and its --pg-config-* options",
         ] {
             assert!(program[0].contains(remedy), "{remedy} missing from {program:?}");
         }
@@ -2980,11 +2977,11 @@ mod macro_build_tests {
         // Headers that the package options named are corrected there.
         let described = chain(true);
         assert_eq!(described.len(), 2, "{described:?}");
-        for remedy in ["--pg-config-includedir-server", "PGRX_TARGET_INFO_PATH_PG17"] {
-            assert!(described[0].contains(remedy), "{remedy} missing from {described:?}");
+        assert!(described[0].contains("--pg-config-includedir-server"), "{described:?}");
+        // Neither remedy sends a person to the variables that carry these values.
+        for remedy in [&program[0], &described[0]] {
+            assert!(!remedy.contains("PGRX_"), "{remedy}");
         }
-        assert!(!described[0].contains("PGRX_INCLUDEDIR_SERVER"), "{described:?}");
-        assert!(!described.concat().contains("PGRX_PG_CONFIG"), "{described:?}");
         let other =
             inspection_error(PostgresError::InvalidCFlags, 17, "aarch64-unknown-linux-gnu", false);
         assert_eq!(

@@ -164,10 +164,10 @@ PostgreSQL headers do not describe the inspected C target: pg_config.h was confi
 ```
 
 The error chain also names the PostgreSQL version, the Cargo target, the server
-header directory and the metadata source, and gives the remedies:
+header directory and the metadata source, and says what to correct:
 
 ```text
-these server headers do not describe aarch64-unknown-linux-gnu; pass --pg-config-includedir-server the PostgreSQL 18 server headers configured for aarch64-unknown-linux-gnu, or import a target bundle with PGRX_TARGET_INFO_PATH_PG18
+these server headers do not describe aarch64-unknown-linux-gnu; pass --pg-config-includedir-server the PostgreSQL 18 server headers configured for aarch64-unknown-linux-gnu
 ```
 
 The checks do not prove that the headers came from the deployed server. These

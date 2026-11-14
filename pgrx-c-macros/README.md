@@ -1107,9 +1107,9 @@ generator's own architecture and OS. One libclang parse then compares the `pg_co
 member-offset alignments, `MAXIMUM_ALIGNOF`, byte order, 64-bit integer flags
 and major version with the target compiler, and reports every disagreement. A
 refusal is `PostgresError::TargetConfiguration`, which wraps a
-`ConfigurationError`. The binding build adds a remedy naming
-`PGRX_INCLUDEDIR_SERVER_PGNN_<target>` in both target spellings,
-`cargo pgrx package`'s `--pg-config-*` options and `PGRX_TARGET_INFO_PATH_PGNN`.
+`ConfigurationError`. The binding build adds what to correct: the
+`--pg-config-includedir-server` option when `cargo pgrx package` described the
+target, otherwise the `pg_config` to use or `cargo pgrx package --target`.
 
 The binding build takes the server header root from `PGRX_INCLUDEDIR_SERVER`
 and its version- and target-specific variants when one is set, and otherwise
