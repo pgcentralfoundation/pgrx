@@ -888,7 +888,7 @@ fn cross_builds_accept_only_target_headers() {
         &[
             &format!("pg_config.h was configured for {} (PG_VERSION_STR)", cross.host_machine),
             &override_variable,
-            "PGRX_PG_CONFIG_AS_ENV",
+            "cargo pgrx package's --pg-config-* options",
             "PGRX_TARGET_INFO_PATH_PG18",
         ],
     );

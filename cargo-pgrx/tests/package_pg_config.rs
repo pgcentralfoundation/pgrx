@@ -328,11 +328,25 @@ fn cross_target_requires_described_postgres() {
     fixture.assert_no_pg_config_calls();
 }
 
-/// Giving any `--pg-config-*` option means describing PostgreSQL in full, on this machine too.
+/// The `--pg-config-*` options describe the PostgreSQL of `--target`, and giving any of them
+/// means describing it in full.
 #[test]
-fn described_postgres_is_all_or_nothing() {
+fn described_postgres_needs_a_target_and_every_option() {
     let fixture = Fixture::new();
-    let output = fixture.command().args(["--pg-config-cflags", "-O2 -fwrapv"]).output().unwrap();
+    let host = host_triple();
+
+    let mut command = fixture.command();
+    described(&mut command, None);
+    let output = command.output().unwrap();
+    assert!(!output.status.success());
+    let output = combined_output(&output);
+    assert!(output.contains("--target <TARGET>"), "{output}");
+
+    let output = fixture
+        .command()
+        .args(["--target", &host, "--pg-config-cflags", "-O2 -fwrapv"])
+        .output()
+        .unwrap();
     assert!(!output.status.success());
     let output = combined_output(&output);
     assert!(
@@ -341,7 +355,7 @@ fn described_postgres_is_all_or_nothing() {
     );
 
     let mut command = fixture.command();
-    described(command.arg("--pg-config").arg(&fixture.pg_config), None);
+    described(command.args(["--target", &host, "--pg-config"]).arg(&fixture.pg_config), None);
     let output = command.output().unwrap();
     assert!(!output.status.success());
     assert!(
@@ -350,12 +364,25 @@ fn described_postgres_is_all_or_nothing() {
         combined_output(&output)
     );
 
+    // This machine's own triple is a target too, and its description decides the layout.
     let mut command = fixture.command();
-    described(&mut command, None);
+    described(command.args(["--target", &host]), None);
     let output = command.output().unwrap();
     assert!(output.status.success(), "{}", combined_output(&output));
     assert!(combined_output(&output).contains("--pg-config-*"), "{}", combined_output(&output));
-    fixture.assert_package("described");
+    let staged = fixture
+        .directory
+        .path()
+        .join("target")
+        .join(&host)
+        .join("debug/package_environment_test-pg18");
+    let library = format!("package_environment_test{}", std::env::consts::DLL_SUFFIX);
+    let library = if cfg!(windows) {
+        staged.join("lib").join(library)
+    } else {
+        staged.join("described/pg/lib").join(library)
+    };
+    assert!(library.is_file(), "{}", library.display());
     fixture.assert_no_pg_config_calls();
 }
 

@@ -826,7 +826,8 @@ replaces the `-arch` flags in the profile.
 
 A cross build therefore needs server headers configured for the target. Select
 them with `PGRX_INCLUDEDIR_SERVER_PGNN_<target>` and keep the host's `pg_config`,
-describe the target with `PGRX_PG_CONFIG_AS_ENV`, or import a
+describe the target with
+`cargo pgrx package`'s `--pg-config-*` options, or import a
 [complete target bundle](build/cross-compile.md#import-a-complete-target-bundle)
 through `PGRX_TARGET_INFO_PATH_PGNN`. When Cargo's host and target differ, a
 `pg_config` program contributes only PostgreSQL's functional CFLAGS

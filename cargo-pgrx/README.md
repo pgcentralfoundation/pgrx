@@ -946,7 +946,7 @@ directory. If you omit `--prefix-dir`, the layout follows `pg_config`. For Windo
 `--pg-config` when given, otherwise the first `pg_config` on `PATH`. The
 `pgrx-pg-sys` build uses the same choice, so the extension is compiled against
 the PostgreSQL it is laid out for. That PostgreSQL's server headers must be
-installed. Neither command reads the `PGRX_PG_CONFIG_*` variables.
+installed.
 
 For cross builds, pass a built-in Rust target triple to `cargo pgrx package
 --target`, which is the only command that has it. A `pg_config` program
@@ -955,8 +955,9 @@ describes the machine it runs on, so a target other than the host rejects
 options, as shown in
 [Packaging for the target](../docs/src/extension/build/cross-compile.md#packaging-for-the-target).
 Packaging then needs no `pg_config` executable, adapter, `cargo pgrx init`, or
-`$PGRX_HOME/config.toml`. Giving any `--pg-config-*` option requires all of them
-except `--pg-config-cflags` and `--pg-config-pkgincludedir`.
+`$PGRX_HOME/config.toml`. The `--pg-config-*` options need `--target`, and giving
+any of them requires all except `--pg-config-cflags` and
+`--pg-config-pkgincludedir`.
 
 `--pg-config-pkglibdir` and `--pg-config-sharedir` describe the target's
 installation layout. Header paths and any libraries needed for linking must be

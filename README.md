@@ -230,7 +230,8 @@ Cross-compiling requires a toolchain and PostgreSQL configuration for the target
 1) A sysroot for the cross architecture, with rust configured to invoke the linker with flags to link against this sysroot.
 2) PostgreSQL server headers configured for the target, from the same build as the server that will load the extension.
 3) PostgreSQL metadata to go with those headers. Either keep the host's `pg_config` and select the target headers with
-   `PGRX_INCLUDEDIR_SERVER_PG<NN>_<target>`, or describe the target with `PGRX_PG_CONFIG_AS_ENV=true`.
+   `PGRX_INCLUDEDIR_SERVER_PG<NN>_<target>`, or describe the target with
+   `cargo pgrx package`'s `--pg-config-*` options.
 4) The `clang` driver and `llvm-ar` described under [System Requirements](#system-requirements).
    `BINDGEN_EXTRA_CLANG_ARGS_<target>` passes the target's sysroot to them when Clang cannot find it.
 

@@ -80,53 +80,33 @@ distributions, check that host values such as `-D_GNU_SOURCE` or
 pgrx cannot tell a `pg_config` program for the target, run under emulation or
 replicated by a shell script, from a host one. It applies only the functional
 CFLAGS from such a program too. Flags from a program use the host's quoting and
-compiler conventions; imported environment metadata uses the Cargo target's.
-Use the next path to apply a target's full CFLAGS or import flags written for a
-different platform, such as MSVC flags on a Unix host.
-
-### PostgreSQL metadata in the environment
-
-Set `PGRX_PG_CONFIG_AS_ENV` to exactly `true` and describe the target's PostgreSQL
-build with `PGRX_PG_CONFIG_*` variables. Record its version and compiler flags
-from that build's `pg_config`; the target executable does not need to run on the
-build host. Relocate header paths and any libraries needed for linking to their
-locations on the build host:
-
-| Variable | Value |
-| --- | --- |
-| `PGRX_PG_CONFIG_VERSION` | `pg_config --version`, for example `PostgreSQL 18.1` |
-| `PGRX_PG_CONFIG_INCLUDEDIR-SERVER` | where the target's server headers are on the build host |
-| `PGRX_PG_CONFIG_PKGINCLUDEDIR` | where the target's public PostgreSQL headers are on the build host; required for MSVC targets |
-| `PGRX_PG_CONFIG_CPPFLAGS` | `pg_config --cppflags` |
-| `PGRX_PG_CONFIG_CFLAGS` | `pg_config --cflags` |
-| `PGRX_PG_CONFIG_LIBDIR` | target library search directory; relocate it to the build host when linking needs its files, such as Windows MSVC `postgres.lib` |
-
-pgrx then runs no `pg_config` program and applies every CFLAGS value except
-Darwin `-arch` selections, which the report lists under `cflags_dropped` (see
-macOS slices below). The
-`--configure` output is not needed: only a `pg_config` program's `CLANG` entry
-is used, as a hint for the Clang driver. Shells
-cannot export `PGRX_PG_CONFIG_INCLUDEDIR-SERVER` because of its hyphen, so set
-the variables with `env`:
-
-```sh
-env PGRX_PG_CONFIG_AS_ENV=true \
-    PGRX_PG_CONFIG_VERSION="PostgreSQL 18.1" \
-    "PGRX_PG_CONFIG_INCLUDEDIR-SERVER=$HOME/pg-arm64/usr/include/postgresql/18/server" \
-    PGRX_PG_CONFIG_CPPFLAGS="$target_cppflags" \
-    PGRX_PG_CONFIG_CFLAGS="$target_cflags" \
-    PGRX_PG_CONFIG_LIBDIR=/usr/lib/aarch64-linux-gnu \
-    cargo build --target aarch64-unknown-linux-gnu --release
-```
-
-Here `target_cppflags` and `target_cflags` contain the target build's recorded
-flags.
+compiler conventions; a description given to `cargo pgrx package` uses the Cargo
+target's. Use the next path to apply a target's full CFLAGS or import flags
+written for a different platform, such as MSVC flags on a Unix host.
 
 ### Packaging for the target
 
-`cargo pgrx package` takes the same description as options, one per `pg_config`
-property, and passes it on to the `pgrx-pg-sys` build. It does not read the
-`PGRX_PG_CONFIG_*` variables:
+`cargo pgrx package --target` takes a description of the target's PostgreSQL as
+options, one per `pg_config` property, and passes it on to the `pgrx-pg-sys`
+build. Record the version and compiler flags from that PostgreSQL's `pg_config`;
+the target executable does not need to run on the build host. Relocate header
+paths and any libraries needed for linking to their locations on the build host:
+
+| Option | Value |
+| --- | --- |
+| `--pg-config-version` | `pg_config --version`, for example `PostgreSQL 18.1` |
+| `--pg-config-includedir-server` | where the target's server headers are on the build host |
+| `--pg-config-pkgincludedir` | where the target's public PostgreSQL headers are on the build host; MSVC targets only |
+| `--pg-config-cppflags` | `pg_config --cppflags` |
+| `--pg-config-cflags` | `pg_config --cflags`; optional |
+| `--pg-config-libdir` | target library search directory; relocate it to the build host when linking needs its files, such as Windows MSVC `postgres.lib` |
+| `--pg-config-pkglibdir` | `pg_config --pkglibdir` on the target |
+| `--pg-config-sharedir` | `pg_config --sharedir` on the target |
+
+pgrx then runs no `pg_config` program and applies every CFLAGS value except
+Darwin `-arch` selections, which the report lists under `cflags_dropped` (see
+macOS slices below). The `--configure` output is not needed: only a `pg_config`
+program's `CLANG` entry is used, as a hint for the Clang driver.
 
 ```sh
 cargo pgrx package --target aarch64-unknown-linux-gnu \
@@ -140,6 +120,9 @@ cargo pgrx package --target aarch64-unknown-linux-gnu \
     --no-default-features --features pg18 --out-dir ./package
 ```
 
+Here `target_cppflags` and `target_cflags` contain the target build's recorded
+flags.
+
 `--pg-config-pkglibdir` and `--pg-config-sharedir` are the target's installation
 directories and decide the package layout. There is no adapter to create, no
 `cargo pgrx init` step, and no `$PGRX_HOME/config.toml`.
@@ -148,8 +131,8 @@ A `pg_config` program describes the machine it runs on. For a `--target` other
 than the host, `cargo pgrx package` requires these options, rejects
 `--pg-config`, and never falls back to `pg_config` on `PATH`. Giving any one of
 the options means describing PostgreSQL in full: all are then required except
-`--pg-config-cflags` and `--pg-config-pkgincludedir`, which only MSVC targets
-need. Only `cargo pgrx package` has `--target`.
+`--pg-config-cflags` and `--pg-config-pkgincludedir`. The options need
+`--target`, which only `cargo pgrx package` has.
 
 For example, when targeting Windows from Linux, `--pg-config-includedir-server`,
 `--pg-config-pkgincludedir`, and `--pg-config-libdir` refer to the Windows
@@ -161,9 +144,8 @@ Git Bash and MSYS2 rewrite arguments that look like Unix paths; write each
 option as `--pg-config-name=value` and set `MSYS2_ARG_CONV_EXCL=--pg-config-`
 to preserve target paths.
 
-These variables are not target-scoped. Every build of `pgrx-pg-sys` in that
-Cargo invocation uses them, and the version must match the selected `pgNN`
-feature. Without `PGRX_PG_CONFIG_CFLAGS`, the report records
+The version must match the selected `pgNN` feature. Without
+`--pg-config-cflags`, the report records
 `cflags_recorded: false` and the profile lacks PostgreSQL's `-fwrapv`. Generated
 macros then treat signed overflow as undefined, as C does by default, instead of
 wrapping as PostgreSQL's own build does, and can differ from a native build.
@@ -228,7 +210,7 @@ The error chain also names the PostgreSQL version, the Cargo target, the server
 header directory and the metadata source, and gives the remedies:
 
 ```text
-these server headers do not describe aarch64-unknown-linux-gnu; set PGRX_INCLUDEDIR_SERVER_PG18_aarch64-unknown-linux-gnu (or PGRX_INCLUDEDIR_SERVER_PG18_aarch64_unknown_linux_gnu) to PostgreSQL 18 server headers configured for aarch64-unknown-linux-gnu, describe the target with PGRX_PG_CONFIG_AS_ENV, or import a target bundle with PGRX_TARGET_INFO_PATH_PG18
+these server headers do not describe aarch64-unknown-linux-gnu; set PGRX_INCLUDEDIR_SERVER_PG18_aarch64-unknown-linux-gnu (or PGRX_INCLUDEDIR_SERVER_PG18_aarch64_unknown_linux_gnu) to PostgreSQL 18 server headers configured for aarch64-unknown-linux-gnu, describe the target with cargo pgrx package's --pg-config-* options, or import a target bundle with PGRX_TARGET_INFO_PATH_PG18
 ```
 
 The checks do not prove that the headers came from the deployed server. These
@@ -542,7 +524,7 @@ Anyway, set
 - `BINDGEN_EXTRA_CLANG_ARGS_aarch64-unknown-linux-gnu=--sysroot=\"$sysroot_dir\"`
 - `PGRX_INCLUDEDIR_SERVER_PG18_aarch64-unknown-linux-gnu` to the target's server headers, for example ones extracted from the target's `postgresql-server-devel` package (see [Getting PostgreSQL headers for the target](#getting-postgresql-headers-for-the-target))
 
-Shells can export these with underscores in the target name instead, such as `BINDGEN_EXTRA_CLANG_ARGS_aarch64_unknown_linux_gnu`. The header override goes with a host `pg_config` of the same PostgreSQL major, from `cargo pgrx init` or `PGRX_PG_CONFIG_PATH`; alternatively, describe the target as in [PostgreSQL metadata in the environment](#postgresql-metadata-in-the-environment).
+Shells can export these with underscores in the target name instead, such as `BINDGEN_EXTRA_CLANG_ARGS_aarch64_unknown_linux_gnu`. The header override goes with a host `pg_config` of the same PostgreSQL major, from `cargo pgrx init` or `PGRX_PG_CONFIG_PATH`; alternatively, describe the target as in [Packaging for the target](#packaging-for-the-target).
 
 The toolchain supplies the linker and sysroot. `pgrx-pg-sys` also needs Clang, `llvm-ar` and `libclang` from one LLVM release, installed on the build host: it inspects the headers and compiles its native support archive, including the C shim when the `cshim` feature is enabled, with that Clang. pgrx adds `--target=aarch64-unknown-linux-gnu`, and the `--sysroot` above makes Clang use the toolchain's C library headers. See [Clang, LLVM and system headers](#clang-llvm-and-system-headers).
 

@@ -74,32 +74,63 @@ pub(crate) struct Package {
     pub(crate) prefix_dir: Option<PathBuf>,
 }
 
-/// A PostgreSQL described by the values its `pg_config` prints, in place of running one.
-/// A `--target` other than this machine needs it.
+/// The PostgreSQL of `--target`, described by the values its `pg_config` prints there. A
+/// target other than this machine needs the description.
 #[derive(clap::Args, Debug, Default, Clone)]
 pub(crate) struct TargetPostgres {
     /// `pg_config --version` of the PostgreSQL to package for, such as "PostgreSQL 18.1"
-    #[clap(long = "pg-config-version", value_name = "VERSION", conflicts_with = "pg_config")]
+    #[clap(
+        long = "pg-config-version",
+        value_name = "VERSION",
+        requires = "target",
+        conflicts_with = "pg_config"
+    )]
     pg_config_version: Option<String>,
     /// Where that PostgreSQL's server headers are on this machine
-    #[clap(long = "pg-config-includedir-server", value_name = "DIR", conflicts_with = "pg_config")]
+    #[clap(
+        long = "pg-config-includedir-server",
+        value_name = "DIR",
+        requires = "target",
+        conflicts_with = "pg_config"
+    )]
     pg_config_includedir_server: Option<String>,
     /// Where its public headers are on this machine (MSVC targets)
-    #[clap(long = "pg-config-pkgincludedir", value_name = "DIR", conflicts_with = "pg_config")]
+    #[clap(
+        long = "pg-config-pkgincludedir",
+        value_name = "DIR",
+        requires = "target",
+        conflicts_with = "pg_config"
+    )]
     pg_config_pkgincludedir: Option<String>,
     /// Its library directory, on this machine when linking reads it
-    #[clap(long = "pg-config-libdir", value_name = "DIR", conflicts_with = "pg_config")]
+    #[clap(
+        long = "pg-config-libdir",
+        value_name = "DIR",
+        requires = "target",
+        conflicts_with = "pg_config"
+    )]
     pg_config_libdir: Option<String>,
     /// Its `pg_config --pkglibdir`, where the extension library will be installed
-    #[clap(long = "pg-config-pkglibdir", value_name = "DIR", conflicts_with = "pg_config")]
+    #[clap(
+        long = "pg-config-pkglibdir",
+        value_name = "DIR",
+        requires = "target",
+        conflicts_with = "pg_config"
+    )]
     pg_config_pkglibdir: Option<String>,
     /// Its `pg_config --sharedir`, where the extension's SQL and control files will be installed
-    #[clap(long = "pg-config-sharedir", value_name = "DIR", conflicts_with = "pg_config")]
+    #[clap(
+        long = "pg-config-sharedir",
+        value_name = "DIR",
+        requires = "target",
+        conflicts_with = "pg_config"
+    )]
     pg_config_sharedir: Option<String>,
     /// Its `pg_config --cppflags`
     #[clap(
         long = "pg-config-cppflags",
         value_name = "FLAGS",
+        requires = "target",
         conflicts_with = "pg_config",
         allow_hyphen_values = true
     )]
@@ -108,6 +139,7 @@ pub(crate) struct TargetPostgres {
     #[clap(
         long = "pg-config-cflags",
         value_name = "FLAGS",
+        requires = "target",
         conflicts_with = "pg_config",
         allow_hyphen_values = true
     )]
@@ -137,10 +169,10 @@ impl TargetPostgres {
     }
 }
 
-/// Choose the PostgreSQL to package for. The `--pg-config-*` options describe one in place of a
-/// `pg_config` program, so giving any of them means giving all that the build and the layout
-/// need. A program describes the machine it runs on, so a `cross` build, given as its target
-/// and this host, accepts only that description.
+/// Choose the PostgreSQL to package for. The `--pg-config-*` options describe the one of
+/// `--target` in place of a `pg_config` program, so giving any of them means giving all that
+/// the build and the layout need. A program describes the machine it runs on, so a `cross`
+/// build, given as its target and this host, accepts only that description.
 fn selected_pg_config(
     explicit: Option<PathBuf>,
     described: &TargetPostgres,
