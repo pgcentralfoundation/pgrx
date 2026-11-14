@@ -1,3 +1,4 @@
+use crate::target::target_arch;
 use eyre::{WrapErr, bail};
 use object::read::macho::{FatArch, MachOFatFile32, MachOFatFile64};
 use object::{Object, ObjectSection};
@@ -17,18 +18,21 @@ enum MachEndian {
     Big,
 }
 
-pub(crate) fn schema_section_data(data: &[u8]) -> eyre::Result<Option<&[u8]>> {
+pub(crate) fn schema_section_data<'a>(
+    data: &'a [u8],
+    target: Option<&str>,
+) -> eyre::Result<Option<&'a [u8]>> {
     let kind = object::FileKind::parse(data).wrap_err("couldn't parse binary kind")?;
 
     match kind {
-        object::FileKind::MachOFat32 => match slice_arch32(data, target_architecture()) {
-            Some(slice) => schema_section_data(slice),
-            None => Ok(None),
-        },
-        object::FileKind::MachOFat64 => match slice_arch64(data, target_architecture()) {
-            Some(slice) => schema_section_data(slice),
-            None => Ok(None),
-        },
+        object::FileKind::MachOFat32 => {
+            let fat = MachOFatFile32::parse(data).wrap_err("couldn't parse universal Mach-O")?;
+            schema_section_data(slice_arch(data, fat.arches(), target_arch(target))?, target)
+        }
+        object::FileKind::MachOFat64 => {
+            let fat = MachOFatFile64::parse(data).wrap_err("couldn't parse universal Mach-O")?;
+            schema_section_data(slice_arch(data, fat.arches(), target_arch(target))?, target)
+        }
         object::FileKind::MachO32 | object::FileKind::MachO64 => macho_schema_section_data(data),
         _ => schema_section_data_from_object(data),
     }
@@ -214,38 +218,34 @@ fn trim_nul(bytes: &[u8]) -> &[u8] {
     &bytes[..len]
 }
 
-fn target_architecture() -> object::Architecture {
-    match std::env::consts::ARCH {
-        "x86" => object::Architecture::I386,
-        "x86_64" => object::Architecture::X86_64,
+/// Select the slice of a universal Mach-O for `arch`, the first component of a target tuple or
+/// the host's architecture. Slices of one architecture are built from the same source and embed
+/// the same schema, so their CPU subtype does not matter here.
+fn slice_arch<'a>(data: &'a [u8], arches: &[impl FatArch], arch: &str) -> eyre::Result<&'a [u8]> {
+    let architecture = match arch {
+        "x86" | "i386" | "i586" | "i686" => object::Architecture::I386,
+        "x86_64" | "x86_64h" => object::Architecture::X86_64,
         "arm" => object::Architecture::Arm,
-        "aarch64" => object::Architecture::Aarch64,
+        "aarch64" | "arm64e" => object::Architecture::Aarch64,
         "mips" => object::Architecture::Mips,
         "powerpc" => object::Architecture::PowerPc,
         "powerpc64" => object::Architecture::PowerPc64,
-        _ => object::Architecture::Unknown,
-    }
-}
-
-fn slice_arch32(data: &[u8], arch: object::Architecture) -> Option<&[u8]> {
-    let candidates = MachOFatFile32::parse(data).ok()?;
-    let architecture =
-        candidates.arches().iter().find(|candidate| candidate.architecture() == arch)?;
-
-    architecture.data(data).ok()
-}
-
-fn slice_arch64(data: &[u8], arch: object::Architecture) -> Option<&[u8]> {
-    let candidates = MachOFatFile64::parse(data).ok()?;
-    let architecture =
-        candidates.arches().iter().find(|candidate| candidate.architecture() == arch)?;
-
-    architecture.data(data).ok()
+        _ => bail!("unsupported target architecture `{arch}` for universal Mach-O"),
+    };
+    let slice =
+        arches.iter().find(|candidate| candidate.architecture() == architecture).ok_or_else(
+            || eyre::eyre!("universal Mach-O has no slice for target architecture `{arch}`"),
+        )?;
+    slice.data(data).wrap_err_with(|| format!("couldn't read Mach-O slice for `{arch}`"))
 }
 
 #[cfg(test)]
 mod tests {
     use super::schema_section_data;
+    use object::macho::{
+        CPU_SUBTYPE_ARM64_ALL, CPU_SUBTYPE_X86_64_ALL, CPU_TYPE_ARM64, CPU_TYPE_X86_64, CpuSubtype,
+        FAT_MAGIC, FAT_MAGIC_64,
+    };
     use object::read::macho::{FatArch, MachOFatFile32};
     use pgrx_pg_config::{PgConfigSelector, Pgrx};
     use pgrx_sql_entity_graph::section::{
@@ -347,7 +347,83 @@ mod tests {
         const PAYLOAD: &[u8] = b"\x04\x00\x00\x00test";
         let bytes = minimal_macho64(PAYLOAD);
 
-        assert_eq!(schema_section_data(&bytes).unwrap(), Some(PAYLOAD));
+        assert_eq!(schema_section_data(&bytes, None).unwrap(), Some(PAYLOAD));
+    }
+
+    /// A universal Mach-O whose x86_64 and arm64 slices hold different schema bytes.
+    fn universal_macho(bits64: bool) -> Vec<u8> {
+        let slices = [
+            (CPU_TYPE_X86_64, CpuSubtype::from(CPU_SUBTYPE_X86_64_ALL), b"x86 schema"),
+            (CPU_TYPE_ARM64, CpuSubtype::from(CPU_SUBTYPE_ARM64_ALL), b"arm schema"),
+        ]
+        .map(|(cpu, subtype, payload)| (cpu, subtype, minimal_macho64(payload)));
+        let mut bytes = Vec::new();
+        bytes.extend_from_slice(&if bits64 { FAT_MAGIC_64 } else { FAT_MAGIC }.to_be_bytes());
+        bytes.extend_from_slice(&(slices.len() as u32).to_be_bytes());
+        let mut offset = 8 + slices.len() * if bits64 { 32 } else { 20 };
+        for (cpu, subtype, slice) in &slices {
+            bytes.extend_from_slice(&cpu.0.to_be_bytes());
+            bytes.extend_from_slice(&subtype.0.to_be_bytes());
+            if bits64 {
+                bytes.extend_from_slice(&(offset as u64).to_be_bytes());
+                bytes.extend_from_slice(&(slice.len() as u64).to_be_bytes());
+                bytes.extend_from_slice(&0u32.to_be_bytes());
+                bytes.extend_from_slice(&0u32.to_be_bytes());
+            } else {
+                bytes.extend_from_slice(&(offset as u32).to_be_bytes());
+                bytes.extend_from_slice(&(slice.len() as u32).to_be_bytes());
+                bytes.extend_from_slice(&0u32.to_be_bytes());
+            }
+            offset += slice.len();
+        }
+        for (_, _, slice) in slices {
+            bytes.extend_from_slice(&slice);
+        }
+        bytes
+    }
+
+    #[test]
+    fn universal_schema_uses_requested_architecture() {
+        for bits64 in [false, true] {
+            let bytes = universal_macho(bits64);
+            for (target, expected) in [
+                ("x86_64-apple-darwin", b"x86 schema"),
+                ("x86_64h-apple-darwin", b"x86 schema"),
+                ("aarch64-apple-darwin", b"arm schema"),
+                ("arm64e-apple-darwin", b"arm schema"),
+            ] {
+                assert_eq!(
+                    schema_section_data(&bytes, Some(target)).unwrap(),
+                    Some(expected.as_slice()),
+                    "{target}, fat64={bits64}"
+                );
+            }
+            let expected = match std::env::consts::ARCH {
+                "x86_64" => Some(b"x86 schema".as_slice()),
+                "aarch64" => Some(b"arm schema".as_slice()),
+                _ => continue,
+            };
+            assert_eq!(schema_section_data(&bytes, None).unwrap(), expected);
+        }
+    }
+
+    #[test]
+    fn universal_schema_reports_missing_target_slice() {
+        for bits64 in [false, true] {
+            let bytes = universal_macho(bits64);
+            let error = schema_section_data(&bytes, Some("i686-apple-darwin")).unwrap_err();
+            assert!(error.to_string().contains("i686"), "{error}");
+        }
+    }
+
+    #[test]
+    fn universal_schema_rejects_invalid_slice_bounds() {
+        for bits64 in [false, true] {
+            let mut bytes = universal_macho(bits64);
+            bytes.truncate(bytes.len() - 1);
+            let error = schema_section_data(&bytes, Some("aarch64-apple-darwin")).unwrap_err();
+            assert!(format!("{error:#}").contains("Invalid fat arch offset or size"), "{error:#}");
+        }
     }
 
     #[test]
@@ -355,7 +431,7 @@ mod tests {
         let payload = schema_section_sentinel_entry();
         let bytes = minimal_macho64(&payload);
 
-        assert_eq!(schema_section_data(&bytes).unwrap(), Some(payload.as_slice()));
+        assert_eq!(schema_section_data(&bytes, None).unwrap(), Some(payload.as_slice()));
     }
 
     #[test]
@@ -364,7 +440,7 @@ mod tests {
         let fixture_path = format!("{root_path}/tests/fixtures/macos-universal-binary");
         let bin = std::fs::read(fixture_path).unwrap();
 
-        assert!(schema_section_data(&bin).unwrap().is_none());
+        assert!(schema_section_data(&bin, None).unwrap().is_none());
     }
 
     #[test]

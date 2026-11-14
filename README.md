@@ -225,16 +225,12 @@ For more details on how to manage pgrx extensions see [Managing pgrx extensions]
 
 ## Cross-compiling
 
-So far, cross-compiling extensions with pgrx has only been demonstrated under [nix](https://nixos.org/).
-Proper support in nixpkgs is still in flux, so watch this space.
-
-In order to cross-compile outside of nix, you will need these ingredients:
+Cross-compiling requires a toolchain and PostgreSQL configuration for the target:
 
 1) A sysroot for the cross architecture, with rust configured to invoke the linker with flags to link against this sysroot.
 2) PostgreSQL server headers configured for the target, from the same build as the server that will load the extension.
 3) PostgreSQL metadata to go with those headers. Either keep the host's `pg_config` and select the target headers with
-   `PGRX_INCLUDEDIR_SERVER_PG<NN>_<target>`, or describe the target with `PGRX_PG_CONFIG_AS_ENV`.
-   A `pg_config` program for the target also works, either emulated with qemu-user or similar, or replicated with a shell script.
+   `PGRX_INCLUDEDIR_SERVER_PG<NN>_<target>`, or describe the target with `PGRX_PG_CONFIG_AS_ENV=true`.
 4) The `clang` driver and `llvm-ar` described under [System Requirements](#system-requirements).
    `BINDGEN_EXTRA_CLANG_ARGS_<target>` passes the target's sysroot to them when Clang cannot find it.
 
@@ -246,12 +242,26 @@ replace items 2 and 4. Raw bindings alone cannot. The
 [cross-compilation guide](docs/src/extension/build/cross-compile.md#postgresql-headers-and-metadata-for-the-target)
 describes each path and what pgrx verifies.
 
-When building with a `pg_config` program, modify the standard build process in the following ways:
+To package with recorded target metadata, set `PGRX_PG_CONFIG_AS_ENV=true` and
+the variables listed in
+[PostgreSQL metadata in the environment](docs/src/extension/build/cross-compile.md#postgresql-metadata-in-the-environment),
+then run `cargo pgrx package --target <target-triple>`. This needs no `pg_config`
+executable, adapter, `cargo pgrx init`, or pgrx configuration file. Header and
+link-library paths must be accessible on the build host; package installation
+paths describe the target. Do not combine this mode with `--pg-config`.
+
+When building with a host-runnable `pg_config` program instead, modify the standard build process in the following ways:
 
 1) Pass `--no-run` to `cargo pgrx init`, since we cannot run postgres for the cross machine.
 2) Pass one of the `--pgXX` flags to `cargo pgrx init` with the aforementioned `pg_config`.
 3) Pass the `--pg-config` flag to `cargo pgrx package` with the aforementioned `pg_config`.
 4) Pass the `--target` flag to `cargo pgrx package` with the rust triple of the cross machine.
+
+Pass a built-in Rust target triple explicitly to cargo-pgrx. Library names,
+package layout, universal Mach-O slice selection, and RPM/DEB generation follow
+that target, falling back to the host when it is omitted. Cargo's `build.target`,
+`CARGO_BUILD_TARGET`, forwarded Cargo flags, and custom JSON target specifications
+do not replace cargo-pgrx's explicit `--target`.
 
 `cargo pgrx run` will not work.
 

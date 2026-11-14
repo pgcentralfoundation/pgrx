@@ -219,12 +219,20 @@ pub(crate) fn pg_config_and_version(
 
 pub(crate) fn display_version_info(pg_config: &PgConfig, pg_version: &PgVersionSource) {
     use owo_colors::OwoColorize;
-    eprintln!(
-        "{} {:?} and `pg_config` from {}",
-        "       Using".bold().green(),
-        pg_version.bold().white(),
-        pg_config.path().unwrap().display().cyan()
-    );
+    match pg_config.path() {
+        Some(path) => eprintln!(
+            "{} {:?} and `pg_config` from {}",
+            "       Using".bold().green(),
+            pg_version.bold().white(),
+            path.display().cyan()
+        ),
+        None => eprintln!(
+            "{} {:?} and PostgreSQL metadata from {}",
+            "       Using".bold().green(),
+            pg_version.bold().white(),
+            "PGRX_PG_CONFIG_*".cyan()
+        ),
+    }
 }
 
 pub(crate) fn get_package_manifest(

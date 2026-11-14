@@ -183,8 +183,7 @@ impl PgConfig {
     /// Construct a new [`PgConfig`] from the set of environment variables that are prefixed with
     /// `PGRX_PG_CONFIG_`.
     ///
-    /// It also requires that the `PGRX_PG_CONFIG_AS_ENV` variable be set to some value that isn't
-    /// the string `"false"`.
+    /// It also requires that `PGRX_PG_CONFIG_AS_ENV` be set to exactly `"true"`.
     pub fn from_env() -> eyre::Result<Self> {
         if !Self::is_in_environment() {
             Err(eyre::eyre!("`PgConfig` not described in the environment"))
@@ -707,7 +706,7 @@ impl Pgrx {
     /// Returns an iterator of all "configured" `PgConfig`s we know about.
     ///
     /// If the `which` argument is [`PgConfigSelector::All`] **and** the environment variable
-    /// `PGRX_PG_CONFIG_AS_ENV` is set to a value that isn't `"false"`then this function will return
+    /// `PGRX_PG_CONFIG_AS_ENV` is set to exactly `"true"`, this function will return
     /// a one-element iterator that represents that single "pg_config".
     ///
     /// Otherwise, we'll follow the rules of [`PgConfigSelector::All`] being supported versions

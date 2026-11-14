@@ -59,6 +59,7 @@ const OUTPUT_LIMIT: u64 = 16 * 1024 * 1024;
 pub(crate) const VALUE_OPTIONS: &[&str] = &[
     "-I",
     "-isystem",
+    "-cxx-isystem",
     "-iquote",
     "-idirafter",
     "-F",
@@ -2465,7 +2466,17 @@ fn build_inputs(
     }
     let mut arguments = arguments.iter();
     while let Some(argument) = arguments.next() {
-        let directory = if matches!(
+        let directory = if argument == "-Xclang" {
+            if arguments.next().is_some_and(|option| option == "-c-isystem") {
+                Some(forwarded_c_include(&mut arguments)?)
+            } else {
+                None
+            }
+        } else if argument == "-cxx-isystem" {
+            // This path is an operand, but it does not affect the inspected C search.
+            let _operand = arguments.next();
+            None
+        } else if matches!(
             argument.as_str(),
             "-I" | "-isystem"
                 | "-iquote"
@@ -2984,29 +2995,39 @@ pub(crate) fn validate_driver_configuration(verbose: &str) -> Result<(), Fronten
 /// An MSVC target also keeps incompatible pointer types a warning, as its own compiler does.
 pub(crate) fn prepare_arguments(arguments: &[String]) -> Result<Vec<String>, FrontendError> {
     let normalized = normalize_arguments(arguments)?;
-    let mut msvc = cfg!(target_env = "msvc");
-    let mut arguments = normalized.iter();
-    while let Some(argument) = arguments.next() {
-        if matches!(argument.as_str(), "-target" | "--target") {
-            if let Some(triple) = arguments.next() {
-                msvc = crate::model::is_msvc_triple(triple);
-            }
-        } else if VALUE_OPTIONS.contains(&argument.as_str())
-            || matches!(argument.as_str(), "-x" | "-Xclang" | "-Xpreprocessor" | "-mllvm")
-        {
-            let _operand = arguments.next();
-        } else if let Some(triple) =
-            argument.strip_prefix("--target=").or_else(|| argument.strip_prefix("-target="))
-        {
-            msvc = crate::model::is_msvc_triple(triple);
-        }
-    }
+    let msvc = explicit_target(&normalized)
+        .map_or(cfg!(target_env = "msvc"), crate::model::is_msvc_triple);
     let mut prepared = crate::lower_msvc_runtime_flags(&normalized, msvc)?;
     if msvc && !prepared.iter().any(|argument| argument == MSVC_POINTER_TYPE_WARNING) {
         // First, so an explicit warning option later in the profile still decides.
         prepared.insert(0, MSVC_POINTER_TYPE_WARNING.into());
     }
     Ok(prepared)
+}
+
+/// Find the last explicit target without treating another option's operand as a selector.
+pub(crate) fn explicit_target(arguments: &[String]) -> Option<&str> {
+    let mut target = None;
+    let mut arguments = arguments.iter();
+    while let Some(argument) = arguments.next() {
+        if matches!(argument.as_str(), "-target" | "--target") {
+            if let Some(triple) = arguments.next() {
+                target = Some(triple.as_str());
+            }
+        } else if VALUE_OPTIONS.contains(&argument.as_str())
+            || matches!(
+                argument.as_str(),
+                "-x" | "-Xclang" | "-Xpreprocessor" | "-mllvm" | "/I" | "/D" | "/U" | "/FI"
+            )
+        {
+            let _operand = arguments.next();
+        } else if let Some(triple) =
+            argument.strip_prefix("--target=").or_else(|| argument.strip_prefix("-target="))
+        {
+            target = Some(triple);
+        }
+    }
+    target
 }
 
 /// Keeps an incompatible pointer type a warning for an MSVC target, as Microsoft's C compiler
@@ -3021,10 +3042,7 @@ pub const MSVC_POINTER_TYPE_WARNING: &str = "-Wno-error=incompatible-pointer-typ
 /// refused rather than silently changing the inspected inputs.
 fn normalize_arguments(arguments: &[String]) -> Result<Vec<String>, FrontendError> {
     let mut normalized = Vec::with_capacity(arguments.len());
-    let windows = cfg!(windows)
-        || arguments.iter().any(|arg| {
-            arg.contains("-windows-") || arg.ends_with("-win32") || arg.ends_with("-mingw32")
-        });
+    let windows = explicit_target(arguments).map_or(cfg!(windows), crate::model::is_windows_triple);
     let mut arguments = arguments.iter();
     while let Some(argument) = arguments.next() {
         // Option operands are paths or definitions, not independent switches.
@@ -3072,9 +3090,27 @@ fn normalize_arguments(arguments: &[String]) -> Result<Vec<String>, FrontendErro
     Ok(normalized)
 }
 
+/// Consume the remaining pair of `-Xclang -c-isystem -Xclang PATH` without reinterpreting the path.
+fn forwarded_c_include<'a>(
+    arguments: &mut impl Iterator<Item = &'a String>,
+) -> Result<&'a str, FrontendError> {
+    match (arguments.next().map(String::as_str), arguments.next().map(String::as_str)) {
+        (Some("-Xclang"), Some(path)) if !path.contains('\0') => Ok(path),
+        _ => Err(FrontendError::Arguments(
+            "-Xclang -c-isystem requires -Xclang and a path without NUL bytes".into(),
+        )),
+    }
+}
+
 /// Reject extra inputs, driver actions, and hidden configuration that could change or bypass the
 /// inspected C phase.
 fn validate_arguments(arguments: &[String]) -> Result<(), FrontendError> {
+    // Clang expands response files before parsing options, including their path operands.
+    if let Some(argument) = arguments.iter().find(|argument| argument.starts_with('@')) {
+        return Err(FrontendError::Arguments(format!(
+            "response file {argument} is unsupported for reproducible analysis"
+        )));
+    }
     let mut arguments = arguments.iter();
     while let Some(argument) = arguments.next() {
         if argument.contains('\0') {
@@ -3091,21 +3127,23 @@ fn validate_arguments(arguments: &[String]) -> Result<(), FrontendError> {
             }
         }
         if argument == "-Xclang" {
-            if arguments.next().is_some_and(|value| {
-                matches!(
-                    value.as_str(),
+            match arguments.next().map(String::as_str) {
+                Some("-c-isystem") => {
+                    forwarded_c_include(&mut arguments)?;
+                    continue;
+                }
+                Some(
                     "--dependent-lib=msvcrt"
-                        | "--dependent-lib=msvcrtd"
-                        | "--dependent-lib=libcmt"
-                        | "--dependent-lib=libcmtd"
-                        | "--dependent-lib=oldnames"
-                        | "-flto-visibility-public-std"
-                )
-            }) {
-                continue;
+                    | "--dependent-lib=msvcrtd"
+                    | "--dependent-lib=libcmt"
+                    | "--dependent-lib=libcmtd"
+                    | "--dependent-lib=oldnames"
+                    | "-flto-visibility-public-std",
+                ) => continue,
+                _ => {}
             }
             return Err(FrontendError::Arguments(
-                "only verified MSVC CRT cc1 options may be forwarded with -Xclang".into(),
+                "only C include paths and verified MSVC CRT cc1 options may be forwarded with -Xclang".into(),
             ));
         }
         if VALUE_OPTIONS.contains(&argument.as_str()) {
@@ -3149,8 +3187,7 @@ fn validate_arguments(arguments: &[String]) -> Result<(), FrontendError> {
                 | "-Xpreprocessor"
                 | "-cc1"
                 | "--"
-        ) || argument.starts_with('@')
-            || argument.starts_with("-o")
+        ) || argument.starts_with("-o")
             || argument.starts_with("--output")
             || argument.starts_with("-MF")
             || argument.starts_with("-MJ")
@@ -3264,6 +3301,87 @@ mod tests {
 
     use crate::SCANNER_LOCK;
 
+    /// Zig supplies C++ search paths even when its bindgen consumer inspects C.
+    #[test]
+    fn zig_cxx_include_operands_remain_opaque() {
+        let arguments = [
+            "--target=x86_64-unknown-linux-gnu",
+            "-cxx-isystem",
+            r"D:\Zig SDK\lib\libcxx\include",
+            "-cxx-isystem",
+            "--target=x86_64-pc-windows-msvc",
+        ]
+        .map(str::to_owned);
+        assert_eq!(explicit_target(&arguments), Some("x86_64-unknown-linux-gnu"));
+        assert_eq!(prepare_arguments(&arguments).unwrap(), arguments);
+        validate_arguments(&arguments).unwrap();
+    }
+
+    /// Only the C-specific include forwarding emitted by Zig joins the reviewed cc1 options.
+    #[test]
+    fn zig_c_include_forwarding_requires_its_complete_operand() {
+        let arguments = [
+            "--target=x86_64-unknown-linux-gnu",
+            "-Xclang",
+            "-c-isystem",
+            "-Xclang",
+            r"D:\Zig SDK\lib\libc\include",
+        ]
+        .map(str::to_owned);
+        assert_eq!(prepare_arguments(&arguments).unwrap(), arguments);
+        validate_arguments(&arguments).unwrap();
+        for arguments in [
+            vec!["-Xclang", "-c-isystem"],
+            vec!["-Xclang", "-c-isystem", "-Xclang"],
+            vec!["-Xclang", "-c-isystem", "include"],
+            vec!["-Xclang", "-c-isystem", "-I", "include"],
+            vec!["-Xclang", "-c-isystem", "-Xclang", "bad\0path"],
+            vec!["-Xclang", "-D__STDC_VERSION__=1"],
+            vec!["-Xclang", "-cxx-isystem", "-Xclang", "include"],
+            vec!["-cxx-isystem"],
+            vec!["-cxx-isystem", "bad\0path"],
+        ] {
+            let arguments = arguments.into_iter().map(str::to_owned).collect::<Vec<_>>();
+            assert!(validate_arguments(&arguments).is_err(), "{arguments:?}");
+        }
+    }
+
+    /// Clang expands response files before consuming include operands, which could inject -D/-U.
+    #[test]
+    fn response_files_cannot_hide_in_option_operands() {
+        let directory = tempfile::tempdir().unwrap();
+        let response = directory.path().join("protected overrides.rsp");
+        std::fs::write(&response, "-D__STDC_VERSION__=1 -U__SIZE_TYPE__\n").unwrap();
+        let response = format!("@{}", response.display());
+        for arguments in [
+            vec![response.as_str()],
+            vec!["-isystem", response.as_str()],
+            vec!["-cxx-isystem", response.as_str()],
+            vec!["-Xclang", "-c-isystem", "-Xclang", response.as_str()],
+            vec!["-I", response.as_str()],
+            vec!["-D", response.as_str()],
+        ] {
+            let arguments = arguments.into_iter().map(str::to_owned).collect::<Vec<_>>();
+            assert!(validate_arguments(&arguments).is_err(), "{arguments:?}");
+        }
+    }
+
+    /// An absent C search directory can acquire a header after inspection.
+    #[test]
+    fn zig_c_include_forwarding_tracks_missing_search_roots() {
+        let directory = tempfile::tempdir().unwrap();
+        let missing = directory.path().join("not created yet");
+        let arguments = [
+            "-Xclang".into(),
+            "-c-isystem".into(),
+            "-Xclang".into(),
+            missing.to_str().unwrap().into(),
+        ];
+        let inputs =
+            build_inputs(&arguments, "", BTreeSet::new(), &CompilerSearch::default()).unwrap();
+        assert!(inputs.directories.contains(&missing));
+    }
+
     /// Native Windows switches retain definitions, paths, optimization, and plain-char choices,
     /// without reinterpreting option operands or allowing protected C fact overrides.
     #[test]
@@ -3336,6 +3454,45 @@ mod tests {
         expected.extend(crate::postgres_clang_flags(recorded, true).unwrap());
         assert_eq!(normalize_arguments(&raw).unwrap(), expected);
         validate_arguments(&expected).unwrap();
+    }
+
+    /// Only real target options choose metadata conventions; the last one overrides the host.
+    #[test]
+    fn explicit_targets_ignore_other_option_operands() {
+        for selector in ["-target", "--target", "-target=", "--target="] {
+            let mut arguments = vec!["--target=x86_64-pc-windows-msvc".to_owned()];
+            if selector.ends_with('=') {
+                arguments.push(format!("{selector}aarch64-unknown-linux-gnu"));
+            } else {
+                arguments.extend([selector.into(), "aarch64-unknown-linux-gnu".into()]);
+            }
+            for option in ["-I", "-D", "-Xclang", "--gcc-triple", "/I", "/D", "/FI"] {
+                arguments.extend([option.into(), "--target=x86_64-pc-windows-msvc".into()]);
+            }
+            assert_eq!(explicit_target(&arguments), Some("aarch64-unknown-linux-gnu"));
+        }
+        assert_eq!(explicit_target(&["-I".into(), "--target=x86_64-pc-windows-msvc".into()]), None);
+    }
+
+    /// A Windows-looking operand cannot enable CL translation for an explicit Unix target.
+    #[test]
+    fn explicit_unix_targets_disable_windows_argument_normalization() {
+        let arguments = [
+            "--target=x86_64-pc-windows-msvc",
+            "--target=aarch64-unknown-linux-gnu",
+            "-I",
+            "/sdk/x86_64-pc-windows-msvc",
+            "/DVALUE=7",
+        ]
+        .map(str::to_owned);
+        for arguments in [&arguments[..], &arguments[1..]] {
+            assert_eq!(normalize_arguments(arguments).unwrap(), arguments);
+            assert_eq!(prepare_arguments(arguments).unwrap(), arguments);
+            assert!(
+                validate_arguments(arguments).is_err(),
+                "a GNU profile must not accept raw CL switches"
+            );
+        }
     }
 
     /// Raw CL runtime controls fold after base normalization, preserving forwarded user overrides

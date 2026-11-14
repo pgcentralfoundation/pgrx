@@ -15,6 +15,7 @@ use crate::command::install::{
 };
 use crate::command::migrate::UnreleasedFragmentMode;
 use crate::manifest::{PgVersionSource, display_version_info};
+use crate::target::{TargetOs, target_arch};
 use cargo_toml::Manifest;
 use eyre::{WrapErr, eyre};
 use owo_colors::OwoColorize;
@@ -95,14 +96,22 @@ impl Package {
         let package_manifest =
             Manifest::from_path(&package_manifest_path).wrap_err("Couldn't parse manifest")?;
 
-        let pg_config = match self.pg_config {
-            None => PgConfig::from_path(),
-            Some(config) => PgConfig::new_with_defaults(config),
+        let pg_config = if PgConfig::is_in_environment() {
+            eyre::ensure!(
+                self.pg_config.is_none(),
+                "cannot combine --pg-config with PGRX_PG_CONFIG_AS_ENV=true"
+            );
+            PgConfig::from_env()?
+        } else {
+            match self.pg_config {
+                None => PgConfig::from_path(),
+                Some(config) => PgConfig::new_with_defaults(config),
+            }
         };
         let pg_version = format!("pg{}", pg_config.major_version()?);
 
         crate::manifest::modify_features_for_version(
-            &Pgrx::from_config()?,
+            &Pgrx::default(),
             Some(&mut self.features),
             &package_manifest,
             &PgVersionSource::PgConfig(pg_version),
@@ -255,10 +264,9 @@ fn build_distrib_packages(
         return Ok(vec![]);
     }
 
-    // The staged library only runs on the platform that built it.
-    if !cfg!(target_os = "linux") {
+    if TargetOs::from_target(target) != TargetOs::Linux {
         eprintln!(
-            "{} skipping RPM and DEB packages, which can only be built on Linux",
+            "{} skipping RPM and DEB packages, which require a Linux target",
             "WARNING:".red().bold()
         );
         return Ok(vec![]);
@@ -434,7 +442,7 @@ impl Vars {
         let out_dir = std::path::absolute(out_dir)
             .wrap_err_with(|| format!("couldn't resolve {}", out_dir.display()))?;
         Ok(Self(HashMap::from([
-            ("ARCH", Ok(package_arch(target).to_owned())),
+            ("ARCH", Ok(target_arch(target).to_owned())),
             ("BUILD_BASE_PATH", Ok(utf8_path(&out_dir)?)),
             (
                 "DESCRIPTION",
@@ -499,12 +507,6 @@ impl Vars {
         }
         Ok(())
     }
-}
-
-/// The architecture of the packaged library. `--target` wins over the host, and
-/// arx-pack accepts the first component of the common Linux target triples.
-fn package_arch(target: Option<&str>) -> &str {
-    target.and_then(|t| t.split('-').next()).unwrap_or(std::env::consts::ARCH)
 }
 
 /// RPM rejects `-` in a version, and Debian reads it as a revision that sorts
@@ -653,14 +655,103 @@ mod tests {
 
     #[test]
     fn package_arch_follows_the_target() {
-        assert_eq!(package_arch(Some("aarch64-unknown-linux-gnu")), "aarch64");
-        assert_eq!(package_arch(None), std::env::consts::ARCH);
+        assert_eq!(target_arch(Some("aarch64-unknown-linux-gnu")), "aarch64");
+        assert_eq!(target_arch(None), std::env::consts::ARCH);
     }
 
     #[test]
     fn package_version_sorts_pre_releases_first() {
         assert_eq!(package_version("1.2.3"), "1.2.3");
         assert_eq!(package_version("1.2.3-rc.1"), "1.2.3~rc.1");
+    }
+
+    fn package_manifest(dir: &Path) -> PathBuf {
+        let path = dir.join("Cargo.toml");
+        std::fs::write(
+            &path,
+            r#"
+            [package]
+            name = "my-ext"
+            version = "1.0.0"
+            description = "Extension"
+            license = "MIT"
+            authors = ["Me"]
+            [lib]
+            path = "lib.rs"
+            [package.metadata.rpm]
+            [package.metadata.deb]
+            "#,
+        )
+        .unwrap();
+        path
+    }
+
+    #[test]
+    fn non_linux_targets_skip_distribution_packages() {
+        let dir = tempfile::tempdir().unwrap();
+        let manifest = package_manifest(dir.path());
+        // No staging tree or pg_config program is needed when the target cannot use these packages.
+        for target in ["aarch64-apple-darwin", "x86_64-pc-windows-msvc", "x86_64-unknown-freebsd"] {
+            let paths = build_distrib_packages(
+                &PgConfig::default(),
+                &manifest,
+                dir.path(),
+                dir.path(),
+                Some(target),
+                dir.path(),
+                &[],
+            )
+            .unwrap();
+            assert!(paths.is_empty(), "{target}: {paths:?}");
+        }
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn linux_target_builds_distribution_packages_on_any_unix_host() {
+        use std::os::unix::fs::PermissionsExt;
+        let dir = tempfile::tempdir().unwrap();
+        let dir = dir.path();
+        let manifest = package_manifest(dir);
+        std::fs::write(dir.join("my_ext.control"), "default_version = '1.0.0'\n").unwrap();
+        let pg_config = dir.join("pg_config");
+        std::fs::write(
+            &pg_config,
+            r#"#!/bin/sh
+case "$1" in
+    --version) echo 'PostgreSQL 18.1' ;;
+    --pkglibdir) echo '/usr/lib/postgresql/18/lib' ;;
+    --sharedir) echo '/usr/share/postgresql/18' ;;
+    *) exit 1 ;;
+esac
+"#,
+        )
+        .unwrap();
+        std::fs::set_permissions(&pg_config, std::fs::Permissions::from_mode(0o755)).unwrap();
+        let pg_config = PgConfig::new_with_defaults(pg_config);
+        let libdir = dir.join("usr/lib/postgresql/18/lib");
+        let extdir = dir.join("usr/share/postgresql/18/extension");
+        std::fs::create_dir_all(&libdir).unwrap();
+        std::fs::create_dir_all(&extdir).unwrap();
+        std::fs::write(libdir.join("my_ext-1.0.0.so"), "library").unwrap();
+        std::fs::copy(dir.join("my_ext.control"), extdir.join("my_ext.control")).unwrap();
+        for (target, rpm_arch, deb_arch) in [
+            ("x86_64-unknown-linux-gnu", "x86_64", "amd64"),
+            ("aarch64-unknown-linux-gnu", "aarch64", "arm64"),
+        ] {
+            let paths =
+                build_distrib_packages(&pg_config, &manifest, dir, dir, Some(target), dir, &[])
+                    .unwrap();
+            assert_eq!(
+                paths,
+                [
+                    dir.join(format!("my-ext_18-1.0.0-1.{rpm_arch}.rpm")),
+                    dir.join(format!("postgresql-18-my-ext_1.0.0_{deb_arch}.deb")),
+                ]
+            );
+            assert!(std::fs::read(&paths[0]).unwrap().starts_with(b"\xed\xab\xee\xdb"));
+            assert!(std::fs::read(&paths[1]).unwrap().starts_with(b"!<arch>\n"));
+        }
     }
 
     // The library's file name differs from the crate name, as it does for a
