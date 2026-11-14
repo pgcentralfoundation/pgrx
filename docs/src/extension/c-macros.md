@@ -824,17 +824,13 @@ installation such as Postgres.app builds each slice named by `-arch` in its
 CFLAGS from the same headers, so either slice is accepted; Cargo's target
 replaces the `-arch` flags in the profile.
 
-A cross build therefore needs server headers configured for the target. Select
-them with `PGRX_INCLUDEDIR_SERVER_PGNN_<target>` and keep the host's `pg_config`,
-describe the target with
-`cargo pgrx package`'s `--pg-config-*` options, or import a
+A cross build therefore needs server headers configured for the target. Give
+them to `cargo pgrx package --target` with its `--pg-config-*` options, or
+import a
 [complete target bundle](build/cross-compile.md#import-a-complete-target-bundle)
-through `PGRX_TARGET_INFO_PATH_PGNN`. When Cargo's host and target differ, a
-`pg_config` program contributes only PostgreSQL's functional CFLAGS
-(`-fno-strict-aliasing`, `-fwrapv` and `-fexcess-precision=standard`); the report
-lists the rest under `cflags_dropped`. See
+through `PGRX_TARGET_INFO_PATH_PGNN`. See
 [the cross-compilation guide](build/cross-compile.md#postgresql-headers-and-metadata-for-the-target)
-for each path, the checks, and what remains trusted. Raw bindings alone and
+for both, the checks, and what remains trusted. Raw bindings alone and
 checked-in documentation snapshots cannot substitute for the target's inspected
 macro and native support.
 
@@ -846,7 +842,7 @@ diagnostics are quiet. To enable macro-generation Cargo warnings, rebuild your
 extension with exactly `PGRX_MACRO_DEBUG=1`:
 
 ```sh
-PGRX_MACRO_DEBUG=1 cargo build
+PGRX_MACRO_DEBUG=1 cargo pgrx run
 ```
 
 Only exactly `1` enables these warnings; unset or `PGRX_MACRO_DEBUG=0` keeps them
