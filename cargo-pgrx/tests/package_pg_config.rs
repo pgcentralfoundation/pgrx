@@ -248,7 +248,7 @@ fn described(command: &mut Command, except: Option<&str>) {
 }
 
 fn host_triple() -> String {
-    let output = Command::new(std::env::var_os("CARGO").unwrap_or_else(|| "cargo".into()))
+    let output = Command::new(std::env::var_os("RUSTC").unwrap_or_else(|| "rustc".into()))
         .arg("-vV")
         .output()
         .unwrap();
