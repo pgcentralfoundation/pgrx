@@ -33,9 +33,22 @@ pub fn postgres_clang_flags_for_target(
     if target.map_or(cfg!(target_env = "msvc"), crate::model::is_msvc_triple) {
         postgres_clang_flags(flags, true)
     } else {
-        let windows = target.map_or(cfg!(windows), crate::model::is_windows_triple);
-        Ok(crate::split_recorded_cflags(flags, windows)?.unwrap_or_default())
+        Ok(split_recorded_cflags_for_target(flags, target)?.unwrap_or_default())
     }
+}
+
+/// Split recorded PostgreSQL flags with the installation's quoting, without translating them.
+///
+/// `target` selects the quoting as in [`postgres_clang_flags_for_target`], and `None` in the
+/// result means the installation recorded no flags. This is for flags a caller only filters,
+/// such as a host installation's CFLAGS in a cross build; flags that reach Clang need
+/// [`postgres_clang_flags_for_target`].
+pub fn split_recorded_cflags_for_target(
+    flags: &str,
+    target: Option<&str>,
+) -> Result<Option<Vec<String>>, FrontendError> {
+    let windows = target.map_or(cfg!(windows), crate::model::is_windows_triple);
+    crate::split_recorded_cflags(flags, windows)
 }
 
 /// PostgreSQL function macros and the other definitions needed to interpret them.

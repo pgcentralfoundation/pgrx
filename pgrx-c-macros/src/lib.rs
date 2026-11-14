@@ -46,7 +46,8 @@ mod postgres_flags;
 pub use postgres::{
     ConfigurationError, LayoutDisagreement, PostgresConfig, PostgresError, PostgresInventory,
     ServerHeaderRoots, postgres_clang_flags_for_target, postgres_function_macro_names,
-    postgres_inline_function_names, postgres_object_macro_names, verify_postgres_configuration,
+    postgres_inline_function_names, postgres_object_macro_names, split_recorded_cflags_for_target,
+    verify_postgres_configuration,
 };
 pub use postgres_flags::{
     lower_msvc_runtime_flags, postgres_clang_flags, separate_architecture_flags,

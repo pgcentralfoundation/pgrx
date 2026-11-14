@@ -1393,7 +1393,7 @@ fn run_bindgen(
     eprintln!("Generating bindings for pg{major_version}");
     let _lock = MACRO_SCANNER.lock().map_err(|_| eyre!("C macro scanner lock was poisoned"))?;
     let scanner = MacroScanner::new().wrap_err("could not initialize C macro discovery")?;
-    let postgres = macro_postgres_config(pg_config, &pg_target_includes[0], target)?;
+    let postgres = macro_postgres_config(pg_config, &pg_target_includes[0])?;
     let explicit_clang = env_tracked("CLANG_PATH").map(PathBuf::from);
     let environment_arguments = bindgen_environment_arguments(env_tracked);
     let cflags = macro_cflags(pg_config, env_tracked)?;
@@ -1403,8 +1403,9 @@ fn run_bindgen(
     if env_tracked("CARGO_CFG_TARGET_OS").as_deref() == Some("windows") {
         let flags = pg_config.cppflags()?;
         let flags = flags.to_str().ok_or_else(|| eyre!("PostgreSQL CPPFLAGS are not UTF-8"))?;
-        let metadata_target = (!pg_config.is_real()).then_some(target);
-        macro_arguments.extend(recorded_macro_flags(flags, metadata_target)?.unwrap_or_default());
+        let metadata_target = metadata_platform(pg_config.is_real(), env_tracked);
+        macro_arguments
+            .extend(recorded_macro_flags(flags, metadata_target.as_deref())?.unwrap_or_default());
     }
     let cppflags = extra_bindgen_clang_args(pg_config)?;
     // Bindgen's own include detection asks whichever clang clang-sys finds, which need not
@@ -1505,13 +1506,9 @@ fn run_bindgen(
 /// Give macro ownership to the server headers that bindgen and inspection include, the first
 /// of `pg_target_includes`. A `PGRX_INCLUDEDIR_SERVER` override replaces pg_config's directory
 /// as that root, so the macros it defines are generated and the installation's are not.
-fn macro_postgres_config(
-    pg_config: &PgConfig,
-    server_root: &str,
-    target: &str,
-) -> eyre::Result<PostgresConfig> {
-    let metadata_target = (!pg_config.is_real()).then_some(target);
-    Ok(PostgresConfig::from_pg_config_with_target(pg_config.clone(), metadata_target)?
+fn macro_postgres_config(pg_config: &PgConfig, server_root: &str) -> eyre::Result<PostgresConfig> {
+    let metadata_target = metadata_platform(pg_config.is_real(), env_tracked);
+    Ok(PostgresConfig::from_pg_config_with_target(pg_config.clone(), metadata_target.as_deref())?
         .with_server_include_dir(server_root.into()))
 }
 
@@ -2299,17 +2296,17 @@ fn scope_macro_cflags(
     host_program: bool,
     lookup: impl Fn(&str) -> Option<String>,
 ) -> eyre::Result<MacroCflags> {
-    let metadata_target = lookup(if host_program { "HOST" } else { "TARGET" });
+    let metadata_target = metadata_platform(host_program, &lookup);
     let cross_host = host_program && lookup("HOST") != lookup("TARGET");
     let Some(flags) = flags
         .map(|flags| {
             if cross_host {
-                // Cargo's HOST is a Rust triple. Host-only ISA options need no Clang
-                // translation: even unrecognized options are discarded below.
-                let windows = metadata_target.as_deref().map_or(cfg!(windows), |host| {
-                    host.split('-').any(|component| component == "windows")
-                });
-                Ok(pgrx_c_macros::split_recorded_cflags(flags, windows)?)
+                // Host-only ISA options need no Clang translation: even unrecognized
+                // options are discarded below.
+                Ok(pgrx_c_macros::split_recorded_cflags_for_target(
+                    flags,
+                    metadata_target.as_deref(),
+                )?)
             } else {
                 recorded_macro_flags(flags, metadata_target.as_deref())
             }
@@ -2325,6 +2322,15 @@ fn scope_macro_cflags(
         pgrx_c_macros::separate_architecture_flags(flags)
     };
     Ok(MacroCflags { applied, dropped, recorded: true })
+}
+
+/// The platform whose quoting and compiler conventions wrote an installation's recorded flags.
+/// A `pg_config` program describes the host it runs on; AS_ENV metadata describes the target.
+fn metadata_platform(
+    host_program: bool,
+    lookup: impl Fn(&str) -> Option<String>,
+) -> Option<String> {
+    lookup(if host_program { "HOST" } else { "TARGET" })
 }
 
 /// Decode one recorded CFLAGS or CPPFLAGS fragment for the macro profile; `None` means the
@@ -2347,7 +2353,7 @@ fn extra_bindgen_clang_args(pg_config: &PgConfig) -> eyre::Result<Vec<String>> {
     let mut out = vec![];
     let flags = pg_config.cppflags()?;
     let flags = flags.to_str().ok_or_else(|| eyre!("PostgreSQL CPPFLAGS are not UTF-8"))?;
-    let metadata_target = env_tracked(if pg_config.is_real() { "HOST" } else { "TARGET" });
+    let metadata_target = metadata_platform(pg_config.is_real(), env_tracked);
     let flags = recorded_macro_flags(flags, metadata_target.as_deref())?.unwrap_or_default();
     if env_tracked("CARGO_CFG_TARGET_OS").as_deref() != Some("windows") {
         // Just give clang the full flag set, since presumably that's what we're
@@ -2969,12 +2975,9 @@ mod macro_build_tests {
             &pg_config,
             "#!/bin/sh\ncase \"$1\" in\n--includedir-server) echo /installation/server ;;\n--version) echo 'PostgreSQL 18.4' ;;\n--cppflags) echo ;;\n*) exit 1 ;;\nesac\n",
         );
-        let postgres = macro_postgres_config(
-            &PgConfig::new_with_defaults(pg_config),
-            "/override/server/",
-            "x86_64-unknown-linux-gnu",
-        )
-        .unwrap();
+        let postgres =
+            macro_postgres_config(&PgConfig::new_with_defaults(pg_config), "/override/server/")
+                .unwrap();
         assert_eq!(postgres.server_include_dir(), Path::new("/override/server/"));
     }
 
