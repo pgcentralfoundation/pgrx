@@ -96,14 +96,22 @@ impl Package {
         let package_manifest =
             Manifest::from_path(&package_manifest_path).wrap_err("Couldn't parse manifest")?;
 
-        let pg_config = match self.pg_config {
-            None => PgConfig::from_path(),
-            Some(config) => PgConfig::new_with_defaults(config),
+        let pg_config = if PgConfig::is_in_environment() {
+            eyre::ensure!(
+                self.pg_config.is_none(),
+                "cannot combine --pg-config with PGRX_PG_CONFIG_AS_ENV=true"
+            );
+            PgConfig::from_env()?
+        } else {
+            match self.pg_config {
+                None => PgConfig::from_path(),
+                Some(config) => PgConfig::new_with_defaults(config),
+            }
         };
         let pg_version = format!("pg{}", pg_config.major_version()?);
 
         crate::manifest::modify_features_for_version(
-            &Pgrx::from_config()?,
+            &Pgrx::default(),
             Some(&mut self.features),
             &package_manifest,
             &PgVersionSource::PgConfig(pg_version),

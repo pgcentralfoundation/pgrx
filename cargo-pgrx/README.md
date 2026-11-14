@@ -935,7 +935,21 @@ directory. If you omit `--prefix-dir`, the layout follows `pg_config`. For Windo
 `share/extension` regardless of this option.
 
 For cross builds, pass a built-in Rust target triple directly to `cargo pgrx package
---target`, with a `--pg-config` that reports the target's installation paths.
+--target`. Set `PGRX_PG_CONFIG_AS_ENV=true` and supply the target's PostgreSQL
+metadata through `PGRX_PG_CONFIG_*` variables, as shown in
+[PostgreSQL metadata in the environment](../docs/src/extension/build/cross-compile.md#postgresql-metadata-in-the-environment).
+Packaging then needs no `pg_config` executable, adapter, `cargo pgrx init`, or
+`$PGRX_HOME/config.toml`. Missing metadata produces an error; it does not fall
+back to a host installation. Combining environment mode with `--pg-config` is
+an error. With environment mode unset or `false`, `--pg-config` still selects
+a host-runnable program, defaulting to `pg_config` on `PATH`.
+
+`PGRX_PG_CONFIG_PKGLIBDIR` and `PGRX_PG_CONFIG_SHAREDIR` describe the target's
+installation layout. Header paths and any libraries needed for linking must be
+accessible on the build host; for a Windows MSVC target, `PGRX_PG_CONFIG_LIBDIR` must
+locate the target's `postgres.lib` there. Windows packages still use `lib` and
+`share/extension`, regardless of the target installation prefix.
+
 The target selects library names, package layout, universal Mach-O architecture
 and distribution package formats. Without `--target`, these use the host.
 Cargo's `build.target`, `CARGO_BUILD_TARGET`, and targets hidden in `--cargo` flags
