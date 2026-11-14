@@ -33,7 +33,6 @@ it is treated as the database name.
 | `--no-default-features`, `--all-features` | Cargo feature selection |
 | `-p, --package <PKG>` | Select a workspace extension |
 | `--manifest-path <PATH>` | Select its manifest |
-| `--target <TARGET>` | Cargo compilation target; the installed artifact must run on this server |
 | `--cargo <FLAG>` | Repeatable Cargo flags, including for metadata |
 
 In the current implementation, `--install-only` skips server startup inside the

@@ -11,7 +11,7 @@ use std::collections::HashMap;
 use crate::CommandExecute;
 use crate::cargo::CargoProfile;
 use crate::command::get::get_property;
-use crate::command::install::{install_extension, warn_if_pg_bench_enabled};
+use crate::command::install::{TargetInfo, install_extension, warn_if_pg_bench_enabled};
 use crate::command::migrate::UnreleasedFragmentMode;
 use crate::command::regress::Regress;
 use crate::command::start::start_postgres;
@@ -196,6 +196,7 @@ pub(crate) fn run(
         None,
         features,
         target,
+        TargetInfo::Generate,
         unreleased_mode,
         target_dir,
         cargo_flags,

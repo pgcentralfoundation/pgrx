@@ -118,6 +118,7 @@ impl CommandExecute for Install {
             None,
             &self.features,
             None,
+            TargetInfo::Generate,
             unreleased_mode,
             metadata.target_directory.as_std_path(),
             &cargo_flags,
@@ -159,6 +160,7 @@ pub(crate) fn install_extension(
     base_directory: Option<PathBuf>,
     features: &clap_cargo::Features,
     target: Option<&str>,
+    target_info: TargetInfo<'_>,
     unreleased_mode: UnreleasedFragmentMode,
     target_dir: &Path,
     cargo_flags: &[String],
@@ -183,6 +185,7 @@ pub(crate) fn install_extension(
         manifest_path_for_build(user_manifest_path, user_package, package_manifest_path);
     let build_command_output = build_extension(
         pg_config,
+        target_info,
         build_manifest_path,
         user_package,
         profile,
@@ -385,6 +388,43 @@ fn copy_file(
 #[derive(Debug, Clone, Copy)]
 pub(crate) struct EffectiveExtVersion<'a>(pub(crate) &'a str);
 
+/// What the `pgrx-pg-sys` build does with a target bundle's generated sources.
+#[derive(Clone, Copy, Debug)]
+pub(crate) enum TargetInfo<'a> {
+    /// Generate them from this machine's PostgreSQL headers, as an ordinary build does.
+    Generate,
+    /// Generate them and also write them to this directory, to go into a bundle.
+    Export(&'a Path),
+    /// Take them from this directory, unpacked from a bundle, and generate nothing.
+    Import(&'a Path),
+}
+
+/// Tell the `pgrx-pg-sys` build script what to do about a bundle. It reads these variables;
+/// only cargo-pgrx sets them, so ones left in this process's environment are removed.
+fn select_target_info(
+    command: &mut std::process::Command,
+    target_info: TargetInfo<'_>,
+    pg_config: &PgConfig,
+) -> eyre::Result<()> {
+    const EXPORT: &str = "PGRX_PG_SYS_EXTRA_TARGET_INFO_PATH";
+    const IMPORT: &str = "PGRX_TARGET_INFO_PATH";
+    for (name, _) in std::env::vars_os() {
+        if name == EXPORT || name.to_string_lossy().starts_with(IMPORT) {
+            command.env_remove(name);
+        }
+    }
+    match target_info {
+        TargetInfo::Generate => {}
+        TargetInfo::Export(directory) => {
+            command.env(EXPORT, directory);
+        }
+        TargetInfo::Import(directory) => {
+            command.env(format!("{IMPORT}_PG{}", pg_config.major_version()?), directory);
+        }
+    }
+    Ok(())
+}
+
 /// Have the `pgrx-pg-sys` build script describe the same PostgreSQL as `pg_config`, which
 /// chose the feature flags and decides where the extension's files go.
 fn select_build_postgres(command: &mut std::process::Command, pg_config: &PgConfig) {
@@ -432,6 +472,7 @@ fn select_build_postgres(command: &mut std::process::Command, pg_config: &PgConf
 
 pub(crate) fn build_extension(
     pg_config: &PgConfig,
+    target_info: TargetInfo<'_>,
     manifest_path: Option<&Path>,
     user_package: Option<&str>,
     profile: &CargoProfile,
@@ -445,6 +486,7 @@ pub(crate) fn build_extension(
     let mut command = crate::cargo::cargo();
     command.env("CARGO_PGRX_EXTVERSION", extversion.0);
     select_build_postgres(&mut command, pg_config);
+    select_target_info(&mut command, target_info, pg_config)?;
     command.arg("rustc");
     command.arg("--lib");
 
@@ -508,7 +550,7 @@ pub(crate) fn build_extension(
     }
 }
 
-fn manifest_path_for_build<'a>(
+pub(crate) fn manifest_path_for_build<'a>(
     user_manifest_path: Option<&'a Path>,
     user_package: Option<&str>,
     package_manifest_path: &'a Path,

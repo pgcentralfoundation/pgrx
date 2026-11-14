@@ -2168,9 +2168,9 @@ including compiler lookup, configuration verification, an unsupported runtime
 profile, the pg-sys integer bridges and native compilation, is a build error.
 In steps 2 to 8, its context names the PostgreSQL major, the Cargo target, the
 server header root and the metadata source (a `pg_config` path or
-`cargo pgrx package`'s `--pg-config-*` options). A configuration refusal also
-says what to correct, as a `pg_config` choice or a `cargo pgrx package` option,
-never as a variable to set. A failure in steps
+a description in its place). A configuration refusal also says what to do, as a
+`pg_config` choice or a `cargo pgrx package` option, never as a variable to set.
+A failure in steps
 1 to 8 publishes no macro tree, report or native linkage for that version, and
 nothing guesses C semantics in its place. Per-macro skips are not failures;
 they remain in the report.
@@ -2193,7 +2193,7 @@ such a program and Cargo's `HOST` and `TARGET` differ, only PostgreSQL's
 functional CFLAGS (`-fno-strict-aliasing`, `-fwrapv` and
 `-fexcess-precision=standard`) reach the macro profile, in recorded order. The
 report lists the others under `cflags_dropped`. Native builds and a description
-from `cargo pgrx package`'s `--pg-config-*` options keep every recorded flag except Darwin `-arch`
+that stands in for a `pg_config` program keep every recorded flag except Darwin `-arch`
 selections, which the report also lists: a universal macOS build records two,
 which Clang cannot preprocess together, and Cargo's target selects the slice.
 Either way, the verification in section 5 decides whether the headers describe
@@ -2884,8 +2884,8 @@ check in section 5 refuses headers whose `PG_VERSION_STR` names another machine
 or whose `pg_config.h` layout facts disagree with the target compiler. A host
 `pg_config` still supplies the version, CPPFLAGS, the configure output and the
 library directory, but only PostgreSQL's functional CFLAGS; target-specific
-`PGRX_INCLUDEDIR_SERVER` variables select the target headers. A description from
-`cargo pgrx package`'s `--pg-config-*` options describes the target directly and keeps every CFLAGS
+`PGRX_INCLUDEDIR_SERVER` variables select the target headers. A description that
+stands in for a `pg_config` program describes the target directly and keeps every CFLAGS
 value except Darwin `-arch` selections, which the report lists under
 `cflags_dropped`. The checks cannot see ISA options the server's build chose
 within one architecture, such as SVE or AVX-512 popcount dispatch, the C

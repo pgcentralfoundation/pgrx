@@ -8,14 +8,16 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use crate::CommandExecute;
+use crate::bundle::Bundle;
 use crate::cargo::CargoProfile;
 use crate::command::get::get_property;
 use crate::command::install::{
-    format_display_path, install_extension, shared_library_filename, warn_if_pg_bench_enabled,
+    EffectiveExtVersion, TargetInfo, build_extension, format_display_path, get_version,
+    install_extension, manifest_path_for_build, shared_library_filename, warn_if_pg_bench_enabled,
 };
 use crate::command::migrate::UnreleasedFragmentMode;
-use crate::manifest::{PgVersionSource, display_version_info};
-use crate::target::{TargetOs, host_triple, target_arch};
+use crate::manifest::{PgVersionSource, display_version_info, program_pg_config};
+use crate::target::{TargetOs, target_arch};
 use cargo_toml::Manifest;
 use eyre::{WrapErr, eyre};
 use owo_colors::OwoColorize;
@@ -50,11 +52,12 @@ pub(crate) struct Package {
     pub(crate) out_dir: Option<PathBuf>,
     #[clap(flatten)]
     pub(crate) features: clap_cargo::Features,
-    /// Build for this target triple; a platform other than this machine needs the `--pg-config-*` options
+    /// Package for the platform and PostgreSQL of this bundle, made there with `--bundle-generate`
+    #[clap(long, value_name = "FILE", value_parser, conflicts_with_all = ["pg_config", "bundle_generate"])]
+    pub(crate) bundle: Option<PathBuf>,
+    /// Write a bundle for this machine's platform and PostgreSQL instead of packaging, so other machines can package for it with `--bundle`
     #[clap(long)]
-    pub(crate) target: Option<String>,
-    #[clap(flatten)]
-    pub(crate) target_postgres: TargetPostgres,
+    pub(crate) bundle_generate: bool,
     /// Assemble unreleased SQL fragments into the package instead of refusing to build it
     #[clap(long, conflicts_with = "no_assemble_unreleased")]
     pub(crate) assemble_unreleased: bool,
@@ -72,138 +75,6 @@ pub(crate) struct Package {
     /// The directory within out_dir to put extension assets (default is based on pg_config path)
     #[clap(long, value_parser)]
     pub(crate) prefix_dir: Option<PathBuf>,
-}
-
-/// The PostgreSQL of `--target`, described by the values its `pg_config` prints there. A
-/// target other than this machine needs the description.
-#[derive(clap::Args, Debug, Default, Clone)]
-pub(crate) struct TargetPostgres {
-    /// `pg_config --version` of the PostgreSQL to package for, such as "PostgreSQL 18.1"
-    #[clap(
-        long = "pg-config-version",
-        value_name = "VERSION",
-        requires = "target",
-        conflicts_with = "pg_config"
-    )]
-    pg_config_version: Option<String>,
-    /// Where that PostgreSQL's server headers are on this machine
-    #[clap(
-        long = "pg-config-includedir-server",
-        value_name = "DIR",
-        requires = "target",
-        conflicts_with = "pg_config"
-    )]
-    pg_config_includedir_server: Option<String>,
-    /// Where its public headers are on this machine (MSVC targets)
-    #[clap(
-        long = "pg-config-pkgincludedir",
-        value_name = "DIR",
-        requires = "target",
-        conflicts_with = "pg_config"
-    )]
-    pg_config_pkgincludedir: Option<String>,
-    /// Its library directory, on this machine when linking reads it
-    #[clap(
-        long = "pg-config-libdir",
-        value_name = "DIR",
-        requires = "target",
-        conflicts_with = "pg_config"
-    )]
-    pg_config_libdir: Option<String>,
-    /// Its `pg_config --pkglibdir`, where the extension library will be installed
-    #[clap(
-        long = "pg-config-pkglibdir",
-        value_name = "DIR",
-        requires = "target",
-        conflicts_with = "pg_config"
-    )]
-    pg_config_pkglibdir: Option<String>,
-    /// Its `pg_config --sharedir`, where the extension's SQL and control files will be installed
-    #[clap(
-        long = "pg-config-sharedir",
-        value_name = "DIR",
-        requires = "target",
-        conflicts_with = "pg_config"
-    )]
-    pg_config_sharedir: Option<String>,
-    /// Its `pg_config --cppflags`
-    #[clap(
-        long = "pg-config-cppflags",
-        value_name = "FLAGS",
-        requires = "target",
-        conflicts_with = "pg_config",
-        allow_hyphen_values = true
-    )]
-    pg_config_cppflags: Option<String>,
-    /// Its `pg_config --cflags`
-    #[clap(
-        long = "pg-config-cflags",
-        value_name = "FLAGS",
-        requires = "target",
-        conflicts_with = "pg_config",
-        allow_hyphen_values = true
-    )]
-    pg_config_cflags: Option<String>,
-}
-
-impl TargetPostgres {
-    /// What the build and the package layout cannot do without.
-    const REQUIRED: [&str; 6] =
-        ["version", "includedir-server", "libdir", "pkglibdir", "sharedir", "cppflags"];
-
-    /// The given values by `pg_config` option name, which is also the option's suffix here.
-    fn properties(&self) -> Vec<(&'static str, &str)> {
-        [
-            ("version", &self.pg_config_version),
-            ("includedir-server", &self.pg_config_includedir_server),
-            ("pkgincludedir", &self.pg_config_pkgincludedir),
-            ("libdir", &self.pg_config_libdir),
-            ("pkglibdir", &self.pg_config_pkglibdir),
-            ("sharedir", &self.pg_config_sharedir),
-            ("cppflags", &self.pg_config_cppflags),
-            ("cflags", &self.pg_config_cflags),
-        ]
-        .into_iter()
-        .filter_map(|(name, value)| Some((name, value.as_deref()?)))
-        .collect()
-    }
-}
-
-/// Choose the PostgreSQL to package for. The `--pg-config-*` options describe the one of
-/// `--target` in place of a `pg_config` program, so giving any of them means giving all that
-/// the build and the layout need. A program describes the machine it runs on, so a `cross`
-/// build, given as its target and this host, accepts only that description.
-fn selected_pg_config(
-    explicit: Option<PathBuf>,
-    described: &TargetPostgres,
-    cross: Option<(&str, &str)>,
-) -> eyre::Result<PgConfig> {
-    let properties = described.properties();
-    if properties.is_empty() && cross.is_none() {
-        return Ok(crate::manifest::program_pg_config(explicit));
-    }
-    let missing: Vec<_> = TargetPostgres::REQUIRED
-        .into_iter()
-        .filter(|required| !properties.iter().any(|(name, _)| name == required))
-        .map(|name| format!("--pg-config-{name}"))
-        .collect();
-    if let Some((target, host)) = cross {
-        eyre::ensure!(
-            explicit.is_none(),
-            "--pg-config names a program that describes this machine ({host}), not `--target {target}`; describe the target's PostgreSQL with the --pg-config-* options instead"
-        );
-        eyre::ensure!(
-            missing.is_empty(),
-            "`--target {target}` is not this machine ({host}), so `pg_config` cannot describe its PostgreSQL; pass {}",
-            missing.join(", ")
-        );
-    }
-    eyre::ensure!(
-        missing.is_empty(),
-        "the --pg-config-* options describe PostgreSQL in place of a `pg_config` program, so all of them are needed; also pass {}",
-        missing.join(", ")
-    );
-    Ok(PgConfig::from_properties(properties))
 }
 
 impl Package {
@@ -231,10 +102,21 @@ impl Package {
         let package_manifest =
             Manifest::from_path(&package_manifest_path).wrap_err("Couldn't parse manifest")?;
 
-        let host = self.target.as_ref().map(|_| host_triple()).transpose()?;
-        let cross =
-            self.target.as_deref().zip(host.as_deref()).filter(|(target, host)| target != host);
-        let pg_config = selected_pg_config(self.pg_config.take(), &self.target_postgres, cross)?;
+        // A bundle names the platform to build for and describes its PostgreSQL. Without one
+        // the build is for this machine, whose `pg_config` program describes it.
+        let bundle = self
+            .bundle
+            .as_deref()
+            .map(|file| Bundle::open(file, metadata.target_directory.as_std_path()))
+            .transpose()?;
+        let (pg_config, target, target_info) = match &bundle {
+            Some(bundle) => (
+                bundle.pg_config.clone(),
+                Some(bundle.target.as_str()),
+                TargetInfo::Import(&bundle.target_info),
+            ),
+            None => (program_pg_config(self.pg_config.take()), None, TargetInfo::Generate),
+        };
         let pg_version = format!("pg{}", pg_config.major_version()?);
 
         crate::manifest::modify_features_for_version(
@@ -249,6 +131,22 @@ impl Package {
             // NB:  `cargo pgrx package` defaults to "--release" whereas all other commands default to "debug"
             if self.debug { CargoProfile::Dev } else { CargoProfile::Release },
         )?;
+        if self.bundle_generate {
+            display_version_info(&pg_config, &PgVersionSource::PgConfig(pg_config.label()?));
+            let path = generate_bundle(
+                &pg_config,
+                self.manifest_path.as_deref(),
+                self.package.as_deref(),
+                &package_manifest_path,
+                &profile,
+                &self.features,
+                self.out_dir.as_deref(),
+                metadata.target_directory.as_std_path(),
+                &cargo_flags,
+            )?;
+            return Ok((path, Vec::new()));
+        }
+
         let out_dir = if let Some(out_dir) = self.out_dir {
             out_dir
         } else {
@@ -256,7 +154,7 @@ impl Package {
                 &pg_config,
                 &package_manifest_path,
                 &profile,
-                self.target.as_deref(),
+                target,
                 metadata.target_directory.as_std_path(),
             )?
         };
@@ -270,7 +168,8 @@ impl Package {
             &profile,
             self.test,
             &self.features,
-            self.target.as_deref(),
+            target,
+            target_info,
             unreleased_mode,
             metadata.target_directory.as_std_path(),
             &cargo_flags,
@@ -283,7 +182,7 @@ impl Package {
                 &package_manifest_path,
                 metadata.workspace_root.as_std_path(),
                 &out_dir,
-                self.target.as_deref(),
+                target,
                 metadata.target_directory.as_std_path(),
                 &cargo_flags,
             )?;
@@ -316,6 +215,7 @@ pub(crate) fn package_extension(
     is_test: bool,
     features: &clap_cargo::Features,
     target: Option<&str>,
+    target_info: TargetInfo<'_>,
     unreleased_mode: UnreleasedFragmentMode,
     target_dir: &Path,
     cargo_flags: &[String],
@@ -339,11 +239,61 @@ pub(crate) fn package_extension(
         Some(out_dir),
         features,
         target,
+        target_info,
         unreleased_mode,
         target_dir,
         cargo_flags,
         prefix_dir,
     )
+}
+
+/// Build the extension on this machine with its `pgrx-pg-sys` exporting what it generates, and
+/// put that with `pg_config`'s values into one bundle file. Nothing is staged: the build is
+/// only how the generated sources come to match the extension's pgrx version and features.
+#[allow(clippy::too_many_arguments)]
+fn generate_bundle(
+    pg_config: &PgConfig,
+    user_manifest_path: Option<&Path>,
+    user_package: Option<&str>,
+    package_manifest_path: &Path,
+    profile: &CargoProfile,
+    features: &clap_cargo::Features,
+    out_dir: Option<&Path>,
+    target_dir: &Path,
+    cargo_flags: &[String],
+) -> eyre::Result<PathBuf> {
+    // A directory of its own for every run: the build script writes only into an empty one,
+    // and a path it has not seen makes Cargo run it again instead of reusing an earlier build
+    // that exported nowhere.
+    std::fs::create_dir_all(target_dir)
+        .wrap_err_with(|| format!("couldn't create {}", target_dir.display()))?;
+    let exported = tempfile::Builder::new()
+        .prefix("pgrx-bundle-")
+        .tempdir_in(target_dir)
+        .wrap_err_with(|| format!("couldn't create a directory in {}", target_dir.display()))?;
+    let exported = exported.path();
+
+    let version = get_version(package_manifest_path, cargo_flags)?;
+    let output = build_extension(
+        pg_config,
+        TargetInfo::Export(exported),
+        manifest_path_for_build(user_manifest_path, user_package, package_manifest_path),
+        user_package,
+        profile,
+        features,
+        None,
+        EffectiveExtVersion(&version),
+        cargo_flags,
+    )?;
+    drop(output);
+
+    let path = crate::bundle::write(pg_config, exported, out_dir.unwrap_or(target_dir))?;
+    eprintln!(
+        "{} bundle to {}",
+        "     Writing".bold().green(),
+        format_display_path(&path, target_dir).cyan()
+    );
+    Ok(path)
 }
 
 pub(crate) fn build_base_path(

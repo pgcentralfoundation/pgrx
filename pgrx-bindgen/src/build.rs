@@ -1555,31 +1555,20 @@ fn require_include_driver(include_driver: Option<&Path>, inspected: &Path) -> ey
     }
 }
 
-/// How errors name PostgreSQL metadata that no `pg_config` program supplied. cargo-pgrx passes
-/// it from the options of `cargo pgrx package --target`.
-const DESCRIBED_METADATA: &str = "cargo pgrx package's --pg-config-* options";
+/// How errors name PostgreSQL metadata that no `pg_config` program supplied.
+const DESCRIBED_METADATA: &str = "a description in place of a `pg_config` program";
 
-/// Say how to supply the right headers when the selected ones were configured for another
-/// machine, ABI or major version. `described` headers came from the package options, so the
-/// remedy is to give those the right directory; a `pg_config` program's headers are wrong for
-/// the whole installation. The remedies name commands and options, never the variables that
-/// carry them to this build script. Other inspection failures keep their general context.
-fn inspection_error(
-    error: PostgresError,
-    major_version: u16,
-    target: &str,
-    described: bool,
-) -> eyre::Report {
-    let context = if !matches!(error, PostgresError::TargetConfiguration(_)) {
-        "could not establish the binding generator's C macro compilation profile".into()
-    } else if described {
+/// Say how to get the right headers when the selected ones were configured for another
+/// machine, ABI or major version. The remedy names commands and options, never the variables
+/// that carry values to this build script. Other inspection failures keep their general
+/// context.
+fn inspection_error(error: PostgresError, major_version: u16, target: &str) -> eyre::Report {
+    let context = if matches!(error, PostgresError::TargetConfiguration(_)) {
         format!(
-            "these server headers do not describe {target}; pass --pg-config-includedir-server the PostgreSQL {major_version} server headers configured for {target}"
+            "these server headers do not describe {target}; use the `pg_config` of a PostgreSQL {major_version} built for {target}, or to package for another platform, generate a bundle there with `cargo pgrx package --bundle-generate` and pass it to `cargo pgrx package --bundle`"
         )
     } else {
-        format!(
-            "these server headers do not describe {target}; use the `pg_config` of a PostgreSQL {major_version} built for {target}, or package for another platform with `cargo pgrx package --target {target}` and its --pg-config-* options"
-        )
+        "could not establish the binding generator's C macro compilation profile".into()
     };
     eyre::Report::new(error).wrap_err(context)
 }
@@ -1672,9 +1661,7 @@ fn generate_macros(
     // needs its inputs tracked.
     let frontend = postgres
         .inspect_with_arguments(scanner, header, &effective_arguments, preferred_clang)
-        .map_err(|error| {
-            inspection_error(error, major_version, target, !postgres.pg_config().is_real())
-        })?;
+        .map_err(|error| inspection_error(error, major_version, target))?;
     require_include_driver(
         include_detection.map(|detection| detection.compiler.as_path()),
         &frontend.profile().compiler.executable,
@@ -2952,38 +2939,27 @@ mod macro_build_tests {
     /// configuration error itself. Other inspection failures keep the general context.
     #[test]
     fn foreign_headers_name_the_target_header_remedies() {
-        let foreign = || {
+        let foreign =
             PostgresError::TargetConfiguration(pgrx_c_macros::ConfigurationError::Machine {
                 recorded: "x86_64-pc-linux-gnu".into(),
                 target: "aarch64-unknown-linux-gnu".into(),
-            })
-        };
-        let chain = |described| {
-            inspection_error(foreign(), 17, "aarch64-unknown-linux-gnu", described)
-                .chain()
-                .map(|cause| cause.to_string())
-                .collect::<Vec<_>>()
-        };
-        // A `pg_config` program's installation is the wrong one for this target.
-        let program = chain(false);
-        assert_eq!(program.len(), 2, "{program:?}");
+            });
+        let chain = inspection_error(foreign, 17, "aarch64-unknown-linux-gnu")
+            .chain()
+            .map(|cause| cause.to_string())
+            .collect::<Vec<_>>();
+        assert_eq!(chain.len(), 2, "{chain:?}");
         for remedy in [
             "the `pg_config` of a PostgreSQL 17 built for aarch64-unknown-linux-gnu",
-            "`cargo pgrx package --target aarch64-unknown-linux-gnu` and its --pg-config-* options",
+            "`cargo pgrx package --bundle-generate`",
+            "`cargo pgrx package --bundle`",
         ] {
-            assert!(program[0].contains(remedy), "{remedy} missing from {program:?}");
+            assert!(chain[0].contains(remedy), "{remedy} missing from {chain:?}");
         }
-        assert!(program[1].contains("configured for x86_64-pc-linux-gnu"), "{program:?}");
-        // Headers that the package options named are corrected there.
-        let described = chain(true);
-        assert_eq!(described.len(), 2, "{described:?}");
-        assert!(described[0].contains("--pg-config-includedir-server"), "{described:?}");
-        // Neither remedy sends a person to the variables that carry these values.
-        for remedy in [&program[0], &described[0]] {
-            assert!(!remedy.contains("PGRX_"), "{remedy}");
-        }
-        let other =
-            inspection_error(PostgresError::InvalidCFlags, 17, "aarch64-unknown-linux-gnu", false);
+        // The remedy does not send a person to the variables that carry these values.
+        assert!(!chain[0].contains("PGRX_"), "{chain:?}");
+        assert!(chain[1].contains("configured for x86_64-pc-linux-gnu"), "{chain:?}");
+        let other = inspection_error(PostgresError::InvalidCFlags, 17, "aarch64-unknown-linux-gnu");
         assert_eq!(
             other.to_string(),
             "could not establish the binding generator's C macro compilation profile"

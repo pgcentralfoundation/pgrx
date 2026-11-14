@@ -124,4 +124,4 @@ separate clusters and dynamic ports; see [test.md](test.md) for its cleanup.
 - [package.md](package.md): staged packages, artifact placement, RPM and DEB builds
 - [new.md](new.md): extension scaffolding
 - [instance-management.md](instance-management.md): start, stop, status, connect
-- [utilities.md](utilities.md): info, get, upgrade, cross
+- [utilities.md](utilities.md): info, get, upgrade

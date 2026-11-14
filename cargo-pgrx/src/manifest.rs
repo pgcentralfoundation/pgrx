@@ -236,7 +236,7 @@ pub(crate) fn display_version_info(pg_config: &PgConfig, pg_version: &PgVersionS
             "{} {:?} as described by {}",
             "       Using".bold().green(),
             pg_version.bold().white(),
-            "--pg-config-*".cyan()
+            "the bundle".cyan()
         ),
     }
 }

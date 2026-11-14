@@ -43,20 +43,3 @@ cargo pgrx upgrade --package my-extension
 Options: `--to <VERSION_REQUIREMENT>`, `-m, --manifest-path`,
 `-n, --dry-run`, `--include-prereleases`, and `-p, --package`.
 `--dry-run` prints the proposed manifest instead of writing it.
-
-## cargo pgrx cross pgrx-target
-
-Builds a target-information bundle using a PostgreSQL installation on the target
-machine. This is an experimental cross-compilation facility; read the
-[cross-compilation guide](../../docs/src/extension/build/cross-compile.md) for
-target headers and toolchain requirements.
-
-```bash
-cargo pgrx cross pgrx-target --pg-config /usr/bin/pg_config --pg-version 18
-```
-
-It builds a temporary crate to produce bindings and writes
-`pgrx-target.<architecture>.tgz` in the current directory. Select the deployment
-installation rather than assuming a pgrx development build represents it.
-`--pg-sys-path` can select a local pgrx-pg-sys checkout. The parser also accepts
-`--output`, but the current implementation still writes the default filename.

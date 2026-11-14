@@ -23,7 +23,8 @@ cargo pgrx package [OPTIONS]
 | `--no-default-features`, `--all-features` | Cargo feature selection |
 | `-p, --package <PKG>` | Select a workspace extension |
 | `--manifest-path <PATH>` | Select its manifest |
-| `--target <TARGET>` | Cargo compilation target |
+| `--bundle <FILE>` | Package for the platform and PostgreSQL of this target bundle; conflicts with `--pg-config` |
+| `--bundle-generate` | Write a target bundle for this machine instead of packaging |
 | `--cargo <FLAG>` | Repeatable Cargo flags, including for metadata |
 
 Without `--out-dir`, output goes under Cargo's resolved target directory as
@@ -75,7 +76,7 @@ Check these before relying on the output:
   in it. Delete it before a release build so stale SQL files do not ship.
 - `${VERSION}` replaces `-` with `~`, since RPM rejects `-` and Debian would sort
   a pre-release after the final release.
-- `${ARCH}` is the first part of `--target`, or the host's architecture. Set `arch`
+- `${ARCH}` is the first part of the bundle's target, or the host's architecture. Set `arch`
   when the package format rejects that name.
 - Packages are unsigned, and the RPM release number is always `1`.
 - `cargo deb` reads `[package.metadata.deb]` too, with different rules. A section

@@ -888,10 +888,7 @@ fn cross_builds_accept_only_target_headers() {
         &[
             &format!("pg_config.h was configured for {} (PG_VERSION_STR)", cross.host_machine),
             &format!("use the `pg_config` of a PostgreSQL 18 built for {}", cross.target),
-            &format!(
-                "`cargo pgrx package --target {}` and its --pg-config-* options",
-                cross.target
-            ),
+            "`cargo pgrx package --bundle-generate`",
         ],
     );
     let underscored = override_variable.replace('-', "_");

@@ -35,7 +35,6 @@ stop its server afterward.
 | `-F, --features <F>` | Additional Cargo features |
 | `--no-default-features`, `--all-features` | Cargo feature selection |
 | `-p, --package <PKG>`, `--manifest-path <PATH>` | Select the extension |
-| `--target <TARGET>` | Cargo compilation target |
 | `--cargo <FLAG>` | Repeatable Cargo flags, including for metadata |
 
 ## Runs and comparisons

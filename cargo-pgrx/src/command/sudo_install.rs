@@ -56,8 +56,8 @@ impl From<SudoInstall> for Package {
             features: value.features,
             verbose: value.verbose,
             // This installs into this machine's PostgreSQL.
-            target: None,
-            target_postgres: Default::default(),
+            bundle: None,
+            bundle_generate: false,
             assemble_unreleased: !value.no_assemble_unreleased,
             no_assemble_unreleased: value.no_assemble_unreleased,
             cargo: value.cargo,

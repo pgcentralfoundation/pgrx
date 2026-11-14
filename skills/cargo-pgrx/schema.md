@@ -29,7 +29,6 @@ With no items, the command emits the complete extension schema.
 | `--no-default-features`, `--all-features` | Cargo feature selection |
 | `-p, --package <PKG>` | Select a workspace extension |
 | `--manifest-path <PATH>` | Select its manifest |
-| `--target <TARGET>` | Cargo compilation target |
 | `--cargo <FLAG>` | Repeatable Cargo flags, including for metadata |
 
 ## Selected SQL items
