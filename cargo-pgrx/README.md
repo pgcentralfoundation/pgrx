@@ -944,10 +944,13 @@ back to a host installation.
 
 `cargo pgrx package` and `cargo pgrx install`, with or without `--sudo`, choose
 PostgreSQL in the same order: `--pg-config` when given, then this environment
-metadata, then the first `pg_config` on `PATH`. `--pg-config` chooses the
-PostgreSQL version and the staged layout. While `PGRX_PG_CONFIG_AS_ENV=true` is
-set, the `pgrx-pg-sys` build still reads its headers and flags from the
-environment, so unset the variable to build against a `pg_config` program.
+metadata, then the first `pg_config` on `PATH`. The `pgrx-pg-sys` build uses the
+same choice, so the extension is compiled against the PostgreSQL it is laid out
+for. That PostgreSQL's server headers must be installed.
+
+A `pg_config` program describes the machine it runs on. When `--target` names a
+platform other than the host, both commands require the environment metadata
+and reject `--pg-config`.
 
 `PGRX_PG_CONFIG_PKGLIBDIR` and `PGRX_PG_CONFIG_SHAREDIR` describe the target's
 installation layout. Header paths and any libraries needed for linking must be

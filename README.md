@@ -248,15 +248,11 @@ the variables listed in
 then run `cargo pgrx package --target <target-triple>`. This needs no `pg_config`
 executable, adapter, `cargo pgrx init`, or pgrx configuration file. Header and
 link-library paths must be accessible on the build host; package installation
-paths describe the target. An explicit `--pg-config` takes precedence for the
-package layout; unset `PGRX_PG_CONFIG_AS_ENV` to build against that program too.
+paths describe the target.
 
-When building with a host-runnable `pg_config` program instead, modify the standard build process in the following ways:
-
-1) Pass `--no-run` to `cargo pgrx init`, since we cannot run postgres for the cross machine.
-2) Pass one of the `--pgXX` flags to `cargo pgrx init` with the aforementioned `pg_config`.
-3) Pass the `--pg-config` flag to `cargo pgrx package` with the aforementioned `pg_config`.
-4) Pass the `--target` flag to `cargo pgrx package` with the rust triple of the cross machine.
+A `pg_config` program describes the machine it runs on. For a `--target` other
+than the host, `cargo pgrx package` requires this environment metadata and
+rejects `--pg-config`.
 
 Pass a built-in Rust target triple explicitly to cargo-pgrx. Library names,
 package layout, universal Mach-O slice selection, and RPM/DEB generation follow

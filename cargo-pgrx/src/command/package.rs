@@ -96,7 +96,7 @@ impl Package {
         let package_manifest =
             Manifest::from_path(&package_manifest_path).wrap_err("Couldn't parse manifest")?;
 
-        let pg_config = selected_pg_config(self.pg_config.take())?;
+        let pg_config = selected_pg_config(self.pg_config.take(), self.target.as_deref())?;
         let pg_version = format!("pg{}", pg_config.major_version()?);
 
         crate::manifest::modify_features_for_version(

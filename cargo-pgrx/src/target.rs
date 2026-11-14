@@ -8,6 +8,8 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+use eyre::WrapErr;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum TargetOs {
     Darwin,
@@ -72,13 +74,34 @@ impl TargetOs {
     }
 }
 
+/// The triple of the machine this build runs on, as the `cargo` that builds the extension
+/// reports it. A `--target` that differs from it is a cross build.
+pub(crate) fn host_triple() -> eyre::Result<String> {
+    let output = crate::cargo::cargo().arg("-vV").output().wrap_err("couldn't run `cargo -vV`")?;
+    eyre::ensure!(output.status.success(), "`cargo -vV` failed with {}", output.status);
+    parse_host(&String::from_utf8_lossy(&output.stdout))
+        .map(str::to_owned)
+        .ok_or_else(|| eyre::eyre!("`cargo -vV` did not report its host"))
+}
+
+fn parse_host(version: &str) -> Option<&str> {
+    version.lines().find_map(|line| line.strip_prefix("host: ")).map(str::trim)
+}
+
 pub(crate) fn target_arch(target: Option<&str>) -> &str {
     target.and_then(|tuple| tuple.split('-').next()).unwrap_or(std::env::consts::ARCH)
 }
 
 #[cfg(test)]
 mod tests {
-    use super::TargetOs;
+    use super::{TargetOs, parse_host};
+
+    #[test]
+    fn reads_the_host_from_cargo_version_output() {
+        let version = "cargo 1.99.1 (abc 2026-01-01)\nrelease: 1.99.1\nhost: aarch64-apple-darwin\nlibgit2: 1.9.0\n";
+        assert_eq!(parse_host(version), Some("aarch64-apple-darwin"));
+        assert_eq!(parse_host("cargo 1.99.1\n"), None);
+    }
 
     #[test]
     fn reads_the_os_out_of_target_tuples() {

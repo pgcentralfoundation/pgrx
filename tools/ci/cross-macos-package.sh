@@ -54,32 +54,24 @@ pg_source="$scratch/postgresql-18.7"
     make -C src/pl/plpgsql/src DESTDIR="$scratch/pg18" install-headers
 )
 
-# The target pg_config executable cannot run here. Describe the configured installation
-# with a host script, relocating only its headers; package destinations stay target paths.
-pg_config="$scratch/pg_config"
-pg_cflags="$(sed -n 's/^CFLAGS = //p' "$pg_source/src/Makefile.global")"
-cat > "$pg_config" <<EOF
-#!/usr/bin/env bash
-set -eu
-case "\$1" in
-    --version) echo 'PostgreSQL 18.7' ;;
-    --includedir-server) echo '$scratch/pg18/usr/local/pgsql/include/server' ;;
-    --libdir | --pkglibdir) echo '/usr/local/pgsql/lib' ;;
-    --sharedir) echo '/usr/local/pgsql/share' ;;
-    --cppflags) echo '-isysroot $OSXCROSS_SDKROOT' ;;
-    --cflags) echo '$pg_cflags' ;;
-    --configure) echo '--without-readline --without-zlib --without-icu' ;;
-    *) echo "unsupported pg_config option: \$1" >&2; exit 1 ;;
-esac
-EOF
-chmod +x "$pg_config"
+# The target pg_config executable cannot run here, and cargo-pgrx accepts no pg_config program
+# for another target. Describe the configured installation in the environment instead,
+# relocating only its headers; package destinations stay target paths. `env` sets the
+# variables because a shell cannot export a name that contains a hyphen.
 export PGRX_HOME="$scratch/pgrx-home"
 mkdir -p "$PGRX_HOME"
-printf "[configs]\npg18 = '%s'\n" "$pg_config" > "$PGRX_HOME/config.toml"
 
 cargo build --locked --package cargo-pgrx
-"${CARGO_TARGET_DIR:-target}/debug/cargo-pgrx" pgrx package --package versioned_so --no-default-features \
-    --features pg18 --target aarch64-apple-darwin --pg-config "$pg_config" \
+env PGRX_PG_CONFIG_AS_ENV=true \
+    PGRX_PG_CONFIG_VERSION='PostgreSQL 18.7' \
+    "PGRX_PG_CONFIG_INCLUDEDIR-SERVER=$scratch/pg18/usr/local/pgsql/include/server" \
+    PGRX_PG_CONFIG_LIBDIR=/usr/local/pgsql/lib \
+    PGRX_PG_CONFIG_PKGLIBDIR=/usr/local/pgsql/lib \
+    PGRX_PG_CONFIG_SHAREDIR=/usr/local/pgsql/share \
+    "PGRX_PG_CONFIG_CPPFLAGS=-isysroot $OSXCROSS_SDKROOT" \
+    "PGRX_PG_CONFIG_CFLAGS=$(sed -n 's/^CFLAGS = //p' "$pg_source/src/Makefile.global")" \
+    "${CARGO_TARGET_DIR:-target}/debug/cargo-pgrx" pgrx package --package versioned_so \
+    --no-default-features --features pg18 --target aarch64-apple-darwin \
     --out-dir "$scratch/package" --debug --no-distrib-packages --cargo=--locked
 
 python3 - "$scratch/package" <<'PY'

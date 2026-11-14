@@ -92,7 +92,8 @@ impl CommandExecute for Install {
         let package_manifest =
             Manifest::from_path(&package_manifest_path).wrap_err("Couldn't parse manifest")?;
 
-        let pg_config = selected_pg_config(self.pg_config.take().map(PathBuf::from))?;
+        let pg_config =
+            selected_pg_config(self.pg_config.take().map(PathBuf::from), self.target.as_deref())?;
         let pg_version = format!("pg{}", pg_config.major_version()?);
         let profile = CargoProfile::from_flags(
             self.profile.as_deref(),
@@ -184,6 +185,7 @@ pub(crate) fn install_extension(
     let build_manifest_path =
         manifest_path_for_build(user_manifest_path, user_package, package_manifest_path);
     let build_command_output = build_extension(
+        pg_config,
         build_manifest_path,
         user_package,
         profile,
@@ -386,7 +388,41 @@ fn copy_file(
 #[derive(Debug, Clone, Copy)]
 pub(crate) struct EffectiveExtVersion<'a>(pub(crate) &'a str);
 
+/// Have the `pgrx-pg-sys` build script describe the same PostgreSQL as `pg_config`, which
+/// chose the feature flags and decides where the extension's files go.
+fn select_build_postgres(command: &mut std::process::Command, pg_config: &PgConfig) {
+    let Some(program) = pg_config.path() else {
+        // The build script reads environment metadata from the same variables.
+        return;
+    };
+    // A program was chosen over any metadata in the environment.
+    command.env_remove("PGRX_PG_CONFIG_AS_ENV");
+    let same_file = |other: PathBuf| match (program.canonicalize(), other.canonicalize()) {
+        (Ok(program), Ok(other)) => program == other,
+        _ => program == other,
+    };
+    // Leave the variable alone when the build script finds this program by itself, as it does
+    // for an installation in `config.toml`: changing it reruns the script, which regenerates
+    // the bindings, in every build that alternates with one that did not set it.
+    let found_by_build_script = pg_config
+        .label()
+        .and_then(|label| Pgrx::from_config()?.get(&label))
+        .ok()
+        .and_then(|found| found.path())
+        .is_some_and(same_file);
+    if !found_by_build_script {
+        // The build script runs in the crate's directory, not this one.
+        let program = if program.components().count() > 1 {
+            std::path::absolute(&program).unwrap_or(program)
+        } else {
+            program
+        };
+        command.env("PGRX_PG_CONFIG_PATH", program);
+    }
+}
+
 pub(crate) fn build_extension(
+    pg_config: &PgConfig,
     manifest_path: Option<&Path>,
     user_package: Option<&str>,
     profile: &CargoProfile,
@@ -399,6 +435,7 @@ pub(crate) fn build_extension(
 
     let mut command = crate::cargo::cargo();
     command.env("CARGO_PGRX_EXTVERSION", extversion.0);
+    select_build_postgres(&mut command, pg_config);
     command.arg("rustc");
     command.arg("--lib");
 
