@@ -1,0 +1,635 @@
+#LICENSE Portions Copyright 2026 PgCentral Foundation, Inc. <contact@pgcentral.org>
+#LICENSE
+#LICENSE All rights reserved.
+#LICENSE
+#LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+
+name: Nightly cross-compilation packages
+
+on:
+  schedule:
+    - cron: '17 3 * * *'
+      timezone: America/New_York
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Branch, tag, or commit to test (empty uses the selected workflow ref)
+        type: string
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    name: ${{ matrix.name }} PG18
+    if: github.event_name != 'schedule' || github.repository == 'pgcentralfoundation/pgrx'
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - id: linux-to-linux-arm64
+            name: Linux x64 to Linux ARM64
+            runner: ubuntu-24.04
+            target: aarch64-unknown-linux-gnu
+            os: linux
+            arch: aarch64
+            suffix: .so
+            rpm_arch: aarch64
+            deb_arch: arm64
+          - id: linux-to-macos-arm64
+            name: Linux x64 to macOS ARM64
+            runner: ubuntu-24.04
+            target: aarch64-apple-darwin
+            os: macos
+            arch: aarch64
+            suffix: .dylib
+            rpm_arch: ''
+            deb_arch: ''
+          - id: macos-to-linux-x64
+            name: macOS ARM64 to Linux x64
+            runner: macos-26
+            target: x86_64-unknown-linux-gnu
+            os: linux
+            arch: x86_64
+            suffix: .so
+            rpm_arch: x86_64
+            deb_arch: amd64
+          - id: linux-to-windows-x64
+            name: Linux x64 to Windows MSVC x64
+            runner: ubuntu-24.04
+            target: x86_64-pc-windows-msvc
+            os: windows
+            arch: x86_64
+            suffix: .dll
+            rpm_arch: ''
+            deb_arch: ''
+          - id: windows-to-linux-x64
+            name: Windows MSVC x64 to Linux x64
+            runner: windows-2025
+            target: x86_64-unknown-linux-gnu
+            os: linux
+            arch: x86_64
+            suffix: .so
+            rpm_arch: x86_64
+            deb_arch: amd64
+    defaults:
+      run:
+        shell: bash
+    env:
+      RUST_BACKTRACE: '1'
+      CARGO_INCREMENTAL: 'false'
+      CARGO_PROFILE_DEV_DEBUG: '0'
+      CARGO_PROFILE_DEV_BUILD_OVERRIDE_DEBUG: '0'
+      # Linux installation paths describe the target, not MSYS2's host filesystem.
+      MSYS2_ENV_CONV_EXCL: 'TARGET_PG_;PGRX_PG_CONFIG_'
+      CROSS_TARGET: ${{ matrix.target }}
+      CROSS_OS: ${{ matrix.os }}
+      CROSS_ARCH: ${{ matrix.arch }}
+      CROSS_SUFFIX: ${{ matrix.suffix }}
+      CROSS_RPM_ARCH: ${{ matrix.rpm_arch }}
+      CROSS_DEB_ARCH: ${{ matrix.deb_arch }}
+      HOMEBREW_NO_AUTO_UPDATE: '1'
+      HOMEBREW_NO_INSTALL_CLEANUP: '1'
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || github.ref }}
+          persist-credentials: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install the RPM metadata reader
+        run: python -m pip install rpmfile==2.2.1
+
+      - name: Prepare isolated build directories
+        run: |
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'cross-package'
+          for directory in ('packages', 'diagnostics', 'pgrx-home'):
+              (root / directory).mkdir(parents=True, exist_ok=True)
+          with open(os.environ['GITHUB_ENV'], 'a') as env:
+              env.write(f'CROSS_ROOT={root.as_posix()}\n')
+              env.write(f'PGRX_HOME={(root / "pgrx-home").as_posix()}\n')
+          PY
+
+      - name: Install the repository Rust toolchain and target
+        run: |
+          toolchain="$(python -c 'import tomllib; print(tomllib.load(open("rust-toolchain.toml", "rb"))["toolchain"]["channel"])')"
+          tools/ci/retry.sh rustup toolchain install "$toolchain" --profile minimal --component rustfmt --no-self-update
+          tools/ci/retry.sh rustup target add "$CROSS_TARGET" --toolchain "$toolchain"
+          rustc -vV
+
+      - name: Install native Linux LLVM and archive tools
+        if: runner.os == 'Linux'
+        run: |
+          llvm=18
+          if [[ "$CROSS_OS" == windows ]]; then
+            llvm=21
+            curl -fsSL --retry 3 https://apt.llvm.org/llvm-snapshot.gpg.key \
+              | sudo tee /usr/share/keyrings/pgrx-nightly-llvm.asc > /dev/null
+            echo 'deb [signed-by=/usr/share/keyrings/pgrx-nightly-llvm.asc] https://apt.llvm.org/noble/ llvm-toolchain-noble-21 main' \
+              | sudo tee /etc/apt/sources.list.d/pgrx-nightly-llvm.list > /dev/null
+          fi
+          tools/ci/retry.sh sudo apt-get update -qq
+          tools/ci/retry.sh sudo apt-get install -y -qq --no-install-recommends \
+            "clang-$llvm" "libclang-$llvm-dev" "llvm-$llvm" "lld-$llvm" \
+            bison flex make unzip libarchive-tools
+          echo "CLANG_PATH=/usr/bin/clang-$llvm" >> "$GITHUB_ENV"
+          echo "LIBCLANG_PATH=/usr/lib/llvm-$llvm/lib" >> "$GITHUB_ENV"
+          echo "LLVM_BIN=/usr/lib/llvm-$llvm/bin" >> "$GITHUB_ENV"
+          echo "/usr/lib/llvm-$llvm/bin" >> "$GITHUB_PATH"
+          echo 'ARCHIVE_TAR=/usr/bin/bsdtar' >> "$GITHUB_ENV"
+
+      - name: Install native macOS LLVM and archive tools
+        if: runner.os == 'macOS'
+        run: |
+          tools/ci/retry.sh brew install llvm make bison flex libarchive
+          llvm="$(brew --prefix llvm)"
+          echo "CLANG_PATH=$llvm/bin/clang" >> "$GITHUB_ENV"
+          echo "LIBCLANG_PATH=$llvm/lib" >> "$GITHUB_ENV"
+          echo "LLVM_BIN=$llvm/bin" >> "$GITHUB_ENV"
+          echo "$llvm/bin" >> "$GITHUB_PATH"
+          echo "$(brew --prefix bison)/bin" >> "$GITHUB_PATH"
+          echo "$(brew --prefix flex)/bin" >> "$GITHUB_PATH"
+          echo "ARCHIVE_TAR=$(brew --prefix libarchive)/bin/bsdtar" >> "$GITHUB_ENV"
+          "$llvm/bin/clang" --version
+          brew list --versions llvm
+
+      - name: Install native Windows LLVM 21
+        if: runner.os == 'Windows'
+        uses: KyleMayes/install-llvm-action@v2
+        with:
+          version: '21.1.8'
+          arch: x64
+          directory: ${{ runner.temp }}/llvm
+          env: false
+
+      - name: Select matching native Windows Clang and libclang
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $bin = "$env:RUNNER_TEMP/llvm/bin"
+          foreach ($file in 'clang.exe', 'libclang.dll', 'llvm-ar.exe', 'llvm-readobj.exe') {
+            if (-not (Test-Path "$bin/$file")) { throw "Missing LLVM tool: $file" }
+          }
+          "CLANG_PATH=$bin/clang.exe" >> $env:GITHUB_ENV
+          "LIBCLANG_PATH=$bin" >> $env:GITHUB_ENV
+          "LLVM_BIN=$bin" >> $env:GITHUB_ENV
+          $bin >> $env:GITHUB_PATH
+
+      - name: Install MSYS2 header-generation and archive tools
+        if: runner.os == 'Windows'
+        id: msys2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MSYS
+          path-type: inherit
+          install: make perl bison flex bsdtar
+
+      - name: Select the Windows archive reader
+        if: runner.os == 'Windows'
+        shell: pwsh
+        env:
+          MSYS2_ROOT: ${{ steps.msys2.outputs.msys2-location }}
+        run: |
+          $archiveTar = "$env:MSYS2_ROOT/usr/bin/bsdtar.exe"
+          if (-not (Test-Path $archiveTar)) { throw 'Missing MSYS2 bsdtar.exe' }
+          "ARCHIVE_TAR=$archiveTar" >> $env:GITHUB_ENV
+
+      - name: Build cargo-pgrx for the native host
+        run: |
+          cargo build --locked --package cargo-pgrx
+          file target/debug/cargo-pgrx*
+          "$CLANG_PATH" --version
+
+      - name: Download Zig 0.17.1 for the Windows host
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $archive = "$env:RUNNER_TEMP/zig.zip"
+          Invoke-WebRequest https://ziglang.org/download/0.17.1/zig-x86_64-windows-0.17.1.zip -OutFile $archive
+          $expected = 'b03f477a1943673e02aca0f570e8030dffd536ce1f45cbc4d3326ec31159562e'
+          if ((Get-FileHash $archive -Algorithm SHA256).Hash.ToLowerInvariant() -ne $expected) {
+            throw 'Zig archive checksum mismatch'
+          }
+          Expand-Archive $archive -DestinationPath "$env:RUNNER_TEMP/zig"
+          $zig = "$env:RUNNER_TEMP/zig/zig-x86_64-windows-0.17.1"
+          & "$zig/zig.exe" version
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          $zig >> $env:GITHUB_PATH
+          "CARGO_ZIGBUILD_ZIG_PATH=$zig/zig.exe" >> $env:GITHUB_ENV
+
+      - name: Download cargo-zigbuild 0.24.1 for the Windows host
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $base = 'https://github.com/rust-cross/cargo-zigbuild/releases/download/v0.24.1'
+          $name = 'cargo-zigbuild-x86_64-pc-windows-msvc.zip'
+          $archive = "$env:RUNNER_TEMP/$name"
+          Invoke-WebRequest "$base/$name" -OutFile $archive
+          Invoke-WebRequest "$base/$name.sha256" -OutFile "$archive.sha256"
+          $digest = ((Get-Content "$archive.sha256" -Raw).Trim() -split '\s+')[0]
+          if ((Get-FileHash $archive -Algorithm SHA256).Hash.ToLowerInvariant() -ne $digest.ToLowerInvariant()) {
+            throw 'cargo-zigbuild archive checksum mismatch'
+          }
+          Expand-Archive $archive -DestinationPath "$env:RUNNER_TEMP/cargo-zigbuild"
+          $executables = @(Get-ChildItem "$env:RUNNER_TEMP/cargo-zigbuild" -Recurse -Filter cargo-zigbuild.exe)
+          if ($executables.Count -ne 1) { throw 'Expected one cargo-zigbuild.exe' }
+          "CARGO_ZIGBUILD_EXE=$($executables[0].FullName)" >> $env:GITHUB_ENV
+
+      - name: Select Zig for nested Linux Cargo builds
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $adapter = "$env:RUNNER_TEMP/cargo-for-linux.cmd"
+          @('@echo off', 'set CARGO=', '"%CARGO_ZIGBUILD_EXE%" %*') |
+            Set-Content -Path $adapter -Encoding ascii
+          "CARGO=$adapter" >> $env:GITHUB_ENV
+          "CARGO_ZIGBUILD_CACHE_DIR=$env:RUNNER_TEMP/zig-cargo-cache" >> $env:GITHUB_ENV
+
+      - name: Install the Linux ARM64 GNU cross compiler
+        if: runner.os == 'Linux' && matrix.os == 'linux'
+        run: |
+          tools/ci/retry.sh sudo apt-get install -y -qq --no-install-recommends \
+            gcc-aarch64-linux-gnu g++-aarch64-linux-gnu libc6-dev-arm64-cross
+          {
+            echo 'TARGET_CC=aarch64-linux-gnu-gcc'
+            echo 'TARGET_CXX=aarch64-linux-gnu-g++'
+            echo 'TARGET_MAKE=make'
+            echo 'CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-linux-gnu-gcc'
+            echo 'CC_aarch64_unknown_linux_gnu=aarch64-linux-gnu-gcc'
+            echo 'CXX_aarch64_unknown_linux_gnu=aarch64-linux-gnu-g++'
+            echo 'AR_aarch64_unknown_linux_gnu=llvm-ar'
+            echo 'BINDGEN_EXTRA_CLANG_ARGS_aarch64_unknown_linux_gnu=-isystem /usr/aarch64-linux-gnu/include -ccc-gcc-name aarch64-linux-gnu-gcc'
+          } >> "$GITHUB_ENV"
+
+      - name: Install the macOS-hosted Linux GNU cross compiler
+        if: runner.os == 'macOS'
+        run: |
+          tools/ci/retry.sh brew tap messense/macos-cross-toolchains
+          git -C "$(brew --repo messense/macos-cross-toolchains)" checkout 473d950430a5149f71a82e8c546638f581bb7e0d
+          tools/ci/retry.sh brew install messense/macos-cross-toolchains/x86_64-unknown-linux-gnu
+          cc="$(command -v x86_64-linux-gnu-gcc)"
+          sysroot="$("$cc" -print-sysroot)"
+          toolchain="$(brew --prefix x86_64-unknown-linux-gnu)/toolchain"
+          test -d "$sysroot/usr/include"
+          "$cc" --version
+          file "$cc"
+          {
+            echo "TARGET_CC=$cc"
+            echo "TARGET_CXX=$(command -v x86_64-linux-gnu-g++)"
+            echo 'TARGET_MAKE=gmake'
+            echo "CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER=$cc"
+            echo "CC_x86_64_unknown_linux_gnu=$cc"
+            echo "CXX_x86_64_unknown_linux_gnu=$(command -v x86_64-linux-gnu-g++)"
+            echo 'AR_x86_64_unknown_linux_gnu=llvm-ar'
+            echo "BINDGEN_EXTRA_CLANG_ARGS_x86_64_unknown_linux_gnu=--sysroot=$sysroot --gcc-toolchain=$toolchain"
+          } >> "$GITHUB_ENV"
+
+      - name: Restore the macOS SDK and Linux-hosted linker
+        if: matrix.os == 'macos'
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/osxcross
+          key: nightly-osxcross-linux-x64-15.5-r0-ab9cb3c178279fb1
+
+      - name: Prepare the macOS cross compiler
+        if: matrix.os == 'macos'
+        run: |
+          toolchain="$RUNNER_TEMP/osxcross"
+          if [[ ! -x "$toolchain/bin/oa64-clang" ]]; then
+            image=ghcr.io/crazy-max/osxcross:15.5-r0-ubuntu@sha256:ab9cb3c178279fb1c1d94b87d2ec860969f07ba154466aacc593ece6dcafd62f
+            tools/ci/retry.sh docker pull "$image"
+            container="$(docker create "$image" unused)"
+            trap 'docker rm "$container" > /dev/null' EXIT
+            docker cp "$container:/osxcross" "$toolchain"
+            docker rm "$container" > /dev/null
+            trap - EXIT
+          fi
+          echo "$toolchain/bin" >> "$GITHUB_PATH"
+          {
+            echo "LD_LIBRARY_PATH=$toolchain/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+            echo "OSXCROSS_SDKROOT=$toolchain/SDK/MacOSX15.5.sdk"
+            echo 'MACOSX_DEPLOYMENT_TARGET=11.0'
+            echo "TARGET_CC=$toolchain/bin/oa64-clang"
+            echo "TARGET_CXX=$toolchain/bin/oa64-clang++"
+            echo 'TARGET_MAKE=make'
+            echo "CARGO_TARGET_AARCH64_APPLE_DARWIN_LINKER=$toolchain/bin/oa64-clang"
+            echo "CC_aarch64_apple_darwin=$toolchain/bin/oa64-clang"
+            echo "CXX_aarch64_apple_darwin=$toolchain/bin/oa64-clang++"
+            echo 'AR_aarch64_apple_darwin=llvm-ar'
+            echo "BINDGEN_EXTRA_CLANG_ARGS_aarch64_apple_darwin=-isysroot $toolchain/SDK/MacOSX15.5.sdk -mmacosx-version-min=11.0"
+          } >> "$GITHUB_ENV"
+
+      - name: Download cargo-xwin and prepare the MSVC SDK
+        if: matrix.os == 'windows'
+        run: |
+          base=https://github.com/rust-cross/cargo-xwin/releases/download/v0.23.1
+          name=cargo-xwin-v0.23.1.x86_64-unknown-linux-musl.tar.gz
+          mkdir -p "$RUNNER_TEMP/cargo-xwin"
+          curl -fSL --retry 3 "$base/$name" -o "$RUNNER_TEMP/$name"
+          curl -fsSL --retry 3 "$base/$name.sha256" -o "$RUNNER_TEMP/$name.sha256"
+          expected="$(awk '{print $1}' "$RUNNER_TEMP/$name.sha256")"
+          printf '%s  %s\n' "$expected" "$RUNNER_TEMP/$name" | sha256sum --check
+          tar -xzf "$RUNNER_TEMP/$name" -C "$RUNNER_TEMP/cargo-xwin"
+          executable="$(find "$RUNNER_TEMP/cargo-xwin" -type f -name cargo-xwin)"
+          test -n "$executable"
+          test "$(printf '%s\n' "$executable" | wc -l)" -eq 1
+          export PATH="$(dirname "$executable"):$PATH"
+          export XWIN_CACHE_DIR="$RUNNER_TEMP/xwin-cache" XWIN_ARCH=x86_64
+          cargo xwin env --target "$CROSS_TARGET" > "$CROSS_ROOT/xwin-env.sh"
+          echo "CROSS_ENV_FILE=$CROSS_ROOT/xwin-env.sh" >> "$GITHUB_ENV"
+
+      - name: Download PostgreSQL 18.7 source for Unix targets
+        if: matrix.os != 'windows'
+        run: |
+          curl -fSL --retry 3 -o "$CROSS_ROOT/postgresql.tar.bz2" \
+            https://ftp.postgresql.org/pub/source/v18.7/postgresql-18.7.tar.bz2
+          python - <<'PY'
+          import hashlib, os, tarfile
+          from pathlib import Path
+          archive = Path(os.environ['CROSS_ROOT']) / 'postgresql.tar.bz2'
+          assert hashlib.sha256(archive.read_bytes()).hexdigest() == '441dfae4280cae3e0425e5f876f80559fb0731c140f1aae22b3e5a54d0411bfd'
+          with tarfile.open(archive, mode='r:bz2') as tar:
+              tar.extractall(archive.parent, filter='data')
+          PY
+
+      - name: Configure PostgreSQL for the Unix target
+        if: matrix.os != 'windows' && runner.os != 'Windows'
+        run: |
+          export PATH="$LLVM_BIN:$PATH"
+          cd "$CROSS_ROOT/postgresql-18.7"
+          CC="$TARGET_CC" CXX="$TARGET_CXX" PG_SYSROOT="${OSXCROSS_SDKROOT:-}" \
+            ./configure --build="$(sh ./config/config.guess)" --host="$CROSS_TARGET" \
+            --prefix=/usr/local/pgsql --without-readline --without-zlib --without-icu \
+            --with-system-tzdata=/usr/share/zoneinfo
+
+      - name: Generate and stage target PostgreSQL headers
+        if: matrix.os != 'windows' && runner.os != 'Windows'
+        run: |
+          cd "$CROSS_ROOT/postgresql-18.7"
+          "$TARGET_MAKE" -C src/backend generated-headers
+          "$TARGET_MAKE" -C src/include DESTDIR="$CROSS_ROOT/pg18" install
+          "$TARGET_MAKE" -C src/pl/plpgsql/src DESTDIR="$CROSS_ROOT/pg18" install-headers
+
+      - name: Configure Linux PostgreSQL with native Windows Zig
+        if: runner.os == 'Windows'
+        shell: msys2 {0}
+        run: |
+          set -euo pipefail
+          export MSYS2_ARG_CONV_EXCL='*'
+          root="$(cygpath -u "$CROSS_ROOT")"
+          cd "$root/postgresql-18.7"
+          CC='zig.exe cc -target x86_64-linux-gnu' CXX='zig.exe c++ -target x86_64-linux-gnu' \
+            ./configure --build="$(sh ./config/config.guess)" --host=x86_64-unknown-linux-gnu \
+            --prefix=/usr/local/pgsql --without-readline --without-zlib --without-icu \
+            --with-system-tzdata=/usr/share/zoneinfo
+
+      - name: Generate and stage Linux PostgreSQL headers on Windows
+        if: runner.os == 'Windows'
+        shell: msys2 {0}
+        run: |
+          set -euo pipefail
+          export MSYS2_ARG_CONV_EXCL='*'
+          root="$(cygpath -u "$CROSS_ROOT")"
+          cd "$root/postgresql-18.7"
+          make -C src/backend generated-headers
+          make -C src/include DESTDIR="$root/pg18" install
+          make -C src/pl/plpgsql/src DESTDIR="$root/pg18" install-headers
+
+      - name: Read the configured Unix PostgreSQL metadata
+        if: matrix.os != 'windows'
+        run: |
+          python - <<'PY'
+          import os, re
+          from pathlib import Path
+          root = Path(os.environ['CROSS_ROOT'])
+          makefile = (root / 'postgresql-18.7/src/Makefile.global').read_text()
+          values = {
+              'TARGET_PG_INCLUDEDIR_SERVER': (root / 'pg18/usr/local/pgsql/include/server').as_posix(),
+              'TARGET_PG_PKGINCLUDEDIR': (root / 'pg18/usr/local/pgsql/include').as_posix(),
+              'TARGET_PG_LIBDIR': '/usr/local/pgsql/lib',
+              'TARGET_PG_PKGLIBDIR': '/usr/local/pgsql/lib',
+              'TARGET_PG_SHAREDIR': '/usr/local/pgsql/share',
+          }
+          for flag in ('CFLAGS', 'CPPFLAGS'):
+              match = re.search(r'^' + flag + r' = (.*)$', makefile, re.M)
+              assert match is not None, f'Missing {flag} in configured Makefile.global'
+              values['TARGET_PG_' + flag] = match[1]
+          with open(os.environ['GITHUB_ENV'], 'a') as env:
+              for key, value in values.items():
+                  env.write(f'{key}={value}\n')
+          PY
+
+      - name: Extract Windows PostgreSQL headers and import library
+        if: matrix.os == 'windows'
+        run: |
+          curl -fSL --retry 3 -o "$CROSS_ROOT/postgresql-windows.zip" \
+            https://get.enterprisedb.com/postgresql/postgresql-18.7-1-windows-x64-binaries.zip
+          printf '%s  %s\n' ead0bbc27fb678fa24dcf86b738981323042abd073c744103bf7f3aed23f9a33 "$CROSS_ROOT/postgresql-windows.zip" \
+            | sha256sum --check
+          unzip -q "$CROSS_ROOT/postgresql-windows.zip" 'pgsql/include/*' 'pgsql/lib/*' -d "$CROSS_ROOT/pg18"
+          pg="$CROSS_ROOT/pg18/pgsql"
+          test -f "$pg/include/server/pg_config.h"
+          test -f "$pg/lib/postgres.lib"
+          {
+            echo "TARGET_PG_INCLUDEDIR_SERVER=$pg/include/server"
+            echo "TARGET_PG_PKGINCLUDEDIR=$pg/include"
+            echo "TARGET_PG_LIBDIR=$pg/lib"
+            echo 'TARGET_PG_PKGLIBDIR=C:/PostgreSQL/18/lib'
+            echo 'TARGET_PG_SHAREDIR=C:/PostgreSQL/18/share'
+            # These strings are recorded in the pinned EDB archive's pg_config.exe.
+            echo 'TARGET_PG_CPPFLAGS=/DWIN32 /DWINDOWS /D__WINDOWS__ /D__WIN32__ /D_CRT_SECURE_NO_DEPRECATE /D_CRT_NONSTDC_NO_DEPRECATE'
+            echo 'TARGET_PG_CFLAGS=-Wall -O2 /wd4018 /wd4244 /wd4273 /wd4101 /wd4102 /wd4090 /wd4267'
+          } >> "$GITHUB_ENV"
+
+      - name: Select target PostgreSQL metadata without a pg_config program
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          root = Path(os.environ['CROSS_ROOT'])
+          assert not (root / 'pgrx-home/config.toml').exists()
+          missing_pg_config = (root / 'no-pg-config').as_posix()
+          assert not Path(missing_pg_config).exists()
+          values = {
+              'PGRX_PG_CONFIG_AS_ENV': 'true',
+              'PGRX_PG_CONFIG_VERSION': 'PostgreSQL 18.7',
+              # These must never be consulted while environment metadata is selected.
+              'PG_CONFIG': missing_pg_config,
+              'PGRX_PG_CONFIG_PATH': missing_pg_config,
+          }
+          for name in ('INCLUDEDIR_SERVER', 'PKGINCLUDEDIR', 'LIBDIR', 'PKGLIBDIR', 'SHAREDIR', 'CPPFLAGS', 'CFLAGS'):
+              key = name.replace('INCLUDEDIR_SERVER', 'INCLUDEDIR-SERVER')
+              if 'TARGET_PG_' + name in os.environ:
+                  values['PGRX_PG_CONFIG_' + key] = os.environ['TARGET_PG_' + name]
+          (root / 'diagnostics/pg-config.json').write_text(json.dumps(values, indent=2))
+          with open(os.environ['GITHUB_ENV'], 'a') as env:
+              for key, value in values.items():
+                  env.write(f'{key}={value}\n')
+          PY
+
+      - name: Package the versioned shared library
+        run: |
+          if [[ -n "${LLVM_BIN:-}" ]]; then export PATH="$LLVM_BIN:$PATH"; fi
+          if [[ -n "${CROSS_ENV_FILE:-}" ]]; then source "$CROSS_ENV_FILE"; fi
+          target/debug/cargo-pgrx pgrx package --package versioned_so \
+            --no-default-features --features pg18 --target "$CROSS_TARGET" \
+            --out-dir "$CROSS_ROOT/packages/versioned_so" \
+            --debug --cargo=--locked
+
+      - name: Package the extension with RPM and DEB metadata
+        run: |
+          if [[ -n "${LLVM_BIN:-}" ]]; then export PATH="$LLVM_BIN:$PATH"; fi
+          if [[ -n "${CROSS_ENV_FILE:-}" ]]; then source "$CROSS_ENV_FILE"; fi
+          target/debug/cargo-pgrx pgrx package --package packaging \
+            --no-default-features --features pg18 --target "$CROSS_TARGET" \
+            --out-dir "$CROSS_ROOT/packages/packaging" \
+            --debug --cargo=--locked
+          test ! -e "$PGRX_HOME/config.toml"
+
+      - name: Check exact package names and SQL library references
+        run: |
+          python - <<'PY'
+          import os, re
+          from pathlib import Path
+          root = Path(os.environ['CROSS_ROOT']) / 'packages'
+          windows = os.environ['CROSS_OS'] == 'windows'
+          libdir = Path('lib' if windows else 'usr/local/pgsql/lib')
+          extdir = Path('share/extension' if windows else 'usr/local/pgsql/share/extension')
+          suffix = os.environ['CROSS_SUFFIX']
+          for name, version, library, sql_library in (
+              ('versioned_so', '0.0.0', 'versioned_so-0.0.0', 'versioned_so-0.0.0'),
+              ('packaging', '0.1.0', 'packaging', 'MODULE_PATHNAME'),
+          ):
+              package = root / name
+              control, sql = extdir / f'{name}.control', extdir / f'{name}--{version}.sql'
+              expected = {libdir / f'{library}{suffix}', control, sql}
+              if name == 'packaging' and os.environ['CROSS_OS'] == 'linux':
+                  expected |= {
+                      Path(f'packaging_18-0.1.0-1.{os.environ["CROSS_RPM_ARCH"]}.rpm'),
+                      Path(f'postgresql-18-packaging_0.1.0_{os.environ["CROSS_DEB_ARCH"]}.deb'),
+                  }
+              actual = {path.relative_to(package) for path in package.rglob('*') if path.is_file()}
+              assert actual == expected, f'{name}: expected {expected}, got {actual}'
+              control_text = (package / control).read_text()
+              assert f"default_version = '{version}'" in control_text, control_text
+              if name == 'packaging':
+                  assert "module_pathname = 'packaging'" in control_text, control_text
+              schema = (package / sql).read_text()
+              assert re.search(r'CREATE\s+FUNCTION\s+"hello_' + name + r'"\(\)', schema), schema
+              assert f"AS '{sql_library}', 'hello_{name}_wrapper'" in schema, schema
+              print(f'Validated {name}: {sorted(map(str, actual))}')
+          PY
+
+      - name: Check target shared-library format and architecture
+        run: |
+          python - <<'PY'
+          import os, re, subprocess
+          from pathlib import Path
+          root = Path(os.environ['CROSS_ROOT'])
+          target_os, arch = os.environ['CROSS_OS'], os.environ['CROSS_ARCH']
+          libdir = Path('lib' if target_os == 'windows' else 'usr/local/pgsql/lib')
+          for name, stem in (('versioned_so', 'versioned_so-0.0.0'), ('packaging', 'packaging')):
+              library = root / 'packages' / name / libdir / (stem + os.environ['CROSS_SUFFIX'])
+              args = ['llvm-readobj', '--file-headers']
+              if target_os == 'macos':
+                  args.append('--macho-version-min')
+              elif target_os == 'linux':
+                  args.extend(['--program-headers', '--dynamic-table'])
+              info = subprocess.check_output([*args, str(library)], text=True)
+              (root / 'diagnostics' / f'{name}-binary.txt').write_text(info)
+              if target_os == 'macos':
+                  required = ['Format: Mach-O arm64', 'FileType: DynamicLibrary (0x6)', 'Platform: macos']
+              elif target_os == 'windows':
+                  required = ['Format: COFF-x86-64', 'Machine: IMAGE_FILE_MACHINE_AMD64', 'IMAGE_FILE_DLL']
+              else:
+                  required = ['Format: elf64-', 'Type: SharedObject', 'Machine: ' + ('EM_AARCH64' if arch == 'aarch64' else 'EM_X86_64')]
+                  assert not re.search(r'\b(?:PT_)?INTERP\b|\bPIE\b', info), f'{library}: executable rather than shared library\n{info}'
+              for token in required:
+                  assert token in info, f'{library}: missing {token!r}\n{info}'
+              print(info)
+          PY
+
+      - name: Check RPM and DEB metadata and packaged bytes
+        if: matrix.os == 'linux'
+        run: |
+          python - <<'PY'
+          import io, os, rpmfile, subprocess, tarfile
+          from pathlib import Path
+          package = Path(os.environ['CROSS_ROOT']) / 'packages/packaging'
+          archive_tar = os.environ['ARCHIVE_TAR']
+          rpm_arch, deb_arch = os.environ['CROSS_RPM_ARCH'], os.environ['CROSS_DEB_ARCH']
+          rpm = package / f'packaging_18-0.1.0-1.{rpm_arch}.rpm'
+          deb = package / f'postgresql-18-packaging_0.1.0_{deb_arch}.deb'
+          payload = {
+              'lib/packaging.so': (package / 'usr/local/pgsql/lib/packaging.so').read_bytes(),
+              'share/extension/packaging.control': (package / 'usr/local/pgsql/share/extension/packaging.control').read_bytes(),
+              'share/extension/packaging--0.1.0.sql': (package / 'usr/local/pgsql/share/extension/packaging--0.1.0.sql').read_bytes(),
+          }
+          with rpmfile.open(rpm) as archive:
+              metadata = {key: archive.headers[key].decode() for key in ('name', 'version', 'release', 'arch')}
+          assert metadata == {'name': 'packaging_18', 'version': '0.1.0', 'release': '1', 'arch': rpm_arch}, metadata
+          members = subprocess.check_output([archive_tar, '-tf', str(rpm)], text=True).splitlines()
+          normalized = {name.removeprefix('./').lstrip('/'): name for name in members}
+          expected_rpm = {f'usr/pgsql-18/{name}': data for name, data in payload.items()}
+          assert set(normalized) == set(expected_rpm), normalized
+          for name, data in expected_rpm.items():
+              assert subprocess.check_output([archive_tar, '-xOf', str(rpm), normalized[name]]) == data, name
+
+          members = subprocess.check_output([archive_tar, '-tf', str(deb)], text=True).splitlines()
+          assert members == ['debian-binary', 'control.tar.gz', 'data.tar.gz'], members
+          assert subprocess.check_output([archive_tar, '-xOf', str(deb), 'debian-binary']) == b'2.0\n'
+          control_bytes = subprocess.check_output([archive_tar, '-xOf', str(deb), 'control.tar.gz'])
+          with tarfile.open(fileobj=io.BytesIO(control_bytes), mode='r:gz') as tar:
+              control = next(entry for entry in tar.getmembers() if entry.name.removeprefix('./') == 'control')
+              metadata = tar.extractfile(control).read().decode()
+          for line in ('Package: postgresql-18-packaging', 'Version: 0.1.0', f'Architecture: {deb_arch}'):
+              assert line in metadata.splitlines(), metadata
+          data_bytes = subprocess.check_output([archive_tar, '-xOf', str(deb), 'data.tar.gz'])
+          with tarfile.open(fileobj=io.BytesIO(data_bytes), mode='r:gz') as tar:
+              actual = {entry.name.removeprefix('./').lstrip('/'): tar.extractfile(entry).read()
+                        for entry in tar.getmembers() if entry.isfile()}
+          expected_deb = {
+              'usr/lib/postgresql/18/lib/packaging.so': payload['lib/packaging.so'],
+              'usr/share/postgresql/18/extension/packaging.control': payload['share/extension/packaging.control'],
+              'usr/share/postgresql/18/extension/packaging--0.1.0.sql': payload['share/extension/packaging--0.1.0.sql'],
+          }
+          assert actual == expected_deb, actual.keys()
+          print(f'Validated RPM and DEB metadata and all three payload files for {deb_arch}')
+          PY
+
+      - name: Collect target configuration diagnostics
+        if: always()
+        run: |
+          python - <<'PY'
+          import os, shutil
+          from pathlib import Path
+          root = Path(os.environ.get('CROSS_ROOT', str(Path(os.environ['RUNNER_TEMP']) / 'cross-package')))
+          diagnostics = root / 'diagnostics'
+          diagnostics.mkdir(parents=True, exist_ok=True)
+          config_log = root / 'postgresql-18.7/config.log'
+          if config_log.exists():
+              shutil.copy2(config_log, diagnostics / 'postgresql-config.log')
+          for report in Path('target').glob('*/debug/build/pgrx-pg-sys-*/out/pg18_macro_report.json'):
+              shutil.copy2(report, diagnostics / f'{report.parent.parent.name}-pg18-macros.json')
+          PY
+
+      - name: Upload packages and configuration diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cross-pg18-${{ matrix.id }}
+          path: |
+            ${{ env.CROSS_ROOT }}/packages
+            ${{ env.CROSS_ROOT }}/diagnostics
+          if-no-files-found: warn
+          retention-days: 7
