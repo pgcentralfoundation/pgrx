@@ -503,6 +503,16 @@ pub(crate) fn machine_family(triple: &str) -> MachineFamily {
     MachineFamily { arch, os, libc, hard_float }
 }
 
+/// Whether `target`, or this machine when there is none, is a Windows platform.
+pub(crate) fn targets_windows(target: Option<&str>) -> bool {
+    target.map_or(cfg!(windows), is_windows_triple)
+}
+
+/// Whether `target`, or this machine when there is none, is a Windows MSVC platform.
+pub(crate) fn targets_msvc(target: Option<&str>) -> bool {
+    target.map_or(cfg!(target_env = "msvc"), is_msvc_triple)
+}
+
 /// Recognize the Windows target spellings whose native objects require COFF conventions.
 /// This controls code generation and archive tools; it does not admit a runtime ABI profile.
 pub(crate) fn is_windows_triple(triple: &str) -> bool {

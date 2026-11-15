@@ -20,7 +20,6 @@ pub struct Cargo {
     manifest: Option<PathBuf>,
     package: String,
     log_level: Option<String>,
-    target: Option<String>,
     profile: CargoProfile,
     // use a BTreeMap for deterministic order of iteration
     more_args: BTreeMap<String, Vec<String>>,
@@ -49,11 +48,6 @@ impl Cargo {
 
     pub fn package(mut self, package: String) -> Self {
         self.package = package;
-        self
-    }
-
-    pub fn target(mut self, target: Option<String>) -> Self {
-        self.target = target;
         self
     }
 
@@ -112,7 +106,6 @@ impl Cargo {
             stdio,
             manifest,
             log_level,
-            target,
             profile,
             package,
             subcmd: _,
@@ -121,13 +114,10 @@ impl Cargo {
             cargo_flags,
         } = self;
 
-        // set most-interesting flags first, like profile, target, and manifest-path
+        // set most-interesting flags first, like profile and manifest-path
         // so that when we read dumped command lines we can see that info first
         cmd.args(profile.cargo_args());
 
-        if let Some(target) = target {
-            cmd.arg("--target").arg(target);
-        }
         if let Some(manifest) = manifest {
             cmd.arg("--manifest-path").arg(manifest);
         }

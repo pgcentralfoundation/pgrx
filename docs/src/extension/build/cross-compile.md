@@ -126,7 +126,8 @@ It writes `pgrx-pg18-aarch64-unknown-linux-gnu.partial.tar.gz` and prints the
 path. The file holds the Rust target, the `pg_config` lines, the server headers,
 and for Windows MSVC targets the public headers and `postgres.lib`.
 
-The script copies what it is given and checks none of it.
+The script stops only when it lacks what it needs to collect: the version that
+names the file, and the directories it copies. It checks nothing else.
 `cargo pgrx package --bundle` checks the bundle when it uses it, and names a
 value that is missing. It cannot tell that a value is wrong for the target: a
 mistaken `--pkglibdir=` produces a package laid out for a directory the server
@@ -198,24 +199,23 @@ rustup target add aarch64-unknown-linux-gnu
 cargo pgrx package --bundle pgrx-pg18-aarch64-unknown-linux-gnu.tar.gz
 ```
 
-`--bundle` takes either kind of bundle. The bundle supplies the target and its PostgreSQL, so `--bundle` cannot be
-combined with `--pg-config`. The extension is staged for the directories the
-target's `pg_config` reported. Windows packages always stage into `lib` and
+`--bundle` takes either kind of bundle. The bundle supplies the target and its
+PostgreSQL, so `--bundle` cannot be combined with `--pg-config`. The extension
+is staged for the directories the target's `pg_config` reported. Windows packages always stage into `lib` and
 `share/extension`, and Linux targets can also produce
 [RPM and DEB packages](../../../../cargo-pgrx/README.md#building-rpm-and-deb-packages).
 cargo-pgrx reads the generated SQL out of the built library without loading it,
 so no target code runs on the build host.
 
-The importer validates all members and the compiler target before publishing
-Rust source or linking the bundled native archive. It rejects missing manifests,
-raw-only imports, changed bytes, extra files, mismatched targets/versions/features,
-and symlinks at the bundle root or within the bundle. Configured ancestor path
-aliases are resolved normally. Members are limited to 128 MiB each, 512 MiB in
-total and 8192 files/directory entries; manifests are limited to 4 MiB. Export
-replaces only an intact bundle of the same domain or an empty directory, preserving
-unrelated files on refusal.
-A bundle from another pgrx version, PostgreSQL major or `cshim` setting is
-refused the same way.
+Before the build uses anything from a full bundle, it checks every file against
+the bundle's manifest and refuses a bundle with a changed, missing or extra
+file, a link, or a file over 128 MiB (512 MiB and 8192 entries in all). It also
+refuses a bundle made for another Rust target, PostgreSQL major version, pgrx
+version or `cshim` setting.
+
+cargo-pgrx unpacks a bundle into `pgrx-bundle/<file name>/` in Cargo's target
+directory and reuses that directory while the file is unchanged, so a second
+package from the same bundle rebuilds nothing.
 
 ## What pgrx verifies
 
@@ -347,6 +347,71 @@ the native support archive with the arguments above.
 Rust needs the target's standard library and a linker that can produce the
 target's libraries. This is ordinary Rust cross compiling; pgrx adds nothing to
 it. Other crates in your build that compile C or C++ may need more.
+
+pgrx's nightly workflow packages its examples from full bundles on the routes
+below. Each needs `rustup target add <target>` and the linker shown.
+
+| Build host → target | Linker |
+| --- | --- |
+| Linux → Linux, another architecture | the distribution's cross GCC, as under [Debian](#debian) |
+| macOS → Linux | a Linux GCC cross toolchain |
+| Linux → macOS | [osxcross](https://github.com/tpoechtrager/osxcross) and a macOS SDK |
+| Linux → Windows MSVC | [cargo-xwin](https://github.com/rust-cross/cargo-xwin) and LLVM |
+| Windows → Linux | [cargo-zigbuild](https://github.com/rust-cross/cargo-zigbuild) and [Zig](https://ziglang.org) |
+
+## macOS to Linux
+
+Install a GCC cross toolchain for the target, such as one of the Homebrew
+formulae in `messense/macos-cross-toolchains`, and tell Cargo to link with it:
+
+```sh
+brew install messense/macos-cross-toolchains/x86_64-unknown-linux-gnu
+export CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER=x86_64-linux-gnu-gcc
+cargo pgrx package --bundle pgrx-pg18-x86_64-unknown-linux-gnu.tar.gz
+```
+
+## Linux to macOS
+
+Build osxcross with a macOS SDK, following its instructions, and name its Clang
+as the linker. Apple's license for the SDK applies.
+
+```sh
+export CARGO_TARGET_AARCH64_APPLE_DARWIN_LINKER=/path/to/osxcross/bin/oa64-clang
+export MACOSX_DEPLOYMENT_TARGET=11.0
+cargo pgrx package --bundle pgrx-pg18-aarch64-apple-darwin.tar.gz
+```
+
+## Linux to Windows MSVC
+
+cargo-xwin downloads Microsoft's C runtime and Windows SDK, and prints the
+variables that make Cargo link with LLVM's `lld-link` against them. Install
+LLVM (`clang`, `lld` and `llvm`) first.
+
+```sh
+cargo install --locked cargo-xwin
+eval "$(cargo xwin env --target x86_64-pc-windows-msvc)"
+cargo pgrx package --bundle pgrx-pg18-x86_64-pc-windows-msvc.tar.gz
+```
+
+The Windows import library that extensions link against comes from the bundle.
+
+## Windows to Linux
+
+cargo-zigbuild links with Zig, which carries the C libraries for Linux targets.
+It has to run in place of Cargo itself, and `cargo pgrx` always sees `CARGO`
+naming Cargo, so run the `cargo-pgrx` program directly with `CARGO` naming a
+small script. The script clears `CARGO`, which cargo-zigbuild would otherwise
+run, and passes its arguments on:
+
+```bat
+@echo off
+set CARGO=
+cargo-zigbuild %*
+```
+
+```sh
+CARGO=C:\path	o\cargo-for-linux.cmd cargo-pgrx pgrx package --bundle pgrx-pg18-x86_64-unknown-linux-gnu.tar.gz
+```
 
 ## Debian
 

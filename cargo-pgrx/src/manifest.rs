@@ -295,7 +295,7 @@ pub(crate) trait PgrxManifestExt {
     fn lib_name(&self) -> eyre::Result<String>;
 
     /// The `cdylib` filename cargo writes for `target`, or for the host when
-    /// no `--target` was passed.
+    /// there is none.
     fn lib_filename(&self, target: Option<&str>) -> eyre::Result<String>;
 }
 

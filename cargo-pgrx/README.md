@@ -1058,7 +1058,7 @@ String values in these sections can use the following variables:
 | `${DESCRIPTION}`      | the crate description                                   |
 | `${LICENSE}`          | the crate license                                       |
 | `${MAINTAINER}`       | the first entry of the crate's `authors`                |
-| `${ARCH}`             | the `--target` or host architecture, such as `x86_64`   |
+| `${ARCH}`             | the bundle's or host's architecture, such as `x86_64`   |
 | `${PG_MAJOR_VERSION}` | the Postgres major version, such as `17`                |
 | `${PG_PKGLIBDIR}`     | `pg_config --pkglibdir`                                 |
 | `${PG_SHAREDIR}`      | `pg_config --sharedir`                                  |
@@ -1079,7 +1079,7 @@ control file, so it can differ from `${NAME}` for a crate with a hyphenated name
 versioned shared library. `${VERSION}` replaces `-` because RPM rejects it in a version
 and Debian would sort `1.0.0-rc.1` after `1.0.0`. Both sort `1.0.0~rc.1` before `1.0.0`.
 
-`${ARCH}` is the first part of a `--target` triple. If the package format doesn't
+`${ARCH}` is the first part of the bundle's target triple. If the package format doesn't
 recognize it, as with `powerpc64le`, set `arch` in your section.
 
 The default `files` and `dirs` expect the layout from `pg_config`. If you pass

@@ -198,7 +198,7 @@ pub(crate) fn generate_schema_for_cli(
 
     if !skip_build {
         // NB:  The only path where this happens is via the command line using `cargo pgrx schema`
-        first_build(cargo.clone(), profile, is_test, &features_arg, target)?;
+        first_build(cargo.clone(), profile, is_test, &features_arg)?;
     };
     generate_schema_implicit(
         package_manifest_path,
@@ -389,7 +389,6 @@ fn first_build(
     profile: &CargoProfile,
     is_test: bool,
     features_arg: &str,
-    target: Option<&str>,
 ) -> eyre::Result<()> {
     let cargo = if is_test {
         cargo.subcommand("test").flag("--no-run")
@@ -397,10 +396,10 @@ fn first_build(
         cargo
             .subcommand("rustc")
             .flag("--lib")
-            .rustc_args(crate::cargo::pgrx_cdylib_rustc_args(target))
+            .rustc_args(crate::cargo::pgrx_cdylib_rustc_args(None))
     };
 
-    let cargo = cargo.profile(profile.clone()).target(target.map(|t| t.to_owned()));
+    let cargo = cargo.profile(profile.clone());
 
     let mut command = cargo.into_command();
 
@@ -470,7 +469,8 @@ mod tests {
         let fixture_path = format!("{root_path}/tests/fixtures/macos-universal-binary");
         let bin = std::fs::read(fixture_path).unwrap();
 
-        let error = decode_section_entities(&bin, None).expect_err("missing section");
+        let error = decode_section_entities(&bin, Some("aarch64-apple-darwin"))
+            .expect_err("missing section");
         assert!(error.to_string().contains("no embedded pgrx schema section found"));
     }
 

@@ -17,9 +17,8 @@ pub(crate) enum TargetOs {
 }
 
 impl TargetOs {
-    /// Read the platform out of a `--target` tuple, falling back to the host
-    /// when no target was passed. Cross builds must pass cargo-pgrx's `--target`
-    /// explicitly rather than relying on Cargo's target configuration.
+    /// Read the platform out of a bundle's target tuple, falling back to the host
+    /// when there is no bundle. Cargo's own target configuration is not consulted.
     pub(crate) fn from_target(target: Option<&str>) -> Self {
         match target {
             Some(tuple) => Self::from_tuple(tuple),

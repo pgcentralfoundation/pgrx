@@ -520,10 +520,6 @@ fn only_a_bundle_names_another_platform() {
     );
     refused(fixture.command().args(["--bundle", "missing.tar.gz"]), "couldn't unpack");
     refused(fixture.command().args(["--target", &host_triple()]), "--target");
-    refused(
-        fixture.command().args(["--pg-config-version", "PostgreSQL 18.7"]),
-        "--pg-config-version",
-    );
     refused(&mut fixture.cargo_pgrx(&["install", "--target", &host_triple()]), "--target");
     refused(&mut fixture.cargo_pgrx(&["cross", "pgrx-target"]), "cross");
     fixture.assert_no_pg_config_calls();

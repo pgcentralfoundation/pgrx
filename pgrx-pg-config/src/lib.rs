@@ -188,23 +188,9 @@ impl PgConfig {
         if !Self::is_in_environment() {
             Err(eyre::eyre!("`PgConfig` not described in the environment"))
         } else {
-            const PREFIX: &str = "PGRX_PG_CONFIG_";
-
-            let mut known_props = BTreeMap::new();
-            for (k, v) in std::env::vars().filter(|(k, _)| k.starts_with(PREFIX)) {
-                // reformat the key to look like an argument option to `pg_config`
-                let prop = format!("--{}", k.trim_start_matches(PREFIX).to_lowercase());
-                known_props.insert(prop, v);
-            }
-
-            Ok(Self {
-                version: None,
-                pg_config: None,
-                known_props: Some(known_props),
-                base_port: 0,
-                base_testing_port: 0,
-                test_port_override: None,
-            })
+            Ok(Self::from_properties(std::env::vars().filter_map(|(name, value)| {
+                Some((name.strip_prefix("PGRX_PG_CONFIG_")?.to_lowercase(), value))
+            })))
         }
     }
 

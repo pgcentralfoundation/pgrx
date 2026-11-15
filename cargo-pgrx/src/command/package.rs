@@ -12,7 +12,7 @@ use crate::bundle::Bundle;
 use crate::cargo::CargoProfile;
 use crate::command::get::get_property;
 use crate::command::install::{
-    EffectiveExtVersion, TargetInfo, build_extension, format_display_path, get_version,
+    EffectiveExtVersion, Platform, build_extension, format_display_path, get_version,
     install_extension, manifest_path_for_build, shared_library_filename, warn_if_pg_bench_enabled,
 };
 use crate::command::migrate::UnreleasedFragmentMode;
@@ -109,15 +109,14 @@ impl Package {
             .as_deref()
             .map(|file| Bundle::open(file, metadata.target_directory.as_std_path()))
             .transpose()?;
-        let (pg_config, target, target_info) = match &bundle {
+        let (pg_config, platform) = match &bundle {
             Some(bundle) => (
                 bundle.pg_config.clone(),
-                Some(bundle.target.as_str()),
-                // A partial bundle has headers to generate from in place of generated sources.
-                bundle.target_info.as_deref().map_or(TargetInfo::Generate, TargetInfo::Import),
+                Platform::Bundle { target: &bundle.target, generated: bundle.generated.as_deref() },
             ),
-            None => (program_pg_config(self.pg_config.take()), None, TargetInfo::Generate),
+            None => (program_pg_config(self.pg_config.take()), Platform::Host),
         };
+        let target = platform.target();
         let pg_version = format!("pg{}", pg_config.major_version()?);
 
         crate::manifest::modify_features_for_version(
@@ -169,8 +168,7 @@ impl Package {
             &profile,
             self.test,
             &self.features,
-            target,
-            target_info,
+            platform,
             unreleased_mode,
             metadata.target_directory.as_std_path(),
             &cargo_flags,
@@ -215,8 +213,7 @@ pub(crate) fn package_extension(
     profile: &CargoProfile,
     is_test: bool,
     features: &clap_cargo::Features,
-    target: Option<&str>,
-    target_info: TargetInfo<'_>,
+    platform: Platform<'_>,
     unreleased_mode: UnreleasedFragmentMode,
     target_dir: &Path,
     cargo_flags: &[String],
@@ -239,8 +236,7 @@ pub(crate) fn package_extension(
         is_test,
         Some(out_dir),
         features,
-        target,
-        target_info,
+        platform,
         unreleased_mode,
         target_dir,
         cargo_flags,
@@ -275,18 +271,16 @@ fn generate_bundle(
     let exported = exported.path();
 
     let version = get_version(package_manifest_path, cargo_flags)?;
-    let output = build_extension(
+    build_extension(
         pg_config,
-        TargetInfo::Export(exported),
+        Platform::HostForBundle(exported),
         manifest_path_for_build(user_manifest_path, user_package, package_manifest_path),
         user_package,
         profile,
         features,
-        None,
         EffectiveExtVersion(&version),
         cargo_flags,
     )?;
-    drop(output);
 
     let path = crate::bundle::write(pg_config, exported, out_dir.unwrap_or(target_dir))?;
     eprintln!(

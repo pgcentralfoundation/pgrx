@@ -98,7 +98,7 @@ impl CommandExecute for Install {
         )?;
 
         crate::manifest::modify_features_for_version(
-            // Only the feature names are needed, and environment metadata has no `config.toml`.
+            // Only the feature names are needed, so no `config.toml` is read.
             &Pgrx::default(),
             Some(&mut self.features),
             &package_manifest,
@@ -117,8 +117,7 @@ impl CommandExecute for Install {
             self.test,
             None,
             &self.features,
-            None,
-            TargetInfo::Generate,
+            Platform::Host,
             unreleased_mode,
             metadata.target_directory.as_std_path(),
             &cargo_flags,
@@ -159,14 +158,14 @@ pub(crate) fn install_extension(
     is_test: bool,
     base_directory: Option<PathBuf>,
     features: &clap_cargo::Features,
-    target: Option<&str>,
-    target_info: TargetInfo<'_>,
+    platform: Platform<'_>,
     unreleased_mode: UnreleasedFragmentMode,
     target_dir: &Path,
     cargo_flags: &[String],
     prefix_directory: Option<PathBuf>,
 ) -> eyre::Result<Vec<PathBuf>> {
     let mut output_tracking = Vec::new();
+    let target = platform.target();
 
     let manifest = Manifest::from_path(package_manifest_path)?;
     let (control_file, extname) = find_control_file(package_manifest_path)?;
@@ -185,12 +184,11 @@ pub(crate) fn install_extension(
         manifest_path_for_build(user_manifest_path, user_package, package_manifest_path);
     let build_command_output = build_extension(
         pg_config,
-        target_info,
+        platform,
         build_manifest_path,
         user_package,
         profile,
         features,
-        target,
         EffectiveExtVersion(&effective_version),
         cargo_flags,
     )?;
@@ -388,22 +386,34 @@ fn copy_file(
 #[derive(Debug, Clone, Copy)]
 pub(crate) struct EffectiveExtVersion<'a>(pub(crate) &'a str);
 
-/// What the `pgrx-pg-sys` build does with a target bundle's generated sources.
+/// The platform an extension is built for, and where its `pgrx-pg-sys` gets the sources it
+/// would otherwise generate from this machine's PostgreSQL headers.
 #[derive(Clone, Copy, Debug)]
-pub(crate) enum TargetInfo<'a> {
-    /// Generate them from this machine's PostgreSQL headers, as an ordinary build does.
-    Generate,
-    /// Generate them and also write them to this directory, to go into a bundle.
-    Export(&'a Path),
-    /// Take them from this directory, unpacked from a bundle, and generate nothing.
-    Import(&'a Path),
+pub(crate) enum Platform<'a> {
+    /// This machine, generating as an ordinary build does.
+    Host,
+    /// This machine, also writing what it generates to this directory, to go into a bundle.
+    HostForBundle(&'a Path),
+    /// A bundle's platform. A full bundle's sources are unpacked in `generated`, and the build
+    /// generates nothing; a partial bundle has none, and the build generates from its headers.
+    Bundle { target: &'a str, generated: Option<&'a Path> },
+}
+
+impl<'a> Platform<'a> {
+    /// The Rust target to build for, or `None` for this machine.
+    pub(crate) fn target(self) -> Option<&'a str> {
+        match self {
+            Self::Host | Self::HostForBundle(_) => None,
+            Self::Bundle { target, .. } => Some(target),
+        }
+    }
 }
 
 /// Tell the `pgrx-pg-sys` build script what to do about a bundle. It reads these variables;
 /// only cargo-pgrx sets them, so ones left in this process's environment are removed.
 fn select_target_info(
     command: &mut std::process::Command,
-    target_info: TargetInfo<'_>,
+    platform: Platform<'_>,
     pg_config: &PgConfig,
 ) -> eyre::Result<()> {
     const EXPORT: &str = "PGRX_PG_SYS_EXTRA_TARGET_INFO_PATH";
@@ -413,12 +423,12 @@ fn select_target_info(
             command.env_remove(name);
         }
     }
-    match target_info {
-        TargetInfo::Generate => {}
-        TargetInfo::Export(directory) => {
+    match platform {
+        Platform::Host | Platform::Bundle { generated: None, .. } => {}
+        Platform::HostForBundle(directory) => {
             command.env(EXPORT, directory);
         }
-        TargetInfo::Import(directory) => {
+        Platform::Bundle { generated: Some(directory), .. } => {
             command.env(format!("{IMPORT}_PG{}", pg_config.major_version()?), directory);
         }
     }
@@ -472,12 +482,11 @@ fn select_build_postgres(command: &mut std::process::Command, pg_config: &PgConf
 
 pub(crate) fn build_extension(
     pg_config: &PgConfig,
-    target_info: TargetInfo<'_>,
+    platform: Platform<'_>,
     manifest_path: Option<&Path>,
     user_package: Option<&str>,
     profile: &CargoProfile,
     features: &clap_cargo::Features,
-    target: Option<&str>,
     extversion: EffectiveExtVersion<'_>,
     cargo_flags: &[String],
 ) -> eyre::Result<std::process::Output> {
@@ -486,7 +495,7 @@ pub(crate) fn build_extension(
     let mut command = crate::cargo::cargo();
     command.env("CARGO_PGRX_EXTVERSION", extversion.0);
     select_build_postgres(&mut command, pg_config);
-    select_target_info(&mut command, target_info, pg_config)?;
+    select_target_info(&mut command, platform, pg_config)?;
     command.arg("rustc");
     command.arg("--lib");
 
@@ -525,6 +534,7 @@ pub(crate) fn build_extension(
         command.arg(arg);
     }
 
+    let target = platform.target();
     if let Some(target) = target {
         command.arg("--target");
         command.arg(target);

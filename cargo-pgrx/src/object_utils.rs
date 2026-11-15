@@ -24,17 +24,23 @@ pub(crate) fn schema_section_data<'a>(
 ) -> eyre::Result<Option<&'a [u8]>> {
     let kind = object::FileKind::parse(data).wrap_err("couldn't parse binary kind")?;
 
-    match kind {
+    let slice = match kind {
         object::FileKind::MachOFat32 => {
             let fat = MachOFatFile32::parse(data).wrap_err("couldn't parse universal Mach-O")?;
-            schema_section_data(slice_arch(data, fat.arches(), target_arch(target))?, target)
+            slice_arch(data, fat.arches(), target_arch(target))?
         }
         object::FileKind::MachOFat64 => {
             let fat = MachOFatFile64::parse(data).wrap_err("couldn't parse universal Mach-O")?;
-            schema_section_data(slice_arch(data, fat.arches(), target_arch(target))?, target)
+            slice_arch(data, fat.arches(), target_arch(target))?
         }
-        object::FileKind::MachO32 | object::FileKind::MachO64 => macho_schema_section_data(data),
-        _ => schema_section_data_from_object(data),
+        object::FileKind::MachO32 | object::FileKind::MachO64 => data,
+        _ => return schema_section_data_from_object(data),
+    };
+    // A slice is one architecture's Mach-O. Anything else, such as another universal file, is
+    // not something a linker writes.
+    match object::FileKind::parse(slice).wrap_err("couldn't parse Mach-O slice")? {
+        object::FileKind::MachO32 | object::FileKind::MachO64 => macho_schema_section_data(slice),
+        _ => bail!("a universal Mach-O slice is not a single-architecture Mach-O"),
     }
 }
 
@@ -417,6 +423,26 @@ mod tests {
     }
 
     #[test]
+    fn a_universal_slice_must_be_one_architecture() {
+        for bits64 in [false, true] {
+            // A universal file whose arm64 slice is the whole file, itself universal.
+            let mut bytes = universal_macho(bits64);
+            let entry = 8 + if bits64 { 32 } else { 20 };
+            let (offset, size, len) =
+                (entry + 8, entry + if bits64 { 16 } else { 12 }, bytes.len());
+            if bits64 {
+                bytes[offset..offset + 8].copy_from_slice(&0u64.to_be_bytes());
+                bytes[size..size + 8].copy_from_slice(&(len as u64).to_be_bytes());
+            } else {
+                bytes[offset..offset + 4].copy_from_slice(&0u32.to_be_bytes());
+                bytes[size..size + 4].copy_from_slice(&(len as u32).to_be_bytes());
+            }
+            let error = schema_section_data(&bytes, Some("aarch64-apple-darwin")).unwrap_err();
+            assert!(error.to_string().contains("single-architecture"), "{error:#}");
+        }
+    }
+
+    #[test]
     fn universal_schema_rejects_invalid_slice_bounds() {
         for bits64 in [false, true] {
             let mut bytes = universal_macho(bits64);
@@ -440,7 +466,7 @@ mod tests {
         let fixture_path = format!("{root_path}/tests/fixtures/macos-universal-binary");
         let bin = std::fs::read(fixture_path).unwrap();
 
-        assert!(schema_section_data(&bin, None).unwrap().is_none());
+        assert!(schema_section_data(&bin, Some("aarch64-apple-darwin")).unwrap().is_none());
     }
 
     #[test]

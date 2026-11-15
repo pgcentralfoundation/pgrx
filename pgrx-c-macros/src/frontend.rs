@@ -2995,8 +2995,7 @@ pub(crate) fn validate_driver_configuration(verbose: &str) -> Result<(), Fronten
 /// An MSVC target also keeps incompatible pointer types a warning, as its own compiler does.
 pub(crate) fn prepare_arguments(arguments: &[String]) -> Result<Vec<String>, FrontendError> {
     let normalized = normalize_arguments(arguments)?;
-    let msvc = explicit_target(&normalized)
-        .map_or(cfg!(target_env = "msvc"), crate::model::is_msvc_triple);
+    let msvc = crate::model::targets_msvc(explicit_target(&normalized));
     let mut prepared = crate::lower_msvc_runtime_flags(&normalized, msvc)?;
     if msvc && !prepared.iter().any(|argument| argument == MSVC_POINTER_TYPE_WARNING) {
         // First, so an explicit warning option later in the profile still decides.
@@ -3042,7 +3041,7 @@ pub const MSVC_POINTER_TYPE_WARNING: &str = "-Wno-error=incompatible-pointer-typ
 /// refused rather than silently changing the inspected inputs.
 fn normalize_arguments(arguments: &[String]) -> Result<Vec<String>, FrontendError> {
     let mut normalized = Vec::with_capacity(arguments.len());
-    let windows = explicit_target(arguments).map_or(cfg!(windows), crate::model::is_windows_triple);
+    let windows = crate::model::targets_windows(explicit_target(arguments));
     let mut arguments = arguments.iter();
     while let Some(argument) = arguments.next() {
         // Option operands are paths or definitions, not independent switches.

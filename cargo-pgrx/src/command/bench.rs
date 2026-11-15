@@ -141,7 +141,6 @@ impl CommandExecute for Bench {
             &features,
             false,
             false,
-            None,
             &target_dir,
             &postgresql_conf,
             crate::command::migrate::UnreleasedFragmentMode::for_development(

@@ -170,7 +170,7 @@ an error.
 | `${DESCRIPTION}`      | The crate description                                          |
 | `${LICENSE}`          | The crate license                                              |
 | `${MAINTAINER}`       | The first entry of the crate's `authors`                       |
-| `${ARCH}`             | The `--target` architecture, or the host's if there isn't one  |
+| `${ARCH}`             | The bundle's architecture, or the host's if there isn't one    |
 | `${PG_MAJOR_VERSION}` | The Postgres major version, such as `17`                       |
 | `${PG_PKGLIBDIR}`     | `pg_config --pkglibdir`                                        |
 | `${PG_SHAREDIR}`      | `pg_config --sharedir`                                         |
@@ -188,8 +188,8 @@ treat `1.0.0-rc.1` as newer than `1.0.0`. Both sort `1.0.0~rc.1` before `1.0.0`.
 
 ### Things to Know
 
-- RPM and DEB packages can only be built on Linux. On other platforms, `cargo pgrx package` prints a
-  warning, skips them, and still produces the package directory.
+- RPM and DEB packages are built only for a Linux target, from any host. For other targets,
+  `cargo pgrx package` prints a warning, skips them, and still produces the package directory.
 - `cargo pgrx install --sudo` stages its files the same way but never builds these packages.
 - `--no-distrib-packages` skips these packages for one build, such as a container build that only
   copies the staged files.
@@ -197,7 +197,7 @@ treat `1.0.0-rc.1` as newer than `1.0.0`. Both sort `1.0.0~rc.1` before `1.0.0`.
   file it finds. Delete the directory before a release so SQL files from older versions don't ship.
 - The default `files` and `dirs` expect the layout from `pg_config`. If you pass `--prefix-dir`,
   override both keys with paths under `${BUILD_BASE_PATH}`.
-- `${ARCH}` is the first part of a `--target` triple. If the package format doesn't recognize it, as
+- `${ARCH}` is the first part of the bundle's target triple. If the package format doesn't recognize it, as
   with `powerpc64le`, set `arch` in your section.
 - Packages are unsigned, and the RPM release number is always `1`.
 - `cargo deb` reads `[package.metadata.deb]` too, with different rules, so a section written for it

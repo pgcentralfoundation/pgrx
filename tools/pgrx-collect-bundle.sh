@@ -11,7 +11,8 @@
 #
 # It needs tar and a POSIX shell, and no Rust or C compiler. On Windows, run it in Git Bash.
 #
-# This script copies what it is given and does not check it. `cargo pgrx package --bundle`
+# This script copies what it is given. It stops only when it lacks what it needs to collect:
+# the version that names the file, and the directories it copies. `cargo pgrx package --bundle`
 # checks the bundle when it uses it.
 
 set -eu

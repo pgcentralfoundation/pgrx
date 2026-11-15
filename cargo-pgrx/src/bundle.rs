@@ -143,7 +143,7 @@ pub(crate) struct Bundle {
     pub(crate) pg_config: PgConfig,
     /// The generated sources and native archive for the `pgrx-pg-sys` build to import. A
     /// partial bundle has none: the build generates them from the bundle's headers.
-    pub(crate) target_info: Option<PathBuf>,
+    pub(crate) generated: Option<PathBuf>,
 }
 
 impl Bundle {
@@ -168,16 +168,24 @@ impl Bundle {
             std::fs::write(root.join(UNPACKED), &identity)?;
         }
 
-        if root.join(DESCRIPTION).is_file() {
-            Self::full(file, &root)
+        let bundle = if root.join(DESCRIPTION).is_file() {
+            Self::full(file, &root)?
         } else if root.join(PARTIAL).is_file() {
-            Self::partial(file, &root)
+            Self::partial(file, &root)?
         } else {
             bail!(
                 "{} is not a pgrx bundle: it has neither {DESCRIPTION} nor {PARTIAL}",
                 file.display()
             )
-        }
+        };
+        // The target goes to Cargo as `--target`.
+        ensure!(
+            is_target_triple(&bundle.target),
+            "{} names `{}` as its Rust target, which is not a target triple such as aarch64-unknown-linux-gnu; make the bundle again with that platform's target",
+            file.display(),
+            bundle.target
+        );
+        Ok(bundle)
     }
 
     /// A bundle that `cargo pgrx package --bundle-generate` wrote on its target.
@@ -206,7 +214,7 @@ impl Bundle {
         Ok(Self {
             target: description.target,
             pg_config: PgConfig::from_properties(properties),
-            target_info: Some(target_info),
+            generated: Some(target_info),
         })
     }
 
@@ -225,11 +233,6 @@ impl Bundle {
             format.trim()
         );
         let target = read(PARTIAL_TARGET)?.trim().to_owned();
-        ensure!(
-            is_target_triple(&target),
-            "{} names `{target}` as its Rust target, which is not a target triple such as aarch64-unknown-linux-gnu; collect it again with that platform's `--target=`",
-            file.display()
-        );
         let server_headers = root.join(SERVER_HEADERS);
         ensure!(
             server_headers.join("pg_config.h").is_file(),
@@ -239,7 +242,7 @@ impl Bundle {
 
         let reported = parse_pg_config(&read(PARTIAL_PG_CONFIG)?);
         let mut properties = BTreeMap::new();
-        for required in ["version", "pkglibdir", "sharedir", "cppflags"] {
+        for required in PROPERTIES.into_iter().chain(["cppflags"]) {
             // The preprocessor flags may be empty, but the bundle has to say that they are.
             let value = reported
                 .get(required)
@@ -283,7 +286,7 @@ impl Bundle {
                 reported["version"]
             )
         })?;
-        Ok(Self { target, pg_config, target_info: None })
+        Ok(Self { target, pg_config, generated: None })
     }
 }
 
@@ -307,9 +310,13 @@ fn parse_pg_config(text: &str) -> BTreeMap<String, String> {
 
 /// Unpack a bundle's regular files and directories. A bundle has nothing else, so any other
 /// kind of entry, or one that would land outside `root`, is refused.
+///
+/// The files take the time of unpacking. Cargo reruns a build script only for an input newer
+/// than its last run, and an archive's own times can be older than that.
 fn unpack(file: &Path, root: &Path) -> eyre::Result<()> {
     let file = File::open(file)?;
     let mut archive = tar::Archive::new(flate2::read::GzDecoder::new(file));
+    archive.set_preserve_mtime(false);
     for entry in archive.entries()? {
         let mut entry = entry?;
         let kind = entry.header().entry_type();
@@ -377,8 +384,7 @@ mod tests {
         assert_eq!(bundle.pg_config.sharedir().unwrap(), Path::new("/usr/share/postgresql/18"));
         assert!(bundle.pg_config.lib_dir().unwrap().is_dir(), "the link directory is local");
         assert_eq!(
-            std::fs::read_to_string(bundle.target_info.unwrap().join("cmacros/pg18/mod.rs"))
-                .unwrap(),
+            std::fs::read_to_string(bundle.generated.unwrap().join("cmacros/pg18/mod.rs")).unwrap(),
             "// generated"
         );
     }
@@ -396,17 +402,22 @@ mod tests {
         let exported = target_info(directory, "aarch64-unknown-linux-gnu");
         let file = write(&pg_config, &exported, &directory.join("out")).unwrap();
         let scratch = directory.join("scratch");
-        let generated = Bundle::open(&file, &scratch).unwrap().target_info.unwrap();
+        let generated = Bundle::open(&file, &scratch).unwrap().generated.unwrap();
         let generated = generated.join("cmacros/pg18/mod.rs");
         std::fs::write(&generated, "// left alone").unwrap();
         Bundle::open(&file, &scratch).unwrap();
         assert_eq!(std::fs::read_to_string(&generated).unwrap(), "// left alone");
 
-        // Another file of the same name is unpacked afresh.
-        std::fs::write(exported.join("cmacros/pg18/mod.rs"), "// generated again").unwrap();
+        // Another file of the same name is unpacked afresh, and looks changed to Cargo even
+        // when it was generated before the last build here.
+        let source = exported.join("cmacros/pg18/mod.rs");
+        std::fs::write(&source, "// generated again").unwrap();
+        let long_ago = std::time::UNIX_EPOCH + std::time::Duration::from_secs(1_000_000_000);
+        File::options().write(true).open(&source).unwrap().set_modified(long_ago).unwrap();
         write(&pg_config, &exported, &directory.join("out")).unwrap();
         Bundle::open(&file, &scratch).unwrap();
         assert_eq!(std::fs::read_to_string(&generated).unwrap(), "// generated again");
+        assert!(std::fs::metadata(&generated).unwrap().modified().unwrap() > long_ago);
     }
 
     #[test]
@@ -461,7 +472,7 @@ mod tests {
         let file = partial_bundle(directory, "aarch64-unknown-linux-gnu", REPORTED, false);
         let bundle = Bundle::open(&file, &directory.join("scratch")).unwrap();
         assert_eq!(bundle.target, "aarch64-unknown-linux-gnu");
-        assert!(bundle.target_info.is_none(), "nothing was generated for the build to import");
+        assert!(bundle.generated.is_none(), "nothing was generated for the build to import");
         let pg_config = &bundle.pg_config;
         assert_eq!(pg_config.major_version().unwrap(), 18);
         // Where the package goes is the target's; what the build reads is unpacked here.
@@ -580,6 +591,14 @@ mod tests {
         });
         let error = Bundle::open(&newer, &directory.join("scratch")).unwrap_err();
         assert!(error.to_string().contains("format 2 bundle"), "{error}");
+
+        let pathlike = archive("pathlike.tar.gz", &|archive| {
+            let description = br#"{"format": 1, "target": "../x86_64-unknown-linux-gnu", "pg_config": {"version": "PostgreSQL 18.1", "pkglibdir": "/l", "sharedir": "/s"}}"#;
+            data(archive, DESCRIPTION, description);
+            data(archive, "target-info/pg18_target_artifact.json", b"{}");
+        });
+        let error = Bundle::open(&pathlike, &directory.join("scratch")).unwrap_err();
+        assert!(error.to_string().contains("is not a target triple"), "{error}");
 
         let link = archive("link.tar.gz", &|archive| {
             let mut header = tar::Header::new_gnu();

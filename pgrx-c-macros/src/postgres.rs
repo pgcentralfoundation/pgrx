@@ -30,7 +30,7 @@ pub fn postgres_clang_flags_for_target(
     flags: &str,
     target: Option<&str>,
 ) -> Result<Vec<String>, FrontendError> {
-    if target.map_or(cfg!(target_env = "msvc"), crate::model::is_msvc_triple) {
+    if crate::model::targets_msvc(target) {
         postgres_clang_flags(flags, true)
     } else {
         Ok(split_recorded_cflags_for_target(flags, target)?.unwrap_or_default())
@@ -47,8 +47,7 @@ pub fn split_recorded_cflags_for_target(
     flags: &str,
     target: Option<&str>,
 ) -> Result<Option<Vec<String>>, FrontendError> {
-    let windows = target.map_or(cfg!(windows), crate::model::is_windows_triple);
-    crate::split_recorded_cflags(flags, windows)
+    crate::split_recorded_cflags(flags, crate::model::targets_windows(target))
 }
 
 /// PostgreSQL function macros and the other definitions needed to interpret them.
@@ -124,7 +123,7 @@ impl PostgresConfig {
         let server_include_dir = include_dir.clone();
         let major_version = pg_config.major_version()?;
         let mut directories = vec![include_dir];
-        if target.map_or(cfg!(target_env = "msvc"), crate::model::is_msvc_triple) {
+        if crate::model::targets_msvc(target) {
             directories.push(pg_config.pkgincludedir()?);
             directories.push(pg_config.includedir_server_port_win32()?);
             directories.push(pg_config.includedir_server_port_win32_msvc()?);
