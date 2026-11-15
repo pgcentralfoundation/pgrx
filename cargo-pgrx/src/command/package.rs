@@ -52,7 +52,7 @@ pub(crate) struct Package {
     pub(crate) out_dir: Option<PathBuf>,
     #[clap(flatten)]
     pub(crate) features: clap_cargo::Features,
-    /// Package for the platform and PostgreSQL of this bundle, collected there with `tools/pgrx-collect-bundle.sh` or generated with `--bundle-generate`
+    /// Package for the platform and PostgreSQL of this bundle, collected there with `tools/pgrx-collect-partial-bundle.sh` or generated with `--bundle-generate`
     #[clap(long, value_name = "FILE", value_parser, conflicts_with_all = ["pg_config", "bundle_generate"])]
     pub(crate) bundle: Option<PathBuf>,
     /// Write a full bundle for this machine's platform, PostgreSQL and pgrx version instead of packaging, so other machines can package for it with `--bundle`

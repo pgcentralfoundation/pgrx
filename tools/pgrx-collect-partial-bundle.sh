@@ -19,7 +19,7 @@ set -eu
 
 usage() {
     cat >&2 <<'EOF'
-usage: pgrx-collect-bundle.sh --target=RUST_TARGET [options]
+usage: pgrx-collect-partial-bundle.sh --target=RUST_TARGET [options]
 
   --target=RUST_TARGET     the Rust target triple of the platform, such as
                            aarch64-unknown-linux-gnu (required)
@@ -43,7 +43,7 @@ EOF
 }
 
 fail() {
-    echo "pgrx-collect-bundle.sh: $*" >&2
+    echo "pgrx-collect-partial-bundle.sh: $*" >&2
     exit 1
 }
 

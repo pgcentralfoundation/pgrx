@@ -10,7 +10,7 @@ the target's PostgreSQL, that `cargo pgrx package` builds from anywhere else.
    uses:
 
     ```sh
-    sh pgrx-collect-bundle.sh --target=aarch64-unknown-linux-gnu
+    sh pgrx-collect-partial-bundle.sh --target=aarch64-unknown-linux-gnu
     ```
 
     This writes `pgrx-pg18-aarch64-unknown-linux-gnu.partial.tar.gz`, named for
@@ -67,13 +67,13 @@ different configure options.
 
 ## Collect a partial bundle
 
-`tools/pgrx-collect-bundle.sh`, in the pgrx repository, collects what must come
-from the target: PostgreSQL's server headers and what `pg_config` reports. Take
-the script from the tag of the pgrx release your extension uses, and copy it to
-the target.
+`tools/pgrx-collect-partial-bundle.sh`, in the pgrx repository, collects what
+must come from the target: PostgreSQL's server headers and what `pg_config`
+reports. Take the script from the tag of the pgrx release your extension uses,
+and copy it to the target.
 
 ```sh
-sh pgrx-collect-bundle.sh --target=aarch64-unknown-linux-gnu
+sh pgrx-collect-partial-bundle.sh --target=aarch64-unknown-linux-gnu
 ```
 
 The script needs `tar` and a POSIX shell; on Windows, run it in Git Bash. It is
@@ -116,7 +116,7 @@ A sysroot from Yocto or Buildroot holds the target's server headers, but its
 the sysroot. Run the script there and state the properties:
 
 ```sh
-sh pgrx-collect-bundle.sh \
+sh pgrx-collect-partial-bundle.sh \
     --target=aarch64-unknown-linux-gnu \
     --version='PostgreSQL 18.1' \
     --includedir-server="$SYSROOT/usr/include/postgresql/server" \
@@ -141,7 +141,7 @@ If the target can run `pg_config` but the script has to run elsewhere, save
 directory on this machine:
 
 ```sh
-sh pgrx-collect-bundle.sh \
+sh pgrx-collect-partial-bundle.sh \
     --target=aarch64-unknown-linux-gnu \
     --pg-config-file=pg_config.txt \
     --includedir-server="$SYSROOT/usr/include/postgresql/server"

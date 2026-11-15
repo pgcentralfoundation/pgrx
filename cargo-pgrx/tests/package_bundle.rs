@@ -415,7 +415,8 @@ fn a_collected_partial_bundle_supplies_headers_to_the_build() {
     // Run the script with `--name=value` arguments, and return the bundle it wrote in `out`.
     let collect = |out: &str, arguments: &[(&str, &std::ffi::OsStr)]| {
         let mut command = Command::new("sh");
-        command.arg(concat!(env!("CARGO_MANIFEST_DIR"), "/../tools/pgrx-collect-bundle.sh"));
+        command
+            .arg(concat!(env!("CARGO_MANIFEST_DIR"), "/../tools/pgrx-collect-partial-bundle.sh"));
         let out = root.join(out);
         for (name, value) in arguments.iter().copied().chain([("--out-dir=", out.as_os_str())]) {
             let mut argument = std::ffi::OsString::from(name);
@@ -555,7 +556,7 @@ fn read_only_headers_are_collected() {
         argument
     };
     let output = Command::new("sh")
-        .arg(concat!(env!("CARGO_MANIFEST_DIR"), "/../tools/pgrx-collect-bundle.sh"))
+        .arg(concat!(env!("CARGO_MANIFEST_DIR"), "/../tools/pgrx-collect-partial-bundle.sh"))
         .args(["--target=x86_64-pc-windows-msvc", "--version=PostgreSQL 18.7"])
         .arg(argument("--includedir-server=", &include.join("server")))
         .arg(argument("--pkgincludedir=", &include))

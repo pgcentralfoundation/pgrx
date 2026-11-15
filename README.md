@@ -228,7 +228,7 @@ For more details on how to manage pgrx extensions see [Managing pgrx extensions]
 Cross-compiling builds an extension on one machine for another platform. pgrx
 does it from a *target bundle*, one file made from the target's PostgreSQL:
 
-1) On the target platform, run [`tools/pgrx-collect-bundle.sh`](tools/pgrx-collect-bundle.sh).
+1) On the target platform, run [`tools/pgrx-collect-partial-bundle.sh`](tools/pgrx-collect-partial-bundle.sh).
    It needs only a POSIX shell, `tar` and PostgreSQL's server headers, and writes a *partial bundle*
    such as `pgrx-pg18-aarch64-unknown-linux-gnu.partial.tar.gz`. It can also take what `pg_config`
    reports from a file or from arguments, for headers in a sysroot whose `pg_config` cannot run.

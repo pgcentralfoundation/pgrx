@@ -16,7 +16,7 @@
 //!   itself when a build imports it;
 //! - `lib/postgres.lib`, for MSVC targets, whose extensions link against it.
 //!
-//! A partial bundle is collected by `tools/pgrx-collect-bundle.sh`, for a platform that has
+//! A partial bundle is collected by `tools/pgrx-collect-partial-bundle.sh`, for a platform that has
 //! PostgreSQL's server headers but no Rust or Clang. It holds only what must come from there:
 //!
 //! - `partial-bundle`, the version of this layout;
@@ -268,8 +268,8 @@ impl Bundle {
         })
     }
 
-    /// A bundle that `tools/pgrx-collect-bundle.sh` collected. Its `pg_config` values are the
-    /// target's, except the directories the build reads, which are the unpacked ones here.
+    /// A bundle that `tools/pgrx-collect-partial-bundle.sh` collected. Its `pg_config` values are
+    /// the target's, except the directories the build reads, which are the unpacked ones here.
     fn partial(file: &Path, root: &Path) -> eyre::Result<Self> {
         let read = |name: &str| {
             std::fs::read_to_string(root.join(name))
@@ -530,7 +530,7 @@ mod tests {
         assert_eq!(reported["version"], "PostgreSQL 18.1");
     }
 
-    /// Build the archive that `tools/pgrx-collect-bundle.sh` writes.
+    /// Build the archive that `tools/pgrx-collect-partial-bundle.sh` writes.
     fn partial_bundle(directory: &Path, target: &str, pg_config: &str, msvc: bool) -> PathBuf {
         let staging = directory.join("staging");
         let _ = std::fs::remove_dir_all(&staging);

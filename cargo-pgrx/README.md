@@ -909,7 +909,7 @@ Options:
       --all-features                   Activate all available features
       --no-default-features            Do not activate the `default` feature
   -F, --features <FEATURES>            Space-separated list of features to activate
-      --bundle <FILE>                  Package for the platform and PostgreSQL of this bundle, collected there with `tools/pgrx-collect-bundle.sh` or generated with `--bundle-generate`
+      --bundle <FILE>                  Package for the platform and PostgreSQL of this bundle, collected there with `tools/pgrx-collect-partial-bundle.sh` or generated with `--bundle-generate`
       --bundle-generate                Write a full bundle for this machine's platform, PostgreSQL and pgrx version instead of packaging, so other machines can package for it with `--bundle`
       --assemble-unreleased            Assemble unreleased SQL fragments into the package instead of refusing to build it
       --no-assemble-unreleased         Build the package without unreleased SQL fragments instead of refusing to build it
@@ -941,8 +941,8 @@ the PostgreSQL it is laid out for. That PostgreSQL's server headers must be
 installed.
 
 To package for another platform, collect a target bundle there with
-`tools/pgrx-collect-bundle.sh`, copy the file to the build host, and pass it to
-`cargo pgrx package --bundle <FILE>`. The bundle names the target and describes
+`tools/pgrx-collect-partial-bundle.sh`, copy the file to the build host, and pass
+it to `cargo pgrx package --bundle <FILE>`. The bundle names the target and describes
 its PostgreSQL, so `--bundle` cannot be combined with `--pg-config`, and
 packaging from it needs no `pg_config` executable, `cargo pgrx init`, or
 `$PGRX_HOME/config.toml`. `cargo pgrx package` is the only command that builds

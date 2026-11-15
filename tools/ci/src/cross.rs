@@ -8,8 +8,9 @@
 //! packages without running any of their code.
 //!
 //! The bundle comes from the target platform: `cargo pgrx package --bundle-generate`, or
-//! `tools/pgrx-collect-bundle.sh` for a partial bundle. The packages must be laid out for the
-//! directories the bundle's `pg_config` reported, and their libraries must be the target's.
+//! `tools/pgrx-collect-partial-bundle.sh` for a partial bundle. The packages must be laid out
+//! for the directories the bundle's `pg_config` reported, and their libraries must be the
+//! target's.
 
 use std::collections::BTreeMap;
 use std::io::Read;
