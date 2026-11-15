@@ -52,10 +52,10 @@ pub(crate) struct Package {
     pub(crate) out_dir: Option<PathBuf>,
     #[clap(flatten)]
     pub(crate) features: clap_cargo::Features,
-    /// Package for the platform and PostgreSQL of this bundle, made there with `--bundle-generate` or collected with `tools/pgrx-collect-bundle.sh`
+    /// Package for the platform and PostgreSQL of this bundle, collected there with `tools/pgrx-collect-bundle.sh` or generated with `--bundle-generate`
     #[clap(long, value_name = "FILE", value_parser, conflicts_with_all = ["pg_config", "bundle_generate"])]
     pub(crate) bundle: Option<PathBuf>,
-    /// Write a bundle for this machine's platform and PostgreSQL instead of packaging, so other machines can package for it with `--bundle`
+    /// Write a full bundle for this machine's platform, PostgreSQL and pgrx version instead of packaging, so other machines can package for it with `--bundle`
     #[clap(long, conflicts_with_all = ["test", "prefix_dir", "no_distrib_packages", "assemble_unreleased", "no_assemble_unreleased"])]
     pub(crate) bundle_generate: bool,
     /// Assemble unreleased SQL fragments into the package instead of refusing to build it
@@ -109,6 +109,12 @@ impl Package {
         let platform = match self.bundle.as_deref() {
             Some(file) => {
                 bundle = Bundle::open(file, metadata.target_directory.as_std_path())?;
+                // `pgrx-bindgen` is the generator whose version a full bundle must match.
+                let pgrx = metadata.packages.iter().find(|package| package.name == "pgrx-bindgen");
+                bundle.require_pgrx(
+                    file,
+                    pgrx.map(|package| package.version.to_string()).as_deref(),
+                )?;
                 Platform::Bundle(&bundle)
             }
             None => {
@@ -240,9 +246,10 @@ pub(crate) fn package_extension(
     )
 }
 
-/// Build the extension on this machine with its `pgrx-pg-sys` exporting what it generates, and
-/// put that with `pg_config`'s values into one bundle file. Nothing is staged: the build is
-/// only how the generated sources come to match the extension's pgrx version and features.
+/// Check the extension on this machine with its `pgrx-pg-sys` exporting what it generates, and
+/// put that with `pg_config`'s values into one bundle file. The extension is neither compiled
+/// nor staged: the check is only how the generated sources come to match its pgrx version and
+/// features.
 fn generate_bundle(
     pg_config: &PgConfig,
     user_manifest_path: Option<&Path>,

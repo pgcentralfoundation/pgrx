@@ -887,7 +887,7 @@ fn cross_builds_accept_only_target_headers() {
         build().output().unwrap(),
         &[
             &format!("pg_config.h was configured for {} (PG_VERSION_STR)", cross.host_machine),
-            &format!("so to package for {}, make a bundle there", cross.target),
+            &format!("so to package for {}, collect a bundle there", cross.target),
             "`cargo pgrx package --bundle-generate`",
         ],
     );

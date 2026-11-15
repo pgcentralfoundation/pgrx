@@ -360,7 +360,8 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: pg18-linux-arm64-bundle
-          path: ${{ runner.temp }}/bundle/pgrx-pg18-aarch64-unknown-linux-gnu.tar.gz
+          # The name starts with the pgrx version that generated the bundle.
+          path: ${{ runner.temp }}/bundle/pgrx-*-pg18-aarch64-unknown-linux-gnu.tar.gz
           if-no-files-found: error
           retention-days: 1
 
@@ -395,8 +396,8 @@ jobs:
       - name: Package from the bundle and check the ARM64 package
         run: |
           cargo build --locked -p pgrx-ci
-          target/debug/pgrx-ci cross-package \
-            --bundle "$RUNNER_TEMP/bundle/pgrx-pg18-aarch64-unknown-linux-gnu.tar.gz"
+          bundle=$(echo "$RUNNER_TEMP"/bundle/pgrx-*-pg18-aarch64-unknown-linux-gnu.tar.gz)
+          target/debug/pgrx-ci cross-package --bundle "$bundle"
 
   miri:
     name: Miri

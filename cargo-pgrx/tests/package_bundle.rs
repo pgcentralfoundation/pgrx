@@ -107,7 +107,10 @@ fn main() {
     if let Some(directory) = std::env::var_os(EXPORT) {
         let directory = std::path::PathBuf::from(directory);
         let target = std::env::var("TARGET").unwrap();
-        let manifest = format!(r##"{{"domain": {{"major": 18, "rust_target": "{target}"}}}}"##);
+        let version = std::env::var("CARGO_PKG_VERSION").unwrap();
+        let manifest = format!(
+            r##"{{"domain": {{"major": 18, "rust_target": "{target}", "generator_version": "{version}"}}}}"##
+        );
         std::fs::write(directory.join("pg18_target_artifact.json"), manifest).unwrap();
         std::fs::write(directory.join("generated.rs"), "// generated").unwrap();
     }
@@ -329,7 +332,8 @@ fn host_triple() -> String {
     version.lines().find_map(|line| line.strip_prefix("host: ")).unwrap().trim().to_owned()
 }
 
-/// `--bundle-generate` writes one file for this platform and PostgreSQL and stages nothing.
+/// `--bundle-generate` writes one file for this platform, PostgreSQL and pgrx version, and
+/// neither compiles the extension nor stages it.
 /// `--bundle` then packages from that file alone: it names the target and describes its
 /// PostgreSQL, and no `pg_config` program runs.
 #[test]
@@ -340,9 +344,15 @@ fn a_generated_bundle_is_all_that_packaging_needs() {
 
     let output = fixture.command().arg("--bundle-generate").output().unwrap();
     assert!(output.status.success(), "{}", combined_output(&output));
-    let bundle = root.join("target").join(format!("pgrx-pg18-{host}.tar.gz"));
+    let bundle = root.join("target").join(format!("pgrx-0.1.0-pg18-{host}.tar.gz"));
     assert!(bundle.is_file(), "{}", combined_output(&output));
     assert!(!root.join("target/debug/package_environment_test-pg18").exists());
+    let library = format!(
+        "{}package_environment_test{}",
+        std::env::consts::DLL_PREFIX,
+        std::env::consts::DLL_SUFFIX
+    );
+    assert!(!root.join("target/debug").join(library).exists(), "the extension was compiled");
     let seen = fixture.build_saw();
     assert_no_header_overrides(&seen);
     let export = seen.iter().find(|(name, _)| name == "PGRX_PG_SYS_EXTRA_TARGET_INFO_PATH");
@@ -358,7 +368,7 @@ fn a_generated_bundle_is_all_that_packaging_needs() {
         .output()
         .unwrap();
     assert!(output.status.success(), "{}", combined_output(&output));
-    assert!(root.join("bundles").join(format!("pgrx-pg18-{host}.tar.gz")).is_file());
+    assert!(root.join("bundles").join(format!("pgrx-0.1.0-pg18-{host}.tar.gz")).is_file());
 
     fs::remove_file(root.join("pg_config-called")).unwrap();
     let output = fixture.command().arg("--bundle").arg(&bundle).output().unwrap();

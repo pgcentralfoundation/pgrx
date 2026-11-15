@@ -226,26 +226,27 @@ For more details on how to manage pgrx extensions see [Managing pgrx extensions]
 ## Cross-compiling
 
 Cross-compiling builds an extension on one machine for another platform. pgrx
-does it from a *target bundle*, one file generated on the target platform:
+does it from a *target bundle*, one file made from the target's PostgreSQL:
 
-1) On the target platform, run `cargo pgrx package --bundle-generate` in your extension's directory.
-   It needs what any pgrx build needs there, and writes a file such as `pgrx-pg18-aarch64-unknown-linux-gnu.tar.gz`.
+1) On the target platform, run [`tools/pgrx-collect-bundle.sh`](tools/pgrx-collect-bundle.sh).
+   It needs only a POSIX shell, `tar` and PostgreSQL's server headers, and writes a *partial bundle*
+   such as `pgrx-pg18-aarch64-unknown-linux-gnu.partial.tar.gz`. It can also take what `pg_config`
+   reports from a file or from arguments, for headers in a sysroot whose `pg_config` cannot run.
 2) Copy that file to the build host.
 3) On the build host, run `cargo pgrx package --bundle <file>`. This needs a Rust toolchain that can link
-   for the target, and no PostgreSQL, `pg_config`, server headers, Clang, or `cargo pgrx init`.
+   for the target, Clang, and the target's system headers, and no PostgreSQL, `pg_config` or `cargo pgrx init`.
 
-A target with PostgreSQL's server headers but no Rust or Clang can collect a *partial bundle* with
-[`tools/pgrx-collect-bundle.sh`](tools/pgrx-collect-bundle.sh) instead. The script also takes what
-`pg_config` reports from a file or from arguments, for headers in a sysroot whose `pg_config` cannot
-run. The build host then also needs Clang and the target's system headers.
+A partial bundle holds nothing generated, so it serves every pgrx version. To need only a linker on
+the build host, generate a *full bundle* instead with `cargo pgrx package --bundle-generate` in your
+extension's directory on the target. That needs Rust and Clang there, and has to be done again after
+each pgrx upgrade, since a full bundle is valid for one Rust target, PostgreSQL major version, pgrx
+version and `cshim` setting.
 
-The bundle is generated on the target because the bindings, C macros and native
+The bundle comes from the target because the bindings, C macros and native
 support that pgrx builds from PostgreSQL's headers depend on how that PostgreSQL
-was built. The target platform can be a container or a CI runner. A bundle is
-valid for one Rust target, PostgreSQL major version, pgrx version and `cshim`
-setting. The
+was built. The target platform can be a container or a CI runner. The
 [cross-compilation guide](docs/src/extension/build/cross-compile.md)
-describes both steps, what pgrx verifies, and cross toolchains.
+describes both kinds of bundle, what pgrx verifies, and cross toolchains.
 
 Library names, package layout, and RPM/DEB generation follow the bundle's
 target. Cargo's `build.target`, `CARGO_BUILD_TARGET`, forwarded Cargo flags, and

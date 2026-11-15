@@ -824,11 +824,13 @@ installation such as Postgres.app builds each slice named by `-arch` in its
 CFLAGS from the same headers, so either slice is accepted; Cargo's target
 replaces the `-arch` flags in the profile.
 
-A cross build therefore starts from a target bundle: `cargo pgrx package
---bundle-generate` on the target platform inspects that platform's headers and
-saves the result, and `cargo pgrx package --bundle` builds from it anywhere
-else. See [the cross-compilation guide](build/cross-compile.md) for both steps,
-the checks, and what remains trusted. Raw bindings alone and
+A cross build therefore starts from a target bundle made from the target's
+PostgreSQL, and `cargo pgrx package --bundle` builds from it anywhere else. A
+partial bundle carries the target's headers for the build host to inspect;
+`cargo pgrx package --bundle-generate` on the target inspects them there and
+saves the result in a full bundle. See
+[the cross-compilation guide](build/cross-compile.md) for both kinds, the
+checks, and what remains trusted. Raw bindings alone and
 checked-in documentation snapshots cannot substitute for the target's inspected
 macro and native support.
 

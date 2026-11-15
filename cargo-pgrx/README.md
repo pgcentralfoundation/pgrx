@@ -909,8 +909,8 @@ Options:
       --all-features                   Activate all available features
       --no-default-features            Do not activate the `default` feature
   -F, --features <FEATURES>            Space-separated list of features to activate
-      --bundle <FILE>                  Package for the platform and PostgreSQL of this bundle, made there with `--bundle-generate` or collected with `tools/pgrx-collect-bundle.sh`
-      --bundle-generate                Write a bundle for this machine's platform and PostgreSQL instead of packaging, so other machines can package for it with `--bundle`
+      --bundle <FILE>                  Package for the platform and PostgreSQL of this bundle, collected there with `tools/pgrx-collect-bundle.sh` or generated with `--bundle-generate`
+      --bundle-generate                Write a full bundle for this machine's platform, PostgreSQL and pgrx version instead of packaging, so other machines can package for it with `--bundle`
       --assemble-unreleased            Assemble unreleased SQL fragments into the package instead of refusing to build it
       --no-assemble-unreleased         Build the package without unreleased SQL fragments instead of refusing to build it
       --no-distrib-packages            Skip the RPM and DEB packages that `[package.metadata.rpm]` and `[package.metadata.deb]` declare
@@ -940,23 +940,27 @@ directory. If you omit `--prefix-dir`, the layout follows `pg_config`. For Windo
 the PostgreSQL it is laid out for. That PostgreSQL's server headers must be
 installed.
 
-To package for another platform, generate a target bundle there with
-`cargo pgrx package --bundle-generate`, copy the file to the build host, and
-pass it to `cargo pgrx package --bundle <FILE>`. The bundle names the target and
-describes its PostgreSQL, so `--bundle` cannot be combined with `--pg-config`,
-and packaging from it needs no `pg_config` executable, server headers, Clang,
-`cargo pgrx init`, or `$PGRX_HOME/config.toml`. `cargo pgrx package` is the only
-command that builds for another platform. See the
+To package for another platform, collect a target bundle there with
+`tools/pgrx-collect-bundle.sh`, copy the file to the build host, and pass it to
+`cargo pgrx package --bundle <FILE>`. The bundle names the target and describes
+its PostgreSQL, so `--bundle` cannot be combined with `--pg-config`, and
+packaging from it needs no `pg_config` executable, `cargo pgrx init`, or
+`$PGRX_HOME/config.toml`. `cargo pgrx package` is the only command that builds
+for another platform. See the
 [cross-compilation guide](../docs/src/extension/build/cross-compile.md).
 
-`--bundle-generate` builds the extension but stages no package. It writes
-`pgrx-pg<NN>-<target>.tar.gz` to Cargo's target directory, or to `--out-dir`.
+The script collects a partial bundle: the target's PostgreSQL server headers and
+what its `pg_config` reports. It checks nothing it collects; `--bundle` does.
+The build generates from those headers itself, so the build host needs Clang
+and the target's system headers.
 
-`--bundle` also takes a partial bundle, which `tools/pgrx-collect-bundle.sh`
-collects from a target's PostgreSQL server headers and what its `pg_config`
-reports, where there is no Rust or Clang. The script checks nothing it
-collects; `--bundle` does. The build then generates from those headers itself,
-so the build host needs Clang and the target's system headers.
+`--bundle-generate`, run on the target, writes a full bundle that also holds
+what `pgrx-pg-sys` generates there, so the build host needs neither. It checks
+the extension with `cargo check` to generate with its exact pgrx version and
+features, and builds and stages nothing. It writes
+`pgrx-<pgrx version>-pg<NN>-<target>.tar.gz` to Cargo's target directory, or to
+`--out-dir`. A full bundle serves only that pgrx version, and `--bundle` refuses
+one that another version generated.
 
 The bundle's target selects library names, package layout and distribution
 package formats. Without `--bundle`, these use the host. Windows packages use

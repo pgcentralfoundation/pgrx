@@ -24,7 +24,7 @@ cargo pgrx package [OPTIONS]
 | `-p, --package <PKG>` | Select a workspace extension |
 | `--manifest-path <PATH>` | Select its manifest |
 | `--bundle <FILE>` | Package for the platform and PostgreSQL of this target bundle; conflicts with `--pg-config` |
-| `--bundle-generate` | Write a target bundle for this machine instead of packaging |
+| `--bundle-generate` | Write a full target bundle for this machine instead of packaging |
 | `--cargo <FLAG>` | Repeatable Cargo flags, including for metadata |
 
 Without `--out-dir`, output goes under Cargo's resolved target directory as

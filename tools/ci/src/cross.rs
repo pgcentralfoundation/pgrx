@@ -57,7 +57,9 @@ pub(crate) fn run(bundle: &Path) -> eyre::Result<bool> {
         .and_then(|name| name.to_str())
         .ok_or_else(|| eyre!("{} is not a bundle file", bundle.display()))?;
     let (major, target) = bundle_domain(name)
-        .ok_or_else(|| eyre!("{name} is not named pgrx-pg<major>-<target>[.partial].tar.gz"))?;
+        .ok_or_else(|| {
+            eyre!("{name} is not named pgrx-<pgrx>-pg<major>-<target>.tar.gz or pgrx-pg<major>-<target>.partial.tar.gz")
+        })?;
     let platform = Platform::of(target)
         .ok_or_else(|| eyre!("{target} is not a target this check knows how to read"))?;
     let layout = Layout::of(bundle)?;
@@ -99,10 +101,15 @@ pub(crate) fn run(bundle: &Path) -> eyre::Result<bool> {
     Ok(true)
 }
 
-/// The PostgreSQL major version and Rust target in a bundle's file name.
+/// The PostgreSQL major version and Rust target in a bundle's file name. A full bundle's name
+/// starts with the pgrx version that generated it, which can itself contain `-`.
 fn bundle_domain(name: &str) -> Option<(u16, &str)> {
-    let stem = name.strip_prefix("pgrx-pg")?.strip_suffix(".tar.gz")?;
-    let (major, target) = stem.strip_suffix(".partial").unwrap_or(stem).split_once('-')?;
+    let stem = name.strip_prefix("pgrx-")?.strip_suffix(".tar.gz")?;
+    let stem = match stem.strip_suffix(".partial") {
+        Some(stem) => stem,
+        None => &stem[stem.find("-pg")? + 1..],
+    };
+    let (major, target) = stem.strip_prefix("pg")?.split_once('-')?;
     Some((major.parse().ok()?, target))
 }
 
@@ -507,13 +514,18 @@ mod tests {
     #[test]
     fn a_bundle_name_gives_the_major_and_target() {
         for (name, target) in [
-            ("pgrx-pg18-aarch64-unknown-linux-gnu.tar.gz", "aarch64-unknown-linux-gnu"),
+            ("pgrx-0.20.0-pg18-aarch64-unknown-linux-gnu.tar.gz", "aarch64-unknown-linux-gnu"),
+            ("pgrx-0.21.0-beta.1-pg18-aarch64-apple-darwin.tar.gz", "aarch64-apple-darwin"),
             ("pgrx-pg18-x86_64-pc-windows-msvc.partial.tar.gz", "x86_64-pc-windows-msvc"),
         ] {
             assert_eq!(bundle_domain(name), Some((18, target)), "{name}");
         }
-        for name in ["pgrx-pg18.tar.gz", "pgrx-pgXX-x86_64-unknown-linux-gnu.tar.gz", "bundle.tgz"]
-        {
+        for name in [
+            "pgrx-0.20.0-pg18.tar.gz",
+            "pgrx-0.20.0-pgXX-x86_64-unknown-linux-gnu.tar.gz",
+            "pgrx-pg18-x86_64-unknown-linux-gnu.tar.gz",
+            "bundle.tgz",
+        ] {
             assert_eq!(bundle_domain(name), None, "{name}");
         }
     }

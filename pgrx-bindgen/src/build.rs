@@ -1578,7 +1578,7 @@ fn inspection_error(
                 format!("use the `pg_config` of a PostgreSQL {major_version} built for {target}")
             }
             HeaderSource::CrossProgram => format!(
-                "a `pg_config` that runs here describes this machine, so to package for {target}, make a bundle there with `cargo pgrx package --bundle-generate`, or collect a partial bundle with `tools/pgrx-collect-bundle.sh`, and pass it to `cargo pgrx package --bundle`"
+                "a `pg_config` that runs here describes this machine, so to package for {target}, collect a bundle there with `tools/pgrx-collect-bundle.sh` or generate one with `cargo pgrx package --bundle-generate`, and pass it to `cargo pgrx package --bundle`"
             ),
             HeaderSource::Description => format!(
                 "collect the partial bundle again from the server headers of a PostgreSQL {major_version} built for {target}"

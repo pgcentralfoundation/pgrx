@@ -384,7 +384,8 @@ pub(crate) enum Platform<'a> {
     /// This machine and the PostgreSQL that `pg_config` describes, generating as an ordinary
     /// build does.
     Host(&'a PgConfig),
-    /// The same, also writing what it generates to this directory, to go into a bundle.
+    /// The same, writing what `pgrx-pg-sys` generates to this directory to go into a bundle,
+    /// and checking the extension instead of building it.
     HostForBundle(&'a PgConfig, &'a Path),
     /// A bundle's platform and PostgreSQL. A full bundle's sources are unpacked for the build to
     /// import; a partial bundle has none, and the build generates from its headers.
@@ -440,8 +441,8 @@ fn select_target_info(
         Platform::HostForBundle(_, directory) => {
             command.env(EXPORT, directory);
         }
-        Platform::Bundle(Bundle { generated: Some(directory), pg_config, .. }) => {
-            command.env(format!("{IMPORT}_PG{}", pg_config.major_version()?), directory);
+        Platform::Bundle(Bundle { generated: Some(generated), pg_config, .. }) => {
+            command.env(format!("{IMPORT}_PG{}", pg_config.major_version()?), &generated.directory);
         }
     }
     Ok(())
@@ -503,7 +504,11 @@ pub(crate) fn build_extension(
     command.env("CARGO_PGRX_EXTVERSION", extversion.0);
     select_build_postgres(&mut command, platform.pg_config());
     select_target_info(&mut command, platform)?;
-    command.arg("rustc");
+    // A bundle needs only what `pgrx-pg-sys`'s build script generates. Checking the library
+    // runs every build script with the features a build would use, without compiling the
+    // extension itself.
+    let exporting = matches!(platform, Platform::HostForBundle(..));
+    command.arg(if exporting { "check" } else { "rustc" });
     command.arg("--lib");
 
     if let Some(manifest_path) = manifest_path {
@@ -548,14 +553,15 @@ pub(crate) fn build_extension(
     }
 
     let rustc_args = crate::cargo::pgrx_cdylib_rustc_args(target);
-    if !rustc_args.is_empty() {
+    if !exporting && !rustc_args.is_empty() {
         command.arg("--");
         command.args(rustc_args);
     }
 
     let command = command.stderr(Stdio::inherit());
     let command_str = format!("{command:?}");
-    println!("{} extension with features {}", "    Building".bold().green(), features_arg.cyan());
+    let verb = if exporting { "    Checking" } else { "    Building" };
+    println!("{} extension with features {}", verb.bold().green(), features_arg.cyan());
     println!("{} command {}", "     Running".bold().green(), command_str.cyan());
     let cargo_output =
         command.output().wrap_err_with(|| format!("failed to spawn cargo: {command_str}"))?;

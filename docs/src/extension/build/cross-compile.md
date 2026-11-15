@@ -1,39 +1,51 @@
 # Cross compiling `pgrx` extensions
 
 Cross compiling builds an extension on one machine, the build host, for another
-platform, the target. pgrx does this from a *target bundle*: one file, generated
-on the target platform, that holds everything `cargo pgrx package` needs to
-build for that platform's PostgreSQL from anywhere else.
+platform, the target. `pgrx-pg-sys` generates its bindings from the target's
+PostgreSQL headers, and the package is laid out for the directories the target's
+`pg_config` reports. pgrx gets both from a *target bundle*: one file, made from
+the target's PostgreSQL, that `cargo pgrx package` builds from anywhere else.
 
-1. On the target platform, in your extension's directory:
+1. On the target platform, with the script from the pgrx release your extension
+   uses:
 
     ```sh
-    cargo pgrx package --bundle-generate
+    sh pgrx-collect-bundle.sh --target=aarch64-unknown-linux-gnu
     ```
 
-    This writes `pgrx-pg18-aarch64-unknown-linux-gnu.tar.gz`, named for the
-    PostgreSQL major version and the platform, and packages nothing.
+    This writes `pgrx-pg18-aarch64-unknown-linux-gnu.partial.tar.gz`, named for
+    the PostgreSQL major version and the platform.
 
 2. Copy that file to the build host.
 
-3. On the build host, with a Rust toolchain that can link for the target:
+3. On the build host, with a Rust toolchain and linker for the target, and Clang
+   with the target's system headers as described under
+   [What the build host needs](#what-the-build-host-needs):
 
     ```sh
-    cargo pgrx package --bundle pgrx-pg18-aarch64-unknown-linux-gnu.tar.gz
+    cargo pgrx package --bundle pgrx-pg18-aarch64-unknown-linux-gnu.partial.tar.gz
     ```
 
 `cargo pgrx package` is the only command that builds for another platform, and a
 bundle is the only way to tell it which one.
 
-If the target platform has PostgreSQL's server headers but no Rust or Clang, or
-its headers exist only in a sysroot, a shell script collects a
-[partial bundle](#collect-a-partial-bundle) from them instead, and the build
-host does the generating.
+That is a *partial bundle*: the target's server headers and what its `pg_config`
+reports, and nothing generated. The build host does the generating, so it needs
+Clang and the target's system headers. A *full bundle* moves the generating to
+the target. The build host then needs only a linker, but the target needs Rust,
+Clang and your extension's source, and the bundle must be made again for every
+pgrx upgrade.
 
-| | Made with | The build host also needs |
+| | Partial bundle | Full bundle |
 | --- | --- | --- |
-| Full bundle | Rust, Clang and PostgreSQL's server headers, on the target | a linker for the target |
-| Partial bundle | `tar`, the target's server headers, and what its `pg_config` reports | a linker, Clang, and the target's system headers |
+| Made on the target with | a POSIX shell, `tar`, and the PostgreSQL to build for | Rust, Clang, your extension's source, and the PostgreSQL to build for |
+| Made again when | the target's PostgreSQL changes | the target's PostgreSQL, the pgrx version or the `cshim` feature changes |
+| The build host needs | a linker, Clang, and the target's system headers | a linker |
+
+Start with a partial bundle. Generate a full one when the build host cannot
+have Clang or the target's system headers, such as macOS SDK or MSVC headers on
+Linux, and a machine of the target's kind is easy to reach after each pgrx
+upgrade.
 
 ## Why the bundle comes from the target
 
@@ -46,55 +58,19 @@ results, and other headers choose declaration shapes from them. PostgreSQL 15 to
 function of that name. Bindings generated from the wrong headers would load that
 function's first instructions as a pointer and call the result.
 
-Generating on the target uses that PostgreSQL's real `pg_config`, its real
-headers, the platform's own system headers and a native compile, so nothing is
-copied by hand or guessed. What remains for you to ensure is that the
-PostgreSQL there is the same build as the server that will load the extension:
-the same packages from the same distribution, or the same source build. pgrx
-cannot detect a different minor version or different configure options.
-
-## Generate a bundle
-
-The target platform needs what any pgrx build needs: Rust, Clang and `libclang`,
-and a PostgreSQL installation with its server headers.
-
-```sh
-cargo pgrx package --bundle-generate --pg-config /usr/lib/postgresql/18/bin/pg_config
-```
-
-- **PostgreSQL.** `--pg-config` selects it; without it, the first `pg_config` on
-  `PATH`. Neither `cargo pgrx init` nor a pgrx configuration file is needed.
-- **Output.** The file goes in Cargo's target directory, or in `--out-dir`. The
-  command builds your extension to generate from its exact pgrx version and
-  features, but stages no package.
-- **Where to run it.** The target platform does not have to be hardware. A
-  container of the target architecture with the distribution's PostgreSQL
-  packages installed, or a CI runner of that platform, generates the same
-  bundle. macOS and Windows targets need a machine or runner of that kind.
-
-A bundle holds:
-
-- `bundle.json`: the Rust target, and the version, `pkglibdir` and `sharedir`
-  that `pg_config` printed;
-- `target-info/`: the raw bindings, the generated C macro tree, the compiler
-  profile report, and the native support archive with its sources, listed in a
-  manifest with a SHA-256 and length for every file;
-- `lib/postgres.lib`, for Windows MSVC targets, whose extensions link against it.
-
-A bundle does not depend on your extension. It is valid for one Rust target,
-one PostgreSQL major version, one pgrx version and one setting of the `cshim`
-feature, so generate it again when any of those change. Development builds of
-pgrx must also be the same source revision. Anyone packaging for the same
-PostgreSQL can share one, but it contains compiled code that is linked into the
-extension, so take it only from a build you trust.
+Either kind of bundle takes the headers and `pg_config`'s values from the
+target's own PostgreSQL, so nothing is copied by hand or guessed. What remains
+for you to ensure is that the PostgreSQL there is the same build as the server
+that will load the extension: the same packages from the same distribution, or
+the same source build. pgrx cannot detect a different minor version or
+different configure options.
 
 ## Collect a partial bundle
 
-A target with no Rust toolchain or no Clang cannot generate a full bundle, but it
-still has the only things that must come from it: PostgreSQL's server headers and
-what `pg_config` reports. `tools/pgrx-collect-bundle.sh`, in the pgrx repository,
-collects those into a partial bundle. Take the script from the tag of the pgrx
-release your extension uses, and copy it to the target.
+`tools/pgrx-collect-bundle.sh`, in the pgrx repository, collects what must come
+from the target: PostgreSQL's server headers and what `pg_config` reports. Take
+the script from the tag of the pgrx release your extension uses, and copy it to
+the target.
 
 ```sh
 sh pgrx-collect-bundle.sh --target=aarch64-unknown-linux-gnu
@@ -171,21 +147,64 @@ sh pgrx-collect-bundle.sh \
     --includedir-server="$SYSROOT/usr/include/postgresql/server"
 ```
 
-### Use a partial bundle
+### What the build host needs
 
 Nothing in a partial bundle is generated, so it does not depend on the pgrx
 version or the `cshim` feature. Collect it once for a PostgreSQL installation and
 keep using it across pgrx upgrades.
 
-The build host generates what a full bundle would have carried, so it needs the
-Clang toolchain described under
-[Clang, LLVM and system headers](#clang-llvm-and-system-headers) and the target's
-system headers, which usually come with the cross toolchain's sysroot. Point
+The build host does the generating, so it needs the Clang toolchain described
+under [Clang, LLVM and system headers](#clang-llvm-and-system-headers) and the
+target's system headers, which usually come with the cross toolchain's sysroot.
+Point
 Clang at them with `BINDGEN_EXTRA_CLANG_ARGS_<target>`, for example
 `--sysroot=/path/to/sysroot`. Those system headers are the one input that does
 not come from the target: they must be for the same C library and architecture.
 pgrx refuses headers whose recorded sizes and alignments disagree with the
 compiler, but it cannot prove the two C libraries are the same.
+
+## Generate a full bundle
+
+A full bundle also carries what `pgrx-pg-sys` generates, made on the target
+itself with the platform's own system headers and a native compile. The build
+host then needs no Clang and none of the target's system headers. In exchange,
+the target needs what any pgrx build needs: Rust, Clang and `libclang`, a
+PostgreSQL installation with its server headers, and your extension's source.
+
+```sh
+cargo pgrx package --bundle-generate --pg-config /usr/lib/postgresql/18/bin/pg_config
+```
+
+- **PostgreSQL.** `--pg-config` selects it; without it, the first `pg_config` on
+  `PATH`. Neither `cargo pgrx init` nor a pgrx configuration file is needed.
+- **Output.** The file goes in Cargo's target directory, or in `--out-dir`. It
+  is named for the pgrx version, the PostgreSQL major version and the platform,
+  such as `pgrx-0.20.0-pg18-aarch64-unknown-linux-gnu.tar.gz`.
+- **What runs.** The command checks your extension with `cargo check`, so that
+  `pgrx-pg-sys` generates with your extension's exact pgrx version and features.
+  It does not build your extension or stage a package.
+- **Where to run it.** The target platform does not have to be hardware. A
+  container of the target architecture with the distribution's PostgreSQL
+  packages installed, or a CI runner of that platform, generates the same
+  bundle. macOS and Windows targets need a machine or runner of that kind.
+
+A full bundle holds:
+
+- `bundle.json`: the Rust target, the pgrx version, and the version, `pkglibdir`
+  and `sharedir` that `pg_config` printed;
+- `target-info/`: the raw bindings, the generated C macro tree, the compiler
+  profile report, and the native support archive with its sources, listed in a
+  manifest with a SHA-256 and length for every file;
+- `lib/postgres.lib`, for Windows MSVC targets, whose extensions link against it.
+
+A full bundle does not depend on your extension's code. It is valid for one Rust
+target, one PostgreSQL major version, one pgrx version and one setting of the
+`cshim` feature. Generate it once after each pgrx upgrade, and every release of
+every extension on that pgrx version can be packaged from it. cargo-pgrx
+refuses a bundle that another pgrx version generated, and says which one did.
+Development builds of pgrx must also be the same source revision. Anyone
+packaging for the same PostgreSQL can share one, but it contains compiled code
+that is linked into the extension, so take it only from a build you trust.
 
 ## Package from a bundle
 
@@ -196,13 +215,14 @@ needs no server headers and no Clang either.
 
 ```sh
 rustup target add aarch64-unknown-linux-gnu
-cargo pgrx package --bundle pgrx-pg18-aarch64-unknown-linux-gnu.tar.gz
+cargo pgrx package --bundle pgrx-pg18-aarch64-unknown-linux-gnu.partial.tar.gz
 ```
 
 `--bundle` takes either kind of bundle. The bundle supplies the target and its
 PostgreSQL, so `--bundle` cannot be combined with `--pg-config`. The extension
-is staged for the directories the target's `pg_config` reported. Windows packages always stage into `lib` and
-`share/extension`, and Linux targets can also produce
+is staged for the directories the target's `pg_config` reported. Windows
+packages always stage into `lib` and `share/extension`, and Linux targets can
+also produce
 [RPM and DEB packages](../../../../cargo-pgrx/README.md#building-rpm-and-deb-packages).
 cargo-pgrx reads the generated SQL out of the built library without loading it,
 so no target code runs on the build host.
@@ -220,7 +240,7 @@ package from the same bundle rebuilds nothing.
 ## What pgrx verifies
 
 Every build that generates from PostgreSQL's headers, including the one that
-makes a bundle, first compares the server headers with the Clang target and
+generates a full bundle, first compares the server headers with the Clang target and
 refuses headers that do not describe it:
 
 - **Machine.** `PG_VERSION_STR` in `pg_config.h` names the machine configure or
@@ -286,14 +306,14 @@ remain trusted:
 - C library feature macros (`HAVE_*`) within one C library family;
 - build options such as `BLCKSZ`, `NAMEDATALEN` and `USE_ASSERT_CHECKING`.
 
-Generate the bundle from the same PostgreSQL build as the server that will load
-the extension.
+Make the bundle from the same PostgreSQL build as the server that will load the
+extension.
 
 ## Clang, LLVM and system headers
 
 This applies wherever `pgrx-pg-sys` generates from headers. For a cross build
-that is the machine that makes a full bundle, or the build host that uses a
-partial one. A build from a full bundle runs no Clang.
+that is the build host that uses a partial bundle, or the machine that generates
+a full one. A build from a full bundle runs no Clang.
 
 The `pgrx-pg-sys` build script runs Clang itself to find system headers, for
 header inspection and for its native support archive, rather than through the

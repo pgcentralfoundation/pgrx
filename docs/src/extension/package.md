@@ -49,7 +49,7 @@ These options change what gets built and where it goes:
 | `--profile <NAME>`                     | Build with this Cargo profile                              |
 | `-F`, `--features <FEATURES>`          | Enable additional Cargo features                           |
 | `--bundle <FILE>`                      | Package for the platform and Postgres of this target bundle |
-| `--bundle-generate`                    | Write a target bundle for this machine instead of packaging |
+| `--bundle-generate`                    | Write a full target bundle for this machine instead of packaging |
 | `-p`, `--package`, `--manifest-path`   | Select an extension in a workspace                         |
 
 Run `cargo pgrx package --help` for the full list.

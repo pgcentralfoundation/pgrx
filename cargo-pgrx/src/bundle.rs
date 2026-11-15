@@ -10,7 +10,8 @@
 //! A full bundle is written by `cargo pgrx package --bundle-generate` there. It is a gzipped
 //! tar archive holding:
 //!
-//! - `bundle.json`, the [`Description`]: the Rust target and what `pg_config` printed there;
+//! - `bundle.json`, the [`Description`]: the Rust target, the pgrx version that generated it,
+//!   and what `pg_config` printed there;
 //! - `target-info/`, what the `pgrx-pg-sys` build script generated there, which it verifies
 //!   itself when a build imports it;
 //! - `lib/postgres.lib`, for MSVC targets, whose extensions link against it.
@@ -67,13 +68,17 @@ struct Description {
     format: u32,
     /// The Rust target the bundle was generated on, which is the one it builds for.
     target: String,
+    /// The version of pgrx whose `pgrx-pg-sys` generated `target-info/`, the only one that
+    /// can import it.
+    pgrx: String,
     /// What that machine's `pg_config` printed, by option name without its dashes.
     pg_config: BTreeMap<String, String>,
 }
 
-/// The file name of the bundle for one PostgreSQL major version and Rust target.
-fn file_name(major_version: u16, target: &str) -> String {
-    format!("pgrx-pg{major_version}-{target}.tar.gz")
+/// The file name of the bundle that one pgrx version generated for one PostgreSQL major
+/// version and Rust target, the three things that decide which builds can use it.
+fn file_name(pgrx: &str, major_version: u16, target: &str) -> String {
+    format!("pgrx-{pgrx}-pg{major_version}-{target}.tar.gz")
 }
 
 /// Write the bundle for `pg_config`'s PostgreSQL into `out_dir`, from the `target_info` that a
@@ -84,9 +89,10 @@ pub(crate) fn write(
     out_dir: &Path,
 ) -> eyre::Result<PathBuf> {
     let major_version = pg_config.major_version()?;
-    let target = exported_target(target_info, major_version)?;
+    let (target, pgrx) = exported_domain(target_info, major_version)?;
     let description = Description {
         format: FORMAT,
+        pgrx,
         pg_config: BTreeMap::from([
             ("version".to_owned(), format!("PostgreSQL {}", pg_config.version()?)),
             ("pkglibdir".to_owned(), utf8(&pg_config.pkglibdir()?)?),
@@ -97,7 +103,7 @@ pub(crate) fn write(
 
     std::fs::create_dir_all(out_dir)
         .wrap_err_with(|| format!("couldn't create {}", out_dir.display()))?;
-    let path = out_dir.join(file_name(major_version, &description.target));
+    let path = out_dir.join(file_name(&description.pgrx, major_version, &description.target));
     let file =
         File::create(&path).wrap_err_with(|| format!("couldn't create {}", path.display()))?;
     let mut archive =
@@ -120,18 +126,21 @@ pub(crate) fn write(
     Ok(path)
 }
 
-/// The Rust target that the build script recorded in the bundle it exported.
-fn exported_target(target_info: &Path, major_version: u16) -> eyre::Result<String> {
+/// The Rust target and pgrx version that the build script recorded in what it exported.
+fn exported_domain(target_info: &Path, major_version: u16) -> eyre::Result<(String, String)> {
     let manifest = target_info.join(format!("pg{major_version}_target_artifact.json"));
     let json = std::fs::read(&manifest).wrap_err_with(|| {
         format!("the build wrote no bundle manifest at {}; does this crate build pgrx-pg-sys for pg{major_version}?", manifest.display())
     })?;
     let json: serde_json::Value = serde_json::from_slice(&json)
         .wrap_err_with(|| format!("couldn't parse {}", manifest.display()))?;
-    json["domain"]["rust_target"]
-        .as_str()
-        .map(str::to_owned)
-        .ok_or_else(|| eyre!("{} names no Rust target", manifest.display()))
+    let field = |name: &str| {
+        json["domain"][name]
+            .as_str()
+            .map(str::to_owned)
+            .ok_or_else(|| eyre!("{} has no `domain.{name}`", manifest.display()))
+    };
+    Ok((field("rust_target")?, field("generator_version")?))
 }
 
 /// A bundle unpacked for a build on this machine.
@@ -141,9 +150,17 @@ pub(crate) struct Bundle {
     pub(crate) target: String,
     /// The target's PostgreSQL, as its `pg_config` described it when the bundle was made.
     pub(crate) pg_config: PgConfig,
-    /// The generated sources and native archive for the `pgrx-pg-sys` build to import. A
-    /// partial bundle has none: the build generates them from the bundle's headers.
-    pub(crate) generated: Option<PathBuf>,
+    /// What a full bundle's target generated for the `pgrx-pg-sys` build to import. A partial
+    /// bundle has none: the build generates it from the bundle's headers.
+    pub(crate) generated: Option<Generated>,
+}
+
+/// The generated sources and native archive in a full bundle.
+#[derive(Debug)]
+pub(crate) struct Generated {
+    pub(crate) directory: PathBuf,
+    /// The pgrx version that generated them; only its `pgrx-pg-sys` imports them.
+    pub(crate) pgrx: String,
 }
 
 impl Bundle {
@@ -203,6 +220,20 @@ impl Bundle {
         Ok(bundle)
     }
 
+    /// Refuse a full bundle that another pgrx version generated, before a build that would
+    /// refuse it with less to go on. `pgrx` is the version the extension builds with, when known.
+    pub(crate) fn require_pgrx(&self, file: &Path, pgrx: Option<&str>) -> eyre::Result<()> {
+        let (Some(generated), Some(pgrx)) = (&self.generated, pgrx) else { return Ok(()) };
+        ensure!(
+            generated.pgrx == pgrx,
+            "{} was generated by pgrx {}, and this extension uses pgrx {pgrx}; generate the bundle again on {} with pgrx {pgrx}",
+            file.display(),
+            generated.pgrx,
+            self.target
+        );
+        Ok(())
+    }
+
     /// A bundle that `cargo pgrx package --bundle-generate` wrote on its target.
     fn full(file: &Path, root: &Path) -> eyre::Result<Self> {
         let parse_error = || format!("couldn't parse {DESCRIPTION} in {}", file.display());
@@ -233,7 +264,7 @@ impl Bundle {
         Ok(Self {
             target: description.target,
             pg_config: PgConfig::from_properties(properties),
-            generated: Some(target_info),
+            generated: Some(Generated { directory: target_info, pgrx: description.pgrx }),
         })
     }
 
@@ -383,7 +414,9 @@ mod tests {
         std::fs::create_dir_all(target_info.join("cmacros/pg18")).unwrap();
         std::fs::write(
             target_info.join("pg18_target_artifact.json"),
-            format!(r#"{{"domain": {{"major": 18, "rust_target": "{target}"}}}}"#),
+            format!(
+                r#"{{"domain": {{"major": 18, "rust_target": "{target}", "generator_version": "0.20.0"}}}}"#
+            ),
         )
         .unwrap();
         std::fs::write(target_info.join("cmacros/pg18/mod.rs"), "// generated").unwrap();
@@ -392,6 +425,28 @@ mod tests {
 
     fn postgres(properties: &[(&str, &str)]) -> PgConfig {
         PgConfig::from_properties(properties.iter().copied())
+    }
+
+    #[test]
+    fn a_full_bundle_serves_only_the_pgrx_that_generated_it() {
+        let directory = tempfile::tempdir().unwrap();
+        let directory = directory.path();
+        let pg_config = postgres(&[
+            ("version", "PostgreSQL 18.1"),
+            ("pkglibdir", "/usr/lib/postgresql/18/lib"),
+            ("sharedir", "/usr/share/postgresql/18"),
+        ]);
+        let exported = target_info(directory, "aarch64-unknown-linux-gnu");
+        let file = write(&pg_config, &exported, &directory.join("out")).unwrap();
+        let bundle = Bundle::open(&file, &directory.join("scratch")).unwrap();
+
+        bundle.require_pgrx(&file, Some("0.20.0")).unwrap();
+        bundle.require_pgrx(&file, None).unwrap();
+        let error = bundle.require_pgrx(&file, Some("0.21.0")).unwrap_err().to_string();
+        assert!(
+            error.contains("generated by pgrx 0.20.0, and this extension uses pgrx 0.21.0"),
+            "{error}"
+        );
     }
 
     #[test]
@@ -407,8 +462,8 @@ mod tests {
         let file = write(&pg_config, &exported, &directory.join("out")).unwrap();
         assert_eq!(
             file.file_name().unwrap(),
-            "pgrx-pg18-aarch64-unknown-linux-gnu.tar.gz",
-            "the name says which PostgreSQL and platform the bundle is for"
+            "pgrx-0.20.0-pg18-aarch64-unknown-linux-gnu.tar.gz",
+            "the name says which pgrx, PostgreSQL and platform the bundle is for"
         );
 
         let bundle = Bundle::open(&file, &directory.join("scratch")).unwrap();
@@ -422,7 +477,10 @@ mod tests {
         assert_eq!(bundle.pg_config.sharedir().unwrap(), Path::new("/usr/share/postgresql/18"));
         assert!(bundle.pg_config.lib_dir().unwrap().is_dir(), "the link directory is local");
         assert_eq!(
-            std::fs::read_to_string(bundle.generated.unwrap().join("cmacros/pg18/mod.rs")).unwrap(),
+            std::fs::read_to_string(
+                bundle.generated.unwrap().directory.join("cmacros/pg18/mod.rs")
+            )
+            .unwrap(),
             "// generated"
         );
     }
@@ -441,7 +499,7 @@ mod tests {
         let file = write(&pg_config, &exported, &directory.join("out")).unwrap();
         let scratch = directory.join("scratch");
         let generated = Bundle::open(&file, &scratch).unwrap().generated.unwrap();
-        let generated = generated.join("cmacros/pg18/mod.rs");
+        let generated = generated.directory.join("cmacros/pg18/mod.rs");
         std::fs::write(&generated, "// left alone").unwrap();
         Bundle::open(&file, &scratch).unwrap();
         assert_eq!(std::fs::read_to_string(&generated).unwrap(), "// left alone");
@@ -682,7 +740,7 @@ mod tests {
         assert!(error.to_string().contains("format 2 bundle"), "{error}");
 
         let pathlike = archive("pathlike.tar.gz", &|archive| {
-            let description = br#"{"format": 1, "target": "../x86_64-unknown-linux-gnu", "pg_config": {"version": "PostgreSQL 18.1", "pkglibdir": "/l", "sharedir": "/s"}}"#;
+            let description = br#"{"format": 1, "target": "../x86_64-unknown-linux-gnu", "pgrx": "0.20.0", "pg_config": {"version": "PostgreSQL 18.1", "pkglibdir": "/l", "sharedir": "/s"}}"#;
             data(archive, DESCRIPTION, description);
             data(archive, "target-info/pg18_target_artifact.json", b"{}");
         });
@@ -726,7 +784,7 @@ mod tests {
             data(
                 archive,
                 DESCRIPTION,
-                br#"{"format": 1, "target": "t", "pg_config": {"version": "PostgreSQL 18.1"}}"#,
+                br#"{"format": 1, "target": "t", "pgrx": "0.20.0", "pg_config": {"version": "PostgreSQL 18.1"}}"#,
             );
             data(archive, "target-info/placeholder", b"");
         });
