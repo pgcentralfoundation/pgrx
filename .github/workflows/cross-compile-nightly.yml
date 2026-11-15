@@ -56,7 +56,9 @@ jobs:
           cargo build --locked --package cargo-pgrx
           target/debug/cargo-pgrx pgrx package --package versioned_so --debug --bundle-generate \
             --pg-config "$PG_CONFIG" --out-dir "$out" --cargo=--locked
-          test -f "$out/pgrx-pg18-${{ matrix.target }}.tar.gz"
+          # The name starts with the pgrx version that generated the bundle.
+          full=("$out"/pgrx-*-pg18-'${{ matrix.target }}'.tar.gz)
+          test "${#full[@]}" -eq 1 && test -f "${full[0]}"
 
       # The script is for a target with no Rust or Clang, so it runs on every platform here,
       # under Git Bash on Windows, and one route below builds from what it collects.
@@ -374,7 +376,11 @@ jobs:
       - name: Leave nothing but the bundle to describe the target
         run: |
           downloaded="${RUNNER_TEMP//\\//}/bundle"
-          bundle="$downloaded/pgrx-pg18-$CROSS_TARGET$CROSS_BUNDLE_KIND.tar.gz"
+          if [[ -z "$CROSS_BUNDLE_KIND" ]]; then
+            bundle=$(echo "$downloaded"/pgrx-*-pg18-"$CROSS_TARGET".tar.gz)
+          else
+            bundle="$downloaded/pgrx-pg18-$CROSS_TARGET$CROSS_BUNDLE_KIND.tar.gz"
+          fi
           test -f "$bundle"
           missing="$CROSS_ROOT/no-pg-config"
           test ! -e "$missing"
