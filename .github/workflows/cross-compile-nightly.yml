@@ -65,7 +65,7 @@ jobs:
       - name: Collect a partial bundle with the shell script
         run: |
           out="${RUNNER_TEMP//\\//}/bundle"
-          partial="$(sh tools/pgrx-collect-bundle.sh --target='${{ matrix.target }}' \
+          partial="$(sh tools/pgrx-collect-partial-bundle.sh --target='${{ matrix.target }}' \
             --pg-config="$PG_CONFIG" --out-dir="$out")"
           test "$partial" = "$out/pgrx-pg18-${{ matrix.target }}.partial.tar.gz"
           tar -tzf - < "$partial" > "$out/partial-contents.txt"
