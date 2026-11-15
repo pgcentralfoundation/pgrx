@@ -1925,10 +1925,14 @@ dependencies = [
 name = "pgrx-ci"
 version = "0.20.0"
 dependencies = [
+ "ar",
  "cargo_metadata",
  "eyre",
+ "flate2",
+ "rpm",
  "serde",
  "serde_json",
+ "tar",
 ]
 
 [[package]]

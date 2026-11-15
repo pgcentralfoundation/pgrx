@@ -8,7 +8,7 @@
 //!
 //! `plan` decides which jobs a change needs. The `test-*` commands run one job's tests and
 //! exit unsuccessfully when any test fails. `macro-summaries` and `macro-compare` check that
-//! every Clang version generates the same C macros. `cross-package` packages an example for
+//! every Clang version generates the same C macros. `cross-package` packages two examples for
 //! another platform from a target bundle.
 
 mod args;
@@ -41,8 +41,8 @@ test-pg and test-variants read the PostgreSQL installation from PG_CONFIG.
 macro-summaries builds pgrx-pg-sys for each PostgreSQL version, which PGRX_HOME must
 configure, and writes what the build generated for each C macro to DIRECTORY/pgNN.json.
 macro-compare fails when the summaries under DIRECTORY differ between Clang versions.
-cross-package packages an example extension from a bundle that `cargo pgrx package
---bundle-generate` wrote on a Linux target, and checks the package for that target.";
+cross-package packages two example extensions from a bundle made on a Linux, macOS or
+Windows target, and checks the packages and their libraries for that target.";
 
 fn main() -> ExitCode {
     match run() {
