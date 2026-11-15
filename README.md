@@ -235,8 +235,9 @@ does it from a *target bundle*, one file generated on the target platform:
    for the target, and no PostgreSQL, `pg_config`, server headers, Clang, or `cargo pgrx init`.
 
 A target with PostgreSQL's server headers but no Rust or Clang can collect a *partial bundle* with
-[`tools/pgrx-collect-bundle.sh`](tools/pgrx-collect-bundle.sh) instead. The build host then also needs
-Clang and the target's system headers.
+[`tools/pgrx-collect-bundle.sh`](tools/pgrx-collect-bundle.sh) instead. The script also takes what
+`pg_config` reports from a file or from arguments, for headers in a sysroot whose `pg_config` cannot
+run. The build host then also needs Clang and the target's system headers.
 
 The bundle is generated on the target because the bindings, C macros and native
 support that pgrx builds from PostgreSQL's headers depend on how that PostgreSQL

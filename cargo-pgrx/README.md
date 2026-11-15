@@ -953,9 +953,10 @@ command that builds for another platform. See the
 `pgrx-pg<NN>-<target>.tar.gz` to Cargo's target directory, or to `--out-dir`.
 
 `--bundle` also takes a partial bundle, which `tools/pgrx-collect-bundle.sh`
-collects on a target that has PostgreSQL's server headers but no Rust or Clang.
-The build then generates from those headers itself, so the build host needs
-Clang and the target's system headers.
+collects from a target's PostgreSQL server headers and what its `pg_config`
+reports, where there is no Rust or Clang. The script checks nothing it
+collects; `--bundle` does. The build then generates from those headers itself,
+so the build host needs Clang and the target's system headers.
 
 The bundle's target selects library names, package layout and distribution
 package formats. Without `--bundle`, these use the host. Windows packages use

@@ -9,22 +9,32 @@
 # platform needs and that only this platform has. `cargo pgrx package --bundle` on another
 # machine generates the rest.
 #
-# Run this where PostgreSQL's server headers are installed. It needs pg_config, tar and a
-# POSIX shell, and no Rust or C compiler. On Windows, run it in Git Bash.
+# It needs tar and a POSIX shell, and no Rust or C compiler. On Windows, run it in Git Bash.
+#
+# This script copies what it is given and does not check it. `cargo pgrx package --bundle`
+# checks the bundle when it uses it.
 
 set -eu
 
 usage() {
     cat >&2 <<'EOF'
-usage: pgrx-collect-bundle.sh --target RUST_TARGET [options]
+usage: pgrx-collect-bundle.sh --target=RUST_TARGET [options]
 
-  --target RUST_TARGET        the Rust target triple of this platform, such as
-                              aarch64-unknown-linux-gnu (required)
-  --pg-config PATH            the pg_config of the PostgreSQL to collect
-                              (default: the first pg_config on PATH)
-  --includedir-server DIR     that PostgreSQL's server headers, when they are not
-                              where pg_config reports them
-  --out-dir DIR               where to write the bundle (default: this directory)
+  --target=RUST_TARGET     the Rust target triple of the platform, such as
+                           aarch64-unknown-linux-gnu (required)
+  --out-dir=DIR            where to write the bundle (default: this directory)
+
+What pg_config reports comes from these, and a later one overrides an earlier one:
+
+  --pg-config=PATH         a pg_config program to run. Without --pg-config-file or a
+                           property, the first pg_config on PATH is run.
+  --pg-config-file=FILE    a file holding what pg_config prints: NAME = value lines
+  --PROPERTY=VALUE         one property, named as pg_config's option is: --version=,
+                           --includedir-server=, --pkglibdir=, --sharedir=, --cppflags=,
+                           --cflags=, and for MSVC targets --pkgincludedir= and --libdir=
+
+The server headers are copied from the directory that INCLUDEDIR-SERVER names, so pass
+--includedir-server=DIR when they are somewhere else on this machine.
 
 Writes pgrx-pg<major>-<target>.partial.tar.gz and prints its path.
 EOF
@@ -36,74 +46,81 @@ fail() {
     exit 1
 }
 
-target=
-pg_config=pg_config
-includedir_server=
-out_dir=.
-while [ $# -gt 0 ]; do
-    case "$1" in
-        --target | --pg-config | --includedir-server | --out-dir)
-            [ $# -ge 2 ] || { echo "$1 needs a value" >&2; usage; }
-            case "$1" in
-                --target) target="$2" ;;
-                --pg-config) pg_config="$2" ;;
-                --includedir-server) includedir_server="$2" ;;
-                --out-dir) out_dir="$2" ;;
-            esac
-            shift 2
-            ;;
-        -h | --help) usage ;;
-        *) echo "unknown argument: $1" >&2; usage ;;
-    esac
-done
-
-[ -n "$target" ] || { echo "--target is required" >&2; usage; }
-case "$target" in
-    *[!A-Za-z0-9_.-]* | -* | *-) fail "$target is not a Rust target triple" ;;
-    *-*-*) ;;
-    *) fail "$target is not a Rust target triple" ;;
-esac
-
-# A Windows pg_config ends its lines with a carriage return.
-ask() {
-    "$pg_config" "$1" | tr -d '\r'
-}
-
-version="$(ask --version)" || fail "couldn't run $pg_config"
-major="$(printf '%s\n' "$version" | sed -n 's/^PostgreSQL \([0-9][0-9]*\).*/\1/p')"
-[ -n "$major" ] || fail "$pg_config reported the version as \"$version\""
-
-[ -n "$includedir_server" ] || includedir_server="$(ask --includedir-server)"
-[ -f "$includedir_server/pg_config.h" ] \
-    || fail "$includedir_server has no pg_config.h; install PostgreSQL's server development package, or pass --includedir-server"
-
 staging="$(mktemp -d)"
 trap 'rm -rf "$staging"' EXIT
 trap 'exit 1' HUP INT TERM
 
+target=
+out_dir=.
+pg_config=
+pg_config_file=
+: > "$staging/properties"
+for argument in "$@"; do
+    case "$argument" in
+        --target=*) target="${argument#*=}" ;;
+        --out-dir=*) out_dir="${argument#*=}" ;;
+        --pg-config=*) pg_config="${argument#*=}" ;;
+        --pg-config-file=*) pg_config_file="${argument#*=}" ;;
+        -h | --help) usage ;;
+        --*=*)
+            # Any other option is a property, written the way pg_config prints one.
+            name="${argument%%=*}"
+            name="$(printf '%s' "${name#--}" | tr '[:lower:]' '[:upper:]')"
+            printf '%s = %s\n' "$name" "${argument#*=}" >> "$staging/properties"
+            ;;
+        *) echo "unknown argument: $argument" >&2; usage ;;
+    esac
+done
+[ -n "$target" ] || { echo "--target is required" >&2; usage; }
+
 # What marks the archive as a partial bundle, and the version of this layout.
 echo 1 > "$staging/partial-bundle"
 printf '%s\n' "$target" > "$staging/target"
-# Everything pg_config reports, exactly as it prints it.
-"$pg_config" | tr -d '\r' > "$staging/pg_config.txt"
+
+# Everything known about the PostgreSQL, as pg_config prints it.
+{
+    if [ -n "$pg_config" ] || { [ -z "$pg_config_file" ] && [ ! -s "$staging/properties" ]; }; then
+        "${pg_config:-pg_config}"
+    fi
+    if [ -n "$pg_config_file" ]; then
+        cat "$pg_config_file"
+    fi
+    cat "$staging/properties"
+} > "$staging/reported"
+# A Windows pg_config ends its lines with a carriage return.
+tr -d '\r' < "$staging/reported" > "$staging/pg_config.txt"
+rm "$staging/properties" "$staging/reported"
+
+# A value this script itself needs from pg_config.txt. The last line for a property is the
+# one that counts, here and in cargo-pgrx.
+reported() {
+    value="$(sed -n "s/^$1 = //p" "$staging/pg_config.txt" | tail -n 1)"
+    [ -n "$value" ] || fail "nothing reports $1; pass --$(echo "$1" | tr '[:upper:]' '[:lower:]')="
+    printf '%s\n' "$value"
+}
+
+# The major version names the bundle.
+version="$(reported VERSION)"
+major="$(echo "$version" | sed -n 's/^PostgreSQL \([0-9][0-9]*\).*/\1/p')"
+[ -n "$major" ] || fail "VERSION is '$version', not 'PostgreSQL <version>'"
 
 # -L: an archive of plain files and directories, whatever the installation links to.
 mkdir "$staging/include" "$staging/lib"
-cp -RL "$includedir_server" "$staging/include/server"
+headers="$(reported INCLUDEDIR-SERVER)"
+cp -RL "$headers" "$staging/include/server"
 case "$target" in
     *-msvc)
         # MSVC builds also read the public headers, and extensions link against postgres.lib.
-        pkgincludedir="$(ask --pkgincludedir)"
-        cp -RL "$pkgincludedir" "$staging/include/pkg"
-        case "$includedir_server" in
-            "$pkgincludedir"/*)
+        public_headers="$(reported PKGINCLUDEDIR)"
+        cp -RL "$public_headers" "$staging/include/pkg"
+        case "$headers" in
+            "$public_headers"/*)
                 # The server headers were inside it, and are already collected.
-                rm -rf "$staging/include/pkg/${includedir_server#"$pkgincludedir"/}"
+                rm -rf "$staging/include/pkg/${headers#"$public_headers"/}"
                 ;;
         esac
-        libdir="$(ask --libdir)"
-        cp "$libdir/postgres.lib" "$staging/lib/postgres.lib" \
-            || fail "$libdir has no postgres.lib"
+        libraries="$(reported LIBDIR)"
+        cp "$libraries/postgres.lib" "$staging/lib/postgres.lib"
         ;;
 esac
 

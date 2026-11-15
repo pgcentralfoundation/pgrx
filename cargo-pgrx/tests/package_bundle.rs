@@ -78,7 +78,18 @@ const EXPORT: &str = "PGRX_PG_SYS_EXTRA_TARGET_INFO_PATH";
 const IMPORT: &str = "PGRX_TARGET_INFO_PATH_PG18";
 
 fn main() {
-    for name in ["PGRX_PG_CONFIG_PATH", "PGRX_PG_CONFIG_AS_ENV", EXPORT, IMPORT] {
+    // Like the real script, run again when the program, the bundle, or a described value that
+    // the build reads changes.
+    for name in [
+        "PGRX_PG_CONFIG_PATH",
+        "PGRX_PG_CONFIG_AS_ENV",
+        "PGRX_PG_CONFIG_VERSION",
+        "PGRX_PG_CONFIG_INCLUDEDIR-SERVER",
+        "PGRX_PG_CONFIG_CPPFLAGS",
+        "PGRX_PG_CONFIG_CFLAGS",
+        EXPORT,
+        IMPORT,
+    ] {
         println!("cargo:rerun-if-env-changed={name}");
     }
     let mut seen: Vec<_> = std::env::vars()
@@ -119,8 +130,7 @@ fn main() {
         Some("--sharedir") => println!("/native/pg/share"),
         // Only an MSVC bundle asks, for the import library.
         Some("--libdir") => println!("{}", std::env::var("PGRX_TEST_PG_LIBDIR").unwrap()),
-        // The collection script asks where the headers are, and for everything at once.
-        Some("--includedir-server") => println!("{}", std::env::var("PGRX_TEST_PG_HEADERS").unwrap()),
+        // The collection script asks for everything at once.
         None => {
             println!("INCLUDEDIR-SERVER = {}", std::env::var("PGRX_TEST_PG_HEADERS").unwrap());
             println!("PKGLIBDIR = /native/pg/lib");
@@ -361,74 +371,130 @@ fn a_generated_bundle_is_all_that_packaging_needs() {
 /// A platform with PostgreSQL's headers but no Rust or Clang collects a partial bundle with a
 /// shell script. `--bundle` then gives the build those headers and `pg_config`'s values to
 /// generate from, and still runs no `pg_config` program.
+///
+/// The script takes those values from a `pg_config` program, from a file of what one prints,
+/// or one at a time, and checks none of them: packaging from the bundle does.
 #[cfg(unix)]
 #[test]
 fn a_collected_partial_bundle_supplies_headers_to_the_build() {
     let fixture = Fixture::new();
     let root = fixture.directory.path();
     let host = host_triple();
+    let called = root.join("pg_config-called");
 
-    let script = concat!(env!("CARGO_MANIFEST_DIR"), "/../tools/pgrx-collect-bundle.sh");
-    let output = Command::new("sh")
-        .arg(script)
-        .args(["--target", &host, "--pg-config"])
-        .arg(&fixture.pg_config)
-        .arg("--out-dir")
-        .arg(root.join("collected"))
-        .env("PGRX_TEST_PG_CONFIG_LOG", root.join("pg_config-called"))
-        .env("PGRX_TEST_PG_HEADERS", root.join("headers"))
-        .env("PGRX_TEST_PG_LIBDIR", root.join("pglib"))
-        .output()
-        .unwrap();
-    assert!(output.status.success(), "{}", combined_output(&output));
-    let bundle = root.join("collected").join(format!("pgrx-pg18-{host}.partial.tar.gz"));
-    assert_eq!(String::from_utf8(output.stdout).unwrap().trim(), bundle.to_str().unwrap());
-    assert!(bundle.is_file());
-
-    fs::remove_file(root.join("pg_config-called")).unwrap();
-    let output = fixture.command().arg("--bundle").arg(&bundle).output().unwrap();
-    assert!(output.status.success(), "{}", combined_output(&output));
-    fixture.assert_no_pg_config_calls();
-    fixture.assert_package_for(Some(&host), "native");
-    let seen = fixture.build_saw();
-    let value = |name: &str| {
-        let found = seen.iter().find(|(seen, _)| seen == name);
-        found.unwrap_or_else(|| panic!("no {name} in {seen:?}")).1.as_str()
+    // Run the script with `--name=value` arguments, and return the bundle it wrote in `out`.
+    let collect = |out: &str, arguments: &[(&str, &std::ffi::OsStr)]| {
+        let mut command = Command::new("sh");
+        command.arg(concat!(env!("CARGO_MANIFEST_DIR"), "/../tools/pgrx-collect-bundle.sh"));
+        let out = root.join(out);
+        for (name, value) in arguments.iter().copied().chain([("--out-dir=", out.as_os_str())]) {
+            let mut argument = std::ffi::OsString::from(name);
+            argument.push(value);
+            command.arg(argument);
+        }
+        let output = command
+            .env("PGRX_TEST_PG_CONFIG_LOG", &called)
+            .env("PGRX_TEST_PG_HEADERS", root.join("headers"))
+            .output()
+            .unwrap();
+        let bundle = out.join(format!("pgrx-pg18-{host}.partial.tar.gz"));
+        if output.status.success() {
+            assert_eq!(String::from_utf8_lossy(&output.stdout).trim(), bundle.to_str().unwrap());
+            assert!(bundle.is_file());
+        } else {
+            assert!(!out.exists(), "a refused collection wrote {}", out.display());
+        }
+        (output, bundle)
     };
+    // Package from a bundle, and return what the build was given.
+    let package = |bundle: &std::path::Path| {
+        let output = fixture.command().arg("--bundle").arg(bundle).output().unwrap();
+        assert!(output.status.success(), "{}", combined_output(&output));
+        fixture.assert_no_pg_config_calls();
+        fixture.assert_package_for(Some(&host), "native");
+        let seen = fixture.build_saw();
+        // The build generates for itself: nothing is imported, and no program is named.
+        assert!(seen.iter().all(|(name, _)| !name.contains("TARGET_INFO")), "{seen:?}");
+        assert!(seen.iter().all(|(name, _)| name != "PGRX_PG_CONFIG_PATH"), "{seen:?}");
+        move |name: &str| {
+            let found = seen.iter().find(|(seen, _)| seen == name);
+            found.unwrap_or_else(|| panic!("no {name} in {seen:?}")).1.clone()
+        }
+    };
+    let (target, headers) = (host.as_ref(), root.join("headers"));
+
+    // From a `pg_config` program.
+    let (output, bundle) =
+        collect("program", &[("--target=", target), ("--pg-config=", fixture.pg_config.as_ref())]);
+    assert!(output.status.success(), "{}", combined_output(&output));
+    fs::remove_file(&called).unwrap();
+    let value = package(&bundle);
     assert_eq!(value("PGRX_PG_CONFIG_AS_ENV"), "true");
     assert_eq!(value("PGRX_PG_CONFIG_VERSION"), "PostgreSQL 18.7");
     assert_eq!(value("PGRX_PG_CONFIG_CPPFLAGS"), "-DCOLLECTED=1");
     assert_eq!(value("PGRX_PG_CONFIG_CFLAGS"), "-O2 -fwrapv");
     // The build reads the collected headers, unpacked here, not a path on the target.
-    let headers = std::path::Path::new(value("PGRX_PG_CONFIG_INCLUDEDIR-SERVER"));
-    assert!(!headers.starts_with(root.join("headers")));
+    let unpacked = std::path::PathBuf::from(value("PGRX_PG_CONFIG_INCLUDEDIR-SERVER"));
+    assert!(!unpacked.starts_with(&headers));
     assert_eq!(
-        fs::read_to_string(headers.join("pg_config.h")).unwrap(),
+        fs::read_to_string(unpacked.join("pg_config.h")).unwrap(),
         "/* configured on the target */"
     );
-    // The build generates for itself: nothing is imported, and no program is named.
-    assert!(seen.iter().all(|(name, _)| !name.contains("TARGET_INFO")), "{seen:?}");
-    assert!(seen.iter().all(|(name, _)| name != "PGRX_PG_CONFIG_PATH"), "{seen:?}");
 
-    // The script says what is wrong with its arguments.
+    // From a file of what the target's `pg_config` printed, ending its lines as Windows does,
+    // with the headers somewhere else on this machine and one value stated over the file's.
+    // No program runs.
+    let saved = root.join("saved-pg_config.txt");
+    fs::write(
+        &saved,
+        "INCLUDEDIR-SERVER = /on/the/target\r\nPKGLIBDIR = /native/pg/lib\r\nSHAREDIR = /native/pg/share\r\nCPPFLAGS = -DSAVED=1\r\nCFLAGS = -O1\r\nVERSION = PostgreSQL 18.7\r\n",
+    )
+    .unwrap();
+    let (output, bundle) = collect(
+        "file",
+        &[
+            ("--target=", target),
+            ("--pg-config-file=", saved.as_ref()),
+            ("--includedir-server=", headers.as_ref()),
+            ("--cppflags=", "-DSTATED=1 -DNAME=\"a = b\"".as_ref()),
+        ],
+    );
+    assert!(output.status.success(), "{}", combined_output(&output));
+    assert!(!called.exists(), "a file and properties were given, so no pg_config should run");
+    let value = package(&bundle);
+    assert_eq!(value("PGRX_PG_CONFIG_CPPFLAGS"), "-DSTATED=1 -DNAME=\"a = b\"");
+    assert_eq!(value("PGRX_PG_CONFIG_CFLAGS"), "-O1");
+
+    // The script collects whatever it is told, and packaging says what is missing.
+    let (output, bundle) = collect(
+        "incomplete",
+        &[
+            ("--target=", target),
+            ("--version=", "PostgreSQL 18.7".as_ref()),
+            ("--includedir-server=", headers.as_ref()),
+            ("--pkglibdir=", "/native/pg/lib".as_ref()),
+        ],
+    );
+    assert!(output.status.success(), "{}", combined_output(&output));
+    let output = fixture.command().arg("--bundle").arg(&bundle).output().unwrap();
+    assert!(!output.status.success());
+    let error = combined_output(&output);
+    assert!(error.contains("does not say what `pg_config --sharedir` reports"), "{error}");
+
+    // The script refuses only what stops it from collecting at all.
     for (arguments, problem) in [
         (vec![], "--target is required"),
-        (vec!["--target", "linux"], "is not a Rust target triple"),
-        (vec!["--target", &host, "--includedir-server", "/nonexistent"], "has no pg_config.h"),
+        (vec![("--target", target)], "unknown argument: --target"),
+        (vec![("--target=", target), ("--pkglibdir=", "/x".as_ref())], "nothing reports VERSION"),
+        (
+            vec![("--target=", target), ("--version=", "PostgreSQL 18.7".as_ref())],
+            "nothing reports INCLUDEDIR-SERVER; pass --includedir-server=",
+        ),
     ] {
-        let output = Command::new("sh")
-            .arg(script)
-            .args(&arguments)
-            .args(["--out-dir", root.join("refused").to_str().unwrap(), "--pg-config"])
-            .arg(&fixture.pg_config)
-            .env("PGRX_TEST_PG_CONFIG_LOG", root.join("pg_config-called"))
-            .env("PGRX_TEST_PG_HEADERS", root.join("headers"))
-            .output()
-            .unwrap();
+        let (output, _) = collect("refused", &arguments);
         assert!(!output.status.success(), "{arguments:?}");
         assert!(combined_output(&output).contains(problem), "{}", combined_output(&output));
     }
-    assert!(!root.join("refused").exists());
 }
 
 /// A bundle supplies the target and its PostgreSQL, so nothing else on the command line can.

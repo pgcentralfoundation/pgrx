@@ -20,9 +20,13 @@
 //!
 //! - `partial-bundle`, the version of this layout;
 //! - `target`, the Rust target;
-//! - `pg_config.txt`, everything `pg_config` printed;
+//! - `pg_config.txt`, `NAME = value` lines as `pg_config` prints them, where the last line
+//!   for a name is the one that counts;
 //! - `include/server/`, the server headers, and `include/pkg/` for MSVC targets;
 //! - `lib/postgres.lib`, for MSVC targets.
+//!
+//! The script copies what it is given: a `pg_config` program's output, a file of it, or
+//! values someone typed. It checks none of that, so [`Bundle::open`] checks all of it.
 //!
 //! The build that uses a partial bundle generates from those headers itself, so it needs
 //! Clang and the target's system headers, which a full bundle spares it.
@@ -221,24 +225,31 @@ impl Bundle {
             format.trim()
         );
         let target = read(PARTIAL_TARGET)?.trim().to_owned();
-        ensure!(!target.is_empty(), "{} names no Rust target", file.display());
+        ensure!(
+            is_target_triple(&target),
+            "{} names `{target}` as its Rust target, which is not a target triple such as aarch64-unknown-linux-gnu; collect it again with that platform's `--target=`",
+            file.display()
+        );
         let server_headers = root.join(SERVER_HEADERS);
         ensure!(
             server_headers.join("pg_config.h").is_file(),
-            "{} has no server headers in {SERVER_HEADERS}",
+            "{} has no PostgreSQL server headers in {SERVER_HEADERS}; collect it again with `--includedir-server=` naming the directory that holds pg_config.h",
             file.display()
         );
 
         let reported = parse_pg_config(&read(PARTIAL_PG_CONFIG)?);
         let mut properties = BTreeMap::new();
         for required in ["version", "pkglibdir", "sharedir", "cppflags"] {
-            let value = reported.get(required).ok_or_else(|| {
-                eyre!(
-                    "{PARTIAL_PG_CONFIG} in {} has no {}",
-                    file.display(),
-                    required.to_uppercase()
-                )
-            })?;
+            // The preprocessor flags may be empty, but the bundle has to say that they are.
+            let value = reported
+                .get(required)
+                .filter(|value| required == "cppflags" || !value.is_empty())
+                .ok_or_else(|| {
+                    eyre!(
+                        "{} does not say what `pg_config --{required}` reports; collect it again with `--{required}=`",
+                        file.display()
+                    )
+                })?;
             properties.insert(required.to_owned(), value.clone());
         }
         if let Some(cflags) = reported.get("cflags") {
@@ -249,9 +260,40 @@ impl Bundle {
         if public_headers.is_dir() {
             properties.insert("pkgincludedir".to_owned(), utf8(&public_headers)?);
         }
-        properties.insert("libdir".to_owned(), utf8(&root.join(LIBRARIES))?);
-        Ok(Self { target, pg_config: PgConfig::from_properties(properties), target_info: None })
+        let libraries = root.join(LIBRARIES);
+        if target.ends_with("-msvc") {
+            // The script collects these two only for an MSVC target, which cannot build without.
+            for (collected, property) in
+                [(public_headers, "pkgincludedir"), (libraries.join(IMPORT_LIBRARY), "libdir")]
+            {
+                ensure!(
+                    collected.exists(),
+                    "{} is for an MSVC target and lacks what `pg_config --{property}` names; collect it again with `--{property}=`",
+                    file.display()
+                );
+            }
+        }
+        properties.insert("libdir".to_owned(), utf8(&libraries)?);
+
+        let pg_config = PgConfig::from_properties(properties);
+        pg_config.major_version().wrap_err_with(|| {
+            format!(
+                "{} reports `VERSION = {}`, which is not a PostgreSQL version",
+                file.display(),
+                reported["version"]
+            )
+        })?;
+        Ok(Self { target, pg_config, target_info: None })
     }
+}
+
+/// Whether `target` has the shape of a Rust target triple. Cargo decides whether it is a
+/// real one; this keeps a path or a stray word from reaching Cargo as a target.
+fn is_target_triple(target: &str) -> bool {
+    let part = |part: &str| {
+        !part.is_empty() && part.chars().all(|c| c.is_ascii_alphanumeric() || c == '_' || c == '.')
+    };
+    target.split('-').count() >= 3 && target.split('-').all(part)
 }
 
 /// Read what `pg_config` prints without arguments: a `NAME = value` line for each property.
@@ -370,9 +412,10 @@ mod tests {
     #[test]
     fn pg_config_output_is_read_by_property() {
         let reported = parse_pg_config(
-            "BINDIR = /usr/lib/postgresql/18/bin\r\nINCLUDEDIR-SERVER = /usr/include/postgresql/18/server\nCPPFLAGS = -D_GNU_SOURCE -DNAME=\"a = b\"\nCFLAGS_SL = \nLDFLAGS_EX =\nVERSION = PostgreSQL 18.1\n",
+            "BINDIR = /usr/lib/postgresql/18/bin\r\nINCLUDEDIR-SERVER = /usr/include/postgresql/18/server\nCPPFLAGS = -D_GNU_SOURCE -DNAME=\"a = b\"\nCFLAGS_SL = \nLDFLAGS_EX =\nVERSION = PostgreSQL 18.1\nBINDIR = /opt/pg/bin\n",
         );
-        assert_eq!(reported["bindir"], "/usr/lib/postgresql/18/bin");
+        // The collection script appends what overrides an earlier line.
+        assert_eq!(reported["bindir"], "/opt/pg/bin");
         assert_eq!(reported["includedir-server"], "/usr/include/postgresql/18/server");
         assert_eq!(reported["cppflags"], "-D_GNU_SOURCE -DNAME=\"a = b\"");
         assert_eq!(reported["cflags_sl"], "");
@@ -395,7 +438,8 @@ mod tests {
             std::fs::write(staging.join("include/pkg/postgres_ext.h"), "").unwrap();
             std::fs::write(staging.join("lib/postgres.lib"), "import library").unwrap();
         }
-        let path = directory.join(format!("pgrx-pg18-{target}.partial.tar.gz"));
+        let name = format!("pgrx-pg18-{}.partial.tar.gz", target.replace('/', "_"));
+        let path = directory.join(name);
         let file = File::create(&path).unwrap();
         let mut archive =
             tar::Builder::new(flate2::write::GzEncoder::new(file, flate2::Compression::default()));
@@ -440,22 +484,38 @@ mod tests {
         assert!(pg_config.lib_dir().unwrap().join("postgres.lib").is_file());
     }
 
+    /// The collection script checks nothing it copies, so opening its bundle has to.
     #[test]
-    fn an_incomplete_partial_bundle_is_refused() {
+    fn a_partial_bundle_is_checked_when_it_is_opened() {
         let directory = tempfile::tempdir().unwrap();
         let directory = directory.path();
         let scratch = directory.join("scratch");
-        let file = partial_bundle(
-            directory,
-            "aarch64-unknown-linux-gnu",
-            "VERSION = PostgreSQL 18.1\n",
-            false,
-        );
-        let error = Bundle::open(&file, &scratch).unwrap_err();
-        assert!(error.to_string().contains("has no PKGLIBDIR"), "{error}");
-        let file = partial_bundle(directory, "", REPORTED, false);
-        let error = Bundle::open(&file, &scratch).unwrap_err();
-        assert!(error.to_string().contains("names no Rust target"), "{error}");
+        let linux = "aarch64-unknown-linux-gnu";
+        let without = |name: &str| {
+            let lines = REPORTED.lines().filter(|line| !line.starts_with(name));
+            lines.map(|line| format!("{line}\n")).collect::<String>()
+        };
+        for (target, pg_config, msvc, problem) in [
+            (linux, without("PKGLIBDIR"), false, "does not say what `pg_config --pkglibdir`"),
+            (linux, without("CPPFLAGS"), false, "does not say what `pg_config --cppflags`"),
+            (linux, format!("{REPORTED}SHAREDIR = \n"), false, "`pg_config --sharedir`"),
+            (linux, format!("{REPORTED}VERSION = 18\n"), false, "`VERSION = 18`, which is not"),
+            ("", REPORTED.to_owned(), false, "is not a target triple"),
+            ("linux", REPORTED.to_owned(), false, "is not a target triple"),
+            ("../x86_64-unknown-linux-gnu", REPORTED.to_owned(), false, "is not a target triple"),
+            ("x86_64-pc-windows-msvc", REPORTED.to_owned(), false, "`pg_config --pkgincludedir`"),
+        ] {
+            let file = partial_bundle(directory, target, &pg_config, msvc);
+            let error = Bundle::open(&file, &scratch).unwrap_err();
+            assert!(format!("{error:#}").contains(problem), "{problem}: {error:#}");
+        }
+
+        // Empty preprocessor flags are an answer, and a later line replaces an earlier one.
+        let stated = format!("{}CPPFLAGS = \nPKGLIBDIR = /opt/pg/lib\n", without("CPPFLAGS"));
+        let file = partial_bundle(directory, linux, &stated, false);
+        let pg_config = Bundle::open(&file, &scratch).unwrap().pg_config;
+        assert_eq!(pg_config.cppflags().unwrap(), "");
+        assert_eq!(pg_config.pkglibdir().unwrap(), Path::new("/opt/pg/lib"));
     }
 
     #[test]

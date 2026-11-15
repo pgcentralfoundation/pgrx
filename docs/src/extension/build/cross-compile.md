@@ -25,14 +25,15 @@ build for that platform's PostgreSQL from anywhere else.
 `cargo pgrx package` is the only command that builds for another platform, and a
 bundle is the only way to tell it which one.
 
-If the target platform has PostgreSQL's server headers but no Rust or Clang, a
-shell script collects a [partial bundle](#collect-a-partial-bundle) there
-instead, and the build host does the generating.
+If the target platform has PostgreSQL's server headers but no Rust or Clang, or
+its headers exist only in a sysroot, a shell script collects a
+[partial bundle](#collect-a-partial-bundle) from them instead, and the build
+host does the generating.
 
-| | Made on the target with | The build host also needs |
+| | Made with | The build host also needs |
 | --- | --- | --- |
-| Full bundle | Rust, Clang and PostgreSQL's server headers | a linker for the target |
-| Partial bundle | `pg_config`, `tar` and PostgreSQL's server headers | a linker, Clang, and the target's system headers |
+| Full bundle | Rust, Clang and PostgreSQL's server headers, on the target | a linker for the target |
+| Partial bundle | `tar`, the target's server headers, and what its `pg_config` reports | a linker, Clang, and the target's system headers |
 
 ## Why the bundle comes from the target
 
@@ -96,24 +97,80 @@ collects those into a partial bundle. Take the script from the tag of the pgrx
 release your extension uses, and copy it to the target.
 
 ```sh
-sh pgrx-collect-bundle.sh --target aarch64-unknown-linux-gnu
+sh pgrx-collect-bundle.sh --target=aarch64-unknown-linux-gnu
 ```
 
-- **What it needs.** `pg_config`, `tar`, and a POSIX shell. On Windows, run it in
-  Git Bash. PostgreSQL's server headers must be installed, which on most
-  distributions is the server's `-dev` or `-devel` package.
-- **`--target`.** The Rust target triple of that platform. A machine without Rust
+The script needs `tar` and a POSIX shell; on Windows, run it in Git Bash. It is
+short enough to read before you run it. Every option is written `--name=value`.
+
+- **`--target=`.** The Rust target triple of that platform. A machine without Rust
   cannot name its own, so you state it; the build that uses the bundle checks the
   headers against it, as described under [What pgrx verifies](#what-pgrx-verifies).
-- **`--pg-config`.** The PostgreSQL to collect; without it, the first `pg_config`
-  on `PATH`.
-- **`--includedir-server`.** The server headers, when they are not where
-  `pg_config` reports them.
-- **`--out-dir`.** Where to write the file; without it, the current directory.
+- **`--out-dir=`.** Where to write the file; without it, the current directory.
+
+The other options say what `pg_config` reports. They combine, and each one in
+this list overrides the ones before it:
+
+- **`--pg-config=`.** A `pg_config` program to run. Given neither of the next
+  two, the script runs the first `pg_config` on `PATH`.
+- **`--pg-config-file=`.** A file holding what `pg_config` prints when run with
+  no arguments: a `NAME = value` line for each property.
+- **`--<property>=`.** One property, named as `pg_config`'s own option is, such
+  as `--pkglibdir=/usr/lib/postgresql/18/lib`.
+
+The script copies the server headers from the directory that `INCLUDEDIR-SERVER`
+names. When they are somewhere else on the machine running the script, pass
+`--includedir-server=` with that directory.
 
 It writes `pgrx-pg18-aarch64-unknown-linux-gnu.partial.tar.gz` and prints the
-path. The file holds the Rust target, everything `pg_config` printed, the server
-headers, and for Windows MSVC targets the public headers and `postgres.lib`.
+path. The file holds the Rust target, the `pg_config` lines, the server headers,
+and for Windows MSVC targets the public headers and `postgres.lib`.
+
+The script copies what it is given and checks none of it.
+`cargo pgrx package --bundle` checks the bundle when it uses it, and names a
+value that is missing. It cannot tell that a value is wrong for the target: a
+mistaken `--pkglibdir=` produces a package laid out for a directory the server
+does not load from.
+
+### When no `pg_config` can run
+
+A sysroot from Yocto or Buildroot holds the target's server headers, but its
+`pg_config` is built for the target and does not run on the machine that holds
+the sysroot. Run the script there and state the properties:
+
+```sh
+sh pgrx-collect-bundle.sh \
+    --target=aarch64-unknown-linux-gnu \
+    --version='PostgreSQL 18.1' \
+    --includedir-server="$SYSROOT/usr/include/postgresql/server" \
+    --pkglibdir=/usr/lib/postgresql \
+    --sharedir=/usr/share/postgresql \
+    --cppflags=-D_GNU_SOURCE \
+    --cflags='-O2 -fwrapv -fno-strict-aliasing'
+```
+
+| Property | What to give |
+| --- | --- |
+| `--version=` | `PostgreSQL` and the version, as `pg_config --version` prints it |
+| `--includedir-server=` | the directory holding `pg_config.h`, on the machine running the script |
+| `--pkglibdir=` | where the target's server loads extension libraries from, as a path on the target |
+| `--sharedir=` | the directory on the target whose `extension` directory holds control and SQL files |
+| `--cppflags=` | the preprocessor flags PostgreSQL was built with; give `--cppflags=` if there were none |
+| `--cflags=` | the compiler flags PostgreSQL was built with; optional |
+| `--pkgincludedir=`, `--libdir=` | for Windows MSVC targets, the public headers and the directory holding `postgres.lib`, on the machine running the script |
+
+If the target can run `pg_config` but the script has to run elsewhere, save
+`pg_config`'s output on the target and pass the file, with the headers'
+directory on this machine:
+
+```sh
+sh pgrx-collect-bundle.sh \
+    --target=aarch64-unknown-linux-gnu \
+    --pg-config-file=pg_config.txt \
+    --includedir-server="$SYSROOT/usr/include/postgresql/server"
+```
+
+### Use a partial bundle
 
 Nothing in a partial bundle is generated, so it does not depend on the pgrx
 version or the `cshim` feature. Collect it once for a PostgreSQL installation and
