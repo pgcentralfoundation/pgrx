@@ -64,6 +64,28 @@ jobs:
           } > "$out/layout.txt"
           cat "$out/layout.txt"
 
+      # The script is for a target with no Rust or Clang, so it runs on every platform here,
+      # under Git Bash on Windows, and one route below builds from what it collects.
+      - name: Collect a partial bundle with the shell script
+        run: |
+          out="${RUNNER_TEMP//\\//}/bundle"
+          partial="$(sh tools/pgrx-collect-bundle.sh --target='${{ matrix.target }}' \
+            --pg-config="$PG_CONFIG" --out-dir="$out")"
+          test "$partial" = "$out/pgrx-pg18-${{ matrix.target }}.partial.tar.gz"
+          tar -tzf - < "$partial" > "$out/partial-contents.txt"
+          for member in partial-bundle target pg_config.txt include/server/pg_config.h; do
+            grep -qx "$member" "$out/partial-contents.txt"
+          done
+          # It holds headers and pg_config's output: nothing generated, nothing compiled.
+          if grep -e '^target-info' -e '\.rs$' -e '\.a$' "$out/partial-contents.txt"; then
+            exit 1
+          fi
+          if [[ '${{ matrix.target }}' == *-msvc ]]; then
+            grep -qx 'lib/postgres.lib' "$out/partial-contents.txt"
+            grep -q '^include/pkg/' "$out/partial-contents.txt"
+          fi
+          rm "$out/partial-contents.txt"
+
       - uses: actions/upload-artifact@v4
         with:
           name: bundle-${{ matrix.target }}
@@ -90,6 +112,18 @@ jobs:
             suffix: .so
             rpm_arch: aarch64
             deb_arch: arm64
+          # The same route from a partial bundle: this job generates from the target's
+          # collected headers, so it also runs Clang for the target.
+          - id: linux-to-linux-arm64-partial
+            name: Linux x64 to Linux ARM64 from a partial bundle
+            runner: ubuntu-24.04
+            target: aarch64-unknown-linux-gnu
+            os: linux
+            arch: aarch64
+            suffix: .so
+            rpm_arch: aarch64
+            deb_arch: arm64
+            bundle: .partial
           - id: linux-to-macos-arm64
             name: Linux x64 to macOS ARM64
             runner: ubuntu-24.04
@@ -137,6 +171,8 @@ jobs:
       # Linux installation paths describe the target, not MSYS2's host filesystem.
       MSYS2_ENV_CONV_EXCL: 'TARGET_PG_'
       CROSS_TARGET: ${{ matrix.target }}
+      # Empty for a full bundle, `.partial` for a collected one.
+      CROSS_BUNDLE_KIND: ${{ matrix.bundle }}
       CROSS_OS: ${{ matrix.os }}
       CROSS_ARCH: ${{ matrix.arch }}
       CROSS_SUFFIX: ${{ matrix.suffix }}
@@ -317,6 +353,8 @@ jobs:
             echo 'CC_aarch64_unknown_linux_gnu=aarch64-linux-gnu-gcc'
             echo 'CXX_aarch64_unknown_linux_gnu=aarch64-linux-gnu-g++'
             echo 'AR_aarch64_unknown_linux_gnu=llvm-ar'
+            # Only a build from a partial bundle runs Clang for the target and reads this.
+            echo 'BINDGEN_EXTRA_CLANG_ARGS_aarch64_unknown_linux_gnu=-isystem /usr/aarch64-linux-gnu/include -ccc-gcc-name aarch64-linux-gnu-gcc'
           } >> "$GITHUB_ENV"
 
       - name: Install the macOS-hosted Linux GNU cross compiler
@@ -403,7 +441,7 @@ jobs:
       - name: Leave nothing but the bundle to describe the target
         run: |
           downloaded="${RUNNER_TEMP//\\//}/bundle"
-          bundle="$downloaded/pgrx-pg18-$CROSS_TARGET.tar.gz"
+          bundle="$downloaded/pgrx-pg18-$CROSS_TARGET$CROSS_BUNDLE_KIND.tar.gz"
           test -f "$bundle"
           test ! -e "$PGRX_HOME/config.toml"
           missing="$CROSS_ROOT/no-pg-config"
