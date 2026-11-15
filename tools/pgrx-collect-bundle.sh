@@ -109,6 +109,9 @@ esac
 
 mkdir -p "$out_dir"
 bundle="$out_dir/pgrx-pg$major-$target.partial.tar.gz"
-# COPYFILE_DISABLE keeps macOS's tar from adding a metadata file beside each header.
-COPYFILE_DISABLE=1 tar -czf "$bundle" -C "$staging" partial-bundle target pg_config.txt include lib
+# COPYFILE_DISABLE keeps macOS's tar from adding a metadata file beside each header. The
+# archive goes to standard output because GNU tar reads a Windows path such as D:/out as a
+# remote host.
+COPYFILE_DISABLE=1 tar -czf - -C "$staging" partial-bundle target pg_config.txt include lib \
+    > "$bundle"
 echo "$bundle"
