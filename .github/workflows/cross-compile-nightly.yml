@@ -90,7 +90,9 @@ jobs:
   package:
     name: ${{ matrix.name }} PG18
     needs: bundle
-    if: github.event_name != 'schedule' || github.repository == 'pgcentralfoundation/pgrx'
+    # Run each route whose bundle exists, even when another platform's bundle job failed; a
+    # route without its bundle fails at the download.
+    if: ${{ !cancelled() && (github.event_name != 'schedule' || github.repository == 'pgcentralfoundation/pgrx') }}
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 45
     strategy:
@@ -390,6 +392,10 @@ jobs:
         run: |
           if [[ -n "${LLVM_BIN:-}" ]]; then export PATH="$LLVM_BIN:$PATH"; fi
           if [[ -n "${CROSS_ENV_FILE:-}" ]]; then source "$CROSS_ENV_FILE"; fi
+          if [[ -z "$CROSS_BUNDLE_KIND" ]]; then
+            # A full bundle needs no Clang for pgrx, so point pgrx at none to show it.
+            export CLANG_PATH=/nonexistent/clang LIBCLANG_PATH=/nonexistent
+          fi
           target/debug/pgrx-ci cross-package --bundle "$CROSS_BUNDLE"
 
       - name: Collect target configuration diagnostics
