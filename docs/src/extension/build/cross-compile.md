@@ -266,10 +266,11 @@ PostgreSQL headers do not describe the inspected C target: pg_config.h was confi
 ```
 
 The error chain also names the PostgreSQL version, the Cargo target, the server
-header directory and the metadata source, and says what to do:
+header directory and the metadata source, and says what to do. From a partial
+bundle, for example:
 
 ```text
-these server headers do not describe aarch64-unknown-linux-gnu; use the `pg_config` of a PostgreSQL 18 built for aarch64-unknown-linux-gnu, or to package for another platform, generate a bundle there with `cargo pgrx package --bundle-generate` and pass it to `cargo pgrx package --bundle`
+these server headers do not describe aarch64-unknown-linux-gnu; collect the partial bundle again from the server headers of a PostgreSQL 18 built for aarch64-unknown-linux-gnu
 ```
 
 The checks do not prove that the headers came from the deployed server. These
@@ -410,7 +411,7 @@ cargo-zigbuild %*
 ```
 
 ```sh
-CARGO=C:\path	o\cargo-for-linux.cmd cargo-pgrx pgrx package --bundle pgrx-pg18-x86_64-unknown-linux-gnu.tar.gz
+CARGO='C:\path\to\cargo-for-linux.cmd' cargo-pgrx pgrx package --bundle pgrx-pg18-x86_64-unknown-linux-gnu.tar.gz
 ```
 
 ## Debian

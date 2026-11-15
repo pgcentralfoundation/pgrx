@@ -339,6 +339,6 @@ impl PgrxManifestExt for Manifest {
     fn lib_filename(&self, target: Option<&str>) -> eyre::Result<String> {
         let os = TargetOs::from_target(target);
         let lib_name = &self.lib_name()?;
-        Ok(format!("{}{lib_name}{}", os.dll_prefix(), os.dll_suffix()))
+        Ok(format!("{}{lib_name}.{}", os.dll_prefix(), os.dll_extension()))
     }
 }

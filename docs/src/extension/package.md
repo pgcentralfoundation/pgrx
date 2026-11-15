@@ -56,12 +56,10 @@ Run `cargo pgrx package --help` for the full list.
 
 ## Building for Several Postgres Versions
 
-Register each Postgres with `cargo pgrx init`, then run `cargo pgrx package` once per version. Each
-run has its own output directory:
+Run `cargo pgrx package` once per version, naming that version's `pg_config`. Packaging needs no
+`cargo pgrx init`, and each run has its own output directory:
 
 ```console
-$ cargo pgrx init --pg16 /usr/lib/postgresql/16/bin/pg_config \
-                  --pg17 /usr/lib/postgresql/17/bin/pg_config
 $ cargo pgrx package --pg-config /usr/lib/postgresql/16/bin/pg_config
 $ cargo pgrx package --pg-config /usr/lib/postgresql/17/bin/pg_config
 ```

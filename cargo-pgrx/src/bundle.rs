@@ -36,7 +36,7 @@ use pgrx_pg_config::PgConfig;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 use std::fs::File;
-use std::path::{Path, PathBuf};
+use std::path::{Component, Path, PathBuf};
 
 const DESCRIPTION: &str = "bundle.json";
 const TARGET_INFO: &str = "target-info";
@@ -72,7 +72,7 @@ struct Description {
 }
 
 /// The file name of the bundle for one PostgreSQL major version and Rust target.
-pub(crate) fn file_name(major_version: u16, target: &str) -> String {
+fn file_name(major_version: u16, target: &str) -> String {
     format!("pgrx-pg{major_version}-{target}.tar.gz")
 }
 
@@ -185,20 +185,39 @@ impl Bundle {
             file.display(),
             bundle.target
         );
+        // The package is staged under these paths, so they must name places on the target.
+        // Windows packages always use `lib` and `share/extension` instead.
+        if !bundle.target.contains("-windows") {
+            let pg_config = &bundle.pg_config;
+            for (property, path) in
+                [("pkglibdir", pg_config.pkglibdir()?), ("sharedir", pg_config.sharedir()?)]
+            {
+                ensure!(
+                    is_target_directory(&path),
+                    "{} reports `{}` for `pg_config --{property}`, which is not an absolute path without `..` on the target; make the bundle again with the target's directory",
+                    file.display(),
+                    path.display()
+                );
+            }
+        }
         Ok(bundle)
     }
 
     /// A bundle that `cargo pgrx package --bundle-generate` wrote on its target.
     fn full(file: &Path, root: &Path) -> eyre::Result<Self> {
-        let description: Description =
+        let parse_error = || format!("couldn't parse {DESCRIPTION} in {}", file.display());
+        let description: serde_json::Value =
             serde_json::from_slice(&std::fs::read(root.join(DESCRIPTION))?)
-                .wrap_err_with(|| format!("couldn't parse {DESCRIPTION} in {}", file.display()))?;
+                .wrap_err_with(parse_error)?;
+        // Another format's description can have other fields, so its format is read first.
+        let format = &description["format"];
         ensure!(
-            description.format == FORMAT,
-            "{} is a format {} bundle, and this cargo-pgrx reads format {FORMAT}; generate it again with this version",
-            file.display(),
-            description.format
+            format.as_u64() == Some(FORMAT.into()),
+            "{} is a format {format} bundle, and this cargo-pgrx reads format {FORMAT}; generate it again with this version",
+            file.display()
         );
+        let description: Description =
+            serde_json::from_value(description).wrap_err_with(parse_error)?;
         let target_info = root.join(TARGET_INFO);
         ensure!(target_info.is_dir(), "{} has no {TARGET_INFO} directory", file.display());
 
@@ -290,6 +309,13 @@ impl Bundle {
     }
 }
 
+/// Whether `path` is an absolute Unix path with no `..`, which staging can place under a
+/// package's root.
+fn is_target_directory(path: &Path) -> bool {
+    let path = path.to_string_lossy();
+    path.starts_with('/') && !path.contains('\\') && path.split('/').all(|part| part != "..")
+}
+
 /// Whether `target` has the shape of a Rust target triple. Cargo decides whether it is a
 /// real one; this keeps a path or a stray word from reaching Cargo as a target.
 fn is_target_triple(target: &str) -> bool {
@@ -313,6 +339,10 @@ fn parse_pg_config(text: &str) -> BTreeMap<String, String> {
 ///
 /// The files take the time of unpacking. Cargo reruns a build script only for an input newer
 /// than its last run, and an archive's own times can be older than that.
+///
+/// Directories take this machine's permissions, not the archive's. Headers copied from a
+/// read-only tree, such as a Nix store, would otherwise refuse the files below them, and the
+/// next unpack could not remove them.
 fn unpack(file: &Path, root: &Path) -> eyre::Result<()> {
     let file = File::open(file)?;
     let mut archive = tar::Archive::new(flate2::read::GzDecoder::new(file));
@@ -321,12 +351,20 @@ fn unpack(file: &Path, root: &Path) -> eyre::Result<()> {
         let mut entry = entry?;
         let kind = entry.header().entry_type();
         let path = entry.path()?.into_owned();
-        if !(kind.is_file() || kind.is_dir()) {
+        let inside = if kind.is_dir() {
+            let inside = path
+                .components()
+                .all(|part| matches!(part, Component::Normal(_) | Component::CurDir));
+            if inside {
+                std::fs::create_dir_all(root.join(&path))?;
+            }
+            inside
+        } else if kind.is_file() {
+            entry.unpack_in(root)?
+        } else {
             bail!("{} is neither a file nor a directory", path.display());
-        }
-        if !entry.unpack_in(root)? {
-            bail!("{} would be written outside the bundle", path.display());
-        }
+        };
+        ensure!(inside, "{} would be written outside the bundle", path.display());
     }
     Ok(())
 }
@@ -495,6 +533,53 @@ mod tests {
         assert!(pg_config.lib_dir().unwrap().join("postgres.lib").is_file());
     }
 
+    /// Headers archived read-only, as copied from a Nix store, unpack, and unpack again over
+    /// that copy when the file changes.
+    #[cfg(unix)]
+    #[test]
+    fn read_only_directories_unpack() {
+        fn append(archive: &mut tar::Builder<impl std::io::Write>, name: &str, bytes: &[u8]) {
+            let mut header = tar::Header::new_gnu();
+            let (kind, mode) = if name.ends_with('/') {
+                (tar::EntryType::Directory, 0o555)
+            } else {
+                (tar::EntryType::Regular, 0o444)
+            };
+            header.set_entry_type(kind);
+            header.set_size(bytes.len() as u64);
+            header.set_mode(mode);
+            header.set_cksum();
+            archive.append_data(&mut header, name, bytes).unwrap();
+        }
+        let directory = tempfile::tempdir().unwrap();
+        let directory = directory.path();
+        let file = directory.join("pgrx-pg18-aarch64-unknown-linux-gnu.partial.tar.gz");
+        let write = |pg_config: &str| {
+            let encoder = flate2::write::GzEncoder::new(
+                File::create(&file).unwrap(),
+                flate2::Compression::default(),
+            );
+            let mut archive = tar::Builder::new(encoder);
+            for (name, bytes) in [
+                ("partial-bundle", b"1\n".as_slice()),
+                ("target", b"aarch64-unknown-linux-gnu\n"),
+                ("pg_config.txt", pg_config.as_bytes()),
+                ("include/", b""),
+                ("include/server/", b""),
+                ("include/server/pg_config.h", b"/* configured */"),
+            ] {
+                append(&mut archive, name, bytes);
+            }
+            archive.into_inner().unwrap().finish().unwrap();
+        };
+        let scratch = directory.join("scratch");
+        write(REPORTED);
+        Bundle::open(&file, &scratch).unwrap();
+        write(&format!("{REPORTED}CPPFLAGS = -DAGAIN\n"));
+        let pg_config = Bundle::open(&file, &scratch).unwrap().pg_config;
+        assert_eq!(pg_config.cppflags().unwrap(), "-DAGAIN");
+    }
+
     /// The collection script checks nothing it copies, so opening its bundle has to.
     #[test]
     fn a_partial_bundle_is_checked_when_it_is_opened() {
@@ -515,6 +600,9 @@ mod tests {
             ("linux", REPORTED.to_owned(), false, "is not a target triple"),
             ("../x86_64-unknown-linux-gnu", REPORTED.to_owned(), false, "is not a target triple"),
             ("x86_64-pc-windows-msvc", REPORTED.to_owned(), false, "`pg_config --pkgincludedir`"),
+            (linux, format!("{REPORTED}PKGLIBDIR = /usr/lib/../../tmp\n"), false, "without `..`"),
+            (linux, format!("{REPORTED}SHAREDIR = share\n"), false, "not an absolute path"),
+            (linux, format!("{REPORTED}SHAREDIR = C:\\pg\\share\n"), false, "not an absolute"),
         ] {
             let file = partial_bundle(directory, target, &pg_config, msvc);
             let error = Bundle::open(&file, &scratch).unwrap_err();
@@ -587,7 +675,8 @@ mod tests {
         };
 
         let newer = archive("newer.tar.gz", &|archive| {
-            data(archive, DESCRIPTION, br#"{"format": 2, "target": "t", "pg_config": {}}"#);
+            let description = br#"{"format": 2, "target": "t", "pg_config": {}, "added": 1}"#;
+            data(archive, DESCRIPTION, description);
         });
         let error = Bundle::open(&newer, &directory.join("scratch")).unwrap_err();
         assert!(error.to_string().contains("format 2 bundle"), "{error}");
@@ -608,6 +697,20 @@ mod tests {
         });
         let error = Bundle::open(&link, &directory.join("scratch")).unwrap_err();
         assert!(format!("{error:#}").contains("neither a file nor a directory"), "{error:#}");
+
+        // The `tar` crate refuses to write such a name, so it goes into the header as bytes.
+        let escape = archive("escape.tar.gz", &|archive| {
+            let mut header = tar::Header::new_gnu();
+            header.as_gnu_mut().unwrap().name[..6].copy_from_slice(b"../up/");
+            header.set_entry_type(tar::EntryType::Directory);
+            header.set_size(0);
+            header.set_mode(0o755);
+            header.set_cksum();
+            archive.append(&header, [].as_slice()).unwrap();
+        });
+        let error = Bundle::open(&escape, &directory.join("scratch")).unwrap_err();
+        assert!(format!("{error:#}").contains("outside the bundle"), "{error:#}");
+        assert!(!directory.join("scratch/pgrx-bundle/up").exists());
 
         let empty = archive("empty.tar.gz", &|_| {});
         let error = Bundle::open(&empty, &directory.join("scratch")).unwrap_err();

@@ -25,7 +25,8 @@ pub use configuration::{ConfigurationError, LayoutDisagreement, verify_postgres_
 /// Decode recorded PostgreSQL flags using the installation's target conventions.
 ///
 /// Windows GNU installations use Windows quoting without MSVC option translation. `None`
-/// selects the generator's native platform, for metadata read from a local `pg_config`.
+/// selects the generator's native convention, for metadata read from a local `pg_config`:
+/// MSVC translation on an MSVC host, and POSIX quoting everywhere else.
 pub fn postgres_clang_flags_for_target(
     flags: &str,
     target: Option<&str>,
@@ -47,7 +48,10 @@ pub fn split_recorded_cflags_for_target(
     flags: &str,
     target: Option<&str>,
 ) -> Result<Option<Vec<String>>, FrontendError> {
-    crate::split_recorded_cflags(flags, crate::model::targets_windows(target))
+    // Without a target, only an MSVC host's own installation records Windows quoting; a
+    // Windows GNU host's `pg_config` has always been read with POSIX quoting.
+    let windows = target.map_or(cfg!(target_env = "msvc"), crate::model::is_windows_triple);
+    crate::split_recorded_cflags(flags, windows)
 }
 
 /// PostgreSQL function macros and the other definitions needed to interpret them.
@@ -697,6 +701,18 @@ pub enum PostgresError {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// Without a target, flags keep the native convention they always had: POSIX quoting except
+    /// on an MSVC host, so a Windows GNU host's `pg_config` reads as it did.
+    #[test]
+    fn recorded_flags_without_a_target_keep_the_native_convention() {
+        let split = split_recorded_cflags_for_target("-I'/a b' -fPIC", None).unwrap().unwrap();
+        if cfg!(target_env = "msvc") {
+            assert_eq!(split, ["-I'/a", "b'", "-fPIC"]);
+        } else {
+            assert_eq!(split, ["-I/a b", "-fPIC"]);
+        }
+    }
 
     /// Metadata syntax belongs to the selected server, including Windows GNU installations.
     #[test]

@@ -118,7 +118,7 @@ const JOBS: &[(&str, Subjects)] = &[
     ("init", Subjects::Artifacts(&["pgrx-tests"])),
     ("variants", Subjects::Packages(&["pgrx-unit-tests", "custom_types"])),
     ("schema_release", Subjects::Packages(&["pgrx-unit-tests"])),
-    ("cross_package", Subjects::Artifacts(&["cargo-pgrx", "versioned_so"])),
+    ("cross_package", Subjects::Artifacts(&["cargo-pgrx", "versioned_so", "packaging"])),
     ("beta", Subjects::Any),
     ("package", Subjects::Packaging),
     // The docs.rs builds of pgrx-pg-sys and pgrx, from their committed bindings.
@@ -805,6 +805,18 @@ mod tests {
         assert!(!plan.everything);
         assert_eq!(output(&plan, &graph, "crates"), "pgrx-version-updater");
         assert_eq!(output(&plan, &graph, "package"), "true");
+    }
+
+    /// `pgrx-ci cross-package` packages each of its examples, so a change to one needs the job.
+    #[test]
+    fn the_cross_package_job_follows_its_examples() {
+        let subjects = JOBS.iter().find_map(|(name, subjects)| match subjects {
+            Subjects::Artifacts(packages) if *name == "cross_package" => Some(*packages),
+            _ => None,
+        });
+        for example in crate::cross::EXAMPLES {
+            assert!(subjects.unwrap().contains(&example.name), "{}", example.name);
+        }
     }
 
     #[test]

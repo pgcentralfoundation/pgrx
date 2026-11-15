@@ -93,7 +93,12 @@ fn main() {
         println!("cargo:rerun-if-env-changed={name}");
     }
     let mut seen: Vec<_> = std::env::vars()
-        .filter(|(name, _)| name.starts_with("PGRX_PG_CONFIG_") || name.contains("TARGET_INFO"))
+        .filter(|(name, _)| {
+            ["PGRX_PG_CONFIG_", "PGRX_INCLUDEDIR", "PGRX_PKGINCLUDEDIR"]
+                .iter()
+                .any(|prefix| name.starts_with(prefix))
+                || name.contains("TARGET_INFO")
+        })
         .collect();
     seen.sort();
     let seen: Vec<_> = seen.iter().map(|(name, value)| format!("{name}={value}\n")).collect();
@@ -202,6 +207,8 @@ fn main() {
             .env("PGRX_PG_CONFIG_VERSION", "PostgreSQL 18.7")
             .env("PGRX_PG_CONFIG_PKGLIBDIR", "/environment/pg/lib")
             .env("PGRX_PG_CONFIG_SHAREDIR", "/environment/pg/share")
+            .env("PGRX_INCLUDEDIR_SERVER_PG18", root.join("stale-headers"))
+            .env("PGRX_PKGINCLUDEDIR", root.join("stale-headers"))
             .env("PGRX_PG_SYS_EXTRA_TARGET_INFO_PATH", root.join("stale-export"))
             .env("PGRX_TARGET_INFO_PATH_PG18", root.join("stale-import"));
         command
@@ -267,6 +274,14 @@ fn main() {
     }
 }
 
+/// Header overrides left in the environment, which would replace the PostgreSQL's headers,
+/// never reach a build that makes or uses a bundle.
+fn assert_no_header_overrides(seen: &[(String, String)]) {
+    let overridden =
+        |name: &str| ["PGRX_INCLUDEDIR", "PGRX_PKGINCLUDEDIR"].iter().any(|p| name.starts_with(p));
+    assert!(seen.iter().all(|(name, _)| !overridden(name)), "{seen:?}");
+}
+
 fn combined_output(output: &Output) -> String {
     format!(
         "stdout:\n{}\nstderr:\n{}",
@@ -289,6 +304,9 @@ fn host_package_ignores_environment_metadata() {
         assert!(output.status.success(), "{}", combined_output(&output));
         fixture.assert_package("native");
         fixture.assert_build_used_program();
+        // Header overrides serve plain `cargo` builds, and a build for this machine keeps them.
+        let seen = fixture.build_saw();
+        assert!(seen.iter().any(|(name, _)| name == "PGRX_INCLUDEDIR_SERVER_PG18"), "{seen:?}");
     }
 }
 
@@ -326,6 +344,7 @@ fn a_generated_bundle_is_all_that_packaging_needs() {
     assert!(bundle.is_file(), "{}", combined_output(&output));
     assert!(!root.join("target/debug/package_environment_test-pg18").exists());
     let seen = fixture.build_saw();
+    assert_no_header_overrides(&seen);
     let export = seen.iter().find(|(name, _)| name == "PGRX_PG_SYS_EXTRA_TARGET_INFO_PATH");
     let (_, export) = export.unwrap_or_else(|| panic!("no export in {seen:?}"));
     assert!(!export.contains("stale-export"), "{seen:?}");
@@ -348,6 +367,7 @@ fn a_generated_bundle_is_all_that_packaging_needs() {
     // The layout is the generating PostgreSQL's, under the bundle's target.
     fixture.assert_package_for(Some(&host), "native");
     let seen = fixture.build_saw();
+    assert_no_header_overrides(&seen);
     let value = |name: &str| {
         let found = seen.iter().find(|(seen, _)| seen == name);
         found.unwrap_or_else(|| panic!("no {name} in {seen:?}")).1.as_str()
@@ -413,6 +433,7 @@ fn a_collected_partial_bundle_supplies_headers_to_the_build() {
         fixture.assert_no_pg_config_calls();
         fixture.assert_package_for(Some(&host), "native");
         let seen = fixture.build_saw();
+        assert_no_header_overrides(&seen);
         // The build generates for itself: nothing is imported, and no program is named.
         assert!(seen.iter().all(|(name, _)| !name.contains("TARGET_INFO")), "{seen:?}");
         assert!(seen.iter().all(|(name, _)| name != "PGRX_PG_CONFIG_PATH"), "{seen:?}");
@@ -441,13 +462,13 @@ fn a_collected_partial_bundle_supplies_headers_to_the_build() {
         "/* configured on the target */"
     );
 
-    // From a file of what the target's `pg_config` printed, ending its lines as Windows does,
-    // with the headers somewhere else on this machine and one value stated over the file's.
-    // No program runs.
+    // From a file of what the target's `pg_config` printed, ending its lines as Windows does
+    // and its last line not at all, with the headers somewhere else on this machine and one
+    // value stated over the file's. No program runs.
     let saved = root.join("saved-pg_config.txt");
     fs::write(
         &saved,
-        "INCLUDEDIR-SERVER = /on/the/target\r\nPKGLIBDIR = /native/pg/lib\r\nSHAREDIR = /native/pg/share\r\nCPPFLAGS = -DSAVED=1\r\nCFLAGS = -O1\r\nVERSION = PostgreSQL 18.7\r\n",
+        "INCLUDEDIR-SERVER = /on/the/target\r\nPKGLIBDIR = /native/pg/lib\r\nSHAREDIR = /native/pg/share\r\nCPPFLAGS = -DSAVED=1\r\nCFLAGS = -O1\r\nVERSION = PostgreSQL 18.7",
     )
     .unwrap();
     let (output, bundle) = collect(
@@ -497,6 +518,101 @@ fn a_collected_partial_bundle_supplies_headers_to_the_build() {
     }
 }
 
+/// Headers in a read-only tree, as in a Nix store, are collected. For an MSVC target the script
+/// also leaves out the server headers nested in the public ones, which it must be able to delete.
+#[cfg(unix)]
+#[test]
+fn read_only_headers_are_collected() {
+    use std::os::unix::fs::PermissionsExt;
+    let directory = tempfile::tempdir().unwrap();
+    let root = directory.path();
+    let (include, lib) = (root.join("include"), root.join("lib"));
+    fs::create_dir_all(include.join("server")).unwrap();
+    fs::create_dir(&lib).unwrap();
+    for file in [include.join("server/pg_config.h"), include.join("libpq-fe.h")] {
+        fs::write(file, "").unwrap();
+    }
+    fs::write(lib.join("postgres.lib"), "import library").unwrap();
+    let chmod = |mode: u32| {
+        for directory in [include.join("server"), include.clone()] {
+            fs::set_permissions(directory, fs::Permissions::from_mode(mode)).unwrap();
+        }
+    };
+    chmod(0o555);
+    let argument = |name: &str, value: &std::path::Path| {
+        let mut argument = std::ffi::OsString::from(name);
+        argument.push(value);
+        argument
+    };
+    let output = Command::new("sh")
+        .arg(concat!(env!("CARGO_MANIFEST_DIR"), "/../tools/pgrx-collect-bundle.sh"))
+        .args(["--target=x86_64-pc-windows-msvc", "--version=PostgreSQL 18.7"])
+        .arg(argument("--includedir-server=", &include.join("server")))
+        .arg(argument("--pkgincludedir=", &include))
+        .arg(argument("--libdir=", &lib))
+        .arg(argument("--out-dir=", &root.join("out")))
+        .output()
+        .unwrap();
+    chmod(0o755);
+    assert!(output.status.success(), "{}", combined_output(&output));
+
+    let bundle = root.join("out/pgrx-pg18-x86_64-pc-windows-msvc.partial.tar.gz");
+    let mut archive =
+        tar::Archive::new(flate2::read::GzDecoder::new(fs::File::open(bundle).unwrap()));
+    let mut files: Vec<_> = archive
+        .entries()
+        .unwrap()
+        .map(|entry| entry.unwrap())
+        .filter(|entry| entry.header().entry_type().is_file())
+        .map(|entry| entry.path().unwrap().display().to_string())
+        .collect();
+    files.sort();
+    assert_eq!(
+        files,
+        [
+            "include/pkg/libpq-fe.h",
+            "include/server/pg_config.h",
+            "lib/postgres.lib",
+            "partial-bundle",
+            "pg_config.txt",
+            "target"
+        ]
+    );
+}
+
+/// With Cargo's build target set, Cargo puts the library in a target directory of its own; the
+/// SQL still comes from that library, not from an older one where a plain build would be.
+#[test]
+fn the_schema_comes_from_the_library_cargo_built() {
+    let fixture = Fixture::new();
+    let output = fixture.command().env("CARGO_BUILD_TARGET", host_triple()).output().unwrap();
+    assert!(output.status.success(), "{}", combined_output(&output));
+    fixture.assert_package("native");
+}
+
+/// When `config.toml` names the program a package selects, the build script finds it there by
+/// itself, and the build is not told it again: setting the variable in some builds and not in
+/// others would make each rerun the script.
+#[test]
+fn a_program_in_config_toml_is_not_named_again() {
+    let fixture = Fixture::new();
+    let home = fixture.directory.path().join("pgrx-home");
+    fs::create_dir_all(&home).unwrap();
+    let program = fixture.pg_config.to_str().unwrap().replace('\\', "/");
+    fs::write(home.join("config.toml"), format!("[configs]\npg18 = \"{program}\"\n")).unwrap();
+    let output = fixture
+        .command()
+        .arg("--pg-config")
+        .arg(&fixture.pg_config)
+        .env_remove("PGRX_PG_CONFIG_PATH")
+        .output()
+        .unwrap();
+    assert!(output.status.success(), "{}", combined_output(&output));
+    let seen = fixture.build_saw();
+    let named = ["PGRX_PG_CONFIG_PATH", "PGRX_PG_CONFIG_AS_ENV"];
+    assert!(seen.iter().all(|(name, _)| !named.contains(&name.as_str())), "{seen:?}");
+}
+
 /// A bundle supplies the target and its PostgreSQL, so nothing else on the command line can.
 #[test]
 fn only_a_bundle_names_another_platform() {
@@ -519,6 +635,8 @@ fn only_a_bundle_names_another_platform() {
         "cannot be used with",
     );
     refused(fixture.command().args(["--bundle", "missing.tar.gz"]), "couldn't unpack");
+    // Making a bundle packages nothing, so options about the package are refused.
+    refused(fixture.command().args(["--bundle-generate", "--test"]), "cannot be used with");
     refused(fixture.command().args(["--target", &host_triple()]), "--target");
     refused(&mut fixture.cargo_pgrx(&["install", "--target", &host_triple()]), "--target");
     refused(&mut fixture.cargo_pgrx(&["cross", "pgrx-target"]), "cross");

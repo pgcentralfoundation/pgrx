@@ -85,6 +85,8 @@ printf '%s\n' "$target" > "$staging/target"
     fi
     if [ -n "$pg_config_file" ]; then
         cat "$pg_config_file"
+        # The file may not end its last line, and the next line must not join it.
+        echo
     fi
     cat "$staging/properties"
 } > "$staging/reported"
@@ -105,15 +107,22 @@ version="$(reported VERSION)"
 major="$(echo "$version" | sed -n 's/^PostgreSQL \([0-9][0-9]*\).*/\1/p')"
 [ -n "$major" ] || fail "VERSION is '$version', not 'PostgreSQL <version>'"
 
-# -L: an archive of plain files and directories, whatever the installation links to.
+# Copy a directory of headers. -L: an archive of plain files and directories, whatever the
+# installation links to. A copy keeps the installation's modes, and one from a read-only tree,
+# such as a Nix store, could not be pruned or removed here, so make it writable.
+collect() {
+    cp -RL "$1" "$2"
+    chmod -R u+w "$2"
+}
+
 mkdir "$staging/include" "$staging/lib"
 headers="$(reported INCLUDEDIR-SERVER)"
-cp -RL "$headers" "$staging/include/server"
+collect "$headers" "$staging/include/server"
 case "$target" in
     *-msvc)
         # MSVC builds also read the public headers, and extensions link against postgres.lib.
         public_headers="$(reported PKGINCLUDEDIR)"
-        cp -RL "$public_headers" "$staging/include/pkg"
+        collect "$public_headers" "$staging/include/pkg"
         case "$headers" in
             "$public_headers"/*)
                 # The server headers were inside it, and are already collected.
@@ -129,7 +138,8 @@ mkdir -p "$out_dir"
 bundle="$out_dir/pgrx-pg$major-$target.partial.tar.gz"
 # COPYFILE_DISABLE keeps macOS's tar from adding a metadata file beside each header. The
 # archive goes to standard output because GNU tar reads a Windows path such as D:/out as a
-# remote host.
+# remote host. It is moved into place only once it is complete.
 COPYFILE_DISABLE=1 tar -czf - -C "$staging" partial-bundle target pg_config.txt include lib \
-    > "$bundle"
+    > "$staging/bundle.tar.gz"
+mv "$staging/bundle.tar.gz" "$bundle"
 echo "$bundle"

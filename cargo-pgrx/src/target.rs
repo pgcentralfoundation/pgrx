@@ -60,15 +60,6 @@ impl TargetOs {
             Self::Linux | Self::Elf => "so",
         }
     }
-
-    /// The `cdylib` extension with its leading dot, as `DLL_SUFFIX` gives.
-    pub(crate) fn dll_suffix(self) -> &'static str {
-        match self {
-            Self::Darwin => ".dylib",
-            Self::Windows => ".dll",
-            Self::Linux | Self::Elf => ".so",
-        }
-    }
 }
 
 pub(crate) fn target_arch(target: Option<&str>) -> &str {
@@ -98,12 +89,15 @@ mod tests {
     #[test]
     fn names_a_cdylib_per_platform() {
         assert_eq!(
-            (TargetOs::Darwin.dll_prefix(), TargetOs::Darwin.dll_suffix()),
-            ("lib", ".dylib")
+            (TargetOs::Darwin.dll_prefix(), TargetOs::Darwin.dll_extension()),
+            ("lib", "dylib")
         );
-        assert_eq!((TargetOs::Windows.dll_prefix(), TargetOs::Windows.dll_suffix()), ("", ".dll"));
-        assert_eq!((TargetOs::Elf.dll_prefix(), TargetOs::Elf.dll_suffix()), ("lib", ".so"));
-        assert_eq!((TargetOs::Linux.dll_prefix(), TargetOs::Linux.dll_suffix()), ("lib", ".so"));
+        assert_eq!(
+            (TargetOs::Windows.dll_prefix(), TargetOs::Windows.dll_extension()),
+            ("", "dll")
+        );
+        assert_eq!((TargetOs::Elf.dll_prefix(), TargetOs::Elf.dll_extension()), ("lib", "so"));
+        assert_eq!((TargetOs::Linux.dll_prefix(), TargetOs::Linux.dll_extension()), ("lib", "so"));
     }
 
     #[test]
@@ -111,7 +105,7 @@ mod tests {
         // whatever machine this runs on, the fallback must match what std says
         let host = TargetOs::from_target(None);
         assert_eq!(host.dll_prefix(), std::env::consts::DLL_PREFIX);
-        assert_eq!(host.dll_suffix(), std::env::consts::DLL_SUFFIX);
         assert_eq!(host.dll_extension(), std::env::consts::DLL_EXTENSION);
+        assert_eq!(format!(".{}", host.dll_extension()), std::env::consts::DLL_SUFFIX);
     }
 }

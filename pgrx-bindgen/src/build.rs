@@ -298,6 +298,10 @@ fn emit_rerun_if_changed() {
     // `pgrx-pg-config` doesn't emit one for this.
     println!("cargo:rerun-if-env-changed=PGRX_PG_CONFIG_PATH");
     println!("cargo:rerun-if-env-changed=PGRX_PG_CONFIG_AS_ENV");
+    // A described installation's link directory, and its version, which an imported bundle
+    // reads without the header inspection that tracks the other properties.
+    println!("cargo:rerun-if-env-changed=PGRX_PG_CONFIG_LIBDIR");
+    println!("cargo:rerun-if-env-changed=PGRX_PG_CONFIG_VERSION");
     // Bindgen's behavior depends on these vars, but it doesn't emit them
     // directly because the output would cause issue with `bindgen-cli`. Do it
     // on bindgen's behalf.
@@ -1562,15 +1566,52 @@ const DESCRIBED_METADATA: &str = "a description in place of a `pg_config` progra
 /// machine, ABI or major version. The remedy names commands and options, never the variables
 /// that carry values to this build script. Other inspection failures keep their general
 /// context.
-fn inspection_error(error: PostgresError, major_version: u16, target: &str) -> eyre::Report {
+fn inspection_error(
+    error: PostgresError,
+    major_version: u16,
+    target: &str,
+    source: HeaderSource,
+) -> eyre::Report {
     let context = if matches!(error, PostgresError::TargetConfiguration(_)) {
-        format!(
-            "these server headers do not describe {target}; use the `pg_config` of a PostgreSQL {major_version} built for {target}, or to package for another platform, generate a bundle there with `cargo pgrx package --bundle-generate` and pass it to `cargo pgrx package --bundle`"
-        )
+        let remedy = match source {
+            HeaderSource::NativeProgram => {
+                format!("use the `pg_config` of a PostgreSQL {major_version} built for {target}")
+            }
+            HeaderSource::CrossProgram => format!(
+                "a `pg_config` that runs here describes this machine, so to package for {target}, make a bundle there with `cargo pgrx package --bundle-generate`, or collect a partial bundle with `tools/pgrx-collect-bundle.sh`, and pass it to `cargo pgrx package --bundle`"
+            ),
+            HeaderSource::Description => format!(
+                "collect the partial bundle again from the server headers of a PostgreSQL {major_version} built for {target}"
+            ),
+        };
+        format!("these server headers do not describe {target}; {remedy}")
     } else {
         "could not establish the binding generator's C macro compilation profile".into()
     };
     eyre::Report::new(error).wrap_err(context)
+}
+
+/// Where the inspected headers' metadata came from, which decides how to supply other headers.
+#[derive(Clone, Copy, Debug)]
+enum HeaderSource {
+    /// A `pg_config` program for the platform the build is for.
+    NativeProgram,
+    /// A `pg_config` program run on this machine for a build for another platform.
+    CrossProgram,
+    /// A description in place of a program, as a partial bundle supplies.
+    Description,
+}
+
+impl HeaderSource {
+    fn of(pg_config: &PgConfig, target: &str) -> Self {
+        if !pg_config.is_real() {
+            Self::Description
+        } else if std::env::var("HOST").is_ok_and(|host| host == target) {
+            Self::NativeProgram
+        } else {
+            Self::CrossProgram
+        }
+    }
 }
 
 /// Carry the generated macro tree and audit report from inspection through binding publication.
@@ -1661,7 +1702,10 @@ fn generate_macros(
     // needs its inputs tracked.
     let frontend = postgres
         .inspect_with_arguments(scanner, header, &effective_arguments, preferred_clang)
-        .map_err(|error| inspection_error(error, major_version, target))?;
+        .map_err(|error| {
+            let source = HeaderSource::of(postgres.pg_config(), target);
+            inspection_error(error, major_version, target, source)
+        })?;
     require_include_driver(
         include_detection.map(|detection| detection.compiler.as_path()),
         &frontend.profile().compiler.executable,
@@ -2939,27 +2983,46 @@ mod macro_build_tests {
     /// configuration error itself. Other inspection failures keep the general context.
     #[test]
     fn foreign_headers_name_the_target_header_remedies() {
-        let foreign =
+        let target = "aarch64-unknown-linux-gnu";
+        let foreign = || {
             PostgresError::TargetConfiguration(pgrx_c_macros::ConfigurationError::Machine {
                 recorded: "x86_64-pc-linux-gnu".into(),
-                target: "aarch64-unknown-linux-gnu".into(),
-            });
-        let chain = inspection_error(foreign, 17, "aarch64-unknown-linux-gnu")
-            .chain()
-            .map(|cause| cause.to_string())
-            .collect::<Vec<_>>();
-        assert_eq!(chain.len(), 2, "{chain:?}");
-        for remedy in [
-            "the `pg_config` of a PostgreSQL 17 built for aarch64-unknown-linux-gnu",
-            "`cargo pgrx package --bundle-generate`",
-            "`cargo pgrx package --bundle`",
-        ] {
-            assert!(chain[0].contains(remedy), "{remedy} missing from {chain:?}");
+                target: target.into(),
+            })
+        };
+        let cases: [(HeaderSource, &[&str]); 3] = [
+            (
+                HeaderSource::NativeProgram,
+                &["the `pg_config` of a PostgreSQL 17 built for aarch64"],
+            ),
+            (
+                HeaderSource::CrossProgram,
+                &[
+                    "`cargo pgrx package --bundle-generate`",
+                    "`tools/pgrx-collect-bundle.sh`",
+                    "`cargo pgrx package --bundle`",
+                ],
+            ),
+            (
+                HeaderSource::Description,
+                &["collect the partial bundle again", "PostgreSQL 17 built for aarch64"],
+            ),
+        ];
+        for (source, remedies) in cases {
+            let chain = inspection_error(foreign(), 17, target, source)
+                .chain()
+                .map(|cause| cause.to_string())
+                .collect::<Vec<_>>();
+            assert_eq!(chain.len(), 2, "{chain:?}");
+            for remedy in remedies {
+                assert!(chain[0].contains(remedy), "{remedy} missing from {chain:?}");
+            }
+            // The remedy does not send a person to the variables that carry these values.
+            assert!(!chain[0].contains("PGRX_"), "{chain:?}");
+            assert!(chain[1].contains("configured for x86_64-pc-linux-gnu"), "{chain:?}");
         }
-        // The remedy does not send a person to the variables that carry these values.
-        assert!(!chain[0].contains("PGRX_"), "{chain:?}");
-        assert!(chain[1].contains("configured for x86_64-pc-linux-gnu"), "{chain:?}");
-        let other = inspection_error(PostgresError::InvalidCFlags, 17, "aarch64-unknown-linux-gnu");
+        let other =
+            inspection_error(PostgresError::InvalidCFlags, 17, target, HeaderSource::NativeProgram);
         assert_eq!(
             other.to_string(),
             "could not establish the binding generator's C macro compilation profile"

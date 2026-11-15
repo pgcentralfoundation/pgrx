@@ -1,6 +1,7 @@
 use crate::target::target_arch;
 use eyre::{WrapErr, bail};
-use object::read::macho::{FatArch, MachOFatFile32, MachOFatFile64};
+use object::macho::{FatArch32, FatArch64};
+use object::read::macho::{FatArch, MachOFatFile};
 use object::{Object, ObjectSection};
 use pgrx_sql_entity_graph::section::{
     MACHO_SECTION_NAME, MACHO_SEGMENT_NAME, is_schema_section_name,
@@ -25,14 +26,8 @@ pub(crate) fn schema_section_data<'a>(
     let kind = object::FileKind::parse(data).wrap_err("couldn't parse binary kind")?;
 
     let slice = match kind {
-        object::FileKind::MachOFat32 => {
-            let fat = MachOFatFile32::parse(data).wrap_err("couldn't parse universal Mach-O")?;
-            slice_arch(data, fat.arches(), target_arch(target))?
-        }
-        object::FileKind::MachOFat64 => {
-            let fat = MachOFatFile64::parse(data).wrap_err("couldn't parse universal Mach-O")?;
-            slice_arch(data, fat.arches(), target_arch(target))?
-        }
+        object::FileKind::MachOFat32 => slice_arch::<FatArch32>(data, target_arch(target))?,
+        object::FileKind::MachOFat64 => slice_arch::<FatArch64>(data, target_arch(target))?,
         object::FileKind::MachO32 | object::FileKind::MachO64 => data,
         _ => return schema_section_data_from_object(data),
     };
@@ -227,7 +222,8 @@ fn trim_nul(bytes: &[u8]) -> &[u8] {
 /// Select the slice of a universal Mach-O for `arch`, the first component of a target tuple or
 /// the host's architecture. Slices of one architecture are built from the same source and embed
 /// the same schema, so their CPU subtype does not matter here.
-fn slice_arch<'a>(data: &'a [u8], arches: &[impl FatArch], arch: &str) -> eyre::Result<&'a [u8]> {
+fn slice_arch<'a, Fat: FatArch>(data: &'a [u8], arch: &str) -> eyre::Result<&'a [u8]> {
+    let fat = MachOFatFile::<Fat>::parse(data).wrap_err("couldn't parse universal Mach-O")?;
     let architecture = match arch {
         "x86" | "i386" | "i586" | "i686" => object::Architecture::I386,
         "x86_64" | "x86_64h" => object::Architecture::X86_64,
@@ -239,7 +235,7 @@ fn slice_arch<'a>(data: &'a [u8], arches: &[impl FatArch], arch: &str) -> eyre::
         _ => bail!("unsupported target architecture `{arch}` for universal Mach-O"),
     };
     let slice =
-        arches.iter().find(|candidate| candidate.architecture() == architecture).ok_or_else(
+        fat.arches().iter().find(|candidate| candidate.architecture() == architecture).ok_or_else(
             || eyre::eyre!("universal Mach-O has no slice for target architecture `{arch}`"),
         )?;
     slice.data(data).wrap_err_with(|| format!("couldn't read Mach-O slice for `{arch}`"))

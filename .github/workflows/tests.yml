@@ -372,6 +372,9 @@ jobs:
     timeout-minutes: 30
     env:
       CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER: aarch64-linux-gnu-gcc
+      # The runner image has Clang; pointing pgrx at none shows a full bundle needs none.
+      CLANG_PATH: /nonexistent/clang
+      LIBCLANG_PATH: /nonexistent
     steps:
       - uses: actions/checkout@v4
       # No PostgreSQL, server headers or Clang: the bundle stands in for all three.

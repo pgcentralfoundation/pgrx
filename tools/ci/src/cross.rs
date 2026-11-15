@@ -22,8 +22,8 @@ use crate::process;
 use crate::workspace::Workspace;
 
 /// An example extension, and what packaging it must produce.
-struct Example {
-    name: &'static str,
+pub(crate) struct Example {
+    pub(crate) name: &'static str,
     version: &'static str,
     /// The library's file name without its suffix, and the name the SQL loads it by.
     library: &'static str,
@@ -32,7 +32,7 @@ struct Example {
     distributions: bool,
 }
 
-const EXAMPLES: [Example; 2] = [
+pub(crate) const EXAMPLES: [Example; 2] = [
     Example {
         name: "versioned_so",
         version: "0.0.0",
@@ -142,9 +142,11 @@ impl Platform {
         Some(Self { os, arch })
     }
 
-    fn library_suffix(self) -> &'static str {
+    /// The installed library's suffix. PostgreSQL loaded `.so` files on macOS until 16.
+    fn library_suffix(self, major: u16) -> &'static str {
         match self.os {
             Os::Linux => ".so",
+            Os::Macos if major < 16 => ".so",
             Os::Macos => ".dylib",
             Os::Windows => ".dll",
         }
@@ -242,7 +244,7 @@ fn check_package(
 ) -> eyre::Result<()> {
     let Example { name, version, .. } = example;
     let (libdir, extdir) = layout.directories(platform.os);
-    let library = libdir.join(format!("{}{}", example.library, platform.library_suffix()));
+    let library = libdir.join(format!("{}{}", example.library, platform.library_suffix(major)));
     let control = extdir.join(format!("{name}.control"));
     let sql = extdir.join(format!("{name}--{version}.sql"));
     let distributions = example.distributions && platform.os == Os::Linux;
@@ -274,12 +276,13 @@ fn check_package(
     ensure!(words.contains(&function), "the SQL does not create hello_{name}");
     let loads = format!("AS '{}', 'hello_{name}_wrapper'", example.sql_library);
     ensure!(words.contains(&loads), "the SQL does not load {}", example.sql_library);
-    check_library(&read(&library)?, platform)
+    let library_bytes = read(&library)?;
+    check_library(&library_bytes, platform)
         .wrap_err_with(|| format!("{} is not the target's library", library.display()))?;
 
     if distributions {
         let payload = BTreeMap::from([
-            (format!("lib/{}.so", example.library), read(&library)?),
+            (format!("lib/{}.so", example.library), library_bytes),
             (format!("share/extension/{name}.control"), control_text.into_bytes()),
             (format!("share/extension/{name}--{version}.sql"), schema.into_bytes()),
         ]);
@@ -524,6 +527,9 @@ mod tests {
         assert_eq!(Platform::of("x86_64-pc-windows-msvc"), platform(Os::Windows, Arch::X86_64));
         assert_eq!(Platform::of("x86_64-unknown-freebsd"), None);
         assert_eq!(Platform::of("powerpc64le-unknown-linux-gnu"), None);
+
+        let macos = Platform { os: Os::Macos, arch: Arch::Aarch64 };
+        assert_eq!((macos.library_suffix(15), macos.library_suffix(16)), (".so", ".dylib"));
     }
 
     #[test]

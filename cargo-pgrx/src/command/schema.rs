@@ -112,14 +112,13 @@ impl CommandExecute for Schema {
         )?;
 
         let attach = !self.no_alter_extension;
-        generate_schema(
+        generate_schema_for_cli(
             self.manifest_path.as_deref(),
             self.package.as_deref(),
             &package_manifest_path,
             &profile,
             self.test,
             &self.features,
-            None,
             &target_dir,
             self.out.as_deref(),
             self.dot.as_deref(),
@@ -168,7 +167,6 @@ pub(crate) fn generate_schema_for_cli(
     profile: &CargoProfile,
     is_test: bool,
     features: &clap_cargo::Features,
-    target: Option<&str>,
     target_dir: &Path,
     path: Option<&Path>,
     dot: Option<&Path>,
@@ -200,38 +198,38 @@ pub(crate) fn generate_schema_for_cli(
         // NB:  The only path where this happens is via the command line using `cargo pgrx schema`
         first_build(cargo.clone(), profile, is_test, &features_arg)?;
     };
+    // `cargo pgrx schema` builds for this machine; only a package names another target.
+    let library = target_dir.join(profile.target_subdir()).join(manifest.lib_filename(None)?);
     generate_schema_implicit(
         package_manifest_path,
-        profile,
+        &library,
         is_test,
-        target,
-        target_dir,
+        None,
         path,
         dot,
         items,
         attach,
         output_tracking,
-        manifest,
+        &manifest,
     )
 }
-pub(crate) use generate_schema_for_cli as generate_schema;
 
+/// Generate the schema from `library`, an extension library already built for `target` or
+/// for this machine.
 pub(crate) fn generate_schema_implicit(
     package_manifest_path: &Path,
-    profile: &CargoProfile,
+    library: &Path,
     is_test: bool,
     target: Option<&str>,
-    target_dir: &Path,
     path: Option<&Path>,
     dot: Option<&Path>,
     items: Option<&[String]>,
     attach: bool,
     output_tracking: &mut Vec<PathBuf>,
-    manifest: cargo_toml::Manifest,
+    manifest: &cargo_toml::Manifest,
 ) -> eyre::Result<()> {
     let (control_file_path, extname) = find_control_file(package_manifest_path)?;
     let lib_name = manifest.lib_name()?;
-    let lib_filename = manifest.lib_filename(target)?;
     let versioned_so = get_property(package_manifest_path, "module_pathname")?.is_none();
     let extension_version = manifest.package_version()?;
 
@@ -246,7 +244,8 @@ pub(crate) fn generate_schema_implicit(
         tracing::info!(dot = %dot_path.display(), "Writing Graphviz DOT");
     }
 
-    let lib_so_data = load_section_data(profile, &lib_filename, target, target_dir)?;
+    let lib_so_data = std::fs::read(library)
+        .wrap_err_with(|| format!("couldn't read extension shared object {}", library.display()))?;
     let section_entities = decode_section_entities(&lib_so_data, target)?;
     report_entity_counts(&section_entities);
 
@@ -306,22 +305,6 @@ pub(crate) fn generate_schema_implicit(
     }
 
     Ok(())
-}
-
-fn load_section_data(
-    profile: &CargoProfile,
-    lib_filename: &str,
-    target: Option<&str>,
-    target_dir: &Path,
-) -> eyre::Result<Vec<u8>> {
-    let mut lib_so = target_dir.to_path_buf();
-    if let Some(target) = target {
-        lib_so.push(target);
-    }
-    lib_so.push(profile.target_subdir());
-    lib_so.push(lib_filename);
-
-    std::fs::read(&lib_so).wrap_err("couldn't read extension shared object")
 }
 
 fn decode_section_entities<'a>(
