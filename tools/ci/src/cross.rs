@@ -466,18 +466,18 @@ fn check_deb(
     }
 
     let files = gzipped_files(&members[2].1)?;
-    let expected: BTreeMap<_, _> = payload
-        .iter()
-        .map(|(path, bytes)| {
-            let path = match path.strip_prefix("lib/") {
-                Some(library) => format!("usr/lib/postgresql/{major}/lib/{library}"),
-                None => format!("usr/share/postgresql/{major}/{path}"),
-            };
-            (path, bytes.clone())
-        })
-        .collect();
+    let expected: BTreeMap<_, _> =
+        payload.iter().map(|(path, bytes)| (debian_path(path, major), bytes.clone())).collect();
     ensure!(files == expected, "its data holds {:?}", files.keys().collect::<Vec<_>>());
     Ok(())
+}
+
+/// Where Debian's PostgreSQL packages put a file staged at `lib/...` or `share/...`.
+fn debian_path(staged: &str, major: u16) -> String {
+    match staged.strip_prefix("lib/") {
+        Some(library) => format!("usr/lib/postgresql/{major}/lib/{library}"),
+        None => format!("usr/share/postgresql/{major}/{}", staged.trim_start_matches("share/")),
+    }
 }
 
 /// The regular files in a gzipped tar archive, by path without a leading `./` or `/`.
@@ -536,6 +536,73 @@ mod tests {
         assert_eq!(layout.directories(Os::Linux).1, Path::new("usr/share/postgresql/18/extension"));
         assert_eq!(layout.directories(Os::Windows).0, Path::new("lib"));
         assert!(Layout::reported("PKGLIBDIR = /l\n").is_err());
+    }
+
+    fn gzipped_tar(files: &[(&str, &[u8])]) -> Vec<u8> {
+        let encoder = flate2::write::GzEncoder::new(Vec::new(), flate2::Compression::fast());
+        let mut archive = tar::Builder::new(encoder);
+        for (path, bytes) in files {
+            let mut header = tar::Header::new_gnu();
+            header.set_size(bytes.len() as u64);
+            header.set_mode(0o644);
+            header.set_cksum();
+            archive.append_data(&mut header, path, *bytes).unwrap();
+        }
+        archive.into_inner().unwrap().finish().unwrap()
+    }
+
+    /// A DEB laid out as Debian's PostgreSQL packages are, which `check_deb` must accept, and
+    /// the same archive with one file moved, which it must refuse.
+    #[test]
+    fn a_deb_must_hold_the_staged_files_in_debians_directories() {
+        let directory = tempfile_dir();
+        let payload = BTreeMap::from([
+            ("lib/packaging.so".to_owned(), b"library".to_vec()),
+            ("share/extension/packaging.control".to_owned(), b"control".to_vec()),
+        ]);
+        let linux = Platform { os: Os::Linux, arch: Arch::Aarch64 };
+        let control = gzipped_tar(&[(
+            "./control",
+            b"Package: postgresql-18-packaging\nVersion: 0.1.0\nArchitecture: arm64\n",
+        )]);
+        let write = |name: &str, data: &[(&str, &[u8])]| {
+            let path = directory.join(name);
+            let mut deb = ar::Builder::new(std::fs::File::create(&path).unwrap());
+            for (member, bytes) in [
+                ("debian-binary", b"2.0\n".to_vec()),
+                ("control.tar.gz", control.clone()),
+                ("data.tar.gz", gzipped_tar(data)),
+            ] {
+                let header = ar::Header::new(member.as_bytes().to_vec(), bytes.len() as u64);
+                deb.append(&header, bytes.as_slice()).unwrap();
+            }
+            path
+        };
+        let good = write(
+            "good.deb",
+            &[
+                ("./usr/lib/postgresql/18/lib/packaging.so", b"library"),
+                ("./usr/share/postgresql/18/extension/packaging.control", b"control"),
+            ],
+        );
+        check_deb(&good, "packaging", "0.1.0", 18, linux, &payload).unwrap();
+        let moved = write(
+            "moved.deb",
+            &[
+                ("./usr/lib/postgresql/18/lib/packaging.so", b"library"),
+                ("./usr/share/postgresql/18/share/extension/packaging.control", b"control"),
+            ],
+        );
+        let error = check_deb(&moved, "packaging", "0.1.0", 18, linux, &payload).unwrap_err();
+        assert!(error.to_string().contains("its data holds"), "{error}");
+        std::fs::remove_dir_all(directory).unwrap();
+    }
+
+    fn tempfile_dir() -> PathBuf {
+        let directory = std::env::temp_dir().join(format!("pgrx-ci-deb-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&directory);
+        std::fs::create_dir_all(&directory).unwrap();
+        directory
     }
 
     fn elf(kind: u16, machine: u16, interpreter: bool) -> Vec<u8> {
