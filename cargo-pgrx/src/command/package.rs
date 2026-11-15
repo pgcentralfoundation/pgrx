@@ -52,7 +52,7 @@ pub(crate) struct Package {
     pub(crate) out_dir: Option<PathBuf>,
     #[clap(flatten)]
     pub(crate) features: clap_cargo::Features,
-    /// Package for the platform and PostgreSQL of this bundle, made there with `--bundle-generate`
+    /// Package for the platform and PostgreSQL of this bundle, made there with `--bundle-generate` or collected with `tools/pgrx-collect-bundle.sh`
     #[clap(long, value_name = "FILE", value_parser, conflicts_with_all = ["pg_config", "bundle_generate"])]
     pub(crate) bundle: Option<PathBuf>,
     /// Write a bundle for this machine's platform and PostgreSQL instead of packaging, so other machines can package for it with `--bundle`
@@ -113,7 +113,8 @@ impl Package {
             Some(bundle) => (
                 bundle.pg_config.clone(),
                 Some(bundle.target.as_str()),
-                TargetInfo::Import(&bundle.target_info),
+                // A partial bundle has headers to generate from in place of generated sources.
+                bundle.target_info.as_deref().map_or(TargetInfo::Generate, TargetInfo::Import),
             ),
             None => (program_pg_config(self.pg_config.take()), None, TargetInfo::Generate),
         };

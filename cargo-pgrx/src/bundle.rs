@@ -7,12 +7,25 @@
 //! A target bundle: one file, made on the platform an extension will run on, that lets any
 //! other machine package extensions for that platform's PostgreSQL.
 //!
-//! The file is a gzipped tar archive holding:
+//! A full bundle is written by `cargo pgrx package --bundle-generate` there. It is a gzipped
+//! tar archive holding:
 //!
 //! - `bundle.json`, the [`Description`]: the Rust target and what `pg_config` printed there;
 //! - `target-info/`, what the `pgrx-pg-sys` build script generated there, which it verifies
 //!   itself when a build imports it;
 //! - `lib/postgres.lib`, for MSVC targets, whose extensions link against it.
+//!
+//! A partial bundle is collected by `tools/pgrx-collect-bundle.sh`, for a platform that has
+//! PostgreSQL's server headers but no Rust or Clang. It holds only what must come from there:
+//!
+//! - `partial-bundle`, the version of this layout;
+//! - `target`, the Rust target;
+//! - `pg_config.txt`, everything `pg_config` printed;
+//! - `include/server/`, the server headers, and `include/pkg/` for MSVC targets;
+//! - `lib/postgres.lib`, for MSVC targets.
+//!
+//! The build that uses a partial bundle generates from those headers itself, so it needs
+//! Clang and the target's system headers, which a full bundle spares it.
 
 use eyre::{WrapErr, bail, ensure, eyre};
 use pgrx_pg_config::PgConfig;
@@ -25,6 +38,17 @@ const DESCRIPTION: &str = "bundle.json";
 const TARGET_INFO: &str = "target-info";
 const LIBRARIES: &str = "lib";
 const IMPORT_LIBRARY: &str = "postgres.lib";
+
+/// What marks a partial bundle, and holds [`PARTIAL_FORMAT`].
+const PARTIAL: &str = "partial-bundle";
+const PARTIAL_FORMAT: &str = "1";
+const PARTIAL_TARGET: &str = "target";
+const PARTIAL_PG_CONFIG: &str = "pg_config.txt";
+const SERVER_HEADERS: &str = "include/server";
+const PUBLIC_HEADERS: &str = "include/pkg";
+
+/// Records which archive a directory was unpacked from, so the same one is not unpacked again.
+const UNPACKED: &str = ".unpacked";
 
 /// The on-disk contract of [`Description`] and the archive's layout.
 const FORMAT: u32 = 1;
@@ -113,29 +137,50 @@ pub(crate) struct Bundle {
     pub(crate) target: String,
     /// The target's PostgreSQL, as its `pg_config` described it when the bundle was made.
     pub(crate) pg_config: PgConfig,
-    /// The generated sources and native archive for the `pgrx-pg-sys` build to import.
-    pub(crate) target_info: PathBuf,
+    /// The generated sources and native archive for the `pgrx-pg-sys` build to import. A
+    /// partial bundle has none: the build generates them from the bundle's headers.
+    pub(crate) target_info: Option<PathBuf>,
 }
 
 impl Bundle {
-    /// Unpack `file` into a directory of its own below `scratch`, replacing an earlier unpack.
+    /// Unpack `file` into a directory of its own below `scratch`. An earlier unpack of the same
+    /// file is kept, so that a build whose inputs are these files does not see them change.
     pub(crate) fn open(file: &Path, scratch: &Path) -> eyre::Result<Self> {
         let name = file.file_name().ok_or_else(|| eyre!("{} is not a file", file.display()))?;
         let root = scratch.join("pgrx-bundle").join(name);
-        if root.exists() {
-            std::fs::remove_dir_all(&root)
-                .wrap_err_with(|| format!("couldn't remove {}", root.display()))?;
+        let metadata = std::fs::metadata(file)
+            .wrap_err_with(|| format!("couldn't unpack {}", file.display()))?;
+        let identity = format!("{} bytes, modified {:?}", metadata.len(), metadata.modified()?);
+        if std::fs::read_to_string(root.join(UNPACKED)).ok().as_deref() != Some(&identity) {
+            if root.exists() {
+                std::fs::remove_dir_all(&root)
+                    .wrap_err_with(|| format!("couldn't remove {}", root.display()))?;
+            }
+            std::fs::create_dir_all(&root)
+                .wrap_err_with(|| format!("couldn't create {}", root.display()))?;
+            unpack(file, &root).wrap_err_with(|| format!("couldn't unpack {}", file.display()))?;
+            // The build links against this directory. It is empty except for MSVC targets.
+            std::fs::create_dir_all(root.join(LIBRARIES))?;
+            std::fs::write(root.join(UNPACKED), &identity)?;
         }
-        std::fs::create_dir_all(&root)
-            .wrap_err_with(|| format!("couldn't create {}", root.display()))?;
-        unpack(file, &root).wrap_err_with(|| format!("couldn't unpack {}", file.display()))?;
 
-        let description = root.join(DESCRIPTION);
-        let description: Description = serde_json::from_slice(
-            &std::fs::read(&description)
-                .wrap_err_with(|| format!("{} has no {DESCRIPTION}", file.display()))?,
-        )
-        .wrap_err_with(|| format!("couldn't parse {DESCRIPTION} in {}", file.display()))?;
+        if root.join(DESCRIPTION).is_file() {
+            Self::full(file, &root)
+        } else if root.join(PARTIAL).is_file() {
+            Self::partial(file, &root)
+        } else {
+            bail!(
+                "{} is not a pgrx bundle: it has neither {DESCRIPTION} nor {PARTIAL}",
+                file.display()
+            )
+        }
+    }
+
+    /// A bundle that `cargo pgrx package --bundle-generate` wrote on its target.
+    fn full(file: &Path, root: &Path) -> eyre::Result<Self> {
+        let description: Description =
+            serde_json::from_slice(&std::fs::read(root.join(DESCRIPTION))?)
+                .wrap_err_with(|| format!("couldn't parse {DESCRIPTION} in {}", file.display()))?;
         ensure!(
             description.format == FORMAT,
             "{} is a format {} bundle, and this cargo-pgrx reads format {FORMAT}; generate it again with this version",
@@ -145,9 +190,6 @@ impl Bundle {
         let target_info = root.join(TARGET_INFO);
         ensure!(target_info.is_dir(), "{} has no {TARGET_INFO} directory", file.display());
 
-        // The build links against this directory. It is empty except for MSVC targets.
-        let libraries = root.join(LIBRARIES);
-        std::fs::create_dir_all(&libraries)?;
         let mut properties = description.pg_config;
         for required in PROPERTIES {
             ensure!(
@@ -156,13 +198,69 @@ impl Bundle {
                 file.display()
             );
         }
-        properties.insert("libdir".to_owned(), utf8(&libraries)?);
+        properties.insert("libdir".to_owned(), utf8(&root.join(LIBRARIES))?);
         Ok(Self {
             target: description.target,
             pg_config: PgConfig::from_properties(properties),
-            target_info,
+            target_info: Some(target_info),
         })
     }
+
+    /// A bundle that `tools/pgrx-collect-bundle.sh` collected. Its `pg_config` values are the
+    /// target's, except the directories the build reads, which are the unpacked ones here.
+    fn partial(file: &Path, root: &Path) -> eyre::Result<Self> {
+        let read = |name: &str| {
+            std::fs::read_to_string(root.join(name))
+                .wrap_err_with(|| format!("{} has no {name}", file.display()))
+        };
+        let format = read(PARTIAL)?;
+        ensure!(
+            format.trim() == PARTIAL_FORMAT,
+            "{} is a format {} partial bundle, and this cargo-pgrx reads format {PARTIAL_FORMAT}; collect it again with this version's script",
+            file.display(),
+            format.trim()
+        );
+        let target = read(PARTIAL_TARGET)?.trim().to_owned();
+        ensure!(!target.is_empty(), "{} names no Rust target", file.display());
+        let server_headers = root.join(SERVER_HEADERS);
+        ensure!(
+            server_headers.join("pg_config.h").is_file(),
+            "{} has no server headers in {SERVER_HEADERS}",
+            file.display()
+        );
+
+        let reported = parse_pg_config(&read(PARTIAL_PG_CONFIG)?);
+        let mut properties = BTreeMap::new();
+        for required in ["version", "pkglibdir", "sharedir", "cppflags"] {
+            let value = reported.get(required).ok_or_else(|| {
+                eyre!(
+                    "{PARTIAL_PG_CONFIG} in {} has no {}",
+                    file.display(),
+                    required.to_uppercase()
+                )
+            })?;
+            properties.insert(required.to_owned(), value.clone());
+        }
+        if let Some(cflags) = reported.get("cflags") {
+            properties.insert("cflags".to_owned(), cflags.clone());
+        }
+        properties.insert("includedir-server".to_owned(), utf8(&server_headers)?);
+        let public_headers = root.join(PUBLIC_HEADERS);
+        if public_headers.is_dir() {
+            properties.insert("pkgincludedir".to_owned(), utf8(&public_headers)?);
+        }
+        properties.insert("libdir".to_owned(), utf8(&root.join(LIBRARIES))?);
+        Ok(Self { target, pg_config: PgConfig::from_properties(properties), target_info: None })
+    }
+}
+
+/// Read what `pg_config` prints without arguments: a `NAME = value` line for each property.
+/// Names come back as `pg_config`'s option names, in lower case.
+fn parse_pg_config(text: &str) -> BTreeMap<String, String> {
+    text.lines()
+        .filter_map(|line| line.trim_end_matches('\r').split_once(" ="))
+        .map(|(name, value)| (name.trim().to_lowercase(), value.trim().to_owned()))
+        .collect()
 }
 
 /// Unpack a bundle's regular files and directories. A bundle has nothing else, so any other
@@ -237,11 +335,127 @@ mod tests {
         assert_eq!(bundle.pg_config.sharedir().unwrap(), Path::new("/usr/share/postgresql/18"));
         assert!(bundle.pg_config.lib_dir().unwrap().is_dir(), "the link directory is local");
         assert_eq!(
-            std::fs::read_to_string(bundle.target_info.join("cmacros/pg18/mod.rs")).unwrap(),
+            std::fs::read_to_string(bundle.target_info.unwrap().join("cmacros/pg18/mod.rs"))
+                .unwrap(),
             "// generated"
         );
-        // Opening it again replaces the first unpack.
-        Bundle::open(&file, &directory.join("scratch")).unwrap();
+    }
+
+    /// The build's inputs are the unpacked files, so they must not change between builds.
+    #[test]
+    fn the_same_file_is_unpacked_once() {
+        let directory = tempfile::tempdir().unwrap();
+        let directory = directory.path();
+        let pg_config = postgres(&[
+            ("version", "PostgreSQL 18.1"),
+            ("pkglibdir", "/usr/lib/postgresql/18/lib"),
+            ("sharedir", "/usr/share/postgresql/18"),
+        ]);
+        let exported = target_info(directory, "aarch64-unknown-linux-gnu");
+        let file = write(&pg_config, &exported, &directory.join("out")).unwrap();
+        let scratch = directory.join("scratch");
+        let generated = Bundle::open(&file, &scratch).unwrap().target_info.unwrap();
+        let generated = generated.join("cmacros/pg18/mod.rs");
+        std::fs::write(&generated, "// left alone").unwrap();
+        Bundle::open(&file, &scratch).unwrap();
+        assert_eq!(std::fs::read_to_string(&generated).unwrap(), "// left alone");
+
+        // Another file of the same name is unpacked afresh.
+        std::fs::write(exported.join("cmacros/pg18/mod.rs"), "// generated again").unwrap();
+        write(&pg_config, &exported, &directory.join("out")).unwrap();
+        Bundle::open(&file, &scratch).unwrap();
+        assert_eq!(std::fs::read_to_string(&generated).unwrap(), "// generated again");
+    }
+
+    #[test]
+    fn pg_config_output_is_read_by_property() {
+        let reported = parse_pg_config(
+            "BINDIR = /usr/lib/postgresql/18/bin\r\nINCLUDEDIR-SERVER = /usr/include/postgresql/18/server\nCPPFLAGS = -D_GNU_SOURCE -DNAME=\"a = b\"\nCFLAGS_SL = \nLDFLAGS_EX =\nVERSION = PostgreSQL 18.1\n",
+        );
+        assert_eq!(reported["bindir"], "/usr/lib/postgresql/18/bin");
+        assert_eq!(reported["includedir-server"], "/usr/include/postgresql/18/server");
+        assert_eq!(reported["cppflags"], "-D_GNU_SOURCE -DNAME=\"a = b\"");
+        assert_eq!(reported["cflags_sl"], "");
+        assert_eq!(reported["ldflags_ex"], "");
+        assert_eq!(reported["version"], "PostgreSQL 18.1");
+    }
+
+    /// Build the archive that `tools/pgrx-collect-bundle.sh` writes.
+    fn partial_bundle(directory: &Path, target: &str, pg_config: &str, msvc: bool) -> PathBuf {
+        let staging = directory.join("staging");
+        let _ = std::fs::remove_dir_all(&staging);
+        std::fs::create_dir_all(staging.join("include/server")).unwrap();
+        std::fs::create_dir_all(staging.join("lib")).unwrap();
+        std::fs::write(staging.join("partial-bundle"), "1\n").unwrap();
+        std::fs::write(staging.join("target"), format!("{target}\n")).unwrap();
+        std::fs::write(staging.join("pg_config.txt"), pg_config).unwrap();
+        std::fs::write(staging.join("include/server/pg_config.h"), "/* configured */").unwrap();
+        if msvc {
+            std::fs::create_dir_all(staging.join("include/pkg")).unwrap();
+            std::fs::write(staging.join("include/pkg/postgres_ext.h"), "").unwrap();
+            std::fs::write(staging.join("lib/postgres.lib"), "import library").unwrap();
+        }
+        let path = directory.join(format!("pgrx-pg18-{target}.partial.tar.gz"));
+        let file = File::create(&path).unwrap();
+        let mut archive =
+            tar::Builder::new(flate2::write::GzEncoder::new(file, flate2::Compression::default()));
+        for name in ["partial-bundle", "target", "pg_config.txt"] {
+            archive.append_path_with_name(staging.join(name), name).unwrap();
+        }
+        archive.append_dir_all("include", staging.join("include")).unwrap();
+        archive.append_dir_all("lib", staging.join("lib")).unwrap();
+        archive.into_inner().unwrap().finish().unwrap();
+        path
+    }
+
+    const REPORTED: &str = "PKGINCLUDEDIR = /usr/include/postgresql\nINCLUDEDIR-SERVER = /usr/include/postgresql/18/server\nLIBDIR = /usr/lib/aarch64-linux-gnu\nPKGLIBDIR = /usr/lib/postgresql/18/lib\nSHAREDIR = /usr/share/postgresql/18\nCPPFLAGS = -D_GNU_SOURCE\nCFLAGS = -O2 -fwrapv\nVERSION = PostgreSQL 18.1\n";
+
+    #[test]
+    fn a_partial_bundle_supplies_headers_to_generate_from() {
+        let directory = tempfile::tempdir().unwrap();
+        let directory = directory.path();
+        let file = partial_bundle(directory, "aarch64-unknown-linux-gnu", REPORTED, false);
+        let bundle = Bundle::open(&file, &directory.join("scratch")).unwrap();
+        assert_eq!(bundle.target, "aarch64-unknown-linux-gnu");
+        assert!(bundle.target_info.is_none(), "nothing was generated for the build to import");
+        let pg_config = &bundle.pg_config;
+        assert_eq!(pg_config.major_version().unwrap(), 18);
+        // Where the package goes is the target's; what the build reads is unpacked here.
+        assert_eq!(pg_config.pkglibdir().unwrap(), Path::new("/usr/lib/postgresql/18/lib"));
+        assert_eq!(pg_config.sharedir().unwrap(), Path::new("/usr/share/postgresql/18"));
+        let headers = pg_config.includedir_server().unwrap();
+        assert_eq!(
+            std::fs::read_to_string(headers.join("pg_config.h")).unwrap(),
+            "/* configured */"
+        );
+        assert!(pg_config.lib_dir().unwrap().starts_with(directory));
+        assert_eq!(pg_config.cppflags().unwrap(), "-D_GNU_SOURCE");
+        assert_eq!(pg_config.optional_cflags().unwrap().unwrap(), "-O2 -fwrapv");
+        assert!(pg_config.pkgincludedir().is_err(), "only MSVC targets collect public headers");
+
+        let file = partial_bundle(directory, "x86_64-pc-windows-msvc", REPORTED, true);
+        let bundle = Bundle::open(&file, &directory.join("scratch")).unwrap();
+        let pg_config = &bundle.pg_config;
+        assert!(pg_config.pkgincludedir().unwrap().join("postgres_ext.h").is_file());
+        assert!(pg_config.lib_dir().unwrap().join("postgres.lib").is_file());
+    }
+
+    #[test]
+    fn an_incomplete_partial_bundle_is_refused() {
+        let directory = tempfile::tempdir().unwrap();
+        let directory = directory.path();
+        let scratch = directory.join("scratch");
+        let file = partial_bundle(
+            directory,
+            "aarch64-unknown-linux-gnu",
+            "VERSION = PostgreSQL 18.1\n",
+            false,
+        );
+        let error = Bundle::open(&file, &scratch).unwrap_err();
+        assert!(error.to_string().contains("has no PKGLIBDIR"), "{error}");
+        let file = partial_bundle(directory, "", REPORTED, false);
+        let error = Bundle::open(&file, &scratch).unwrap_err();
+        assert!(error.to_string().contains("names no Rust target"), "{error}");
     }
 
     #[test]
@@ -318,7 +532,13 @@ mod tests {
 
         let empty = archive("empty.tar.gz", &|_| {});
         let error = Bundle::open(&empty, &directory.join("scratch")).unwrap_err();
-        assert!(error.to_string().contains("has no bundle.json"), "{error}");
+        assert!(error.to_string().contains("is not a pgrx bundle"), "{error}");
+
+        let newer_partial = archive("newer-partial.tar.gz", &|archive| {
+            data(archive, PARTIAL, b"2\n");
+        });
+        let error = Bundle::open(&newer_partial, &directory.join("scratch")).unwrap_err();
+        assert!(error.to_string().contains("format 2 partial bundle"), "{error}");
 
         let incomplete = archive("incomplete.tar.gz", &|archive| {
             data(

@@ -234,6 +234,10 @@ does it from a *target bundle*, one file generated on the target platform:
 3) On the build host, run `cargo pgrx package --bundle <file>`. This needs a Rust toolchain that can link
    for the target, and no PostgreSQL, `pg_config`, server headers, Clang, or `cargo pgrx init`.
 
+A target with PostgreSQL's server headers but no Rust or Clang can collect a *partial bundle* with
+[`tools/pgrx-collect-bundle.sh`](tools/pgrx-collect-bundle.sh) instead. The build host then also needs
+Clang and the target's system headers.
+
 The bundle is generated on the target because the bindings, C macros and native
 support that pgrx builds from PostgreSQL's headers depend on how that PostgreSQL
 was built. The target platform can be a container or a CI runner. A bundle is

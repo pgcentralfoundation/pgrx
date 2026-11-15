@@ -25,6 +25,15 @@ build for that platform's PostgreSQL from anywhere else.
 `cargo pgrx package` is the only command that builds for another platform, and a
 bundle is the only way to tell it which one.
 
+If the target platform has PostgreSQL's server headers but no Rust or Clang, a
+shell script collects a [partial bundle](#collect-a-partial-bundle) there
+instead, and the build host does the generating.
+
+| | Made on the target with | The build host also needs |
+| --- | --- | --- |
+| Full bundle | Rust, Clang and PostgreSQL's server headers | a linker for the target |
+| Partial bundle | `pg_config`, `tar` and PostgreSQL's server headers | a linker, Clang, and the target's system headers |
+
 ## Why the bundle comes from the target
 
 `pgrx-pg-sys` generates its Rust bindings and C macros from PostgreSQL's server
@@ -78,18 +87,61 @@ pgrx must also be the same source revision. Anyone packaging for the same
 PostgreSQL can share one, but it contains compiled code that is linked into the
 extension, so take it only from a build you trust.
 
+## Collect a partial bundle
+
+A target with no Rust toolchain or no Clang cannot generate a full bundle, but it
+still has the only things that must come from it: PostgreSQL's server headers and
+what `pg_config` reports. `tools/pgrx-collect-bundle.sh`, in the pgrx repository,
+collects those into a partial bundle. Take the script from the tag of the pgrx
+release your extension uses, and copy it to the target.
+
+```sh
+sh pgrx-collect-bundle.sh --target aarch64-unknown-linux-gnu
+```
+
+- **What it needs.** `pg_config`, `tar`, and a POSIX shell. On Windows, run it in
+  Git Bash. PostgreSQL's server headers must be installed, which on most
+  distributions is the server's `-dev` or `-devel` package.
+- **`--target`.** The Rust target triple of that platform. A machine without Rust
+  cannot name its own, so you state it; the build that uses the bundle checks the
+  headers against it, as described under [What pgrx verifies](#what-pgrx-verifies).
+- **`--pg-config`.** The PostgreSQL to collect; without it, the first `pg_config`
+  on `PATH`.
+- **`--includedir-server`.** The server headers, when they are not where
+  `pg_config` reports them.
+- **`--out-dir`.** Where to write the file; without it, the current directory.
+
+It writes `pgrx-pg18-aarch64-unknown-linux-gnu.partial.tar.gz` and prints the
+path. The file holds the Rust target, everything `pg_config` printed, the server
+headers, and for Windows MSVC targets the public headers and `postgres.lib`.
+
+Nothing in a partial bundle is generated, so it does not depend on the pgrx
+version or the `cshim` feature. Collect it once for a PostgreSQL installation and
+keep using it across pgrx upgrades.
+
+The build host generates what a full bundle would have carried, so it needs the
+Clang toolchain described under
+[Clang, LLVM and system headers](#clang-llvm-and-system-headers) and the target's
+system headers, which usually come with the cross toolchain's sysroot. Point
+Clang at them with `BINDGEN_EXTRA_CLANG_ARGS_<target>`, for example
+`--sysroot=/path/to/sysroot`. Those system headers are the one input that does
+not come from the target: they must be for the same C library and architecture.
+pgrx refuses headers whose recorded sizes and alignments disagree with the
+compiler, but it cannot prove the two C libraries are the same.
+
 ## Package from a bundle
 
 The build host needs the Rust standard library for the target and a linker for
 it, as described under [Cross toolchains](#cross-toolchains). It needs no
-PostgreSQL, no `pg_config`, no server headers, no Clang, and no `cargo pgrx init`.
+PostgreSQL, no `pg_config`, and no `cargo pgrx init`. With a full bundle it
+needs no server headers and no Clang either.
 
 ```sh
 rustup target add aarch64-unknown-linux-gnu
 cargo pgrx package --bundle pgrx-pg18-aarch64-unknown-linux-gnu.tar.gz
 ```
 
-The bundle supplies the target and its PostgreSQL, so `--bundle` cannot be
+`--bundle` takes either kind of bundle. The bundle supplies the target and its PostgreSQL, so `--bundle` cannot be
 combined with `--pg-config`. The extension is staged for the directories the
 target's `pg_config` reported. Windows packages always stage into `lib` and
 `share/extension`, and Linux targets can also produce
@@ -181,8 +233,9 @@ the extension.
 
 ## Clang, LLVM and system headers
 
-This applies wherever `pgrx-pg-sys` generates from headers, which for a cross
-build is the machine that makes the bundle. A build from a bundle runs no Clang.
+This applies wherever `pgrx-pg-sys` generates from headers. For a cross build
+that is the machine that makes a full bundle, or the build host that uses a
+partial one. A build from a full bundle runs no Clang.
 
 The `pgrx-pg-sys` build script runs Clang itself to find system headers, for
 header inspection and for its native support archive, rather than through the
@@ -205,7 +258,9 @@ header inspection and for its native support archive, rather than through the
   `BINDGEN_EXTRA_CLANG_ARGS_<target>` or, if that is unset,
   `BINDGEN_EXTRA_CLANG_ARGS`. The target suffix can be hyphenated or
   underscored. The same arguments reach bindgen, header inspection, include
-  path detection and native compilation.
+  path detection and native compilation. Use them to name the target's sysroot
+  (`--sysroot=...`), or its headers and GCC installation (`-isystem` and
+  `-ccc-gcc-name`), when Clang cannot find them.
 - **System headers.** pgrx asks the same Clang driver for its system include
   directories with the arguments of the inspected profile without their `-I`
   options: the target arguments above, the applied CFLAGS and PostgreSQL's
@@ -267,6 +322,12 @@ install from one package, and the cross sysroot is the normal root.
     ```
 
 This stages the extension's library, control file and SQL under `./target/<target>/release/<extension>-pg18/`, laid out for the target's directories.
+
+With a partial bundle, also install Clang and point it at the target's C library headers before step 4. `-isystem` adds the headers that `crossbuild-essential-<arch>` installs, and `-ccc-gcc-name` names the cross GCC for the Clang driver:
+
+- `sudo apt install clang llvm libclang-dev`
+- *`target=aarch64`*: `export BINDGEN_EXTRA_CLANG_ARGS_aarch64_unknown_linux_gnu="-isystem /usr/aarch64-linux-gnu/include/ -ccc-gcc-name aarch64-linux-gnu-gcc"`.
+- *`target=x86_64`*: `export BINDGEN_EXTRA_CLANG_ARGS_x86_64_unknown_linux_gnu="-isystem /usr/x86_64-linux-gnu/include/ -ccc-gcc-name x86_64-linux-gnu-gcc"`.
 
 ## Other distributions
 

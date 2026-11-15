@@ -909,7 +909,7 @@ Options:
       --all-features                   Activate all available features
       --no-default-features            Do not activate the `default` feature
   -F, --features <FEATURES>            Space-separated list of features to activate
-      --bundle <FILE>                  Package for the platform and PostgreSQL of this bundle, made there with `--bundle-generate`
+      --bundle <FILE>                  Package for the platform and PostgreSQL of this bundle, made there with `--bundle-generate` or collected with `tools/pgrx-collect-bundle.sh`
       --bundle-generate                Write a bundle for this machine's platform and PostgreSQL instead of packaging, so other machines can package for it with `--bundle`
       --assemble-unreleased            Assemble unreleased SQL fragments into the package instead of refusing to build it
       --no-assemble-unreleased         Build the package without unreleased SQL fragments instead of refusing to build it
@@ -951,6 +951,11 @@ command that builds for another platform. See the
 
 `--bundle-generate` builds the extension but stages no package. It writes
 `pgrx-pg<NN>-<target>.tar.gz` to Cargo's target directory, or to `--out-dir`.
+
+`--bundle` also takes a partial bundle, which `tools/pgrx-collect-bundle.sh`
+collects on a target that has PostgreSQL's server headers but no Rust or Clang.
+The build then generates from those headers itself, so the build host needs
+Clang and the target's system headers.
 
 The bundle's target selects library names, package layout and distribution
 package formats. Without `--bundle`, these use the host. Windows packages use
