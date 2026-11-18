@@ -70,6 +70,10 @@ impl From<isize> for PgLogLevel {
             PgLogLevel::DEBUG2
         } else if i == PgLogLevel::DEBUG1 as isize {
             PgLogLevel::DEBUG1
+        } else if i == PgLogLevel::LOG as isize {
+            PgLogLevel::LOG
+        } else if i == PgLogLevel::LOG_SERVER_ONLY as isize {
+            PgLogLevel::LOG_SERVER_ONLY
         } else if i == PgLogLevel::INFO as isize {
             PgLogLevel::INFO
         } else if i == PgLogLevel::NOTICE as isize {
@@ -565,4 +569,31 @@ macro_rules! ereport_domain {
                 .report($loglevel);
         }
     };
+}
+
+#[cfg(test)]
+mod tests {
+    use super::PgLogLevel;
+
+    #[test]
+    fn log_levels_convert_from_their_values() {
+        for level in [
+            PgLogLevel::DEBUG5,
+            PgLogLevel::DEBUG4,
+            PgLogLevel::DEBUG3,
+            PgLogLevel::DEBUG2,
+            PgLogLevel::DEBUG1,
+            PgLogLevel::LOG,
+            PgLogLevel::LOG_SERVER_ONLY,
+            PgLogLevel::INFO,
+            PgLogLevel::NOTICE,
+            PgLogLevel::WARNING,
+            PgLogLevel::ERROR,
+            PgLogLevel::FATAL,
+            PgLogLevel::PANIC,
+        ] {
+            assert_eq!(PgLogLevel::from(level as isize), level);
+            assert_eq!(PgLogLevel::from(level as i32), level);
+        }
+    }
 }
