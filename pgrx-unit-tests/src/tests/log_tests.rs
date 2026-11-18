@@ -12,8 +12,10 @@
 mod tests {
     #[allow(unused_imports)]
     use crate as pgrx_unit_tests;
+    use pgrx::pg_sys::panic::CaughtError;
     use pgrx::prelude::*;
-    use std::sync::atomic::{AtomicBool, Ordering};
+    use std::alloc::{GlobalAlloc, Layout, System};
+    use std::sync::atomic::{AtomicBool, AtomicIsize, Ordering};
 
     #[pg_test]
     fn test_info() {
@@ -134,6 +136,106 @@ mod tests {
             assert_eq!(unpacked.to_str(), Ok(sqlstate));
             assert_eq!(PgSqlErrorCode::from(code as i32), code);
         }
+    }
+
+    /// A domain length that nothing else in these tests allocates, with or without a NUL
+    const LARGE_DOMAIN_LEN: usize = 1_048_583;
+
+    /// Live allocations of a large domain's length, with or without its NUL
+    static LARGE_DOMAINS: AtomicIsize = AtomicIsize::new(0);
+
+    fn is_large_domain(size: usize) -> bool {
+        size == LARGE_DOMAIN_LEN || size == LARGE_DOMAIN_LEN + 1
+    }
+
+    /// The system allocator, counting [`LARGE_DOMAINS`]
+    struct CountLargeDomains;
+
+    // SAFETY: every call goes to the system allocator with the same arguments
+    unsafe impl GlobalAlloc for CountLargeDomains {
+        unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
+            let ptr = unsafe { System.alloc(layout) };
+            if !ptr.is_null() && is_large_domain(layout.size()) {
+                LARGE_DOMAINS.fetch_add(1, Ordering::Relaxed);
+            }
+            ptr
+        }
+
+        unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
+            if is_large_domain(layout.size()) {
+                LARGE_DOMAINS.fetch_sub(1, Ordering::Relaxed);
+            }
+            unsafe { System.dealloc(ptr, layout) }
+        }
+
+        unsafe fn realloc(&self, ptr: *mut u8, layout: Layout, new_size: usize) -> *mut u8 {
+            let new_ptr = unsafe { System.realloc(ptr, layout, new_size) };
+            if !new_ptr.is_null() {
+                if is_large_domain(layout.size()) {
+                    LARGE_DOMAINS.fetch_sub(1, Ordering::Relaxed);
+                }
+                if is_large_domain(new_size) {
+                    LARGE_DOMAINS.fetch_add(1, Ordering::Relaxed);
+                }
+            }
+            new_ptr
+        }
+    }
+
+    #[global_allocator]
+    static ALLOCATOR: CountLargeDomains = CountLargeDomains;
+
+    #[pg_extern]
+    fn raise_with_large_domain() {
+        pgrx::ereport_domain!(
+            PgLogLevel::ERROR,
+            "d".repeat(LARGE_DOMAIN_LEN),
+            PgSqlErrorCode::ERRCODE_INTERNAL_ERROR,
+            "raised with a large domain"
+        )
+    }
+
+    #[pg_extern]
+    fn raise_with_nul_in_domain() {
+        pgrx::ereport_domain!(
+            PgLogLevel::ERROR,
+            "test_extension_domain\0ignored",
+            PgSqlErrorCode::ERRCODE_INTERNAL_ERROR,
+            "raised with a NUL in its domain"
+        )
+    }
+
+    /// Runs `sql`, which calls a function that raises an ERROR, and returns the domain of the
+    /// ERROR.  The function's guard reports it to Postgres, which jumps back to SPI.
+    fn domain_of_error_from(sql: &str) -> Option<String> {
+        PgTryBuilder::new(|| {
+            Spi::run(sql).expect("SPI failed");
+            panic!("{sql} returned normally")
+        })
+        .catch_others(|e| match e {
+            CaughtError::PostgresError(ereport) => ereport.domain().map(str::to_string),
+            e => e.rethrow(),
+        })
+        .execute()
+    }
+
+    /// Each ERROR reported with the same domain leaves no copy of it behind.
+    #[pg_test]
+    fn test_ereport_domain_error_keeps_one_copy() {
+        let before = LARGE_DOMAINS.load(Ordering::Relaxed);
+        for _ in 0..4 {
+            let domain = domain_of_error_from("SELECT tests.raise_with_large_domain()");
+            assert_eq!(domain.map(|d| d.len()), Some(LARGE_DOMAIN_LEN));
+        }
+        let kept = LARGE_DOMAINS.load(Ordering::Relaxed) - before;
+        assert!(kept <= 1, "{kept} copies of the domain are still allocated");
+    }
+
+    /// Postgres reads a domain as a C string, so it ends at its first NUL, like the message.
+    #[pg_test]
+    fn test_ereport_domain_with_nul() {
+        let domain = domain_of_error_from("SELECT tests.raise_with_nul_in_domain()");
+        assert_eq!(domain.as_deref(), Some("test_extension_domain"));
     }
 
     #[pg_test(error = "panic message")]

@@ -22,6 +22,7 @@ use std::panic::{
 };
 use std::ptr::{self, NonNull};
 use std::sync::atomic::{AtomicUsize, Ordering};
+use std::sync::{Mutex, PoisonError};
 
 use crate::elog::PgLogLevel;
 use crate::errcodes::PgSqlErrorCode;
@@ -946,10 +947,7 @@ unsafe fn do_ereport(ereport: ErrorReportWithLevel) {
     let level = ereport.level();
 
     // Use the domain from the ErrorReport if one was set, otherwise use the null default
-    let domain_cstring = ereport.inner.domain.as_ref().map(|d| {
-        std::ffi::CString::new(d.as_str()).expect("domain must not contain interior NUL bytes")
-    });
-    let domain_ptr = domain_cstring.as_ref().map_or(DEFAULT_DOMAIN, |c| c.as_ptr());
+    let domain_ptr = ereport.domain().map_or(DEFAULT_DOMAIN, |d| static_domain(d).as_ptr());
 
     unsafe {
         if errstart(level as _, domain_ptr) {
@@ -1025,4 +1023,27 @@ unsafe fn do_ereport(ereport: ErrorReportWithLevel) {
             }
         }
     }
+}
+
+/// Returns `domain` as a C string that lives as long as the backend.
+///
+/// `errstart()` keeps the domain pointer in the error's `ErrorData` without copying it, because
+/// C passes a string literal.  Postgres reads it until it discards the error, which can be long
+/// after `do_ereport()` has jumped away with an ERROR, so the string can't be owned by its frame.
+/// Each distinct domain is copied once and kept.  Postgres reads the domain as a C string, so,
+/// like the message, detail, and hint, it ends at its first NUL.
+fn static_domain(domain: &str) -> &'static CStr {
+    static DOMAINS: Mutex<Vec<&'static CStr>> = Mutex::new(Vec::new());
+
+    let bytes = domain.as_bytes();
+    let bytes = &bytes[..bytes.iter().position(|&b| b == 0).unwrap_or(bytes.len())];
+    let mut domains = DOMAINS.lock().unwrap_or_else(PoisonError::into_inner);
+    if let Some(domain) = domains.iter().find(|d| d.to_bytes() == bytes) {
+        return domain;
+    }
+    let domain: &'static CStr = Box::leak(
+        CString::new(bytes).expect("bytes before the first NUL contain no NUL").into_boxed_c_str(),
+    );
+    domains.push(domain);
+    domain
 }
