@@ -285,7 +285,14 @@ storage bridge preserves its bytes. Raw `i8` and `u8` inputs retain the separate
 signed-char and unsigned-char identities, so a plain-char operand requires an
 explicit `CValue<CChar>` or `Pointer<CChar, _>` tag.
 Recorded MSVC flags use Windows quoting and explicit Clang translations; unknown
-options fail rather than disappearing. Inspection or native-generation failures
+options fail rather than disappearing. Standalone commands use the last explicit
+Clang `--target` or `-target` to interpret the selected PostgreSQL metadata,
+including its flags and include directories. Library callers can use
+`PostgresConfig::from_pg_config_with_target`; the existing constructors retain
+native defaults. Bindgen treats a runnable `pg_config` as host metadata and a
+description that stands in for one, as cargo-pgrx passes for a target bundle, as target metadata. It decodes each with its own
+platform's quoting rules before filtering host flags for cross-compilation.
+Inspection or native-generation failures
 stop the binding build; unsupported individual macros retain structured skips.
 The decoder retains runtime choices until `lower_msvc_runtime_flags` sees the
 combined flags: the last `/MD[d]` or `/MT[d]` choice determines the runtime
@@ -301,8 +308,8 @@ version, and `cshim` before linkage. Raw-only imports cannot supply the migrated
 callers. Format 2 added the inline invocation interface, and format 3 returns Rust
 `bool` from macros whose C result is a truth value; older bundles require
 fresh generation into a new directory. See the [cross-compilation guide](../docs/src/extension/build/cross-compile.md)
-for `PGRX_PG_SYS_EXTRA_TARGET_INFO_PATH` export and
-`PGRX_TARGET_INFO_PATH_PGnn` import. Bundle integrity does not authenticate its
+for `cargo pgrx package --bundle-generate` and `--bundle`, which export and
+import it. Bundle integrity does not authenticate its
 producer; use trusted artifacts from the same pgrx release and revision.
 
 The docs.rs path uses shipped bindings, typed macro shells and generated adapter
@@ -1079,11 +1086,11 @@ active `pgNN` feature generates them. A missing matching Clang driver, server
 headers configured for another machine, a refused profile or a failed native
 support build stops the build. The error names the PostgreSQL version, the
 Cargo target, the server headers, the source of the PostgreSQL metadata (a
-`pg_config` path or `PGRX_PG_CONFIG_AS_ENV`) and the cause. Unsupported
+`pg_config` path or a description in its place) and the cause. Unsupported
 individual macros remain structured skips in the report. `PGRX_MACRO_DEBUG=1`
 prints the generation summary and each skip; normal builds stay quiet. docs.rs
 builds skip generation and use the shipped snapshots, and a complete target
-bundle imported through `PGRX_TARGET_INFO_PATH_PGNN` supplies its verified
+bundle imported by `cargo pgrx package --bundle` supplies its verified
 generated files instead.
 
 `PostgresConfig::inspect` and `inspect_with_arguments` check that the server
@@ -1100,9 +1107,9 @@ generator's own architecture and OS. One libclang parse then compares the `pg_co
 member-offset alignments, `MAXIMUM_ALIGNOF`, byte order, 64-bit integer flags
 and major version with the target compiler, and reports every disagreement. A
 refusal is `PostgresError::TargetConfiguration`, which wraps a
-`ConfigurationError`. The binding build adds a remedy naming
-`PGRX_INCLUDEDIR_SERVER_PGNN_<target>` in both target spellings,
-`PGRX_PG_CONFIG_AS_ENV` and `PGRX_TARGET_INFO_PATH_PGNN`.
+`ConfigurationError`. The binding build adds what to do: use the `pg_config`
+of a PostgreSQL built for the target, or package from a bundle generated on
+the target platform.
 
 The binding build takes the server header root from `PGRX_INCLUDEDIR_SERVER`
 and its version- and target-specific variants when one is set, and otherwise
@@ -1114,7 +1121,7 @@ A `pg_config` program describes the machine it runs on. When Cargo's `HOST` and
 functional CFLAGS from it: `-fno-strict-aliasing`, `-fwrapv` and
 `-fexcess-precision=standard`, in recorded order. The report lists the other
 recorded flags under `cflags_dropped`, and the `PGRX_MACRO_DEBUG=1` summary
-prints them. Native builds and `PGRX_PG_CONFIG_AS_ENV` metadata apply every
+prints them. Native builds and a description from those options apply every
 recorded flag, as does the CLI, except Darwin `-arch` selections: Clang cannot
 preprocess for two slices at once, and the target selects the slice, so they
 are listed under `cflags_dropped` too.
@@ -1123,11 +1130,11 @@ The runtime checks the selected compiler's LP64, LLP64, or ILP32 representation,
 including plain-char signedness, C long width, and the distinct ranks of `size_t`
 and pointer differences. This includes unsigned-char Linux AArch64 and Windows
 LLP64; both byte orders are admitted when the C and Rust target agree. See the
-[cross-compilation guide](../docs/src/extension/build/cross-compile.md#postgresql-headers-and-metadata-for-the-target)
-for supplying target headers and metadata.
+[cross-compilation guide](../docs/src/extension/build/cross-compile.md)
+for building for another platform.
 
-Some installations do not record historical CFLAGS, and `PGRX_PG_CONFIG_AS_ENV`
-metadata may omit `PGRX_PG_CONFIG_CFLAGS`. In that case, the selected headers,
+Some installations do not record historical CFLAGS, and a description that
+stands in for one may omit them. In that case, the selected headers,
 target, and current compiler invocation define the macro profile. The build
 report records `cflags_recorded: false`; it does not infer the server's
 unrecorded build options, including `-fwrapv`. The binding build splits

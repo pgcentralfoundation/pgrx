@@ -15,7 +15,12 @@ description = "Chooses and runs the jobs of pgrx's CI workflow"
 publish = false
 
 [dependencies]
+# Reading what `cargo pgrx package` wrote: bundles, and RPM and DEB packages.
+ar = "0.9"
 cargo_metadata.workspace = true
 eyre.workspace = true
+flate2 = "1"
+rpm = { version = "0.25.1", default-features = false, features = ["payload", "gzip-compression"] }
 serde.workspace = true
 serde_json.workspace = true
+tar = "0.4"

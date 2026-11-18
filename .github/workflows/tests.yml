@@ -334,32 +334,70 @@ jobs:
           cargo build --locked -p pgrx-ci
           target/debug/pgrx-ci test-variants --pg "$PG_VER"
 
-  cross-package:
-    name: Linux to macOS PG18 package
+  # A target bundle is generated on the platform an extension will run on, and is all another
+  # machine needs to package for it. These two jobs do that across architectures.
+  cross-bundle:
+    name: PG18 bundle on Linux ARM64
     needs: plan
+    if: needs.plan.outputs.cross_package == 'true'
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 30
+    env:
+      PG_VER: 18
+    steps:
+      - uses: actions/checkout@v4
+      - run: tools/ci/setup.sh
+      # Restore what the PG18 tests on this platform saved, and save nothing more.
+      - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: pg-linux-arm64
+          save-if: false
+      - name: Generate the bundle
+        run: |
+          cargo build --locked --package cargo-pgrx
+          target/debug/cargo-pgrx pgrx package --package versioned_so --debug --bundle-generate \
+            --pg-config "$PG_CONFIG" --out-dir "$RUNNER_TEMP/bundle" --cargo=--locked
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pg18-linux-arm64-bundle
+          # The name starts with the pgrx version that generated the bundle.
+          path: ${{ runner.temp }}/bundle/pgrx-*-pg18-aarch64-unknown-linux-gnu.tar.gz
+          if-no-files-found: error
+          retention-days: 1
+
+  cross-package:
+    name: Linux x64 to Linux ARM64 PG18 package
+    needs: [plan, cross-bundle]
     if: needs.plan.outputs.cross_package == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     env:
-      CLANG_VER: 18
+      CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER: aarch64-linux-gnu-gcc
+      # The runner image has Clang; pointing pgrx at none shows a full bundle needs none.
+      CLANG_PATH: /nonexistent/clang
+      LIBCLANG_PATH: /nonexistent
     steps:
       - uses: actions/checkout@v4
+      # No PostgreSQL, server headers or Clang: the bundle stands in for all three.
       - run: tools/ci/setup.sh
-      - name: Install cross-build dependencies
+      - name: Install the ARM64 linker and Rust target
         run: |
-          tools/ci/retry.sh sudo apt-get install -y -qq --no-install-recommends bison flex lld-18
-          tools/ci/retry.sh rustup target add aarch64-apple-darwin
-      - name: Restore the macOS SDK and linker
-        uses: actions/cache@v4
+          tools/ci/retry.sh sudo apt-get install -y -qq --no-install-recommends \
+            gcc-aarch64-linux-gnu libc6-dev-arm64-cross
+          tools/ci/retry.sh rustup target add aarch64-unknown-linux-gnu
+      - uses: actions/download-artifact@v4
         with:
-          path: ${{ runner.temp }}/osxcross
-          key: osxcross-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('tools/ci/cross-macos-package.sh') }}
+          name: pg18-linux-arm64-bundle
+          path: ${{ runner.temp }}/bundle
       - uses: Swatinem/rust-cache@v2
         with:
-          shared-key: cross-macos-pg18
+          shared-key: cross-package
           save-if: ${{ env.SAVE_RUST_CACHE == 'true' }}
-      - name: Cross-compile and check the macOS package
-        run: tools/ci/cross-macos-package.sh
+      - name: Package from the bundle and check the ARM64 package
+        run: |
+          cargo build --locked -p pgrx-ci
+          bundle=$(echo "$RUNNER_TEMP"/bundle/pgrx-*-pg18-aarch64-unknown-linux-gnu.tar.gz)
+          target/debug/pgrx-ci cross-package --bundle "$bundle"
 
   miri:
     name: Miri

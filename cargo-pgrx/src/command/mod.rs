@@ -14,7 +14,6 @@ use ureq::tls::{RootCerts, TlsConfig};
 
 pub(crate) mod bench;
 pub(crate) mod connect;
-pub(crate) mod cross;
 pub(crate) mod get;
 pub(crate) mod info;
 pub(crate) mod init;

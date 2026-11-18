@@ -50,6 +50,65 @@ fn fixture(name: &str) -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures").join(name)
 }
 
+/// Zig's C++ headers must not shadow C headers, whose ordered search and freshness still apply.
+#[test]
+fn zig_language_specific_includes_preserve_c_search_order_and_freshness() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().expect("libclang must be available");
+    let directory = tempfile::tempdir().unwrap();
+    let cpp = directory.path().join("C++ headers");
+    let first = directory.path().join("first C headers");
+    let second = directory.path().join("second C headers");
+    for path in [&cpp, &first, &second] {
+        std::fs::create_dir(path).unwrap();
+    }
+    std::fs::write(cpp.join("selected.h"), "#error C++ headers must not enter C inspection\n")
+        .unwrap();
+    let header = directory.path().join("wrapper.h");
+    std::fs::write(&header, "#include <selected.h>\n#define SELECTED(value) ((value) + NUMBER)\n")
+        .unwrap();
+    for (earlier, later, expected) in [(&first, &second, "11"), (&second, &first, "22")] {
+        std::fs::write(first.join("selected.h"), "#define NUMBER 11\n").unwrap();
+        std::fs::write(second.join("selected.h"), "#define NUMBER 22\n").unwrap();
+        let mut arguments = oracle::native_arguments();
+        arguments.extend(["-cxx-isystem".into(), cpp.to_str().unwrap().into()]);
+        for path in [earlier, later] {
+            arguments.extend([
+                "-Xclang".into(),
+                "-c-isystem".into(),
+                "-Xclang".into(),
+                path.to_str().unwrap().into(),
+            ]);
+        }
+        let frontend = inspect(&scanner, &header, &arguments, None).unwrap();
+        let mut expected_arguments = arguments.clone();
+        if cfg!(target_env = "msvc") {
+            // MSVC's default warning policy precedes the caller's arguments.
+            expected_arguments.insert(0, pgrx_c_macros::MSVC_POINTER_TYPE_WARNING.into());
+        }
+        assert!(
+            frontend.profile().arguments.starts_with(&expected_arguments),
+            "unexpected compiler arguments: {:?}",
+            frontend.profile().arguments
+        );
+        let number = &frontend.environment().active["NUMBER"].definition;
+        assert_eq!(number.tokens.last().unwrap().spelling, expected);
+        let selected = earlier.join("selected.h");
+        assert_eq!(
+            number.provenance.as_ref().unwrap().file.canonicalize().unwrap(),
+            selected.canonicalize().unwrap()
+        );
+        for path in [earlier, later] {
+            assert!(frontend.profile().inputs.directories.contains(path));
+        }
+        let session = AnalysisSession::prepare(&scanner, &frontend, &["SELECTED"]).unwrap();
+        session.verify_inputs().unwrap();
+        std::fs::write(&selected, "#define NUMBER 99\n").unwrap();
+        let error = session.verify_inputs().unwrap_err().to_string();
+        assert!(error.contains("changed after inspection"), "{error}");
+    }
+}
+
 /// Repeated forward declarations cannot recharge or overwrite one original definition's source.
 #[test]
 fn repeated_inline_declarations_retain_definition_source_once_within_budget() {

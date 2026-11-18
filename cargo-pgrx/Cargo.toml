@@ -36,6 +36,8 @@ toml.workspace = true
 toml_edit.workspace = true
 
 arx-pack = "0.3.7" # RPM and DEB packages for `cargo pgrx package`
+flate2 = "1" # target bundles are gzipped tar archives
+tar = "0.4"
 clap = { version = "4.4.2", features = ["env", "suggestions", "cargo", "derive", "wrap_help"] }
 jobslot = "0.2.24" # as seen in gmake -j{N}
 semver = "1.0.28" # checking pgrx versions match

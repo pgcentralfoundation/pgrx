@@ -48,19 +48,18 @@ These options change what gets built and where it goes:
 | `-d`, `--debug`                        | Build with the development profile                         |
 | `--profile <NAME>`                     | Build with this Cargo profile                              |
 | `-F`, `--features <FEATURES>`          | Enable additional Cargo features                           |
-| `--target <TRIPLE>`                    | Compile for this target                                    |
+| `--bundle <FILE>`                      | Package for the platform and Postgres of this target bundle |
+| `--bundle-generate`                    | Write a full target bundle for this machine instead of packaging |
 | `-p`, `--package`, `--manifest-path`   | Select an extension in a workspace                         |
 
 Run `cargo pgrx package --help` for the full list.
 
 ## Building for Several Postgres Versions
 
-Register each Postgres with `cargo pgrx init`, then run `cargo pgrx package` once per version. Each
-run has its own output directory:
+Run `cargo pgrx package` once per version, naming that version's `pg_config`. Packaging needs no
+`cargo pgrx init`, and each run has its own output directory:
 
 ```console
-$ cargo pgrx init --pg16 /usr/lib/postgresql/16/bin/pg_config \
-                  --pg17 /usr/lib/postgresql/17/bin/pg_config
 $ cargo pgrx package --pg-config /usr/lib/postgresql/16/bin/pg_config
 $ cargo pgrx package --pg-config /usr/lib/postgresql/17/bin/pg_config
 ```
@@ -169,7 +168,7 @@ an error.
 | `${DESCRIPTION}`      | The crate description                                          |
 | `${LICENSE}`          | The crate license                                              |
 | `${MAINTAINER}`       | The first entry of the crate's `authors`                       |
-| `${ARCH}`             | The `--target` architecture, or the host's if there isn't one  |
+| `${ARCH}`             | The bundle's architecture, or the host's if there isn't one    |
 | `${PG_MAJOR_VERSION}` | The Postgres major version, such as `17`                       |
 | `${PG_PKGLIBDIR}`     | `pg_config --pkglibdir`                                        |
 | `${PG_SHAREDIR}`      | `pg_config --sharedir`                                         |
@@ -187,8 +186,8 @@ treat `1.0.0-rc.1` as newer than `1.0.0`. Both sort `1.0.0~rc.1` before `1.0.0`.
 
 ### Things to Know
 
-- RPM and DEB packages can only be built on Linux. On other platforms, `cargo pgrx package` prints a
-  warning, skips them, and still produces the package directory.
+- RPM and DEB packages are built only for a Linux target, from any host. For other targets,
+  `cargo pgrx package` prints a warning, skips them, and still produces the package directory.
 - `cargo pgrx install --sudo` stages its files the same way but never builds these packages.
 - `--no-distrib-packages` skips these packages for one build, such as a container build that only
   copies the staged files.
@@ -196,7 +195,7 @@ treat `1.0.0-rc.1` as newer than `1.0.0`. Both sort `1.0.0~rc.1` before `1.0.0`.
   file it finds. Delete the directory before a release so SQL files from older versions don't ship.
 - The default `files` and `dirs` expect the layout from `pg_config`. If you pass `--prefix-dir`,
   override both keys with paths under `${BUILD_BASE_PATH}`.
-- `${ARCH}` is the first part of a `--target` triple. If the package format doesn't recognize it, as
+- `${ARCH}` is the first part of the bundle's target triple. If the package format doesn't recognize it, as
   with `powerpc64le`, set `arch` in your section.
 - Packages are unsigned, and the RPM release number is always `1`.
 - `cargo deb` reads `[package.metadata.deb]` too, with different rules, so a section written for it

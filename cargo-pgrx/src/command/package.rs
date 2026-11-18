@@ -8,13 +8,16 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use crate::CommandExecute;
+use crate::bundle::Bundle;
 use crate::cargo::CargoProfile;
 use crate::command::get::get_property;
 use crate::command::install::{
-    format_display_path, install_extension, shared_library_filename, warn_if_pg_bench_enabled,
+    EffectiveExtVersion, Platform, build_extension, format_display_path, get_version,
+    install_extension, manifest_path_for_build, shared_library_filename, warn_if_pg_bench_enabled,
 };
 use crate::command::migrate::UnreleasedFragmentMode;
-use crate::manifest::{PgVersionSource, display_version_info};
+use crate::manifest::{PgVersionSource, display_version_info, program_pg_config};
+use crate::target::{TargetOs, target_arch};
 use cargo_toml::Manifest;
 use eyre::{WrapErr, eyre};
 use owo_colors::OwoColorize;
@@ -49,8 +52,12 @@ pub(crate) struct Package {
     pub(crate) out_dir: Option<PathBuf>,
     #[clap(flatten)]
     pub(crate) features: clap_cargo::Features,
-    #[clap(long)]
-    pub(crate) target: Option<String>,
+    /// Package for the platform and PostgreSQL of this bundle, collected there with `tools/pgrx-collect-partial-bundle.sh` or generated with `--bundle-generate`
+    #[clap(long, value_name = "FILE", value_parser, conflicts_with_all = ["pg_config", "bundle_generate"])]
+    pub(crate) bundle: Option<PathBuf>,
+    /// Write a full bundle for this machine's platform, PostgreSQL and pgrx version instead of packaging, so other machines can package for it with `--bundle`
+    #[clap(long, conflicts_with_all = ["test", "prefix_dir", "no_distrib_packages", "assemble_unreleased", "no_assemble_unreleased"])]
+    pub(crate) bundle_generate: bool,
     /// Assemble unreleased SQL fragments into the package instead of refusing to build it
     #[clap(long, conflicts_with = "no_assemble_unreleased")]
     pub(crate) assemble_unreleased: bool,
@@ -95,14 +102,31 @@ impl Package {
         let package_manifest =
             Manifest::from_path(&package_manifest_path).wrap_err("Couldn't parse manifest")?;
 
-        let pg_config = match self.pg_config {
-            None => PgConfig::from_path(),
-            Some(config) => PgConfig::new_with_defaults(config),
+        // A bundle names the platform to build for and describes its PostgreSQL. Without one
+        // the build is for this machine, whose `pg_config` program describes it.
+        let bundle;
+        let program;
+        let platform = match self.bundle.as_deref() {
+            Some(file) => {
+                bundle = Bundle::open(file, metadata.target_directory.as_std_path())?;
+                // `pgrx-bindgen` is the generator whose version a full bundle must match.
+                let pgrx = metadata.packages.iter().find(|package| package.name == "pgrx-bindgen");
+                bundle.require_pgrx(
+                    file,
+                    pgrx.map(|package| package.version.to_string()).as_deref(),
+                )?;
+                Platform::Bundle(&bundle)
+            }
+            None => {
+                program = program_pg_config(self.pg_config.take());
+                Platform::Host(&program)
+            }
         };
+        let pg_config = platform.pg_config();
         let pg_version = format!("pg{}", pg_config.major_version()?);
 
         crate::manifest::modify_features_for_version(
-            &Pgrx::from_config()?,
+            &Pgrx::default(),
             Some(&mut self.features),
             &package_manifest,
             &PgVersionSource::PgConfig(pg_version),
@@ -113,14 +137,29 @@ impl Package {
             // NB:  `cargo pgrx package` defaults to "--release" whereas all other commands default to "debug"
             if self.debug { CargoProfile::Dev } else { CargoProfile::Release },
         )?;
+        if self.bundle_generate {
+            display_version_info(pg_config, &PgVersionSource::PgConfig(pg_config.label()?));
+            let path = generate_bundle(
+                pg_config,
+                self.manifest_path.as_deref(),
+                self.package.as_deref(),
+                &package_manifest_path,
+                &profile,
+                &self.features,
+                self.out_dir.as_deref(),
+                metadata.target_directory.as_std_path(),
+                &cargo_flags,
+            )?;
+            return Ok((path, Vec::new()));
+        }
+
         let out_dir = if let Some(out_dir) = self.out_dir {
             out_dir
         } else {
             build_base_path(
-                &pg_config,
+                platform,
                 &package_manifest_path,
                 &profile,
-                self.target.as_deref(),
                 metadata.target_directory.as_std_path(),
             )?
         };
@@ -129,12 +168,11 @@ impl Package {
             self.manifest_path.as_deref(),
             self.package.as_deref(),
             &package_manifest_path,
-            &pg_config,
             out_dir.clone(),
             &profile,
             self.test,
             &self.features,
-            self.target.as_deref(),
+            platform,
             unreleased_mode,
             metadata.target_directory.as_std_path(),
             &cargo_flags,
@@ -143,11 +181,10 @@ impl Package {
 
         if !self.no_distrib_packages {
             build_distrib_packages(
-                &pg_config,
+                platform,
                 &package_manifest_path,
                 metadata.workspace_root.as_std_path(),
                 &out_dir,
-                self.target.as_deref(),
                 metadata.target_directory.as_std_path(),
                 &cargo_flags,
             )?;
@@ -166,7 +203,7 @@ impl CommandExecute for Package {
 }
 
 #[tracing::instrument(level = "error", skip_all, fields(
-    pg_version = %pg_config.version()?,
+    pg_version = %platform.pg_config().version()?,
     profile = ?profile,
     test = is_test,
 ))]
@@ -174,12 +211,11 @@ pub(crate) fn package_extension(
     user_manifest_path: Option<&Path>,
     user_package: Option<&str>,
     package_manifest_path: &Path,
-    pg_config: &PgConfig,
     out_dir: PathBuf,
     profile: &CargoProfile,
     is_test: bool,
     features: &clap_cargo::Features,
-    target: Option<&str>,
+    platform: Platform<'_>,
     unreleased_mode: UnreleasedFragmentMode,
     target_dir: &Path,
     cargo_flags: &[String],
@@ -192,17 +228,17 @@ pub(crate) fn package_extension(
         std::fs::create_dir_all(&out_dir)?;
     }
 
+    let pg_config = platform.pg_config();
     display_version_info(pg_config, &PgVersionSource::PgConfig(pg_config.label()?));
     install_extension(
         user_manifest_path,
         user_package,
         package_manifest_path,
-        pg_config,
         profile,
         is_test,
         Some(out_dir),
         features,
-        target,
+        platform,
         unreleased_mode,
         target_dir,
         cargo_flags,
@@ -210,18 +246,63 @@ pub(crate) fn package_extension(
     )
 }
 
-pub(crate) fn build_base_path(
+/// Check the extension on this machine with its `pgrx-pg-sys` exporting what it generates, and
+/// put that with `pg_config`'s values into one bundle file. The extension is neither compiled
+/// nor staged: the check is only how the generated sources come to match its pgrx version and
+/// features.
+fn generate_bundle(
     pg_config: &PgConfig,
+    user_manifest_path: Option<&Path>,
+    user_package: Option<&str>,
+    package_manifest_path: &Path,
+    profile: &CargoProfile,
+    features: &clap_cargo::Features,
+    out_dir: Option<&Path>,
+    target_dir: &Path,
+    cargo_flags: &[String],
+) -> eyre::Result<PathBuf> {
+    // A directory of its own for every run: the build script writes only into an empty one,
+    // and a path it has not seen makes Cargo run it again instead of reusing an earlier build
+    // that exported nowhere.
+    std::fs::create_dir_all(target_dir)
+        .wrap_err_with(|| format!("couldn't create {}", target_dir.display()))?;
+    let exported = tempfile::Builder::new()
+        .prefix("pgrx-bundle-")
+        .tempdir_in(target_dir)
+        .wrap_err_with(|| format!("couldn't create a directory in {}", target_dir.display()))?;
+    let exported = exported.path();
+
+    let version = get_version(package_manifest_path, cargo_flags)?;
+    build_extension(
+        Platform::HostForBundle(pg_config, exported),
+        manifest_path_for_build(user_manifest_path, user_package, package_manifest_path),
+        user_package,
+        profile,
+        features,
+        EffectiveExtVersion(&version),
+        cargo_flags,
+    )?;
+
+    let path = crate::bundle::write(pg_config, exported, out_dir.unwrap_or(target_dir))?;
+    eprintln!(
+        "{} bundle to {}",
+        "     Writing".bold().green(),
+        format_display_path(&path, target_dir).cyan()
+    );
+    Ok(path)
+}
+
+pub(crate) fn build_base_path(
+    platform: Platform<'_>,
     manifest_path: &Path,
     profile: &CargoProfile,
-    target: Option<&str>,
     target_dir: &Path,
 ) -> eyre::Result<PathBuf> {
     let mut target_dir = target_dir.to_path_buf();
-    let pgver = pg_config.major_version()?;
+    let pgver = platform.pg_config().major_version()?;
     let extname = get_property(manifest_path, "extname")?
         .ok_or_else(|| eyre!("could not determine extension name"))?;
-    if let Some(target) = target {
+    if let Some(target) = platform.target() {
         target_dir.push(target);
     }
     target_dir.push(profile.target_subdir());
@@ -230,11 +311,10 @@ pub(crate) fn build_base_path(
 }
 
 fn build_distrib_packages(
-    pg_config: &PgConfig,
+    platform: Platform<'_>,
     manifest_path: &Path,
     workspace_root: &Path,
     out_dir: &Path,
-    target: Option<&str>,
     target_dir: &Path,
     cargo_flags: &[String],
 ) -> eyre::Result<Vec<PathBuf>> {
@@ -255,10 +335,9 @@ fn build_distrib_packages(
         return Ok(vec![]);
     }
 
-    // The staged library only runs on the platform that built it.
-    if !cfg!(target_os = "linux") {
+    if TargetOs::from_target(platform.target()) != TargetOs::Linux {
         eprintln!(
-            "{} skipping RPM and DEB packages, which can only be built on Linux",
+            "{} skipping RPM and DEB packages, which require a Linux target",
             "WARNING:".red().bold()
         );
         return Ok(vec![]);
@@ -268,9 +347,8 @@ fn build_distrib_packages(
     let manifest_dir = manifest_path.parent().expect("a manifest path names a file in a directory");
 
     // Built once and shared by every package kind
-    let lib_file = shared_library_filename(manifest_path, pg_config, cargo_flags, target)?;
-    let vars =
-        Vars::new(pg_config, out_dir, manifest_dir, workspace_root, package, target, lib_file)?;
+    let lib_file = shared_library_filename(manifest_path, platform, cargo_flags)?;
+    let vars = Vars::new(platform, out_dir, manifest_dir, workspace_root, package, lib_file)?;
 
     kinds
         .into_iter()
@@ -420,21 +498,21 @@ struct Vars(HashMap<&'static str, Result<String, &'static str>>);
 
 impl Vars {
     fn new(
-        pg_config: &PgConfig,
+        platform: Platform<'_>,
         out_dir: &Path,
         manifest_dir: &Path,
         workspace_root: &Path,
         package: &cargo_toml::Package<toml::Value>,
-        target: Option<&str>,
         lib_file: String,
     ) -> eyre::Result<Self> {
+        let pg_config = platform.pg_config();
         let optional = |value: Option<&str>, reason| value.map(str::to_owned).ok_or(reason);
         // Absolute, so that a relative `--out-dir` still names the directory below the one
         // `cargo pgrx` runs in after relative sources resolve against `manifest_dir`.
         let out_dir = std::path::absolute(out_dir)
             .wrap_err_with(|| format!("couldn't resolve {}", out_dir.display()))?;
         Ok(Self(HashMap::from([
-            ("ARCH", Ok(package_arch(target).to_owned())),
+            ("ARCH", Ok(target_arch(platform.target()).to_owned())),
             ("BUILD_BASE_PATH", Ok(utf8_path(&out_dir)?)),
             (
                 "DESCRIPTION",
@@ -499,12 +577,6 @@ impl Vars {
         }
         Ok(())
     }
-}
-
-/// The architecture of the packaged library. `--target` wins over the host, and
-/// arx-pack accepts the first component of the common Linux target triples.
-fn package_arch(target: Option<&str>) -> &str {
-    target.and_then(|t| t.split('-').next()).unwrap_or(std::env::consts::ARCH)
 }
 
 /// RPM rejects `-` in a version, and Debian reads it as a revision that sorts
@@ -653,14 +725,101 @@ mod tests {
 
     #[test]
     fn package_arch_follows_the_target() {
-        assert_eq!(package_arch(Some("aarch64-unknown-linux-gnu")), "aarch64");
-        assert_eq!(package_arch(None), std::env::consts::ARCH);
+        assert_eq!(target_arch(Some("aarch64-unknown-linux-gnu")), "aarch64");
+        assert_eq!(target_arch(None), std::env::consts::ARCH);
     }
 
     #[test]
     fn package_version_sorts_pre_releases_first() {
         assert_eq!(package_version("1.2.3"), "1.2.3");
         assert_eq!(package_version("1.2.3-rc.1"), "1.2.3~rc.1");
+    }
+
+    fn package_manifest(dir: &Path) -> PathBuf {
+        let path = dir.join("Cargo.toml");
+        std::fs::write(
+            &path,
+            r#"
+            [package]
+            name = "my-ext"
+            version = "1.0.0"
+            description = "Extension"
+            license = "MIT"
+            authors = ["Me"]
+            [lib]
+            path = "lib.rs"
+            [package.metadata.rpm]
+            [package.metadata.deb]
+            "#,
+        )
+        .unwrap();
+        path
+    }
+
+    #[test]
+    fn non_linux_targets_skip_distribution_packages() {
+        let dir = tempfile::tempdir().unwrap();
+        let manifest = package_manifest(dir.path());
+        // No staging tree or PostgreSQL is needed when the target cannot use these packages.
+        for target in ["aarch64-apple-darwin", "x86_64-pc-windows-msvc", "x86_64-unknown-freebsd"] {
+            let bundle = bundle(target, &[]);
+            let paths = build_distrib_packages(
+                Platform::Bundle(&bundle),
+                &manifest,
+                dir.path(),
+                dir.path(),
+                dir.path(),
+                &[],
+            )
+            .unwrap();
+            assert!(paths.is_empty(), "{target}: {paths:?}");
+        }
+    }
+
+    /// A partial bundle for `target`, whose PostgreSQL has these `pg_config` properties.
+    fn bundle(target: &str, properties: &[(&str, &str)]) -> Bundle {
+        let pg_config = PgConfig::from_properties(properties.iter().copied());
+        Bundle { target: target.to_owned(), pg_config, generated: None }
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn linux_target_builds_distribution_packages_on_any_unix_host() {
+        let dir = tempfile::tempdir().unwrap();
+        let dir = dir.path();
+        let manifest = package_manifest(dir);
+        std::fs::write(dir.join("my_ext.control"), "default_version = '1.0.0'\n").unwrap();
+        let libdir = dir.join("usr/lib/postgresql/18/lib");
+        let extdir = dir.join("usr/share/postgresql/18/extension");
+        std::fs::create_dir_all(&libdir).unwrap();
+        std::fs::create_dir_all(&extdir).unwrap();
+        std::fs::write(libdir.join("my_ext-1.0.0.so"), "library").unwrap();
+        std::fs::copy(dir.join("my_ext.control"), extdir.join("my_ext.control")).unwrap();
+        for (target, rpm_arch, deb_arch) in [
+            ("x86_64-unknown-linux-gnu", "x86_64", "amd64"),
+            ("aarch64-unknown-linux-gnu", "aarch64", "arm64"),
+        ] {
+            let bundle = bundle(
+                target,
+                &[
+                    ("version", "PostgreSQL 18.1"),
+                    ("pkglibdir", "/usr/lib/postgresql/18/lib"),
+                    ("sharedir", "/usr/share/postgresql/18"),
+                ],
+            );
+            let paths =
+                build_distrib_packages(Platform::Bundle(&bundle), &manifest, dir, dir, dir, &[])
+                    .unwrap();
+            assert_eq!(
+                paths,
+                [
+                    dir.join(format!("my-ext_18-1.0.0-1.{rpm_arch}.rpm")),
+                    dir.join(format!("postgresql-18-my-ext_1.0.0_{deb_arch}.deb")),
+                ]
+            );
+            assert!(std::fs::read(&paths[0]).unwrap().starts_with(b"\xed\xab\xee\xdb"));
+            assert!(std::fs::read(&paths[1]).unwrap().starts_with(b"!<arch>\n"));
+        }
     }
 
     // The library's file name differs from the crate name, as it does for a

@@ -43,7 +43,6 @@ Commands:
   connect       Connect, via psql, to a Postgres instance
   test          Run the test suite for this crate
   get           Get a property from the extension control file
-  cross         Commands having to do with cross-compilation. (Experimental)
   upgrade       Upgrade pgrx crate versions in `Cargo.toml`. Defaults to latest
   regress       Run the regression test suite for this crate
   migrate       Manage extension SQL migrations and upgrade scripts
@@ -675,7 +674,6 @@ Options:
           Do not activate the `default` feature
   -F, --features <FEATURES>
           Space-separated list of features to activate
-      --target <TARGET>
       --cargo <FLAG>
           Extra cargo flags forwarded to every `cargo` invocation. Repeatable and split on whitespace: `--cargo=--config=foo` or `--cargo "--offline --frozen"`.
       --no-assemble-unreleased
@@ -881,7 +879,7 @@ installing extension
 `./target/[debug | release]/extension_name-PGVER` using the Postgres installation path information from the `pg_config`
 tool on your `$PATH`.
 
-The intent is that you'd then change into that directory and build a tarball or other package. On Linux,
+The intent is that you'd then change into that directory and build a tarball or other package. For Linux targets,
 `cargo pgrx package` can also build a .deb or .rpm package for you, as described in
 [Building RPM and DEB packages](#building-rpm-and-deb-packages).
 
@@ -911,10 +909,12 @@ Options:
       --all-features                   Activate all available features
       --no-default-features            Do not activate the `default` feature
   -F, --features <FEATURES>            Space-separated list of features to activate
-      --cargo <FLAG>                   Extra cargo flags forwarded to every `cargo` invocation. Repeatable and split on whitespace: `--cargo=--config=foo` or `--cargo "--offline --frozen"`.
+      --bundle <FILE>                  Package for the platform and PostgreSQL of this bundle, collected there with `tools/pgrx-collect-partial-bundle.sh` or generated with `--bundle-generate`
+      --bundle-generate                Write a full bundle for this machine's platform, PostgreSQL and pgrx version instead of packaging, so other machines can package for it with `--bundle`
       --assemble-unreleased            Assemble unreleased SQL fragments into the package instead of refusing to build it
       --no-assemble-unreleased         Build the package without unreleased SQL fragments instead of refusing to build it
       --no-distrib-packages            Skip the RPM and DEB packages that `[package.metadata.rpm]` and `[package.metadata.deb]` declare
+      --cargo <FLAG>                   Extra cargo flags forwarded to every `cargo` invocation. Repeatable and split on whitespace: `--cargo=--config=foo` or `--cargo "--offline --frozen"`
       --prefix-dir <PREFIX_DIR>        The directory within out_dir to put extension assets (default is based on pg_config path)
   -h, --help                           Print help
   -V, --version                        Print version
@@ -922,7 +922,7 @@ Options:
 
 ### Extension Artifact Placement
 
-On Unix, `--prefix-dir <PREFIX_DIR>` overrides the installation paths obtained from `pg_config`, placing the control file,
+For Unix targets, `--prefix-dir <PREFIX_DIR>` overrides the installation paths obtained from `pg_config`, placing the control file,
 SQL files, and shared library in the same directory within the package output. Use `--out-dir` to choose the package output
 directory:
 
@@ -931,12 +931,47 @@ $ cargo pgrx package --out-dir ./package --prefix-dir /opt/my_extension
 ```
 
 This places the extension assets in `./package/opt/my_extension/`. An absolute prefix is made relative to the package output
-directory. If you omit `--prefix-dir`, the layout follows `pg_config`. On Windows, the package layout uses `lib` and
+directory. If you omit `--prefix-dir`, the layout follows `pg_config`. For Windows targets, the package layout uses `lib` and
 `share/extension` regardless of this option.
+
+`cargo pgrx package` and `cargo pgrx install`, with or without `--sudo`, use
+`--pg-config` when given, otherwise the first `pg_config` on `PATH`. The
+`pgrx-pg-sys` build uses the same choice, so the extension is compiled against
+the PostgreSQL it is laid out for. That PostgreSQL's server headers must be
+installed.
+
+To package for another platform, collect a target bundle there with
+`tools/pgrx-collect-partial-bundle.sh`, copy the file to the build host, and pass
+it to `cargo pgrx package --bundle <FILE>`. The bundle names the target and describes
+its PostgreSQL, so `--bundle` cannot be combined with `--pg-config`, and
+packaging from it needs no `pg_config` executable, `cargo pgrx init`, or
+`$PGRX_HOME/config.toml`. `cargo pgrx package` is the only command that builds
+for another platform. See the
+[cross-compilation guide](../docs/src/extension/build/cross-compile.md).
+
+The script collects a partial bundle: the target's PostgreSQL server headers and
+what its `pg_config` reports. It checks nothing it collects; `--bundle` does.
+The build generates from those headers itself, so the build host needs Clang
+and the target's system headers.
+
+`--bundle-generate`, run on the target, writes a full bundle that also holds
+what `pgrx-pg-sys` generates there, so the build host needs neither. It checks
+the extension with `cargo check` to generate with its exact pgrx version and
+features, and builds and stages nothing. It writes
+`pgrx-<pgrx version>-pg<NN>-<target>.tar.gz` to Cargo's target directory, or to
+`--out-dir`. A full bundle serves only that pgrx version, and `--bundle` refuses
+one that another version generated.
+
+The bundle's target selects library names, package layout and distribution
+package formats. Without `--bundle`, these use the host. Windows packages use
+`lib` and `share/extension`, regardless of the target installation prefix.
+Cargo's `build.target`, `CARGO_BUILD_TARGET`, and targets hidden in `--cargo`
+flags do not select cargo-pgrx's target. Custom JSON target specifications are
+not supported by cargo-pgrx packaging.
 
 ### Building RPM and DEB packages
 
-On Linux, `cargo pgrx package` can also build distribution packages from the
+For Linux targets, including cross builds, `cargo pgrx package` can also build distribution packages from the
 packaged files. Add an empty `[package.metadata.rpm]` or `[package.metadata.deb]`
 section to your extension's `Cargo.toml`:
 
@@ -957,8 +992,8 @@ The matching `.rpm` or `.deb` file is written to the output directory. Each
 section builds one package for the Postgres version selected by `pg_config`.
 An empty section uses the default specs below. The `description`, `license`,
 and first `authors` entry of `[package]` fill in the package fields of the same
-name, so `cargo pgrx package` reports an error if one of them is missing. On
-other platforms, `cargo pgrx package` prints a warning and skips these packages.
+name, so `cargo pgrx package` reports an error if one of them is missing. For
+other targets, `cargo pgrx package` prints a warning and skips these packages.
 `cargo pgrx install --sudo` never builds them, and `cargo pgrx package
 --no-distrib-packages` skips them when only the staged files are needed.
 
@@ -1027,7 +1062,7 @@ String values in these sections can use the following variables:
 | `${DESCRIPTION}`      | the crate description                                   |
 | `${LICENSE}`          | the crate license                                       |
 | `${MAINTAINER}`       | the first entry of the crate's `authors`                |
-| `${ARCH}`             | the `--target` or host architecture, such as `x86_64`   |
+| `${ARCH}`             | the bundle's or host's architecture, such as `x86_64`   |
 | `${PG_MAJOR_VERSION}` | the Postgres major version, such as `17`                |
 | `${PG_PKGLIBDIR}`     | `pg_config --pkglibdir`                                 |
 | `${PG_SHAREDIR}`      | `pg_config --sharedir`                                  |
@@ -1048,7 +1083,7 @@ control file, so it can differ from `${NAME}` for a crate with a hyphenated name
 versioned shared library. `${VERSION}` replaces `-` because RPM rejects it in a version
 and Debian would sort `1.0.0-rc.1` after `1.0.0`. Both sort `1.0.0~rc.1` before `1.0.0`.
 
-`${ARCH}` is the first part of a `--target` triple. If the package format doesn't
+`${ARCH}` is the first part of the bundle's target triple. If the package format doesn't
 recognize it, as with `powerpc64le`, set `arch` in your section.
 
 The default `files` and `dirs` expect the layout from `pg_config`. If you pass
@@ -1096,7 +1131,6 @@ Options:
       --test                           Build in test mode (for `cargo pgrx test`)
   -r, --release                        Compile for release mode (default is debug)
       --profile <PROFILE>              Specific profile to use (conflicts with `--release`)
-  -c, --pg-config <PG_CONFIG>          The `pg_config` path (default is first in $PATH)
       --all-features                   Activate all available features
       --no-default-features            Do not activate the `default` feature
   -F, --features <FEATURES>            Space-separated list of features to activate

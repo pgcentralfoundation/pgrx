@@ -225,33 +225,32 @@ For more details on how to manage pgrx extensions see [Managing pgrx extensions]
 
 ## Cross-compiling
 
-So far, cross-compiling extensions with pgrx has only been demonstrated under [nix](https://nixos.org/).
-Proper support in nixpkgs is still in flux, so watch this space.
+Cross-compiling builds an extension on one machine for another platform. pgrx
+does it from a *target bundle*, one file made from the target's PostgreSQL:
 
-In order to cross-compile outside of nix, you will need these ingredients:
+1) On the target platform, run [`tools/pgrx-collect-partial-bundle.sh`](tools/pgrx-collect-partial-bundle.sh).
+   It needs only a POSIX shell, `tar` and PostgreSQL's server headers, and writes a *partial bundle*
+   such as `pgrx-pg18-aarch64-unknown-linux-gnu.partial.tar.gz`. It can also take what `pg_config`
+   reports from a file or from arguments, for headers in a sysroot whose `pg_config` cannot run.
+2) Copy that file to the build host.
+3) On the build host, run `cargo pgrx package --bundle <file>`. This needs a Rust toolchain that can link
+   for the target, Clang, and the target's system headers, and no PostgreSQL, `pg_config` or `cargo pgrx init`.
 
-1) A sysroot for the cross architecture, with rust configured to invoke the linker with flags to link against this sysroot.
-2) PostgreSQL server headers configured for the target, from the same build as the server that will load the extension.
-3) PostgreSQL metadata to go with those headers. Either keep the host's `pg_config` and select the target headers with
-   `PGRX_INCLUDEDIR_SERVER_PG<NN>_<target>`, or describe the target with `PGRX_PG_CONFIG_AS_ENV`.
-   A `pg_config` program for the target also works, either emulated with qemu-user or similar, or replicated with a shell script.
-4) The `clang` driver and `llvm-ar` described under [System Requirements](#system-requirements).
-   `BINDGEN_EXTRA_CLANG_ARGS_<target>` passes the target's sysroot to them when Clang cannot find it.
+A partial bundle holds nothing generated, so it serves every pgrx version. To need only a linker on
+the build host, generate a *full bundle* instead with `cargo pgrx package --bundle-generate` in your
+extension's directory on the target. That needs Rust and Clang there, and has to be done again after
+each pgrx upgrade, since a full bundle is valid for one Rust target, PostgreSQL major version, pgrx
+version and `cshim` setting.
 
-pgrx checks that the server headers were configured for the target and refuses
-them otherwise. A
-[complete target bundle](docs/src/extension/build/cross-compile.md#import-a-complete-target-bundle),
-built on the target machine or by a cross build that passed those checks, can
-replace items 2 and 4. Raw bindings alone cannot. The
-[cross-compilation guide](docs/src/extension/build/cross-compile.md#postgresql-headers-and-metadata-for-the-target)
-describes each path and what pgrx verifies.
+The bundle comes from the target because the bindings, C macros and native
+support that pgrx builds from PostgreSQL's headers depend on how that PostgreSQL
+was built. The target platform can be a container or a CI runner. The
+[cross-compilation guide](docs/src/extension/build/cross-compile.md)
+describes both kinds of bundle, what pgrx verifies, and cross toolchains.
 
-When building with a `pg_config` program, modify the standard build process in the following ways:
-
-1) Pass `--no-run` to `cargo pgrx init`, since we cannot run postgres for the cross machine.
-2) Pass one of the `--pgXX` flags to `cargo pgrx init` with the aforementioned `pg_config`.
-3) Pass the `--pg-config` flag to `cargo pgrx package` with the aforementioned `pg_config`.
-4) Pass the `--target` flag to `cargo pgrx package` with the rust triple of the cross machine.
+Library names, package layout, and RPM/DEB generation follow the bundle's
+target. Cargo's `build.target`, `CARGO_BUILD_TARGET`, forwarded Cargo flags, and
+custom JSON target specifications do not select a target for cargo-pgrx.
 
 `cargo pgrx run` will not work.
 

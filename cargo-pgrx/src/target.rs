@@ -12,18 +12,20 @@
 pub(crate) enum TargetOs {
     Darwin,
     Windows,
+    Linux,
     Elf,
 }
 
 impl TargetOs {
-    /// Read the platform out of a `--target` tuple, falling back to the host
-    /// when no target was passed, which is what cargo itself does.
+    /// Read the platform out of a bundle's target tuple, falling back to the host
+    /// when there is no bundle. Cargo's own target configuration is not consulted.
     pub(crate) fn from_target(target: Option<&str>) -> Self {
         match target {
             Some(tuple) => Self::from_tuple(tuple),
             // The host is the one case where the build-time `cfg` is the answer.
             None if cfg!(target_vendor = "apple") => Self::Darwin,
             None if cfg!(target_os = "windows") => Self::Windows,
+            None if cfg!(target_os = "linux") => Self::Linux,
             None => Self::Elf,
         }
     }
@@ -32,19 +34,20 @@ impl TargetOs {
     /// matching the delimited vendor and os components avoids mistaking an
     /// architecture or environment that merely contains the same letters.
     fn from_tuple(tuple: &str) -> Self {
-        if tuple.contains("-apple-") {
-            Self::Darwin
-        } else if tuple.contains("-windows") {
-            Self::Windows
-        } else {
-            Self::Elf
+        let mut components = tuple.split('-');
+        let _arch = components.next();
+        match (components.next(), components.next()) {
+            (Some("apple"), _) => Self::Darwin,
+            (_, Some("windows")) => Self::Windows,
+            (_, Some("linux")) => Self::Linux,
+            _ => Self::Elf,
         }
     }
 
     /// The `cdylib` name prefix, as `std::env::consts::DLL_PREFIX` gives for the host.
     pub(crate) fn dll_prefix(self) -> &'static str {
         match self {
-            Self::Darwin | Self::Elf => "lib",
+            Self::Darwin | Self::Linux | Self::Elf => "lib",
             Self::Windows => "",
         }
     }
@@ -54,18 +57,13 @@ impl TargetOs {
         match self {
             Self::Darwin => "dylib",
             Self::Windows => "dll",
-            Self::Elf => "so",
+            Self::Linux | Self::Elf => "so",
         }
     }
+}
 
-    /// The `cdylib` extension with its leading dot, as `DLL_SUFFIX` gives.
-    pub(crate) fn dll_suffix(self) -> &'static str {
-        match self {
-            Self::Darwin => ".dylib",
-            Self::Windows => ".dll",
-            Self::Elf => ".so",
-        }
-    }
+pub(crate) fn target_arch(target: Option<&str>) -> &str {
+    target.and_then(|tuple| tuple.split('-').next()).unwrap_or(std::env::consts::ARCH)
 }
 
 #[cfg(test)]
@@ -80,24 +78,26 @@ mod tests {
         for tuple in ["x86_64-pc-windows-msvc", "x86_64-pc-windows-gnu"] {
             assert_eq!(TargetOs::from_target(Some(tuple)), TargetOs::Windows, "{tuple}");
         }
-        for tuple in [
-            "x86_64-unknown-linux-gnu",
-            "aarch64-unknown-linux-gnu",
-            "x86_64-unknown-linux-musl",
-            "x86_64-unknown-freebsd",
-        ] {
-            assert_eq!(TargetOs::from_target(Some(tuple)), TargetOs::Elf, "{tuple}");
+        for tuple in
+            ["x86_64-unknown-linux-gnu", "aarch64-unknown-linux-gnu", "x86_64-unknown-linux-musl"]
+        {
+            assert_eq!(TargetOs::from_target(Some(tuple)), TargetOs::Linux, "{tuple}");
         }
+        assert_eq!(TargetOs::from_target(Some("x86_64-unknown-freebsd")), TargetOs::Elf);
     }
 
     #[test]
     fn names_a_cdylib_per_platform() {
         assert_eq!(
-            (TargetOs::Darwin.dll_prefix(), TargetOs::Darwin.dll_suffix()),
-            ("lib", ".dylib")
+            (TargetOs::Darwin.dll_prefix(), TargetOs::Darwin.dll_extension()),
+            ("lib", "dylib")
         );
-        assert_eq!((TargetOs::Windows.dll_prefix(), TargetOs::Windows.dll_suffix()), ("", ".dll"));
-        assert_eq!((TargetOs::Elf.dll_prefix(), TargetOs::Elf.dll_suffix()), ("lib", ".so"));
+        assert_eq!(
+            (TargetOs::Windows.dll_prefix(), TargetOs::Windows.dll_extension()),
+            ("", "dll")
+        );
+        assert_eq!((TargetOs::Elf.dll_prefix(), TargetOs::Elf.dll_extension()), ("lib", "so"));
+        assert_eq!((TargetOs::Linux.dll_prefix(), TargetOs::Linux.dll_extension()), ("lib", "so"));
     }
 
     #[test]
@@ -105,7 +105,7 @@ mod tests {
         // whatever machine this runs on, the fallback must match what std says
         let host = TargetOs::from_target(None);
         assert_eq!(host.dll_prefix(), std::env::consts::DLL_PREFIX);
-        assert_eq!(host.dll_suffix(), std::env::consts::DLL_SUFFIX);
         assert_eq!(host.dll_extension(), std::env::consts::DLL_EXTENSION);
+        assert_eq!(format!(".{}", host.dll_extension()), std::env::consts::DLL_SUFFIX);
     }
 }

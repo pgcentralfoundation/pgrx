@@ -217,14 +217,28 @@ pub(crate) fn pg_config_and_version(
     }
 }
 
+/// The `pg_config` program for a build on this machine: `--pg-config` when given, otherwise
+/// the first `pg_config` on `PATH`.
+pub(crate) fn program_pg_config(explicit: Option<PathBuf>) -> PgConfig {
+    explicit.map_or_else(PgConfig::from_path, PgConfig::new_with_defaults)
+}
+
 pub(crate) fn display_version_info(pg_config: &PgConfig, pg_version: &PgVersionSource) {
     use owo_colors::OwoColorize;
-    eprintln!(
-        "{} {:?} and `pg_config` from {}",
-        "       Using".bold().green(),
-        pg_version.bold().white(),
-        pg_config.path().unwrap().display().cyan()
-    );
+    match pg_config.path() {
+        Some(path) => eprintln!(
+            "{} {:?} and `pg_config` from {}",
+            "       Using".bold().green(),
+            pg_version.bold().white(),
+            path.display().cyan()
+        ),
+        None => eprintln!(
+            "{} {:?} as described by {}",
+            "       Using".bold().green(),
+            pg_version.bold().white(),
+            "the bundle".cyan()
+        ),
+    }
 }
 
 pub(crate) fn get_package_manifest(
@@ -281,7 +295,7 @@ pub(crate) trait PgrxManifestExt {
     fn lib_name(&self) -> eyre::Result<String>;
 
     /// The `cdylib` filename cargo writes for `target`, or for the host when
-    /// no `--target` was passed.
+    /// there is none.
     fn lib_filename(&self, target: Option<&str>) -> eyre::Result<String>;
 }
 
@@ -325,6 +339,6 @@ impl PgrxManifestExt for Manifest {
     fn lib_filename(&self, target: Option<&str>) -> eyre::Result<String> {
         let os = TargetOs::from_target(target);
         let lib_name = &self.lib_name()?;
-        Ok(format!("{}{lib_name}{}", os.dll_prefix(), os.dll_suffix()))
+        Ok(format!("{}{lib_name}.{}", os.dll_prefix(), os.dll_extension()))
     }
 }

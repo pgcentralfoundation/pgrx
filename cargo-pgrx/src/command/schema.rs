@@ -50,9 +50,6 @@ pub(crate) struct Schema {
     /// Specific profile to use (conflicts with `--release`)
     #[clap(long)]
     profile: Option<String>,
-    /// The `pg_config` path (default is first in $PATH)
-    #[clap(long, short = 'c', value_parser)]
-    pg_config: Option<PathBuf>,
     #[clap(flatten)]
     features: clap_cargo::Features,
     /// A path to output a produced SQL file (default is `stdout`)
@@ -61,8 +58,6 @@ pub(crate) struct Schema {
     /// A path to output a produced GraphViz DOT file
     #[clap(long, short, value_parser)]
     dot: Option<PathBuf>,
-    #[clap(long)]
-    target: Option<String>,
     #[clap(from_global, action = ArgAction::Count)]
     verbose: u8,
     /// Skip building a fresh extension shared object.
@@ -117,14 +112,13 @@ impl CommandExecute for Schema {
         )?;
 
         let attach = !self.no_alter_extension;
-        generate_schema(
+        generate_schema_for_cli(
             self.manifest_path.as_deref(),
             self.package.as_deref(),
             &package_manifest_path,
             &profile,
             self.test,
             &self.features,
-            self.target.as_deref(),
             &target_dir,
             self.out.as_deref(),
             self.dot.as_deref(),
@@ -173,7 +167,6 @@ pub(crate) fn generate_schema_for_cli(
     profile: &CargoProfile,
     is_test: bool,
     features: &clap_cargo::Features,
-    target: Option<&str>,
     target_dir: &Path,
     path: Option<&Path>,
     dot: Option<&Path>,
@@ -203,40 +196,40 @@ pub(crate) fn generate_schema_for_cli(
 
     if !skip_build {
         // NB:  The only path where this happens is via the command line using `cargo pgrx schema`
-        first_build(cargo.clone(), profile, is_test, &features_arg, target)?;
+        first_build(cargo.clone(), profile, is_test, &features_arg)?;
     };
+    // `cargo pgrx schema` builds for this machine; only a package names another target.
+    let library = target_dir.join(profile.target_subdir()).join(manifest.lib_filename(None)?);
     generate_schema_implicit(
         package_manifest_path,
-        profile,
+        &library,
         is_test,
-        target,
-        target_dir,
+        None,
         path,
         dot,
         items,
         attach,
         output_tracking,
-        manifest,
+        &manifest,
     )
 }
-pub(crate) use generate_schema_for_cli as generate_schema;
 
+/// Generate the schema from `library`, an extension library already built for `target` or
+/// for this machine.
 pub(crate) fn generate_schema_implicit(
     package_manifest_path: &Path,
-    profile: &CargoProfile,
+    library: &Path,
     is_test: bool,
     target: Option<&str>,
-    target_dir: &Path,
     path: Option<&Path>,
     dot: Option<&Path>,
     items: Option<&[String]>,
     attach: bool,
     output_tracking: &mut Vec<PathBuf>,
-    manifest: cargo_toml::Manifest,
+    manifest: &cargo_toml::Manifest,
 ) -> eyre::Result<()> {
     let (control_file_path, extname) = find_control_file(package_manifest_path)?;
     let lib_name = manifest.lib_name()?;
-    let lib_filename = manifest.lib_filename(target)?;
     let versioned_so = get_property(package_manifest_path, "module_pathname")?.is_none();
     let extension_version = manifest.package_version()?;
 
@@ -251,8 +244,9 @@ pub(crate) fn generate_schema_implicit(
         tracing::info!(dot = %dot_path.display(), "Writing Graphviz DOT");
     }
 
-    let lib_so_data = load_section_data(profile, &lib_filename, target, target_dir)?;
-    let section_entities = decode_section_entities(&lib_so_data)?;
+    let lib_so_data = std::fs::read(library)
+        .wrap_err_with(|| format!("couldn't read extension shared object {}", library.display()))?;
+    let section_entities = decode_section_entities(&lib_so_data, target)?;
     report_entity_counts(&section_entities);
 
     let mut entities = Vec::new();
@@ -313,24 +307,11 @@ pub(crate) fn generate_schema_implicit(
     Ok(())
 }
 
-fn load_section_data(
-    profile: &CargoProfile,
-    lib_filename: &str,
+fn decode_section_entities<'a>(
+    lib_so_data: &'a [u8],
     target: Option<&str>,
-    target_dir: &Path,
-) -> eyre::Result<Vec<u8>> {
-    let mut lib_so = target_dir.to_path_buf();
-    if let Some(target) = target {
-        lib_so.push(target);
-    }
-    lib_so.push(profile.target_subdir());
-    lib_so.push(lib_filename);
-
-    std::fs::read(&lib_so).wrap_err("couldn't read extension shared object")
-}
-
-fn decode_section_entities<'a>(lib_so_data: &'a [u8]) -> eyre::Result<Vec<SqlGraphEntity<'a>>> {
-    let section = schema_section_data(lib_so_data)?.ok_or_else(|| {
+) -> eyre::Result<Vec<SqlGraphEntity<'a>>> {
+    let section = schema_section_data(lib_so_data, target)?.ok_or_else(|| {
         eyre::eyre!(
             "no embedded pgrx schema section found; expected `.pgrxsc` on ELF/PE or `__DATA,__pgrxsc` on Mach-O. the artifact may have been built with an incompatible pgrx, stripped incorrectly, or selected from the wrong architecture slice",
         )
@@ -391,7 +372,6 @@ fn first_build(
     profile: &CargoProfile,
     is_test: bool,
     features_arg: &str,
-    target: Option<&str>,
 ) -> eyre::Result<()> {
     let cargo = if is_test {
         cargo.subcommand("test").flag("--no-run")
@@ -399,10 +379,10 @@ fn first_build(
         cargo
             .subcommand("rustc")
             .flag("--lib")
-            .rustc_args(crate::cargo::pgrx_cdylib_rustc_args(target))
+            .rustc_args(crate::cargo::pgrx_cdylib_rustc_args(None))
     };
 
-    let cargo = cargo.profile(profile.clone()).target(target.map(|t| t.to_owned()));
+    let cargo = cargo.profile(profile.clone());
 
     let mut command = cargo.into_command();
 
@@ -472,7 +452,8 @@ mod tests {
         let fixture_path = format!("{root_path}/tests/fixtures/macos-universal-binary");
         let bin = std::fs::read(fixture_path).unwrap();
 
-        let error = decode_section_entities(&bin).expect_err("missing section");
+        let error = decode_section_entities(&bin, Some("aarch64-apple-darwin"))
+            .expect_err("missing section");
         assert!(error.to_string().contains("no embedded pgrx schema section found"));
     }
 

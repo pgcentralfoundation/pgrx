@@ -298,6 +298,10 @@ fn emit_rerun_if_changed() {
     // `pgrx-pg-config` doesn't emit one for this.
     println!("cargo:rerun-if-env-changed=PGRX_PG_CONFIG_PATH");
     println!("cargo:rerun-if-env-changed=PGRX_PG_CONFIG_AS_ENV");
+    // A described installation's link directory, and its version, which an imported bundle
+    // reads without the header inspection that tracks the other properties.
+    println!("cargo:rerun-if-env-changed=PGRX_PG_CONFIG_LIBDIR");
+    println!("cargo:rerun-if-env-changed=PGRX_PG_CONFIG_VERSION");
     // Bindgen's behavior depends on these vars, but it doesn't emit them
     // directly because the output would cause issue with `bindgen-cli`. Do it
     // on bindgen's behalf.
@@ -1329,11 +1333,11 @@ fn get_bindings(
         let target = env_tracked("TARGET").ok_or_else(|| eyre!("Cargo did not set TARGET"))?;
         let metadata = pg_config
             .path()
-            .map_or_else(|| "PGRX_PG_CONFIG_AS_ENV".to_owned(), |path| path.display().to_string());
+            .map_or_else(|| DESCRIBED_METADATA.to_owned(), |path| path.display().to_string());
         let pg_target_includes =
             pg_target_includes(major_version, pg_config).wrap_err_with(|| {
                 format!(
-                    "pg{major_version}: could not select PostgreSQL server headers for {target} (PostgreSQL metadata {metadata})"
+                    "pg{major_version}: could not select PostgreSQL server headers for {target} (PostgreSQL metadata from {metadata})"
                 )
             })?;
         eprintln!("pg_target_includes = {pg_target_includes:?}");
@@ -1341,7 +1345,7 @@ fn get_bindings(
             run_bindgen(major_version, pg_config, include_h, &target, &pg_target_includes, native)
                 .wrap_err_with(|| {
                     format!(
-                        "pg{major_version}: pgrx-pg-sys requires generated C macros for {target} (server headers {}, PostgreSQL metadata {metadata})",
+                        "pg{major_version}: pgrx-pg-sys requires generated C macros for {target} (server headers {}, PostgreSQL metadata from {metadata})",
                         pg_target_includes[0]
                     )
                 })?;
@@ -1403,7 +1407,9 @@ fn run_bindgen(
     if env_tracked("CARGO_CFG_TARGET_OS").as_deref() == Some("windows") {
         let flags = pg_config.cppflags()?;
         let flags = flags.to_str().ok_or_else(|| eyre!("PostgreSQL CPPFLAGS are not UTF-8"))?;
-        macro_arguments.extend(recorded_macro_flags(flags, env_tracked)?.unwrap_or_default());
+        let metadata_target = metadata_platform(pg_config.is_real(), env_tracked);
+        macro_arguments
+            .extend(recorded_macro_flags(flags, metadata_target.as_deref())?.unwrap_or_default());
     }
     let cppflags = extra_bindgen_clang_args(pg_config)?;
     // Bindgen's own include detection asks whichever clang clang-sys finds, which need not
@@ -1505,7 +1511,8 @@ fn run_bindgen(
 /// of `pg_target_includes`. A `PGRX_INCLUDEDIR_SERVER` override replaces pg_config's directory
 /// as that root, so the macros it defines are generated and the installation's are not.
 fn macro_postgres_config(pg_config: &PgConfig, server_root: &str) -> eyre::Result<PostgresConfig> {
-    Ok(PostgresConfig::from_pg_config(pg_config.clone())?
+    let metadata_target = metadata_platform(pg_config.is_real(), env_tracked);
+    Ok(PostgresConfig::from_pg_config_with_target(pg_config.clone(), metadata_target.as_deref())?
         .with_server_include_dir(server_root.into()))
 }
 
@@ -1552,19 +1559,59 @@ fn require_include_driver(include_driver: Option<&Path>, inspected: &Path) -> ey
     }
 }
 
-/// Name the supported ways to supply target headers when the selected headers were configured
-/// for another machine, ABI or major version. Other inspection failures keep their general
+/// How errors name PostgreSQL metadata that no `pg_config` program supplied.
+const DESCRIBED_METADATA: &str = "a description in place of a `pg_config` program";
+
+/// Say how to get the right headers when the selected ones were configured for another
+/// machine, ABI or major version. The remedy names commands and options, never the variables
+/// that carry values to this build script. Other inspection failures keep their general
 /// context.
-fn inspection_error(error: PostgresError, major_version: u16, target: &str) -> eyre::Report {
+fn inspection_error(
+    error: PostgresError,
+    major_version: u16,
+    target: &str,
+    source: HeaderSource,
+) -> eyre::Report {
     let context = if matches!(error, PostgresError::TargetConfiguration(_)) {
-        format!(
-            "these server headers do not describe {target}; set PGRX_INCLUDEDIR_SERVER_PG{major_version}_{target} (or PGRX_INCLUDEDIR_SERVER_PG{major_version}_{}) to PostgreSQL {major_version} server headers configured for {target}, describe the target with PGRX_PG_CONFIG_AS_ENV, or import a target bundle with PGRX_TARGET_INFO_PATH_PG{major_version}",
-            target.replace('-', "_")
-        )
+        let remedy = match source {
+            HeaderSource::NativeProgram => {
+                format!("use the `pg_config` of a PostgreSQL {major_version} built for {target}")
+            }
+            HeaderSource::CrossProgram => format!(
+                "a `pg_config` that runs here describes this machine, so to package for {target}, collect a bundle there with `tools/pgrx-collect-partial-bundle.sh` or generate one with `cargo pgrx package --bundle-generate`, and pass it to `cargo pgrx package --bundle`"
+            ),
+            HeaderSource::Description => format!(
+                "collect the partial bundle again from the server headers of a PostgreSQL {major_version} built for {target}"
+            ),
+        };
+        format!("these server headers do not describe {target}; {remedy}")
     } else {
         "could not establish the binding generator's C macro compilation profile".into()
     };
     eyre::Report::new(error).wrap_err(context)
+}
+
+/// Where the inspected headers' metadata came from, which decides how to supply other headers.
+#[derive(Clone, Copy, Debug)]
+enum HeaderSource {
+    /// A `pg_config` program for the platform the build is for.
+    NativeProgram,
+    /// A `pg_config` program run on this machine for a build for another platform.
+    CrossProgram,
+    /// A description in place of a program, as a partial bundle supplies.
+    Description,
+}
+
+impl HeaderSource {
+    fn of(pg_config: &PgConfig, target: &str) -> Self {
+        if !pg_config.is_real() {
+            Self::Description
+        } else if std::env::var("HOST").is_ok_and(|host| host == target) {
+            Self::NativeProgram
+        } else {
+            Self::CrossProgram
+        }
+    }
 }
 
 /// Carry the generated macro tree and audit report from inspection through binding publication.
@@ -1655,7 +1702,10 @@ fn generate_macros(
     // needs its inputs tracked.
     let frontend = postgres
         .inspect_with_arguments(scanner, header, &effective_arguments, preferred_clang)
-        .map_err(|error| inspection_error(error, major_version, target))?;
+        .map_err(|error| {
+            let source = HeaderSource::of(postgres.pg_config(), target);
+            inspection_error(error, major_version, target, source)
+        })?;
     require_include_driver(
         include_detection.map(|detection| detection.compiler.as_path()),
         &frontend.profile().compiler.executable,
@@ -2293,17 +2343,41 @@ fn scope_macro_cflags(
     host_program: bool,
     lookup: impl Fn(&str) -> Option<String>,
 ) -> eyre::Result<MacroCflags> {
-    let Some(flags) =
-        flags.map(|flags| recorded_macro_flags(flags, &lookup)).transpose()?.flatten()
+    let metadata_target = metadata_platform(host_program, &lookup);
+    let cross_host = host_program && lookup("HOST") != lookup("TARGET");
+    let Some(flags) = flags
+        .map(|flags| {
+            if cross_host {
+                // Host-only ISA options need no Clang translation: even unrecognized
+                // options are discarded below.
+                Ok(pgrx_c_macros::split_recorded_cflags_for_target(
+                    flags,
+                    metadata_target.as_deref(),
+                )?)
+            } else {
+                recorded_macro_flags(flags, metadata_target.as_deref())
+            }
+        })
+        .transpose()?
+        .flatten()
     else {
         return Ok(MacroCflags::default());
     };
-    let (applied, dropped) = if host_program && lookup("HOST") != lookup("TARGET") {
+    let (applied, dropped) = if cross_host {
         flags.into_iter().partition(|flag| POSTGRES_FUNCTIONAL_CFLAGS.contains(&flag.as_str()))
     } else {
         pgrx_c_macros::separate_architecture_flags(flags)
     };
     Ok(MacroCflags { applied, dropped, recorded: true })
+}
+
+/// The platform whose quoting and compiler conventions wrote an installation's recorded flags.
+/// A `pg_config` program describes the host it runs on; AS_ENV metadata describes the target.
+fn metadata_platform(
+    host_program: bool,
+    lookup: impl Fn(&str) -> Option<String>,
+) -> Option<String> {
+    lookup(if host_program { "HOST" } else { "TARGET" })
 }
 
 /// Decode one recorded CFLAGS or CPPFLAGS fragment for the macro profile; `None` means the
@@ -2312,23 +2386,22 @@ fn scope_macro_cflags(
 /// the same GNU-style Clang arguments.
 fn recorded_macro_flags(
     flags: &str,
-    lookup: impl Fn(&str) -> Option<String>,
+    metadata_target: Option<&str>,
 ) -> eyre::Result<Option<Vec<String>>> {
-    let windows = lookup("CARGO_CFG_TARGET_OS").as_deref() == Some("windows");
-    let Some(arguments) = pgrx_c_macros::split_recorded_cflags(flags, windows)? else {
+    if flags.trim().is_empty() || flags.trim() == "not recorded" {
         return Ok(None);
-    };
-    if lookup("CARGO_CFG_TARGET_ENV").as_deref() == Some("msvc") {
-        return Ok(Some(pgrx_c_macros::postgres_clang_flags(flags, true)?));
     }
-    Ok(Some(arguments))
+    Ok(Some(pgrx_c_macros::postgres_clang_flags_for_target(flags, metadata_target)?))
 }
 
 /// Preserve the established ordinary binding arguments independently of macro inspection;
 /// PostgreSQL's historical CFLAGS belong to the separate verified macro profile.
 fn extra_bindgen_clang_args(pg_config: &PgConfig) -> eyre::Result<Vec<String>> {
     let mut out = vec![];
-    let flags = shlex::split(&pg_config.cppflags()?.to_string_lossy()).unwrap_or_default();
+    let flags = pg_config.cppflags()?;
+    let flags = flags.to_str().ok_or_else(|| eyre!("PostgreSQL CPPFLAGS are not UTF-8"))?;
+    let metadata_target = metadata_platform(pg_config.is_real(), env_tracked);
+    let flags = recorded_macro_flags(flags, metadata_target.as_deref())?.unwrap_or_default();
     if env_tracked("CARGO_CFG_TARGET_OS").as_deref() != Some("windows") {
         // Just give clang the full flag set, since presumably that's what we're
         // getting when we build the C shim anyway.
@@ -2662,29 +2735,31 @@ mod macro_build_tests {
     /// decodes them with the CLI's reviewed translation instead of passing raw CL switches on.
     #[test]
     fn recorded_msvc_macro_flags_use_the_reviewed_cl_translation() {
-        let target = |os: &'static str, env: &'static str| {
-            move |name: &str| match name {
-                "CARGO_CFG_TARGET_OS" => Some(os.to_owned()),
-                "CARGO_CFG_TARGET_ENV" => Some(env.to_owned()),
-                _ => None,
-            }
-        };
         let recorded = "-O2 /W3 /wd4018 /wd4244 /DWIN32";
-        let decoded = recorded_macro_flags(recorded, target("windows", "msvc")).unwrap().unwrap();
+        let decoded =
+            recorded_macro_flags(recorded, Some("x86_64-pc-windows-msvc")).unwrap().unwrap();
         assert_eq!(decoded, ["-O3", "-fomit-frame-pointer", "-ffunction-sections", "-DWIN32"]);
         assert_eq!(decoded, pgrx_c_macros::postgres_clang_flags(recorded, true).unwrap());
         // PostgreSQL 19's meson.build adds C11 and level and error switches for single warnings.
         let pg19 = "/std:c11 -Wall -O2 /external:anglebrackets /external:W0 /wd4244 /w24062 \
                     /w24102 /w24334 /we4013 /wd4090 /wd4018 /wd4101 /wd4267 /w24255";
         assert_eq!(
-            recorded_macro_flags(pg19, target("windows", "msvc")).unwrap().unwrap(),
+            recorded_macro_flags(pg19, Some("x86_64-pc-windows-msvc")).unwrap().unwrap(),
             ["-std=c11", "-O3", "-fomit-frame-pointer", "-ffunction-sections"]
         );
-        assert_eq!(recorded_macro_flags("/W3", target("windows", "msvc")).unwrap(), Some(vec![]));
-        assert_eq!(recorded_macro_flags("not recorded", target("windows", "msvc")).unwrap(), None);
-        assert!(recorded_macro_flags("/unknown", target("windows", "msvc")).is_err());
         assert_eq!(
-            recorded_macro_flags("-I'/a b' -O2", target("linux", "gnu")).unwrap().unwrap(),
+            recorded_macro_flags("/W3", Some("x86_64-pc-windows-msvc")).unwrap(),
+            Some(vec![])
+        );
+        assert_eq!(
+            recorded_macro_flags("not recorded", Some("x86_64-pc-windows-msvc")).unwrap(),
+            None
+        );
+        assert!(recorded_macro_flags("/unknown", Some("x86_64-pc-windows-msvc")).is_err());
+        assert_eq!(
+            recorded_macro_flags("-I'/a b' -O2", Some("x86_64-unknown-linux-gnu"))
+                .unwrap()
+                .unwrap(),
             ["-I/a b", "-O2"]
         );
     }
@@ -2733,6 +2808,38 @@ mod macro_build_tests {
         for absent in [None, Some(""), Some("not recorded")] {
             assert_eq!(scope_macro_cflags(absent, true, cross).unwrap(), MacroCflags::default());
         }
+    }
+
+    /// Decode each installation's flags before selecting the portion that applies to a target.
+    #[test]
+    fn cross_os_macro_cflags_use_the_metadata_platform() {
+        let environment = |host: &'static str, target: &'static str| {
+            move |name: &str| match name {
+                "HOST" => Some(host.to_owned()),
+                "TARGET" => Some(target.to_owned()),
+                _ => None,
+            }
+        };
+        let cross = environment("x86_64-unknown-linux-gnu", "x86_64-pc-windows-msvc");
+        let host = scope_macro_cflags(Some("-fwrapv -fcf-protection"), true, cross).unwrap();
+        assert_eq!(host.applied, ["-fwrapv"]);
+        assert_eq!(host.dropped, ["-fcf-protection"]);
+        let target = scope_macro_cflags(Some(r"/IC:\O'Brien\include /MDd"), false, cross).unwrap();
+        assert_eq!(target.applied, [r"-IC:\O'Brien\include", "-fms-runtime-lib=dll_dbg"]);
+        assert!(target.dropped.is_empty());
+
+        let cross = environment("x86_64-pc-windows-msvc", "aarch64-unknown-linux-gnu");
+        let host =
+            scope_macro_cflags(Some(r"/O2 /arch:AVX2 /IC:\O'Brien\include"), true, cross).unwrap();
+        assert!(host.applied.is_empty());
+        assert_eq!(host.dropped, ["/O2", "/arch:AVX2", r"/IC:\O'Brien\include"]);
+        let target = scope_macro_cflags(Some("-fPIC -I'/a b'"), false, cross).unwrap();
+        assert_eq!(target.applied, ["-fPIC", "-I/a b"]);
+        assert!(target.dropped.is_empty());
+
+        let native = environment("x86_64-pc-windows-msvc", "x86_64-pc-windows-msvc");
+        assert!(scope_macro_cflags(Some("/arch:AVX2"), true, native).is_err());
+        assert!(scope_macro_cflags(Some("/arch:AVX2"), false, native).is_err());
     }
 
     /// Postgres.app records `-arch arm64 -arch x86_64`, which Clang cannot preprocess. Cargo's
@@ -2872,31 +2979,50 @@ mod macro_build_tests {
         );
     }
 
-    /// Headers configured for another machine name the variables that supply target headers,
-    /// in both spellings, above the configuration error itself. Other inspection failures keep
-    /// the general context.
+    /// Headers configured for another machine say how to supply the right ones, above the
+    /// configuration error itself. Other inspection failures keep the general context.
     #[test]
     fn foreign_headers_name_the_target_header_remedies() {
-        let foreign =
+        let target = "aarch64-unknown-linux-gnu";
+        let foreign = || {
             PostgresError::TargetConfiguration(pgrx_c_macros::ConfigurationError::Machine {
                 recorded: "x86_64-pc-linux-gnu".into(),
-                target: "aarch64-unknown-linux-gnu".into(),
-            });
-        let chain = inspection_error(foreign, 17, "aarch64-unknown-linux-gnu")
-            .chain()
-            .map(ToString::to_string)
-            .collect::<Vec<_>>();
-        assert_eq!(chain.len(), 2, "{chain:?}");
-        for remedy in [
-            "PGRX_INCLUDEDIR_SERVER_PG17_aarch64-unknown-linux-gnu",
-            "PGRX_INCLUDEDIR_SERVER_PG17_aarch64_unknown_linux_gnu",
-            "PGRX_PG_CONFIG_AS_ENV",
-            "PGRX_TARGET_INFO_PATH_PG17",
-        ] {
-            assert!(chain[0].contains(remedy), "{remedy} missing from {chain:?}");
+                target: target.into(),
+            })
+        };
+        let cases: [(HeaderSource, &[&str]); 3] = [
+            (
+                HeaderSource::NativeProgram,
+                &["the `pg_config` of a PostgreSQL 17 built for aarch64"],
+            ),
+            (
+                HeaderSource::CrossProgram,
+                &[
+                    "`cargo pgrx package --bundle-generate`",
+                    "`tools/pgrx-collect-partial-bundle.sh`",
+                    "`cargo pgrx package --bundle`",
+                ],
+            ),
+            (
+                HeaderSource::Description,
+                &["collect the partial bundle again", "PostgreSQL 17 built for aarch64"],
+            ),
+        ];
+        for (source, remedies) in cases {
+            let chain = inspection_error(foreign(), 17, target, source)
+                .chain()
+                .map(|cause| cause.to_string())
+                .collect::<Vec<_>>();
+            assert_eq!(chain.len(), 2, "{chain:?}");
+            for remedy in remedies {
+                assert!(chain[0].contains(remedy), "{remedy} missing from {chain:?}");
+            }
+            // The remedy does not send a person to the variables that carry these values.
+            assert!(!chain[0].contains("PGRX_"), "{chain:?}");
+            assert!(chain[1].contains("configured for x86_64-pc-linux-gnu"), "{chain:?}");
         }
-        assert!(chain[1].contains("configured for x86_64-pc-linux-gnu"), "{chain:?}");
-        let other = inspection_error(PostgresError::InvalidCFlags, 17, "aarch64-unknown-linux-gnu");
+        let other =
+            inspection_error(PostgresError::InvalidCFlags, 17, target, HeaderSource::NativeProgram);
         assert_eq!(
             other.to_string(),
             "could not establish the binding generator's C macro compilation profile"

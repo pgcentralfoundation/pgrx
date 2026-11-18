@@ -884,3 +884,36 @@ fn cflags_precede_cppflags_and_final_explicit_overrides() {
             .any(|constant| constant["name"] == "ORDER" && constant["value"]["value"] == 3)
     );
 }
+
+/// A target-reporting pg_config wrapper can carry MSVC metadata to a Unix generator.
+#[test]
+fn explicit_target_selects_metadata_before_cli_configuration() {
+    let config = TestConfig::new();
+    let header = config.include_dir.join("target.h");
+    std::fs::write(&header, "#define TARGET_VALUE(x) ((x) + VALUE)\n").unwrap();
+    let report = successful_stdout(
+        config
+            .command()
+            .env("PGRX_C_MACROS_TEST_CPPFLAGS", r"/IC:\O'Brien\include /DVALUE=7")
+            .env("PGRX_C_MACROS_TEST_CFLAGS", "/O2 /J")
+            .args(["analyze", "pg18"])
+            .arg(&header)
+            .args([
+                "--format",
+                "json",
+                "--name",
+                "TARGET_VALUE",
+                "--",
+                "--target=x86_64-pc-windows-msvc19.20.0",
+            ])
+            .output()
+            .unwrap(),
+    );
+    let report: serde_json::Value = serde_json::from_str(&report).unwrap();
+    let arguments = report["profile"]["arguments"].as_array().unwrap();
+    for expected in [r"-IC:\O'Brien\include", "-DVALUE=7", "-O3", "-funsigned-char"] {
+        assert!(arguments.iter().any(|argument| argument == expected), "{expected}: {arguments:?}");
+    }
+    assert_eq!(report["profile"]["target"]["triple"], "x86_64-pc-windows-msvc19.20.0");
+    assert_eq!(report["macros"][0]["name"], "TARGET_VALUE");
+}

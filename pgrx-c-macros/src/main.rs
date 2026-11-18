@@ -286,7 +286,7 @@ fn run(cli: Cli) -> Result<(), CliError> {
 
 /// Discover and filter PostgreSQL-owned function macros, then write the selected inventory format.
 fn list(args: ListArgs) -> Result<(), CliError> {
-    let postgres = PostgresConfig::resolve(&args.pg_version)?;
+    let postgres = PostgresConfig::resolve_with_clang_args(&args.pg_version, &args.clang_args)?;
     let scanner = MacroScanner::new()?;
     let mut inventory =
         postgres.scan(&scanner, args.header.as_deref(), &args.clang_args)?.inventory;
@@ -327,7 +327,7 @@ fn list(args: ListArgs) -> Result<(), CliError> {
 /// Resolve the installation, prepare a coherent session, and report candidates and skip reasons with
 /// their profile.
 fn analyze_postgres(args: AnalyzeArgs) -> Result<(), CliError> {
-    let postgres = PostgresConfig::resolve(&args.pg_version)?;
+    let postgres = PostgresConfig::resolve_with_clang_args(&args.pg_version, &args.clang_args)?;
     let scanner = MacroScanner::new()?;
     let inspected = postgres.inspect(
         &scanner,
@@ -405,7 +405,7 @@ fn analyze_postgres(args: AnalyzeArgs) -> Result<(), CliError> {
 /// Run supported standalone emission and send untranslated macro reasons to stderr or the JSON
 /// report.
 fn emit_postgres(args: EmitArgs) -> Result<(), CliError> {
-    let postgres = PostgresConfig::resolve(&args.pg_version)?;
+    let postgres = PostgresConfig::resolve_with_clang_args(&args.pg_version, &args.clang_args)?;
     let scanner = MacroScanner::new()?;
     let inspected = postgres.inspect(
         &scanner,

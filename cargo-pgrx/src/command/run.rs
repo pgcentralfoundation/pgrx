@@ -11,7 +11,7 @@ use std::collections::HashMap;
 use crate::CommandExecute;
 use crate::cargo::CargoProfile;
 use crate::command::get::get_property;
-use crate::command::install::{install_extension, warn_if_pg_bench_enabled};
+use crate::command::install::{Platform, install_extension, warn_if_pg_bench_enabled};
 use crate::command::migrate::UnreleasedFragmentMode;
 use crate::command::regress::Regress;
 use crate::command::start::start_postgres;
@@ -45,8 +45,6 @@ pub(crate) struct Run {
     profile: Option<String>,
     #[clap(flatten)]
     features: clap_cargo::Features,
-    #[clap(long)]
-    target: Option<String>,
     #[clap(from_global, action = ArgAction::Count)]
     verbose: u8,
     /// Use an existing `pgcli` on the $PATH.
@@ -75,7 +73,6 @@ impl From<&Regress> for Run {
             release: regress.release,
             profile: regress.profile.clone(),
             features: regress.features.clone(),
-            target: None,
             verbose: regress.verbose,
             pgcli: false,
             install_only: false,
@@ -141,7 +138,6 @@ impl Run {
             &self.features,
             self.install_only,
             self.valgrind,
-            self.target.as_deref(),
             &target_dir,
             postgresql_conf,
             unreleased_mode,
@@ -179,7 +175,6 @@ pub(crate) fn run(
     features: &clap_cargo::Features,
     install_only: bool,
     use_valgrind: bool,
-    target: Option<&str>,
     target_dir: &Path,
     postgresql_conf: &HashMap<String, String>,
     unreleased_mode: UnreleasedFragmentMode,
@@ -193,12 +188,11 @@ pub(crate) fn run(
         user_manifest_path,
         user_package,
         package_manifest_path,
-        pg_config,
         profile,
         false,
         None,
         features,
-        target,
+        Platform::Host(pg_config),
         unreleased_mode,
         target_dir,
         cargo_flags,

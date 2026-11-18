@@ -183,30 +183,42 @@ impl PgConfig {
     /// Construct a new [`PgConfig`] from the set of environment variables that are prefixed with
     /// `PGRX_PG_CONFIG_`.
     ///
-    /// It also requires that the `PGRX_PG_CONFIG_AS_ENV` variable be set to some value that isn't
-    /// the string `"false"`.
+    /// It also requires that `PGRX_PG_CONFIG_AS_ENV` be set to exactly `"true"`.
     pub fn from_env() -> eyre::Result<Self> {
         if !Self::is_in_environment() {
             Err(eyre::eyre!("`PgConfig` not described in the environment"))
         } else {
-            const PREFIX: &str = "PGRX_PG_CONFIG_";
-
-            let mut known_props = BTreeMap::new();
-            for (k, v) in std::env::vars().filter(|(k, _)| k.starts_with(PREFIX)) {
-                // reformat the key to look like an argument option to `pg_config`
-                let prop = format!("--{}", k.trim_start_matches(PREFIX).to_lowercase());
-                known_props.insert(prop, v);
-            }
-
-            Ok(Self {
-                version: None,
-                pg_config: None,
-                known_props: Some(known_props),
-                base_port: 0,
-                base_testing_port: 0,
-                test_port_override: None,
-            })
+            Ok(Self::from_properties(std::env::vars().filter_map(|(name, value)| {
+                Some((name.strip_prefix("PGRX_PG_CONFIG_")?.to_lowercase(), value))
+            })))
         }
+    }
+
+    /// Describe an installation by the values its `pg_config` would print, without running a
+    /// program. Each name is a `pg_config` option without its dashes, such as `pkglibdir`.
+    /// Asking for a property that was not given is an error.
+    pub fn from_properties<N: AsRef<str>, V: Into<String>>(
+        properties: impl IntoIterator<Item = (N, V)>,
+    ) -> Self {
+        let known_props = properties
+            .into_iter()
+            .map(|(name, value)| (format!("--{}", name.as_ref()), value.into()))
+            .collect();
+        Self {
+            version: None,
+            pg_config: None,
+            known_props: Some(known_props),
+            base_port: 0,
+            base_testing_port: 0,
+            test_port_override: None,
+        }
+    }
+
+    /// The values of an installation that is described rather than queried, by `pg_config`
+    /// option name without its dashes. `None` for a `pg_config` program.
+    pub fn properties(&self) -> Option<impl Iterator<Item = (&str, &str)>> {
+        let properties = self.known_props.as_ref()?;
+        Some(properties.iter().map(|(name, value)| (name.trim_start_matches('-'), value.as_str())))
     }
 
     pub fn is_in_environment() -> bool {
@@ -707,7 +719,7 @@ impl Pgrx {
     /// Returns an iterator of all "configured" `PgConfig`s we know about.
     ///
     /// If the `which` argument is [`PgConfigSelector::All`] **and** the environment variable
-    /// `PGRX_PG_CONFIG_AS_ENV` is set to a value that isn't `"false"`then this function will return
+    /// `PGRX_PG_CONFIG_AS_ENV` is set to exactly `"true"`, this function will return
     /// a one-element iterator that represents that single "pg_config".
     ///
     /// Otherwise, we'll follow the rules of [`PgConfigSelector::All`] being supported versions
@@ -1157,6 +1169,33 @@ fn failed_pg_config_queries_do_not_accept_partial_stdout() {
     assert!(error.contains("7"), "{error}");
     assert!(error.contains("query failed"), "{error}");
     assert!(!error.contains("partial flags"), "{error}");
+}
+
+#[test]
+fn described_properties_answer_without_a_program() -> eyre::Result<()> {
+    let pg_config = PgConfig::from_properties([
+        ("version", "PostgreSQL 18.7"),
+        ("includedir-server", "/target/include/server"),
+        ("pkglibdir", "/usr/lib/postgresql/18/lib"),
+    ]);
+    assert!(!pg_config.is_real());
+    assert_eq!(pg_config.major_version()?, 18);
+    assert_eq!(pg_config.includedir_server()?, PathBuf::from("/target/include/server"));
+    assert_eq!(pg_config.pkglibdir()?, PathBuf::from("/usr/lib/postgresql/18/lib"));
+    let error = pg_config.sharedir().unwrap_err().to_string();
+    assert!(error.contains("no known property named --sharedir"), "{error}");
+    let mut properties: Vec<_> = pg_config.properties().unwrap().collect();
+    properties.sort();
+    assert_eq!(
+        properties,
+        [
+            ("includedir-server", "/target/include/server"),
+            ("pkglibdir", "/usr/lib/postgresql/18/lib"),
+            ("version", "PostgreSQL 18.7"),
+        ]
+    );
+    assert!(PgConfig::from_path().properties().is_none());
+    Ok(())
 }
 
 #[test]

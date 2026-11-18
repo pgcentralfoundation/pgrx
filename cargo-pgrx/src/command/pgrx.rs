@@ -42,7 +42,6 @@ enum CargoPgrxSubCommands {
     Connect(super::connect::Connect),
     Test(super::test::Test),
     Get(super::get::Get),
-    Cross(super::cross::Cross),
     Migrate(super::migrate::Migrate),
     Upgrade(super::upgrade::Upgrade),
     Regress(super::regress::Regress),
@@ -68,7 +67,6 @@ impl CommandExecute for CargoPgrxSubCommands {
             Connect(c) => c.execute(),
             Test(c) => c.execute(),
             Get(c) => c.execute(),
-            Cross(c) => c.execute(),
             Upgrade(c) => c.execute(),
             Regress(c) => c.execute(),
         }

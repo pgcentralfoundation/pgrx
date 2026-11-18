@@ -887,9 +887,8 @@ fn cross_builds_accept_only_target_headers() {
         build().output().unwrap(),
         &[
             &format!("pg_config.h was configured for {} (PG_VERSION_STR)", cross.host_machine),
-            &override_variable,
-            "PGRX_PG_CONFIG_AS_ENV",
-            "PGRX_TARGET_INFO_PATH_PG18",
+            &format!("so to package for {}, collect a bundle there", cross.target),
+            "`cargo pgrx package --bundle-generate`",
         ],
     );
     let underscored = override_variable.replace('-', "_");
