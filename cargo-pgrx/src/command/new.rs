@@ -141,7 +141,7 @@ fn create_crate_template(
 #[cfg(test)]
 mod tests {
     use super::{TEMPLATE_DIRS, create_crate_template, template_files};
-    use std::path::Path;
+    use std::path::{Path, PathBuf};
 
     fn written_paths(root: &Path) -> Vec<String> {
         fn walk(directory: &Path, root: &Path, found: &mut Vec<String>) {
@@ -213,7 +213,12 @@ mod tests {
             "fn mine() {}"
         );
         assert_eq!(std::fs::read_to_string(root.path().join("Cargo.toml")).unwrap(), "mine");
-        assert_eq!(written_paths(root.path()), ["Cargo.toml", "src/lib.rs"]);
+        // built through PathBuf so the separator matches whatever `written_paths` renders
+        let untouched = [PathBuf::from("Cargo.toml"), PathBuf::from_iter(["src", "lib.rs"])]
+            .iter()
+            .map(|path| path.display().to_string())
+            .collect::<Vec<_>>();
+        assert_eq!(written_paths(root.path()), untouched);
     }
 
     #[test]
