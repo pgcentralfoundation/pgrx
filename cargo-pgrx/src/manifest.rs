@@ -7,6 +7,7 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+use crate::target::TargetOs;
 use cargo_metadata::{CrateType, Metadata};
 use cargo_toml::Manifest;
 use clap_cargo::Features;
@@ -279,8 +280,9 @@ pub(crate) trait PgrxManifestExt {
     /// <https://doc.rust-lang.org/cargo/reference/cargo-targets.html#the-name-field>
     fn lib_name(&self) -> eyre::Result<String>;
 
-    /// Resolved string for target library name extension filename
-    fn lib_filename(&self) -> eyre::Result<String>;
+    /// The `cdylib` filename cargo writes for `target`, or for the host when
+    /// no `--target` was passed.
+    fn lib_filename(&self, target: Option<&str>) -> eyre::Result<String>;
 }
 
 impl PgrxManifestExt for Manifest {
@@ -320,9 +322,9 @@ impl PgrxManifestExt for Manifest {
             .ok_or_else(|| eyre!("Could not get [lib] name from manifest."))
     }
 
-    fn lib_filename(&self) -> eyre::Result<String> {
-        use std::env::consts::{DLL_PREFIX, DLL_SUFFIX};
+    fn lib_filename(&self, target: Option<&str>) -> eyre::Result<String> {
+        let os = TargetOs::from_target(target);
         let lib_name = &self.lib_name()?;
-        Ok(format!("{DLL_PREFIX}{}{DLL_SUFFIX}", lib_name))
+        Ok(format!("{}{lib_name}{}", os.dll_prefix(), os.dll_suffix()))
     }
 }

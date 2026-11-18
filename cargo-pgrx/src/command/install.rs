@@ -14,6 +14,7 @@ use crate::command::migrate::{UnreleasedFragmentMode, plan_unreleased_fragments}
 use crate::command::sudo_install::SudoInstall;
 use crate::manifest::PgrxManifestExt;
 use crate::manifest::{PgVersionSource, display_version_info};
+use crate::target::TargetOs;
 use cargo_metadata::{CrateType, Message as CargoMessage};
 use cargo_toml::Manifest;
 use eyre::{WrapErr, eyre};
@@ -200,7 +201,8 @@ pub(crate) fn install_extension(
         build_command_stream.collect::<Result<Vec<_>, std::io::Error>>()?;
 
     println!("{} extension", "  Installing".bold().green());
-    let shlibpath = find_library_file(&manifest, package_manifest_path, &build_command_messages)?;
+    let shlibpath =
+        find_library_file(&manifest, package_manifest_path, &build_command_messages, target)?;
 
     let relative_extdir = if let Some(prefix_directory) = prefix_directory.as_ref() {
         make_relative_extdir(prefix_directory.to_path_buf())
@@ -244,8 +246,12 @@ pub(crate) fn install_extension(
     }
 
     {
-        let dest =
-            pkglibdir.join(shared_library_filename(package_manifest_path, pg_config, cargo_flags)?);
+        let dest = pkglibdir.join(shared_library_filename(
+            package_manifest_path,
+            pg_config,
+            cargo_flags,
+            target,
+        )?);
 
         // Remove the existing shared libraries if present. This is a workaround for an
         // issue highlighted by the following apple documentation:
@@ -305,6 +311,7 @@ pub(crate) fn shared_library_filename(
     package_manifest_path: &Path,
     pg_config: &PgConfig,
     cargo_flags: &[String],
+    target: Option<&str>,
 ) -> eyre::Result<String> {
     let (_, extname) = find_control_file(package_manifest_path)?;
     let so_name = if get_property(package_manifest_path, "module_pathname")?.is_none() {
@@ -316,10 +323,11 @@ pub(crate) fn shared_library_filename(
     };
     // Since Postgres 16, the shared library extension on macOS is `dylib`, not `so`.
     // Ref https://github.com/postgres/postgres/commit/b55f62abb2c2e07dfae99e19a2b3d7ca9e58dc1a
-    let so_suffix = if cfg!(target_os = "macos") && pg_config.major_version()? < 16 {
+    let target_os = TargetOs::from_target(target);
+    let so_suffix = if target_os == TargetOs::Darwin && pg_config.major_version()? < 16 {
         ".so"
     } else {
-        std::env::consts::DLL_SUFFIX
+        target_os.dll_suffix()
     };
     Ok(format!("{so_name}{so_suffix}"))
 }
@@ -540,11 +548,12 @@ pub(crate) fn find_library_file(
     manifest: &Manifest,
     manifest_path: &Path,
     build_command_messages: &[CargoMessage],
+    target: Option<&str>,
 ) -> eyre::Result<PathBuf> {
-    use std::env::consts::DLL_EXTENSION;
+    let dll_extension = TargetOs::from_target(target).dll_extension();
 
     let manifest_path = std::path::absolute(manifest_path)?;
-    let lib_filename = manifest.lib_filename()?;
+    let lib_filename = manifest.lib_filename(target)?;
 
     // no hard and fast rule for the lib.so output filename exists, so we implement this routine
     // which is essentially a cope for cargo's disinterest in writing down any docs so far.
@@ -565,7 +574,7 @@ pub(crate) fn find_library_file(
             artifact
                 .filenames
                 .iter()
-                .find(|filename| filename.extension() == Some(DLL_EXTENSION))
+                .find(|filename| filename.extension() == Some(dll_extension))
                 .map(|filename| filename.to_string())
         })
         .ok_or_else(|| {

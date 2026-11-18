@@ -46,6 +46,7 @@ jobs:
       init: ${{ steps.plan.outputs.init }}
       variants: ${{ steps.plan.outputs.variants }}
       schema_release: ${{ steps.plan.outputs.schema_release }}
+      cross_package: ${{ steps.plan.outputs.cross_package }}
       beta: ${{ steps.plan.outputs.beta }}
       package: ${{ steps.plan.outputs.package }}
       docsrs: ${{ steps.plan.outputs.docsrs }}
@@ -332,6 +333,33 @@ jobs:
         run: |
           cargo build --locked -p pgrx-ci
           target/debug/pgrx-ci test-variants --pg "$PG_VER"
+
+  cross-package:
+    name: Linux to macOS PG18 package
+    needs: plan
+    if: needs.plan.outputs.cross_package == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      CLANG_VER: 18
+    steps:
+      - uses: actions/checkout@v4
+      - run: tools/ci/setup.sh
+      - name: Install cross-build dependencies
+        run: |
+          tools/ci/retry.sh sudo apt-get install -y -qq --no-install-recommends bison flex lld-18
+          tools/ci/retry.sh rustup target add aarch64-apple-darwin
+      - name: Restore the macOS SDK and linker
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/osxcross
+          key: osxcross-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('tools/ci/cross-macos-package.sh') }}
+      - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: cross-macos-pg18
+          save-if: ${{ env.SAVE_RUST_CACHE == 'true' }}
+      - name: Cross-compile and check the macOS package
+        run: tools/ci/cross-macos-package.sh
 
   miri:
     name: Miri
