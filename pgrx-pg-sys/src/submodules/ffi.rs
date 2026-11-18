@@ -168,6 +168,14 @@ unsafe fn pg_guard_ffi_boundary_impl<T, F: FnOnce() -> T>(f: F) -> T {
     // accesses multiple `static mut`. The ultimate caller asserts this is the main thread.
     unsafe {
         let caller_memxct = pg_sys::CurrentMemoryContext;
+        // An ERROR raised while Postgres handles another resets `ErrorContext`, which deletes its
+        // children, so after an ERROR the boundary can't go back to a caller context under
+        // `ErrorContext`.  It goes to `ErrorContext` instead, where a C handler would be.
+        let catch_memxct = if is_under_error_context(caller_memxct) {
+            pg_sys::ErrorContext
+        } else {
+            caller_memxct
+        };
         let prev_exception_stack = pg_sys::PG_exception_stack;
         let prev_error_context_stack = pg_sys::error_context_stack;
         let mut result: std::mem::MaybeUninit<T> = MaybeUninit::uninit();
@@ -202,12 +210,37 @@ unsafe fn pg_guard_ffi_boundary_impl<T, F: FnOnce() -> T>(f: F) -> T {
 
             // At this point, we're running within `pg_sys::ErrorContext`, but should be in the
             // memory context the caller was in
-            pg_sys::CurrentMemoryContext = caller_memxct;
+            pg_sys::CurrentMemoryContext = catch_memxct;
 
             // finally, turn this Postgres error into a Rust panic so that we can ensure proper
             // Rust stack unwinding and also defer handling until later.  The original stays on
             // Postgres' error stack, so it can later be rethrown unchanged
             std::panic::panic_any(CaughtError::PostgresError(CaughtPostgresError::catch()))
         }
+    }
+}
+
+/// Whether `context` is a descendant of `ErrorContext`
+///
+/// # Safety
+///
+/// Call only on the backend thread, with a valid `context`.
+#[inline(always)]
+unsafe fn is_under_error_context(mut context: pg_sys::MemoryContext) -> bool {
+    // SAFETY: the caller vouches for `context`, and its ancestors are valid while it is.
+    // `ErrorContext` is null or valid
+    unsafe {
+        let error_context = pg_sys::ErrorContext;
+        // `ErrorContext` usually has no children, which saves the walk
+        if error_context.is_null() || (*error_context).firstchild.is_null() {
+            return false;
+        }
+        while !context.is_null() {
+            context = (*context).parent;
+            if context == error_context {
+                return true;
+            }
+        }
+        false
     }
 }

@@ -683,6 +683,75 @@ mod tests {
         assert_eq!(current, unsafe { pg_sys::ErrorContext });
     }
 
+    /// An error context callback that switches to a new child of `ErrorContext` and raises an
+    /// ERROR through a boundary there.  As an ERROR raised while Postgres handles another, it
+    /// resets `ErrorContext`, which deletes the child.  `arg` points to the callback's own
+    /// `ErrorContextCallback`, which it takes off the stack so the ERROR doesn't call it again.
+    #[pg_guard]
+    unsafe extern "C-unwind" fn raise_from_error_context_child(arg: *mut core::ffi::c_void) {
+        #[cfg_attr(target_os = "windows", link(name = "postgres"))]
+        unsafe extern "C-unwind" {
+            // unguarded, so the boundary below is the one that catches its ERROR
+            #[link_name = "pg_strtoint32"]
+            fn unguarded_pg_strtoint32(s: *const core::ffi::c_char) -> i32;
+        }
+
+        // SAFETY: the callback is on top of the stack, and `arg` points to it.  Postgres can't
+        // delete the current context, so the closure leaves the child before it raises, and
+        // holds nothing that needs dropping
+        let caught = unsafe {
+            pg_sys::error_context_stack = (*arg.cast::<pg_sys::ErrorContextCallback>()).previous;
+            let child = pg_sys::AllocSetContextCreateInternal(
+                pg_sys::ErrorContext,
+                c"error context child".as_ptr(),
+                pg_sys::ALLOCSET_SMALL_MINSIZE as usize,
+                pg_sys::ALLOCSET_SMALL_INITSIZE as usize,
+                pg_sys::ALLOCSET_SMALL_MAXSIZE as usize,
+            );
+            pg_sys::MemoryContextSwitchTo(child);
+            std::panic::catch_unwind(|| {
+                pg_sys::ffi::pg_guard_ffi_boundary(|| {
+                    pg_sys::CurrentMemoryContext = pg_sys::ErrorContext;
+                    unguarded_pg_strtoint32(c"x".as_ptr())
+                })
+            })
+        };
+        let e = caught.expect_err("pg_strtoint32 should have raised an ERROR");
+        assert_eq!(unsafe { pg_sys::CurrentMemoryContext }, unsafe { pg_sys::ErrorContext });
+        std::panic::resume_unwind(e)
+    }
+
+    /// A boundary whose caller context is a child of `ErrorContext` that its ERROR deletes
+    /// leaves `CurrentMemoryContext` at `ErrorContext`.
+    #[pg_test]
+    fn test_catch_postgres_error_in_deleted_error_context_child() {
+        use pgrx::pg_sys::panic::CaughtError;
+
+        // SAFETY: tests run on the backend thread
+        let previous = unsafe { pg_sys::error_context_stack };
+        let mut callback = pg_sys::ErrorContextCallback {
+            previous,
+            callback: Some(raise_from_error_context_child),
+            arg: core::ptr::null_mut(),
+        };
+        let callback = &raw mut callback;
+        // SAFETY: `callback` points to the local above
+        unsafe { (*callback).arg = callback.cast() };
+        let message = PgTryBuilder::new(|| {
+            // SAFETY: `finally` takes `callback` off the stack before it goes out of scope
+            unsafe { pg_sys::error_context_stack = callback };
+            open_missing_relation(0);
+            panic!("relation_open returned")
+        })
+        .catch_others(|e| match e {
+            CaughtError::PostgresError(ereport) => ereport.message().to_string(),
+            e => e.rethrow(),
+        })
+        .finally(|| unsafe { pg_sys::error_context_stack = previous })
+        .execute();
+        assert_eq!(message, r#"invalid input syntax for type integer: "x""#);
+    }
+
     /// Catching a Postgres ERROR leaves nothing behind in the current memory context.
     #[pg_test]
     fn test_catch_postgres_error_frees_its_copy() {
