@@ -23,9 +23,9 @@ use std::panic::{
 use std::ptr::{self, NonNull};
 use std::sync::atomic::{AtomicUsize, Ordering};
 
+use crate::AsPgCStr;
 use crate::elog::PgLogLevel;
 use crate::errcodes::PgSqlErrorCode;
-use crate::{AsPgCStr, pfree};
 
 /// Indicates that something can be reported as a Postgres ERROR, if that's what it might represent.
 pub trait ErrorReportable {
@@ -930,6 +930,7 @@ unsafe fn do_ereport(ereport: ErrorReportWithLevel) {
         fn errdetail(fmt: *const ::std::os::raw::c_char, ...) -> ::std::os::raw::c_int;
         fn errhint(fmt: *const ::std::os::raw::c_char, ...) -> ::std::os::raw::c_int;
         fn errcontext_msg(fmt: *const ::std::os::raw::c_char, ...) -> ::std::os::raw::c_int;
+        fn pfree(pointer: *mut ::std::os::raw::c_void);
     }
 
     // we only allocate file, lineno and funcname if `errstart` returns true
@@ -978,49 +979,58 @@ unsafe fn do_ereport(ereport: ErrorReportWithLevel) {
             //
             // The various pointers used as arguments to these functions might have been allocated above
             // or they might be the null pointer, so we guard against that possibility for each usage.
-            errcode(sqlerrcode as _);
-            if !message.is_null() {
-                errmsg(PERCENT_S.as_ptr(), message);
-                pfree(message.cast());
-            }
-            if !detail.is_null() {
-                errdetail(PERCENT_S.as_ptr(), detail);
-                pfree(detail.cast());
-            }
-            if !hint.is_null() {
-                errhint(PERCENT_S.as_ptr(), hint);
-                pfree(hint.cast());
-            }
-            if !context.is_null() {
-                errcontext_msg(PERCENT_S.as_ptr(), context);
-                pfree(context.cast());
-            }
+            //
+            // None of these functions is guarded, so none of them panics
+            let report = || {
+                errcode(sqlerrcode as _);
+                if !message.is_null() {
+                    errmsg(PERCENT_S.as_ptr(), message);
+                    pfree(message.cast());
+                }
+                if !detail.is_null() {
+                    errdetail(PERCENT_S.as_ptr(), detail);
+                    pfree(detail.cast());
+                }
+                if !hint.is_null() {
+                    errhint(PERCENT_S.as_ptr(), hint);
+                    pfree(hint.cast());
+                }
+                if !context.is_null() {
+                    errcontext_msg(PERCENT_S.as_ptr(), context);
+                    pfree(context.cast());
+                }
+                errfinish(file, lineno as _, funcname);
+            };
 
             if level >= PgLogLevel::ERROR {
                 crate::submodules::thread_check::active_thread::clear();
-            }
-            errfinish(file, lineno as _, funcname);
+                report();
 
-            if level >= PgLogLevel::ERROR {
                 // SAFETY:  `crate::errstart() is guaranteed to have returned true if >=ERROR and
                 // `crate::errfinish()` is guaranteed to not have not returned at all if >= ERROR, which
                 // means we won't either
                 unreachable_unchecked()
-            } else {
-                // if it wasn't an ERROR we need to free up the things that Postgres wouldn't have
-                //
-                // ... except on Postgres 19, whose `errfinish()` resets `ErrorContext` (where we
-                // allocated `file` and `funcname`) on its way out, making a `pfree()` here a
-                // use-after-free.  In the nested-error case where pg19 doesn't reset the context,
-                // these allocations just live in `ErrorContext` until it's eventually reset
-                #[cfg(not(feature = "pg19"))]
-                {
-                    if !file.is_null() {
-                        pfree(file.cast());
-                    }
-                    if !funcname.is_null() {
-                        pfree(funcname.cast());
-                    }
+            }
+
+            // A report below ERROR can still raise one: an error context callback can, and so can
+            // `errfinish()` when it checks for interrupts.  Postgres would jump over the Rust
+            // frames that called us without running their destructors, so catch the ERROR and
+            // unwind them as a panic instead.  `report` holds nothing that needs dropping.
+            super::ffi::pg_guard_ffi_boundary(report);
+
+            // if it wasn't an ERROR we need to free up the things that Postgres wouldn't have
+            //
+            // ... except on Postgres 19, whose `errfinish()` resets `ErrorContext` (where we
+            // allocated `file` and `funcname`) on its way out, making a `pfree()` here a
+            // use-after-free.  In the nested-error case where pg19 doesn't reset the context,
+            // these allocations just live in `ErrorContext` until it's eventually reset
+            #[cfg(not(feature = "pg19"))]
+            {
+                if !file.is_null() {
+                    pfree(file.cast());
+                }
+                if !funcname.is_null() {
+                    pfree(funcname.cast());
                 }
             }
         }
