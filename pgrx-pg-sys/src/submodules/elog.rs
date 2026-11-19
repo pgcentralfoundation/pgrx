@@ -307,6 +307,14 @@ macro_rules! function_name {
 /// - `message: String`
 /// - (optional) `detail: String`
 ///
+/// ## Errors while reporting
+///
+/// Postgres can raise an ERROR while it emits a message below [PgLogLevel::ERROR], for example
+/// from an error context callback.  That ERROR unwinds the calling Rust code as a panic, like
+/// one from any `pg_sys` function.  The level macros, such as `warning!`, expand to this one
+/// and behave the same.  In a destructor that runs while another panic unwinds, it is a second
+/// panic, and Rust aborts the process.
+///
 /// ## Examples
 ///
 /// ```rust,no_run

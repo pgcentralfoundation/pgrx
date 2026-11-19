@@ -188,6 +188,68 @@ mod tests {
         assert!(dropped.get(), "the frame that reported the NOTICE wasn't dropped");
     }
 
+    static REPORTING_FRAME_DROPPED: AtomicBool = AtomicBool::new(false);
+
+    /// Reports a NOTICE with an error context callback that raises an ERROR, and doesn't catch
+    /// that ERROR.
+    #[pg_extern]
+    fn notice_with_raising_context_callback() {
+        /// Puts the error context stack back and records that this frame was dropped
+        struct Dropped(*mut pg_sys::ErrorContextCallback);
+        impl Drop for Dropped {
+            fn drop(&mut self) {
+                // SAFETY: Postgres calls this function on the backend thread
+                unsafe { pg_sys::error_context_stack = self.0 };
+                REPORTING_FRAME_DROPPED.store(true, Ordering::Relaxed);
+            }
+        }
+
+        // SAFETY: Postgres calls this function on the backend thread
+        let previous = unsafe { pg_sys::error_context_stack };
+        let mut callback = pg_sys::ErrorContextCallback {
+            previous,
+            callback: Some(raise_from_context_callback),
+            arg: core::ptr::null_mut(),
+        };
+        let callback = &raw mut callback;
+        let _dropped = Dropped(previous);
+        // SAFETY: `callback` points to the local above, and `_dropped` takes it off the stack
+        // before it goes out of scope
+        unsafe {
+            (*callback).arg = callback.cast();
+            pg_sys::error_context_stack = callback;
+        }
+        notice!("reported with an error context callback that raises an ERROR");
+        panic!("notice! returned")
+    }
+
+    /// An ERROR raised while Postgres reports a NOTICE unwinds the Rust frames that reported it
+    /// when none of them catches it, and Postgres passes it to the caller's handler.
+    #[pg_test]
+    fn test_uncaught_error_while_reporting_notice_runs_drop() {
+        use pgrx::pg_sys::panic::CaughtError;
+
+        REPORTING_FRAME_DROPPED.store(false, Ordering::Relaxed);
+        let message = PgTryBuilder::new(|| {
+            Spi::run("SELECT tests.notice_with_raising_context_callback()").unwrap();
+            panic!("the ERROR didn't reach the caller")
+        })
+        .catch_others(|e| match e {
+            CaughtError::PostgresError(ereport) => ereport.message().to_string(),
+            e => e.rethrow(),
+        })
+        .execute();
+        assert_eq!(message, "raised from an error context callback");
+        assert!(
+            REPORTING_FRAME_DROPPED.load(Ordering::Relaxed),
+            "the frame that reported the NOTICE wasn't dropped"
+        );
+
+        // the backend still reports messages and runs queries
+        notice!("reported after the ERROR");
+        assert_eq!(Spi::get_one::<i32>("SELECT 1"), Ok(Some(1)));
+    }
+
     #[pg_test(error = "panic message")]
     fn test_panic() {
         panic!("panic message")
