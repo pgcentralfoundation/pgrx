@@ -596,7 +596,7 @@ impl ErrorReport {
     ///
     /// This corresponds to the `domain` argument in Postgres' `ereport_domain` C macro.
     /// When set, the domain is passed to `errstart()` to indicate the gettext text domain
-    /// for message translation.
+    /// for message translation.  Postgres reads it as a C string, so it ends at its first NUL.
     pub fn set_domain<S: Into<String>>(mut self, domain: S) -> Self {
         self.domain = Some(domain.into());
         self
@@ -901,6 +901,48 @@ pub(crate) fn downcast_panic_payload(e: Box<dyn Any + Send>) -> CaughtError {
     }
 }
 
+/// Has Postgres free `domain` when it next resets `ErrorContext`, which is how it discards the
+/// errors on its error data stack.  With no memory left to register that, the domain leaks.
+///
+/// # Safety
+///
+/// - Call only on the backend thread, once `ErrorContext` exists.
+/// - Postgres has `domain`'s pointer only in errors that the next reset of `ErrorContext`
+///   discards.  `errstart()` can do that reset itself before it keeps the pointer it is given,
+///   so call this after `errstart()` returns.
+unsafe fn free_on_error_context_reset(domain: CString) {
+    /// Frees the domain this callback was registered with
+    unsafe extern "C-unwind" fn free_domain(domain: *mut c_void) {
+        // SAFETY: `domain` is what `CString::into_raw()` returned below, and Postgres takes a
+        // callback off its list before calling it, so this runs once
+        drop(unsafe { CString::from_raw(domain.cast()) });
+    }
+
+    // Postgres has the pointer whether or not the callback gets registered, so from here on the
+    // domain is only ever freed by the callback
+    let domain = domain.into_raw();
+
+    // SAFETY: the caller vouches for the thread and for ErrorContext.  NO_OOM returns null
+    // instead of raising.  The callback is allocated in the context it's registered on, which
+    // calls it before the reset frees it, and its fields are written before it's registered.
+    unsafe {
+        let callback: *mut crate::MemoryContextCallback = crate::MemoryContextAllocExtended(
+            crate::ErrorContext,
+            size_of::<crate::MemoryContextCallback>(),
+            crate::MCXT_ALLOC_NO_OOM as _,
+        )
+        .cast();
+        if !callback.is_null() {
+            callback.write(crate::MemoryContextCallback {
+                func: Some(free_domain),
+                arg: domain.cast(),
+                next: ptr::null_mut(),
+            });
+            crate::MemoryContextRegisterResetCallback(crate::ErrorContext, callback);
+        }
+    }
+}
+
 /// This is a (as faithful as possible) Rust unrolling of Postgres' `#define ereport(...)` macro.
 ///
 /// Different implementations are provided for different postgres version ranges to ensure
@@ -945,9 +987,12 @@ unsafe fn do_ereport(ereport: ErrorReportWithLevel) {
 
     let level = ereport.level();
 
-    // Use the domain from the ErrorReport if one was set, otherwise use the null default
+    // Use the domain from the ErrorReport if one was set, otherwise use the null default.  Postgres
+    // reads the domain as a C string, so, like the message, detail, and hint, it ends at its first
+    // NUL.
     let domain_cstring = ereport.inner.domain.as_ref().map(|d| {
-        std::ffi::CString::new(d.as_str()).expect("domain must not contain interior NUL bytes")
+        let before_nul = d.split('\0').next().unwrap_or_default();
+        std::ffi::CString::new(before_nul).expect("the text before the first NUL has no NUL")
     });
     let domain_ptr = domain_cstring.as_ref().map_or(DEFAULT_DOMAIN, |c| c.as_ptr());
 
@@ -968,6 +1013,21 @@ unsafe fn do_ereport(ereport: ErrorReportWithLevel) {
             let file = ereport.file().as_pg_cstr();
             let funcname = ereport.function_name().as_pg_cstr();
             crate::MemoryContextSwitchTo(prev_cxt);
+
+            // `errstart()` kept the domain's pointer.  At ERROR or above `errfinish()` leaves this
+            // function for good, and Postgres reads the domain until it discards the error by
+            // resetting `ErrorContext`, so that reset frees the domain.  This can't be arranged
+            // before `errstart()`, which resets `ErrorContext` itself for an ERROR raised while
+            // Postgres reports another.  Below ERROR the domain is dropped when this function
+            // returns.
+            //
+            // SAFETY: the active thread check passed above, `ErrorContext` exists once
+            // `errstart()` returns true, and Postgres has the pointer only in this report.
+            if level >= PgLogLevel::ERROR
+                && let Some(domain) = domain_cstring
+            {
+                free_on_error_context_reset(domain);
+            }
 
             // do not leak the Rust `ErrorReportWithLocation` instance
             drop(ereport);

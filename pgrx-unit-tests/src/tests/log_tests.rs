@@ -113,6 +113,107 @@ mod tests {
         }
     }
 
+    #[pg_extern]
+    fn raise_with_domain() {
+        pgrx::ereport_domain!(
+            PgLogLevel::ERROR,
+            "test_extension_domain",
+            PgSqlErrorCode::ERRCODE_INTERNAL_ERROR,
+            "raised with a domain"
+        )
+    }
+
+    #[pg_extern]
+    fn raise_with_nul_in_domain() {
+        pgrx::ereport_domain!(
+            PgLogLevel::ERROR,
+            "test_extension_domain\0ignored",
+            PgSqlErrorCode::ERRCODE_INTERNAL_ERROR,
+            "raised with a NUL in its domain"
+        )
+    }
+
+    /// An error context callback that raises an ERROR with a domain.  `arg` points to its own
+    /// `ErrorContextCallback`, which it takes off the stack so the ERROR doesn't call it again.
+    #[pg_guard]
+    unsafe extern "C-unwind" fn raise_with_domain_from_context_callback(
+        arg: *mut core::ffi::c_void,
+    ) {
+        // SAFETY: the callback is on top of the stack, and `arg` points to it
+        unsafe {
+            pg_sys::error_context_stack = (*arg.cast::<pg_sys::ErrorContextCallback>()).previous
+        };
+        pgrx::ereport_domain!(
+            PgLogLevel::ERROR,
+            "test_extension_domain",
+            PgSqlErrorCode::ERRCODE_INTERNAL_ERROR,
+            "raised while Postgres reports another ERROR"
+        )
+    }
+
+    /// Raises an ERROR whose report calls [`raise_with_domain_from_context_callback`].
+    #[pg_extern]
+    fn raise_with_domain_while_reporting() {
+        // SAFETY: Postgres calls this function on the backend thread
+        let previous = unsafe { pg_sys::error_context_stack };
+        // The guard reports the ERROR below once this frame is gone, so the callback's entry
+        // can't be a local.  It lasts for the transaction, and the callback takes it off the
+        // stack.
+        let callback = pgrx::PgMemoryContexts::TopTransactionContext.leak_and_drop_on_delete(
+            pg_sys::ErrorContextCallback {
+                previous,
+                callback: Some(raise_with_domain_from_context_callback),
+                arg: core::ptr::null_mut(),
+            },
+        );
+        // SAFETY: `callback` points to the entry allocated above
+        unsafe {
+            (*callback).arg = callback.cast();
+            pg_sys::error_context_stack = callback;
+        }
+        error!("reported with an error context callback that raises an ERROR");
+    }
+
+    /// Runs `sql`, which calls a function that raises an ERROR, and returns the domain Postgres
+    /// has for that ERROR.  The function's guard reports the ERROR to Postgres, which jumps back
+    /// to SPI's caller.
+    fn domain_of_error_from(sql: &str) -> Option<String> {
+        use pgrx::pg_sys::panic::CaughtError;
+
+        pgrx::PgTryBuilder::new(|| {
+            Spi::run(sql).expect("SPI failed");
+            panic!("{sql} returned normally")
+        })
+        .catch_others(|e| match e {
+            CaughtError::PostgresError(ereport) => ereport.domain().map(str::to_string),
+            e => e.rethrow(),
+        })
+        .execute()
+    }
+
+    /// Postgres keeps the pointer to an ERROR's domain and reads it after the function that
+    /// raised the ERROR is gone.
+    #[pg_test]
+    fn test_ereport_domain_reaches_postgres() {
+        let domain = domain_of_error_from("SELECT tests.raise_with_domain()");
+        assert_eq!(domain.as_deref(), Some("test_extension_domain"));
+    }
+
+    /// Postgres reads a domain as a C string, so it ends at its first NUL, like the message.
+    #[pg_test]
+    fn test_ereport_domain_with_nul() {
+        let domain = domain_of_error_from("SELECT tests.raise_with_nul_in_domain()");
+        assert_eq!(domain.as_deref(), Some("test_extension_domain"));
+    }
+
+    /// Postgres resets `ErrorContext` when it starts an ERROR that is raised while it reports
+    /// another.  The new ERROR's domain is still there afterward.
+    #[pg_test]
+    fn test_ereport_domain_raised_while_reporting() {
+        let domain = domain_of_error_from("SELECT tests.raise_with_domain_while_reporting()");
+        assert_eq!(domain.as_deref(), Some("test_extension_domain"));
+    }
+
     /// PostgreSQL spells each SQLSTATE that pgrx added after PostgreSQL 12 the way
     /// errcodes.txt does, and converting the code back returns the same variant rather than
     /// `ERRCODE_INTERNAL_ERROR`.
