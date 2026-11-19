@@ -131,7 +131,7 @@ jobs:
             -Drustdoc::invalid-html-tags
 
   # Every package that needs PostgreSQL, against every supported version on every supported
-  # platform. Windows has no PostgreSQL 19 binaries yet.
+  # platform.
   pg:
     name: ${{ matrix.platform }} PG${{ matrix.pg }}
     needs: plan
@@ -168,6 +168,7 @@ jobs:
           - { platform: windows, os: windows-2025, pg: 16 }
           - { platform: windows, os: windows-2025, pg: 17 }
           - { platform: windows, os: windows-2025, pg: 18 }
+          - { platform: windows, os: windows-2025, pg: 19 }
     env:
       PG_VER: ${{ matrix.pg }}
       CLANG_VER: ${{ matrix.clang }}
