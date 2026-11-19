@@ -31,6 +31,15 @@ mod tests {
     }
 
     #[pg_test]
+    fn test_warning_client_only() {
+        pgrx::ereport!(
+            PgLogLevel::WARNING_CLIENT_ONLY,
+            PgSqlErrorCode::ERRCODE_WARNING,
+            "client-only warn message"
+        );
+    }
+
+    #[pg_test]
     fn test_notice() {
         notice!("notice message");
     }
