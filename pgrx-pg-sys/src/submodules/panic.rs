@@ -23,9 +23,9 @@ use std::panic::{
 use std::ptr::{self, NonNull};
 use std::sync::atomic::{AtomicUsize, Ordering};
 
+use crate::AsPgCStr;
 use crate::elog::PgLogLevel;
 use crate::errcodes::PgSqlErrorCode;
-use crate::{AsPgCStr, pfree};
 
 /// Indicates that something can be reported as a Postgres ERROR, if that's what it might represent.
 pub trait ErrorReportable {
@@ -627,6 +627,10 @@ impl ErrorReport {
     /// Report this [ErrorReport], which will ultimately be reported by Postgres at the specified [PgLogLevel]
     ///
     /// If the provided `level` is >= [`PgLogLevel::ERROR`] this function will not return.
+    ///
+    /// Below that level it returns once Postgres has emitted the report.  Postgres can raise an
+    /// ERROR while it does, for example from an error context callback, and that ERROR unwinds
+    /// the caller as a panic, like one from any `pg_sys` function.
     pub fn report(self, level: PgLogLevel) {
         ErrorReportWithLevel { level, inner: self, caught: None }.report()
     }
@@ -954,7 +958,6 @@ unsafe fn free_on_error_context_reset(domain: CString) {
 /// error (and purposely exclude them from `build.rs`) to ensure users can't get into trouble
 /// trying to roll their own error handling.
 unsafe fn do_ereport(ereport: ErrorReportWithLevel) {
-    const PERCENT_S: &CStr = c"%s";
     const DEFAULT_DOMAIN: *const ::std::os::raw::c_char = std::ptr::null_mut();
 
     // the following code is definitely thread-unsafe -- not-the-main-thread can't be creating Postgres
@@ -963,28 +966,14 @@ unsafe fn do_ereport(ereport: ErrorReportWithLevel) {
     crate::thread_check::check_active_thread();
 
     //
-    // only declare these functions here.  They're explicitly excluded from bindings generation in
-    // `build.rs` and we'd prefer pgrx users not have access to them at all
+    // only declare `errstart()` here and the rest in `error_finish()`.  They're explicitly excluded
+    // from bindings generation in `build.rs` and we'd prefer pgrx users not have access to them at all
     //
-
-    #[cfg_attr(target_os = "windows", link(name = "postgres"))]
-    unsafe extern "C-unwind" {
-        fn errcode(sqlerrcode: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
-        fn errmsg(fmt: *const ::std::os::raw::c_char, ...) -> ::std::os::raw::c_int;
-        fn errdetail(fmt: *const ::std::os::raw::c_char, ...) -> ::std::os::raw::c_int;
-        fn errhint(fmt: *const ::std::os::raw::c_char, ...) -> ::std::os::raw::c_int;
-        fn errcontext_msg(fmt: *const ::std::os::raw::c_char, ...) -> ::std::os::raw::c_int;
-    }
 
     // we only allocate file, lineno and funcname if `errstart` returns true
     #[cfg_attr(target_os = "windows", link(name = "postgres"))]
     unsafe extern "C-unwind" {
         fn errstart(elevel: ::std::os::raw::c_int, domain: *const ::std::os::raw::c_char) -> bool;
-        fn errfinish(
-            filename: *const ::std::os::raw::c_char,
-            lineno: ::std::os::raw::c_int,
-            funcname: *const ::std::os::raw::c_char,
-        );
     }
 
     let level = ereport.level();
@@ -1034,41 +1023,29 @@ unsafe fn do_ereport(ereport: ErrorReportWithLevel) {
             // do not leak the Rust `ErrorReportWithLocation` instance
             drop(ereport);
 
-            // SAFETY
-            //
-            // The following functions are all FFI into Postgres, so they're inherently unsafe.
-            //
-            // The various pointers used as arguments to these functions might have been allocated above
-            // or they might be the null pointer, so we guard against that possibility for each usage.
-            errcode(sqlerrcode as _);
-            if !message.is_null() {
-                errmsg(PERCENT_S.as_ptr(), message);
-                pfree(message.cast());
-            }
-            if !detail.is_null() {
-                errdetail(PERCENT_S.as_ptr(), detail);
-                pfree(detail.cast());
-            }
-            if !hint.is_null() {
-                errhint(PERCENT_S.as_ptr(), hint);
-                pfree(hint.cast());
-            }
-            if !context.is_null() {
-                errcontext_msg(PERCENT_S.as_ptr(), context);
-                pfree(context.cast());
-            }
-
+            // SAFETY: for both calls to `error_finish()` below.  The active thread check passed
+            // above, and `errstart()` returned true for this report.  `message`, `detail`, `hint`
+            // and `context` are each null or were just allocated by `as_pg_cstr()`, and `file`
+            // and `funcname` are each null or were just allocated in `ErrorContext`.  At ERROR or
+            // above, `ereport` is already dropped.
             if level >= PgLogLevel::ERROR {
                 crate::submodules::thread_check::active_thread::clear();
-            }
-            errfinish(file, lineno as _, funcname);
+                error_finish(sqlerrcode, message, detail, hint, context, file, lineno, funcname);
 
-            if level >= PgLogLevel::ERROR {
                 // SAFETY:  `crate::errstart() is guaranteed to have returned true if >=ERROR and
                 // `crate::errfinish()` is guaranteed to not have not returned at all if >= ERROR, which
                 // means we won't either
                 unreachable_unchecked()
             } else {
+                // A report below ERROR can still raise one, for example from an error context
+                // callback.  Postgres would jump over the Rust frames that called us without
+                // running their destructors, so catch the ERROR and unwind them as a panic
+                // instead.  The closure only makes the call, so it has nothing to drop, and
+                // `error_finish()` calls nothing that panics.
+                super::ffi::pg_guard_ffi_boundary(|| {
+                    error_finish(sqlerrcode, message, detail, hint, context, file, lineno, funcname)
+                });
+
                 // if it wasn't an ERROR we need to free up the things that Postgres wouldn't have
                 //
                 // ... except on Postgres 19, whose `errfinish()` resets `ErrorContext` (where we
@@ -1078,13 +1055,87 @@ unsafe fn do_ereport(ereport: ErrorReportWithLevel) {
                 #[cfg(not(feature = "pg19"))]
                 {
                     if !file.is_null() {
-                        pfree(file.cast());
+                        crate::pfree(file.cast());
                     }
                     if !funcname.is_null() {
-                        pfree(funcname.cast());
+                        crate::pfree(funcname.cast());
                     }
                 }
             }
         }
+    }
+}
+
+/// Fills in the report that `errstart()` started and finishes it, as the rest of Postgres'
+/// `ereport()` macro does.
+///
+/// Returns once Postgres has emitted a report below ERROR.  At ERROR or above `errfinish()`
+/// doesn't return, so this doesn't either.
+///
+/// # Safety
+///
+/// - Call only on the backend thread.  None of the functions declared here checks.
+/// - `errstart()` returned true for this report, and no other report has been started since.
+/// - `message`, `detail`, `hint` and `context` are each null or a NUL-terminated string that
+///   `palloc` allocated.  This function frees them.
+/// - `file` and `funcname` are each null or a NUL-terminated string that stays valid until
+///   Postgres discards the report.  Postgres keeps these two pointers instead of copying.
+/// - Postgres can raise an ERROR during these calls, whatever the level of the report, and it
+///   then jumps over this frame and its callers' without running their destructors.  Below
+///   ERROR, call this inside `pg_guard_ffi_boundary()`, which turns that ERROR into a panic.
+///   At ERROR or above it never returns, so call it holding nothing that must be dropped.
+#[allow(clippy::too_many_arguments)] // One argument per field that `ereport()` sets.
+unsafe fn error_finish(
+    sqlerrcode: PgSqlErrorCode,
+    message: *mut c_char,
+    detail: *mut c_char,
+    hint: *mut c_char,
+    context: *mut c_char,
+    file: *const c_char,
+    lineno: u32,
+    funcname: *const c_char,
+) {
+    const PERCENT_S: &CStr = c"%s";
+
+    // Only declared here.  `build.rs` leaves the `err*()` functions out of the bindings.  The
+    // bindings do have `pfree`, but guarded: it would panic on an ERROR, which a
+    // `pg_guard_ffi_boundary()` closure must not do, and its thread check would claim the active
+    // thread again after `do_ereport()` cleared it for an ERROR.
+    #[cfg_attr(target_os = "windows", link(name = "postgres"))]
+    unsafe extern "C-unwind" {
+        fn errcode(sqlerrcode: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+        fn errmsg(fmt: *const ::std::os::raw::c_char, ...) -> ::std::os::raw::c_int;
+        fn errdetail(fmt: *const ::std::os::raw::c_char, ...) -> ::std::os::raw::c_int;
+        fn errhint(fmt: *const ::std::os::raw::c_char, ...) -> ::std::os::raw::c_int;
+        fn errcontext_msg(fmt: *const ::std::os::raw::c_char, ...) -> ::std::os::raw::c_int;
+        fn errfinish(
+            filename: *const ::std::os::raw::c_char,
+            lineno: ::std::os::raw::c_int,
+            funcname: *const ::std::os::raw::c_char,
+        );
+        fn pfree(pointer: *mut ::std::os::raw::c_void);
+    }
+
+    // SAFETY: the caller vouches for the thread, the report and each pointer.  Postgres copies a
+    // string that is the `%s` argument of its format before the string is freed here.
+    unsafe {
+        errcode(sqlerrcode as _);
+        if !message.is_null() {
+            errmsg(PERCENT_S.as_ptr(), message);
+            pfree(message.cast());
+        }
+        if !detail.is_null() {
+            errdetail(PERCENT_S.as_ptr(), detail);
+            pfree(detail.cast());
+        }
+        if !hint.is_null() {
+            errhint(PERCENT_S.as_ptr(), hint);
+            pfree(hint.cast());
+        }
+        if !context.is_null() {
+            errcontext_msg(PERCENT_S.as_ptr(), context);
+            pfree(context.cast());
+        }
+        errfinish(file, lineno as _, funcname);
     }
 }
