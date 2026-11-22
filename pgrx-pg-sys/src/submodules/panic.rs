@@ -221,9 +221,11 @@ impl CaughtPostgresError {
         let data = unsafe {
             // `CopyErrorData()` asserts that it isn't copying into ErrorContext, which is current
             // in an error context callback, and `FreeErrorData()` doesn't free all it copies.  A
-            // context of our own, under ErrorContext, avoids both.
+            // context of our own avoids both.  It isn't a child of ErrorContext: if
+            // `CopyErrorData()` raises while Postgres handles another ERROR, Postgres resets
+            // ErrorContext, which would delete this context while it's the current one.
             let context = crate::AllocSetContextCreateInternal(
-                crate::ErrorContext,
+                crate::TopMemoryContext,
                 c"pgrx caught ERROR".as_ptr(),
                 crate::ALLOCSET_SMALL_MINSIZE as _,
                 crate::ALLOCSET_SMALL_INITSIZE as _,
