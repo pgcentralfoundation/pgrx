@@ -163,17 +163,17 @@ pub const MAXIMUM_ALIGNOF: u32 = 8;
 pub const MEMSET_LOOP_LIMIT: u32 = 1024;
 pub const PACKAGE_BUGREPORT: &::core::ffi::CStr = c"pgsql-bugs@lists.postgresql.org";
 pub const PACKAGE_NAME: &::core::ffi::CStr = c"PostgreSQL";
-pub const PACKAGE_STRING: &::core::ffi::CStr = c"PostgreSQL 19rc2";
+pub const PACKAGE_STRING: &::core::ffi::CStr = c"PostgreSQL 19.0";
 pub const PACKAGE_TARNAME: &::core::ffi::CStr = c"postgresql";
 pub const PACKAGE_URL: &::core::ffi::CStr = c"https://www.postgresql.org/";
-pub const PACKAGE_VERSION: &::core::ffi::CStr = c"19rc2";
+pub const PACKAGE_VERSION: &::core::ffi::CStr = c"19.0";
 pub const PG_KRB_SRVNAM: &::core::ffi::CStr = c"postgres";
 pub const PG_MAJORVERSION: &::core::ffi::CStr = c"19";
 pub const PG_MAJORVERSION_NUM: u32 = 19;
 pub const PG_MINORVERSION_NUM: u32 = 0;
-pub const PG_VERSION: &::core::ffi::CStr = c"19rc2";
+pub const PG_VERSION: &::core::ffi::CStr = c"19.0";
 pub const PG_VERSION_NUM: u32 = 190000;
-pub const PG_VERSION_STR : & :: core :: ffi :: CStr = c"PostgreSQL 19rc2 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0, 64-bit" ;
+pub const PG_VERSION_STR : & :: core :: ffi :: CStr = c"PostgreSQL 19.0 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0, 64-bit" ;
 pub const RELSEG_SIZE: u32 = 131072;
 pub const SIZEOF_INTMAX_T: u32 = 8;
 pub const SIZEOF_LONG: u32 = 8;
@@ -253,7 +253,7 @@ pub const PG_BINARY_A: &::core::ffi::CStr = c"a";
 pub const PG_BINARY_R: &::core::ffi::CStr = c"r";
 pub const PG_BINARY_W: &::core::ffi::CStr = c"w";
 pub const PGINVALID_SOCKET: i32 = -1;
-pub const PG_BACKEND_VERSIONSTR: &::core::ffi::CStr = c"postgres (PostgreSQL) 19rc2\n";
+pub const PG_BACKEND_VERSIONSTR: &::core::ffi::CStr = c"postgres (PostgreSQL) 19.0\n";
 pub const EXE: &::core::ffi::CStr = c"";
 pub const DEVNULL: &::core::ffi::CStr = c"/dev/null";
 pub const USE_REPL_SNPRINTF: u32 = 1;
@@ -28276,6 +28276,7 @@ pub struct JoinPathExtraData {
     pub semifactors: SemiAntiJoinFactors,
     pub param_source_rels: Relids,
     pub pgs_mask: uint64,
+    pub ojrelids: Relids,
 }
 impl Default for JoinPathExtraData {
     fn default() -> Self {
@@ -33211,6 +33212,7 @@ pub struct DecodingWorkerShared {
     pub roleid: Oid,
     pub lock_timeout: ::core::ffi::c_int,
     pub transaction_timeout: ::core::ffi::c_int,
+    pub temp_file_limit: ::core::ffi::c_int,
     pub relid: Oid,
     pub cv: ConditionVariable,
     pub backend_pid: pid_t,
@@ -55343,6 +55345,7 @@ unsafe extern "C-unwind" {
         relation: Relation,
         total_pages: BlockNumber,
         scanned_pages: BlockNumber,
+        scanned_new_pages: BlockNumber,
         scanned_tuples: f64,
     ) -> f64;
     pub fn vac_update_relstats(
@@ -55410,13 +55413,13 @@ unsafe extern "C-unwind" {
     pub fn parallel_vacuum_reset_dead_items(pvs: *mut ParallelVacuumState);
     pub fn parallel_vacuum_bulkdel_all_indexes(
         pvs: *mut ParallelVacuumState,
-        num_table_tuples: ::core::ffi::c_long,
+        num_table_tuples: f64,
         num_index_scans: ::core::ffi::c_int,
         wstats: *mut PVWorkerStats,
     );
     pub fn parallel_vacuum_cleanup_all_indexes(
         pvs: *mut ParallelVacuumState,
-        num_table_tuples: ::core::ffi::c_long,
+        num_table_tuples: f64,
         num_index_scans: ::core::ffi::c_int,
         estimated_count: bool,
         wstats: *mut PVWorkerStats,
@@ -55439,6 +55442,14 @@ unsafe extern "C-unwind" {
         attr: Form_pg_attribute,
         p_attstattarget: *mut ::core::ffi::c_int,
     ) -> bool;
+    pub fn build_statistic_tuple(
+        relid: Oid,
+        attnum: ::core::ffi::c_int,
+        inh: bool,
+        stats: *mut VacAttrStats,
+        tupdesc: TupleDesc,
+        oldtup: HeapTuple,
+    ) -> HeapTuple;
     pub fn std_typanalyze(stats: *mut VacAttrStats) -> bool;
     pub fn anl_random_fract() -> f64;
     pub fn anl_init_selection_state(n: ::core::ffi::c_int) -> f64;
@@ -61951,6 +61962,7 @@ unsafe extern "C-unwind" {
         d: Datum,
         typid: Oid,
         typmod: int32,
+        allow_empty: bool,
         ok: *mut bool,
     ) -> Datum;
     pub fn statatt_get_elem_type(

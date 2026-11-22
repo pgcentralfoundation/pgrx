@@ -7,9 +7,9 @@ edition = "2024"
 rust-version = "1.96"
 
 [workspace.dependencies]
-pgrx = "=0.19.4"
-pgrx-bench = "=0.19.4"
-pgrx-macros = "=0.19.4"
-pgrx-pg-sys = "=0.19.4"
-pgrx-sql-entity-graph = { version = "=0.19.4" }
-pgrx-pg-config = { version = "=0.19.4" }
+pgrx = "=0.19.5"
+pgrx-bench = "=0.19.5"
+pgrx-macros = "=0.19.5"
+pgrx-pg-sys = "=0.19.5"
+pgrx-sql-entity-graph = { version = "=0.19.5" }
+pgrx-pg-config = { version = "=0.19.5" }
