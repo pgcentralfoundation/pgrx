@@ -10938,6 +10938,9 @@ macro_rules! __pgrx_c_field_marker {
     (temp_bytes) => {
         $crate::__pgrx_c_generated::Field_temp_bytes
     };
+    (temp_file_limit) => {
+        $crate::__pgrx_c_generated::Field_temp_file_limit
+    };
     (temp_files) => {
         $crate::__pgrx_c_generated::Field_temp_files
     };

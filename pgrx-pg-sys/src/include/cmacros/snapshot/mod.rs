@@ -2854,7 +2854,7 @@ const _: () = ::core::assert!(
 const _: () = ::core::assert!(
     ::core::matches!(
         crate::__pgrx_c_bindings::__PGRX_GENERATION.as_bytes(),
-        b"b3287edb0d87e62cd4e9c6a72f468679441246790ffb1edc4ee80b9d7fa9ef5c"
+        b"ad9cbb1203400ad3cdc302afa45d742993044d25628bf2b55cb2ffc7f8f6f144"
     ),
     "the documentation snapshot was generated with bindings other than src/include/pg19.rs; regenerate them together"
 );
