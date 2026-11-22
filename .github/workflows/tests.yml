@@ -169,20 +169,9 @@ jobs:
           echo ""
 
       - name: Setup release Postgres apt repo
-        if: matrix.postgres != '19'
         run: |
           sudo apt-get install -y wget gnupg
           sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
-          wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
-          sudo apt-get update -y -qq --fix-missing
-
-      - name: Setup beta Postgres apt repo
-        if: matrix.postgres == '19'
-        run: |
-          sudo apt-get install -y wget gnupg
-          sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7FCC7D46ACCC4CF8
-          sudo add-apt-repository "deb https://apt.postgresql.org/pub/repos/apt/ $(lsb_release -s -c)-pgdg-snapshot main $PG_VER"
-          sudo add-apt-repository "deb https://apt.postgresql.org/pub/repos/apt/ $(lsb_release -s -c)-pgdg main $PG_VER"
           wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
           sudo apt-get update -y -qq --fix-missing
 
@@ -654,7 +643,7 @@ jobs:
     strategy:
       matrix:
         os: [ "windows-2022" ]
-        postgresql: [ 13, 17 ]
+        postgresql: [ 13, 17, 19 ]
 
     steps:
       - uses: actions/checkout@v4
