@@ -643,7 +643,7 @@ jobs:
     strategy:
       matrix:
         os: [ "windows-2022" ]
-        postgresql: [ 13, 17 ]
+        postgresql: [ 13, 17, 19 ]
 
     steps:
       - uses: actions/checkout@v4
