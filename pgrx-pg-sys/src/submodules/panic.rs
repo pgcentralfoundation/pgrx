@@ -447,8 +447,8 @@ impl ErrorReportWithLevel {
             // ERRORs get converted into panics so they can perform proper stack unwinding
             PgLogLevel::ERROR => panic_any(self),
 
-            // FATAL and PANIC are reported directly to Postgres -- they abort the process
-            PgLogLevel::FATAL | PgLogLevel::PANIC => unsafe {
+            // Levels above ERROR are reported directly to Postgres -- they end the process
+            level if level > PgLogLevel::ERROR => unsafe {
                 crate::InterruptHoldoffCount += 1;
                 do_ereport(self);
                 unreachable!()

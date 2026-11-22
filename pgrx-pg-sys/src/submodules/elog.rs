@@ -47,11 +47,20 @@ pub enum PgLogLevel {
     /// \[WARNING\] is for unexpected messages.
     WARNING = crate::WARNING as isize,
 
+    /// Same as WARNING for the client, but never sent to the server log.
+    #[allow(non_camel_case_types)]
+    WARNING_CLIENT_ONLY = crate::WARNING_CLIENT_ONLY as isize,
+
     /// user error - abort transaction; return to known state
     ERROR = crate::PGERROR as isize,
 
     /// fatal error - abort process
     FATAL = crate::FATAL as isize,
+
+    /// Same as FATAL for the client, but never sent to the server log.  Postgres 19 and later.
+    #[cfg(feature = "pg19")]
+    #[allow(non_camel_case_types)]
+    FATAL_CLIENT_ONLY = crate::FATAL_CLIENT_ONLY as isize,
 
     /// take down the other backends with me
     PANIC = crate::PANIC as isize,
@@ -60,6 +69,12 @@ pub enum PgLogLevel {
 impl From<isize> for PgLogLevel {
     #[inline]
     fn from(i: isize) -> Self {
+        // Checked apart from the chain below because an `else if` can't carry a `cfg`.
+        #[cfg(feature = "pg19")]
+        if i == PgLogLevel::FATAL_CLIENT_ONLY as isize {
+            return PgLogLevel::FATAL_CLIENT_ONLY;
+        }
+
         if i == PgLogLevel::DEBUG5 as isize {
             PgLogLevel::DEBUG5
         } else if i == PgLogLevel::DEBUG4 as isize {
@@ -70,12 +85,18 @@ impl From<isize> for PgLogLevel {
             PgLogLevel::DEBUG2
         } else if i == PgLogLevel::DEBUG1 as isize {
             PgLogLevel::DEBUG1
+        } else if i == PgLogLevel::LOG as isize {
+            PgLogLevel::LOG
+        } else if i == PgLogLevel::LOG_SERVER_ONLY as isize {
+            PgLogLevel::LOG_SERVER_ONLY
         } else if i == PgLogLevel::INFO as isize {
             PgLogLevel::INFO
         } else if i == PgLogLevel::NOTICE as isize {
             PgLogLevel::NOTICE
         } else if i == PgLogLevel::WARNING as isize {
             PgLogLevel::WARNING
+        } else if i == PgLogLevel::WARNING_CLIENT_ONLY as isize {
+            PgLogLevel::WARNING_CLIENT_ONLY
         } else if i == PgLogLevel::ERROR as isize {
             PgLogLevel::ERROR
         } else if i == PgLogLevel::FATAL as isize {
@@ -565,4 +586,34 @@ macro_rules! ereport_domain {
                 .report($loglevel);
         }
     };
+}
+
+#[cfg(test)]
+mod tests {
+    use super::PgLogLevel;
+
+    #[test]
+    fn log_levels_convert_from_their_values() {
+        for level in [
+            PgLogLevel::DEBUG5,
+            PgLogLevel::DEBUG4,
+            PgLogLevel::DEBUG3,
+            PgLogLevel::DEBUG2,
+            PgLogLevel::DEBUG1,
+            PgLogLevel::LOG,
+            PgLogLevel::LOG_SERVER_ONLY,
+            PgLogLevel::INFO,
+            PgLogLevel::NOTICE,
+            PgLogLevel::WARNING,
+            PgLogLevel::WARNING_CLIENT_ONLY,
+            PgLogLevel::ERROR,
+            PgLogLevel::FATAL,
+            #[cfg(feature = "pg19")]
+            PgLogLevel::FATAL_CLIENT_ONLY,
+            PgLogLevel::PANIC,
+        ] {
+            assert_eq!(PgLogLevel::from(level as isize), level);
+            assert_eq!(PgLogLevel::from(level as i32), level);
+        }
+    }
 }
