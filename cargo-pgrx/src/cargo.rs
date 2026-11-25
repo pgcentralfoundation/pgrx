@@ -228,26 +228,16 @@ pub(crate) fn pgrx_cdylib_rustc_args(
     let mut hash = DefaultHasher::new();
     SCRIPT.hash(&mut hash);
     let directory = std::path::absolute(target_dir)?.join(".pgrx");
-    std::fs::create_dir_all(&directory)
-        .wrap_err_with(|| format!("couldn't create {}", directory.display()))?;
     let path = directory.join(format!("schema-{:016x}.ld", hash.finish()));
 
-    // Stable arguments let Cargo reuse the build. A new script gets a new path,
-    // and atomic publication keeps concurrent builds from reading a partial file.
-    if !path.try_exists()? {
-        let mut file = tempfile::NamedTempFile::new_in(&directory)?;
-        file.write_all(SCRIPT.as_bytes())?;
-        if let Err(error) = file.persist_noclobber(&path)
-            && error.error.kind() != std::io::ErrorKind::AlreadyExists
-        {
-            return Err(error).wrap_err_with(|| format!("couldn't write {}", path.display()));
-        }
+    // Stable arguments let Cargo reuse the build, so a script already in place is left alone
+    // and a new script gets a new path. A file with other contents is replaced instead of
+    // reported: a system crash can leave the name without its data, and every later build
+    // would otherwise fail until someone deleted the file.
+    if std::fs::read(&path).ok().as_deref() != Some(SCRIPT.as_bytes()) {
+        write_by_rename(&directory, &path, SCRIPT.as_bytes())
+            .wrap_err_with(|| format!("couldn't write {}", path.display()))?;
     }
-    eyre::ensure!(
-        std::fs::read(&path)? == SCRIPT.as_bytes(),
-        "schema linker script has unexpected contents: {}",
-        path.display()
-    );
     let path = path.to_str().ok_or_else(|| eyre::eyre!("non-UTF-8 linker script path"))?;
 
     // -Wl splits on commas, including any commas in the target directory.
@@ -257,6 +247,18 @@ pub(crate) fn pgrx_cdylib_rustc_args(
         "-C".into(),
         format!("link-arg=--script={path}"),
     ])
+}
+
+/// Write `contents` to `path` in `directory` by renaming a complete file into place, so a
+/// concurrent build reads either the whole file or none of it. Renaming replaces a file
+/// that is already there, which needs neither hard links nor `RENAME_NOREPLACE` from the
+/// filesystem.
+fn write_by_rename(directory: &Path, path: &Path, contents: &[u8]) -> std::io::Result<()> {
+    std::fs::create_dir_all(directory)?;
+    let mut file = tempfile::NamedTempFile::new_in(directory)?;
+    file.write_all(contents)?;
+    file.persist(path)?;
+    Ok(())
 }
 
 fn target_uses_gnuish_ld(target: Option<&str>) -> bool {
@@ -377,11 +379,32 @@ mod tests {
         assert_eq!(std::fs::read_to_string(path).unwrap(), include_str!("pgrx-schema.ld"));
         let file = std::fs::File::options().write(true).open(path).unwrap();
         file.set_modified(std::time::UNIX_EPOCH).unwrap();
+        drop(file);
         assert_eq!(
             pgrx_cdylib_rustc_args(Some("x86_64-unknown-linux-gnu"), &target_dir).unwrap(),
             args
         );
-        assert_eq!(file.metadata().unwrap().modified().unwrap(), std::time::UNIX_EPOCH);
+        // Stat the path: a handle opened earlier would not see a file renamed over it.
+        assert_eq!(std::fs::metadata(path).unwrap().modified().unwrap(), std::time::UNIX_EPOCH);
+    }
+
+    #[test]
+    fn cdylib_rustc_args_replace_a_damaged_schema_linker_script() {
+        if std::env::var_os("CARGO_PGRX_DISABLE_GC_SECTIONS_WORKAROUND").is_some() {
+            return;
+        }
+
+        let directory = tempfile::tempdir().unwrap();
+        let args =
+            pgrx_cdylib_rustc_args(Some("x86_64-unknown-linux-gnu"), directory.path()).unwrap();
+        let path = args[3].strip_prefix("link-arg=--script=").unwrap();
+        // A crash soon after the first build can leave the name without its contents.
+        std::fs::write(path, "").unwrap();
+        assert_eq!(
+            pgrx_cdylib_rustc_args(Some("x86_64-unknown-linux-gnu"), directory.path()).unwrap(),
+            args
+        );
+        assert_eq!(std::fs::read_to_string(path).unwrap(), include_str!("pgrx-schema.ld"));
     }
 
     #[test]
