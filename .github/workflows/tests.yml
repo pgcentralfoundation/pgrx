@@ -695,25 +695,39 @@ jobs:
           CARGO_TARGET_DIR: ${{ github.workspace }}/target
         run: cd "$RUNNER_TEMP/sample" && PGRX_HOME="$RUNNER_TEMP/pgrx-home-download" cargo pgrx test pg$PG_VER
 
-  # aarch64 release builds without LTO and with many codegen units keep `.pgrxsc` only if
-  # SHF_GNU_RETAIN survives LLVM, binutils and `ld --gc-sections`, which has broken in the
-  # wild (see the pglinter 0.18.0 failure). If cargo-pgrx's injected `--no-gc-sections`
-  # workaround regresses, schema generation fails with "no embedded pgrx schema section found".
+  # Keep schema metadata in non-LTO builds even without SHF_GNU_RETAIN, while collecting
+  # unused code and its imports. Exercise the linker script with both supported ELF linkers.
   schema-release:
-    name: linux-arm64 cargo pgrx schema --release
+    name: ${{ matrix.os }} schema --release (${{ matrix.linker }})
     needs: plan
     if: needs.plan.outputs.schema_release == 'true'
-    runs-on: ubuntu-24.04-arm
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, ubuntu-24.04-arm]
+        linker: [bfd, lld]
     env:
       PG_VER: 17
     steps:
       - uses: actions/checkout@v4
       - run: tools/ci/setup.sh
+      - name: Select the ELF linker
+        run: |
+          if [ "${{ matrix.linker }}" = lld ]; then
+            host="$(rustc -vV | sed -n 's/^host: //p')"
+            linker="$(rustc --print sysroot)/lib/rustlib/$host/bin/gcc-ld/ld.lld"
+            echo "RUSTFLAGS=-C linker=clang -C link-arg=--ld-path=$linker" >> "$GITHUB_ENV"
+          else
+            echo "RUSTFLAGS=-C linker=cc -C link-arg=-fuse-ld=bfd" >> "$GITHUB_ENV"
+          fi
       - uses: Swatinem/rust-cache@v2
         with:
-          shared-key: schema-release
+          shared-key: schema-release-${{ matrix.os }}-${{ matrix.linker }}
           save-if: ${{ env.SAVE_RUST_CACHE == 'true' }}
+      - name: Verify schema retention and unused import collection
+        run: cargo test --locked -p cargo-pgrx --test schema_gc -- --nocapture
       - name: Exercise cargo pgrx schema --release against pgrx-unit-tests
         env:
           CARGO_PROFILE_RELEASE_LTO: "false"
