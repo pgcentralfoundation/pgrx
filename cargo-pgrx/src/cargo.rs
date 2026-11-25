@@ -213,7 +213,8 @@ pub(crate) fn cargo() -> std::process::Command {
 /// `#[used]` preserves the records through compilation, but not linker GC.
 /// Only final extension links receive this script; Cargo's configured rustflags
 /// and test executable links are left alone. The existing opt-out also disables
-/// this narrower retention rule.
+/// this narrower retention rule. cargo-pgrx cannot tell which linker rustc will
+/// run, and mold and gold fail on the script, so their users need that opt-out.
 pub(crate) fn pgrx_cdylib_rustc_args(
     target: Option<&str>,
     target_dir: &Path,
