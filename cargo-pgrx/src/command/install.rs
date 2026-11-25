@@ -168,8 +168,15 @@ pub(crate) fn install_extension(
 
     let build_manifest_path =
         manifest_path_for_build(user_manifest_path, user_package, package_manifest_path);
-    let build_command_output =
-        build_extension(build_manifest_path, user_package, profile, features, target, cargo_flags)?;
+    let build_command_output = build_extension(
+        build_manifest_path,
+        user_package,
+        profile,
+        features,
+        target,
+        target_dir,
+        cargo_flags,
+    )?;
     let build_command_bytes = build_command_output.stdout;
     let build_command_reader = BufReader::new(build_command_bytes.as_slice());
     let build_command_stream = CargoMessage::parse_stream(build_command_reader);
@@ -339,6 +346,7 @@ pub(crate) fn build_extension(
     profile: &CargoProfile,
     features: &clap_cargo::Features,
     target: Option<&str>,
+    target_dir: &Path,
     cargo_flags: &[String],
 ) -> eyre::Result<std::process::Output> {
     let flags = std::env::var("PGRX_BUILD_FLAGS").unwrap_or_default();
@@ -387,7 +395,7 @@ pub(crate) fn build_extension(
         command.arg(target);
     }
 
-    let rustc_args = crate::cargo::pgrx_cdylib_rustc_args(target);
+    let rustc_args = crate::cargo::pgrx_cdylib_rustc_args(target, target_dir)?;
     if !rustc_args.is_empty() {
         command.arg("--");
         command.args(rustc_args);

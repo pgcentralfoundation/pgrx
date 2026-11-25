@@ -277,7 +277,7 @@ fn install_from_virtual_workspace_auto_detects_manifest_and_preserves_rustflags(
     // extension member, but the actual build still targeted the virtual
     // workspace root. The fixture also has a workspace rustflag that would be
     // replaced by the old top-level `--config target...rustflags=[...]`
-    // workaround, so a successful compile proves the no-gc workaround is being
+    // workaround, so a successful compile proves schema retention is being
     // passed as a final-crate rustc arg instead.
     let Some((pg_feature, pg_config_path)) = preferred_pg_config() else {
         return;
@@ -315,8 +315,11 @@ fn install_from_virtual_workspace_auto_detects_manifest_and_preserves_rustflags(
     );
     if cfg!(all(target_family = "unix", not(target_os = "macos"))) {
         assert!(
-            stdout.contains("\"-C\"") && stdout.contains("link-arg=-Wl,--no-gc-sections"),
-            "cargo-pgrx build command did not pass no-gc as final rustc args\nstdout:\n{stdout}\nstderr:\n{stderr}"
+            stdout.contains("\"-C\"")
+                && stdout.contains("link-arg=-Xlinker")
+                && stdout.contains("link-arg=--script=")
+                && !stdout.contains("--no-gc-sections"),
+            "cargo-pgrx build command did not pass the schema linker script as final rustc args\nstdout:\n{stdout}\nstderr:\n{stderr}"
         );
     }
 }

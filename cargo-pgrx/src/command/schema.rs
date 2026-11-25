@@ -202,7 +202,7 @@ pub(crate) fn generate_schema_for_cli(
 
     if !skip_build {
         // NB:  The only path where this happens is via the command line using `cargo pgrx schema`
-        first_build(cargo.clone(), profile, is_test, &features_arg, target)?;
+        first_build(cargo.clone(), profile, is_test, &features_arg, target, target_dir)?;
     };
     generate_schema_implicit(
         package_manifest_path,
@@ -388,6 +388,7 @@ fn first_build(
     is_test: bool,
     features_arg: &str,
     target: Option<&str>,
+    target_dir: &Path,
 ) -> eyre::Result<()> {
     let cargo = if is_test {
         cargo.subcommand("test").flag("--no-run")
@@ -395,7 +396,7 @@ fn first_build(
         cargo
             .subcommand("rustc")
             .flag("--lib")
-            .rustc_args(crate::cargo::pgrx_cdylib_rustc_args(target))
+            .rustc_args(crate::cargo::pgrx_cdylib_rustc_args(target, target_dir)?)
     };
 
     let cargo = cargo.profile(profile.clone()).target(target.map(|t| t.to_owned()));
