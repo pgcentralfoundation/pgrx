@@ -188,6 +188,7 @@ pub(crate) fn install_extension(
         profile,
         features,
         EffectiveExtVersion(&effective_version),
+        target_dir,
         cargo_flags,
     )?;
     let build_command_bytes = build_command_output.stdout;
@@ -496,6 +497,7 @@ pub(crate) fn build_extension(
     profile: &CargoProfile,
     features: &clap_cargo::Features,
     extversion: EffectiveExtVersion<'_>,
+    target_dir: &Path,
     cargo_flags: &[String],
 ) -> eyre::Result<std::process::Output> {
     let flags = std::env::var("PGRX_BUILD_FLAGS").unwrap_or_default();
@@ -552,10 +554,12 @@ pub(crate) fn build_extension(
         command.arg(target);
     }
 
-    let rustc_args = crate::cargo::pgrx_cdylib_rustc_args(target);
-    if !exporting && !rustc_args.is_empty() {
-        command.arg("--");
-        command.args(rustc_args);
+    if !exporting {
+        let rustc_args = crate::cargo::pgrx_cdylib_rustc_args(target, target_dir)?;
+        if !rustc_args.is_empty() {
+            command.arg("--");
+            command.args(rustc_args);
+        }
     }
 
     let command = command.stderr(Stdio::inherit());

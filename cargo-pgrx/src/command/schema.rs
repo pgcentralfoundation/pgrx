@@ -196,7 +196,7 @@ pub(crate) fn generate_schema_for_cli(
 
     if !skip_build {
         // NB:  The only path where this happens is via the command line using `cargo pgrx schema`
-        first_build(cargo.clone(), profile, is_test, &features_arg)?;
+        first_build(cargo.clone(), profile, is_test, &features_arg, target_dir)?;
     };
     // `cargo pgrx schema` builds for this machine; only a package names another target.
     let library = target_dir.join(profile.target_subdir()).join(manifest.lib_filename(None)?);
@@ -372,6 +372,7 @@ fn first_build(
     profile: &CargoProfile,
     is_test: bool,
     features_arg: &str,
+    target_dir: &Path,
 ) -> eyre::Result<()> {
     let cargo = if is_test {
         cargo.subcommand("test").flag("--no-run")
@@ -379,7 +380,7 @@ fn first_build(
         cargo
             .subcommand("rustc")
             .flag("--lib")
-            .rustc_args(crate::cargo::pgrx_cdylib_rustc_args(None))
+            .rustc_args(crate::cargo::pgrx_cdylib_rustc_args(None, target_dir)?)
     };
 
     let cargo = cargo.profile(profile.clone());

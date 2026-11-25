@@ -8,8 +8,12 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use std::collections::BTreeMap;
-use std::path::PathBuf;
+use std::hash::{DefaultHasher, Hash, Hasher};
+use std::io::Write;
+use std::path::{Path, PathBuf};
 use std::{env, process};
+
+use eyre::WrapErr;
 
 /// Configuration for building a cargo execution
 #[derive(Default, Clone, Debug)]
@@ -205,48 +209,57 @@ pub(crate) fn cargo() -> std::process::Command {
     command
 }
 
-/// Extra `cargo rustc --lib -- ...` arguments that force the linker to retain
-/// the `.pgrxsc` section when building the extension cdylib.
-///
-/// The schema metadata that drives `cargo pgrx schema` lives in a `.pgrxsc`
-/// ELF section composed of `#[used]` statics scattered across every CGU. Rust
-/// lowers `#[used]` to `@llvm.used`, which on ELF is supposed to mark the
-/// containing section with `SHF_GNU_RETAIN` so the linker's default
-/// `--gc-sections` pass leaves it alone. That contract is fragile in the wild:
-/// it depends on LLVM emitting the flag, binutils honoring it, and LTO not
-/// masking the difference. When it breaks, every `.pgrxsc` contribution is
-/// dropped and `cargo pgrx schema` fails with "no embedded pgrx schema section
-/// found", which is exactly what we've seen on non-LTO aarch64 Linux builds.
-///
-/// Passing `-Wl,--no-gc-sections` as a final-crate link-arg on non-macOS Unix
-/// sidesteps the whole retention contract. The cost is a few KB of unreferenced
-/// code surviving in the final cdylib, which is a trade we'll happily make.
-///
-/// Critically, these args are only injected for cdylib-producing invocations
-/// (`cargo rustc --lib` inside cargo-pgrx install/package/schema paths). They
-/// MUST NOT be injected for `cargo test` invocations: rustc uses `--gc-sections`
-/// on test binaries to prune the many unreachable `extern "C"` references to
-/// Postgres symbols that pgrx-pg-sys declares. Keeping all those call sites
-/// retained makes the linker refuse to produce the test executable with a
-/// wall of "undefined symbol: CurrentMemoryContext" errors. The test-harness
-/// flow (`cargo pgrx test`) still picks up the workaround because the harness
-/// re-invokes `cargo-pgrx install` internally, and that path goes through
-/// `build_extension` which does apply the workaround.
-///
-/// This only fires when building for a GNU-ld-ish target; macOS (Mach-O,
-/// `ld64`, uses `-dead_strip` and doesn't understand this flag) and Windows
-/// (MSVC `link.exe`, doesn't speak `-Wl,...`) are excluded.
-///
-/// Setting `CARGO_PGRX_DISABLE_GC_SECTIONS_WORKAROUND=1` in the environment
-/// suppresses the injection entirely.
-pub(crate) fn pgrx_cdylib_rustc_args(target: Option<&str>) -> Vec<String> {
-    if std::env::var_os("CARGO_PGRX_DISABLE_GC_SECTIONS_WORKAROUND").is_some() {
-        return Vec::new();
+/// Keep the schema records in ELF cdylibs without retaining unrelated code.
+/// `#[used]` preserves the records through compilation, but not linker GC.
+/// Only final extension links receive this script; Cargo's configured rustflags
+/// and test executable links are left alone. The existing opt-out also disables
+/// this narrower retention rule. cargo-pgrx cannot tell which linker rustc will
+/// run, and mold and gold fail on the script, so their users need that opt-out.
+pub(crate) fn pgrx_cdylib_rustc_args(
+    target: Option<&str>,
+    target_dir: &Path,
+) -> eyre::Result<Vec<String>> {
+    if std::env::var_os("CARGO_PGRX_DISABLE_GC_SECTIONS_WORKAROUND").is_some()
+        || !target_uses_gnuish_ld(target)
+    {
+        return Ok(Vec::new());
     }
-    if !target_uses_gnuish_ld(target) {
-        return Vec::new();
+
+    const SCRIPT: &str = include_str!("pgrx-schema.ld");
+    let mut hash = DefaultHasher::new();
+    SCRIPT.hash(&mut hash);
+    let directory = std::path::absolute(target_dir)?.join(".pgrx");
+    let path = directory.join(format!("schema-{:016x}.ld", hash.finish()));
+
+    // Stable arguments let Cargo reuse the build, so a script already in place is left alone
+    // and a new script gets a new path. A file with other contents is replaced instead of
+    // reported: a system crash can leave the name without its data, and every later build
+    // would otherwise fail until someone deleted the file.
+    if std::fs::read(&path).ok().as_deref() != Some(SCRIPT.as_bytes()) {
+        write_by_rename(&directory, &path, SCRIPT.as_bytes())
+            .wrap_err_with(|| format!("couldn't write {}", path.display()))?;
     }
-    vec!["-C".to_string(), "link-arg=-Wl,--no-gc-sections".to_string()]
+    let path = path.to_str().ok_or_else(|| eyre::eyre!("non-UTF-8 linker script path"))?;
+
+    // -Wl splits on commas, including any commas in the target directory.
+    Ok(vec![
+        "-C".into(),
+        "link-arg=-Xlinker".into(),
+        "-C".into(),
+        format!("link-arg=--script={path}"),
+    ])
+}
+
+/// Write `contents` to `path` in `directory` by renaming a complete file into place, so a
+/// concurrent build reads either the whole file or none of it. Renaming replaces a file
+/// that is already there, which needs neither hard links nor `RENAME_NOREPLACE` from the
+/// filesystem.
+fn write_by_rename(directory: &Path, path: &Path, contents: &[u8]) -> std::io::Result<()> {
+    std::fs::create_dir_all(directory)?;
+    let mut file = tempfile::NamedTempFile::new_in(directory)?;
+    file.write_all(contents)?;
+    file.persist(path)?;
+    Ok(())
 }
 
 fn target_uses_gnuish_ld(target: Option<&str>) -> bool {
@@ -354,23 +367,55 @@ mod tests {
     use super::{Cargo, pgrx_cdylib_rustc_args};
 
     #[test]
-    fn cdylib_rustc_args_carry_no_gc_sections_workaround() {
+    fn cdylib_rustc_args_reuse_schema_linker_script() {
         if std::env::var_os("CARGO_PGRX_DISABLE_GC_SECTIONS_WORKAROUND").is_some() {
             return;
         }
 
-        let args = pgrx_cdylib_rustc_args(Some("x86_64-unknown-linux-gnu"));
+        let directory = tempfile::tempdir().unwrap();
+        let target_dir = directory.path().join("target with spaces,and commas");
+        let args = pgrx_cdylib_rustc_args(Some("x86_64-unknown-linux-gnu"), &target_dir).unwrap();
+        assert_eq!(&args[..3], ["-C", "link-arg=-Xlinker", "-C"]);
+        let path = args[3].strip_prefix("link-arg=--script=").unwrap();
+        assert_eq!(std::fs::read_to_string(path).unwrap(), include_str!("pgrx-schema.ld"));
+        let file = std::fs::File::options().write(true).open(path).unwrap();
+        file.set_modified(std::time::UNIX_EPOCH).unwrap();
+        drop(file);
         assert_eq!(
-            args,
-            ["-C", "link-arg=-Wl,--no-gc-sections"],
-            "cdylib rustc args should disable section GC on GNU-ish Unix"
+            pgrx_cdylib_rustc_args(Some("x86_64-unknown-linux-gnu"), &target_dir).unwrap(),
+            args
         );
+        // Stat the path: a handle opened earlier would not see a file renamed over it.
+        assert_eq!(std::fs::metadata(path).unwrap().modified().unwrap(), std::time::UNIX_EPOCH);
+    }
+
+    #[test]
+    fn cdylib_rustc_args_replace_a_damaged_schema_linker_script() {
+        if std::env::var_os("CARGO_PGRX_DISABLE_GC_SECTIONS_WORKAROUND").is_some() {
+            return;
+        }
+
+        let directory = tempfile::tempdir().unwrap();
+        let args =
+            pgrx_cdylib_rustc_args(Some("x86_64-unknown-linux-gnu"), directory.path()).unwrap();
+        let path = args[3].strip_prefix("link-arg=--script=").unwrap();
+        // A crash soon after the first build can leave the name without its contents.
+        std::fs::write(path, "").unwrap();
+        assert_eq!(
+            pgrx_cdylib_rustc_args(Some("x86_64-unknown-linux-gnu"), directory.path()).unwrap(),
+            args
+        );
+        assert_eq!(std::fs::read_to_string(path).unwrap(), include_str!("pgrx-schema.ld"));
     }
 
     #[test]
     fn cdylib_rustc_args_skip_non_gnuish_targets() {
-        assert!(pgrx_cdylib_rustc_args(Some("aarch64-apple-darwin")).is_empty());
-        assert!(pgrx_cdylib_rustc_args(Some("x86_64-pc-windows-msvc")).is_empty());
+        let directory = tempfile::tempdir().unwrap();
+        let target_dir = directory.path().join("unused");
+        for target in ["aarch64-apple-darwin", "x86_64-pc-windows-msvc"] {
+            assert!(pgrx_cdylib_rustc_args(Some(target), &target_dir).unwrap().is_empty());
+        }
+        assert!(!target_dir.exists());
     }
 
     #[test]
@@ -379,10 +424,13 @@ mod tests {
             return;
         }
 
+        let directory = tempfile::tempdir().unwrap();
+        let rustc_args =
+            pgrx_cdylib_rustc_args(Some("x86_64-unknown-linux-gnu"), directory.path()).unwrap();
         let command = Cargo::default()
             .subcommand("rustc")
             .flag("--lib")
-            .rustc_args(pgrx_cdylib_rustc_args(Some("x86_64-unknown-linux-gnu")))
+            .rustc_args(rustc_args.clone())
             .into_command();
         let args = command.get_args().map(|arg| arg.to_string_lossy()).collect::<Vec<_>>();
 
@@ -391,14 +439,8 @@ mod tests {
             !args.iter().any(|arg| arg.as_ref() == "--config"),
             "the cdylib workaround must not override Cargo config rustflags: {args:?}"
         );
-        assert!(
-            args.windows(3).any(|window| {
-                window[0].as_ref() == "--"
-                    && window[1].as_ref() == "-C"
-                    && window[2].as_ref() == "link-arg=-Wl,--no-gc-sections"
-            }),
-            "expected no-GC rustc args after `--`: {args:?}"
-        );
+        let separator = args.iter().position(|arg| arg.as_ref() == "--").unwrap();
+        assert_eq!(&args[separator + 1..], rustc_args.as_slice());
     }
 
     #[test]
