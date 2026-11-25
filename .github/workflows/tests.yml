@@ -291,26 +291,24 @@ jobs:
       - name: Stop sccache server
         run: sccache --stop-server || true
 
-  pgrx_tests_arm64:
-    name: Linux arm64 native tests
+  schema_release:
+    name: ${{ matrix.os }} schema --release (${{ matrix.linker }})
     needs: lintck
-    runs-on: ubuntu-24.04-arm
+    runs-on: ${{ matrix.os }}
     if: "!contains(github.event.head_commit.message, 'nogha')"
     env:
       PG_VER: ${{ matrix.postgres }}
-      RUST_TOOLCHAIN: 'stable'
+      RUST_TOOLCHAIN: '1.96.0'
+      RUSTUP_TOOLCHAIN: '1.96.0'
 
-    # Regression coverage for the `.pgrxsc` ELF-section retention contract on
-    # aarch64 Linux. The bug this is guarding against: without LTO, `#[used]`
-    # statics in `.pgrxsc` rely on `SHF_GNU_RETAIN` surviving through LLVM →
-    # binutils → `ld --gc-sections`. That chain has broken in the wild on
-    # aarch64 (see pglinter 0.18.0 failure), dropping the whole section and
-    # producing "no embedded pgrx schema section found" at schema-generation
-    # time. Running `cargo pgrx schema --release` against pgrx-unit-tests on
-    # a native aarch64 runner directly exercises the broken path.
+    # Keep schema metadata in non-LTO builds even without SHF_GNU_RETAIN, while
+    # collecting unused code and its imports, on the branch's minimum Rust version.
     strategy:
+      fail-fast: false
       matrix:
         postgres: [ 17 ]
+        os: [ubuntu-22.04, ubuntu-24.04-arm]
+        linker: [bfd, lld]
 
     steps:
       - uses: actions/checkout@v4
@@ -353,6 +351,16 @@ jobs:
           env
           echo ""
 
+      - name: Select the ELF linker
+        run: |
+          if [ "${{ matrix.linker }}" = lld ]; then
+            host="$(rustc -vV | sed -n 's/^host: //p')"
+            linker="$(rustc --print sysroot)/lib/rustlib/$host/bin/gcc-ld/ld.lld"
+            echo "RUSTFLAGS=-C linker=clang -C link-arg=--ld-path=$linker" >> "$GITHUB_ENV"
+          else
+            echo "RUSTFLAGS=-C linker=cc -C link-arg=-fuse-ld=bfd" >> "$GITHUB_ENV"
+          fi
+
       - name: Setup release Postgres apt repo
         run: |
           sudo apt-get install -y wget gnupg
@@ -376,7 +384,7 @@ jobs:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-          key: pgrx-arm64-cargo-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
+          key: pgrx-schema-cargo-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
 
       - name: Install cargo-pgrx
         run: cargo install --path cargo-pgrx/ --debug --force --locked
@@ -384,15 +392,12 @@ jobs:
       - name: Run 'cargo pgrx init' against system-level ${{ matrix.postgres }}
         run: cargo pgrx init --pg$PG_VER /usr/lib/postgresql/$PG_VER/bin/pg_config
 
-      # Reproduces the pglinter 0.18.0 failure mode: release build with LTO
-      # off and many codegen units, where `.pgrxsc` retention depends on
-      # `SHF_GNU_RETAIN` surviving the whole LLVM → binutils → `ld
-      # --gc-sections` chain. The env vars below pin the profile shape so
-      # this regression test keeps exercising the broken path even if
-      # someone later edits `[profile.release]` in the workspace Cargo.toml.
-      # pgrx-unit-tests has a large, diverse set of schema entries, so if
-      # the injected `--no-gc-sections` workaround ever regresses, this step
-      # fails with "no embedded pgrx schema section found".
+      - name: Verify schema retention and unused import collection
+        run: cargo test --locked -p cargo-pgrx --test schema_gc -- --nocapture
+
+      # Reproduce the non-LTO, many-CGU build that originally lost schema metadata.
+      # Pin this profile shape even if the workspace's release settings change.
+      # pgrx-unit-tests exercises a large, diverse set of schema entries retained by KEEP.
       - name: Exercise cargo pgrx schema --release against pgrx-unit-tests
         env:
           CARGO_PROFILE_RELEASE_LTO: "false"
@@ -533,7 +538,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [ "macos-14" ] # macos-14 is M1
+        os: [ "macos-15" ] # ARM64
         # Since Postgres 16 on macOS the dynamic library extension is "dylib" (instead of "so" on older versions),
         # so it's important to test against both versions (with "old" and "new" extensions).
         #
