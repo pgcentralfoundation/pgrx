@@ -646,4 +646,48 @@ mod tests {
         let retval = Spi::get_one::<i32>("SELECT id FROM tests.dont_delete;");
         assert_eq!(retval, Ok(Some(1)));
     }
+
+    /// Its `Debug` rendering is the bare variant name, so a message reaching the
+    /// client proves the error was reported through `Display`.
+    #[derive(thiserror::Error, Debug)]
+    enum ReportedTriggerError {
+        #[error("the trigger refused this row")]
+        Refused,
+    }
+
+    #[pg_trigger]
+    fn always_refuses<'a>(
+        _trigger: &'a pgrx::PgTrigger<'a>,
+    ) -> Result<Option<PgHeapTuple<'a, AllocatedByRust>>, ReportedTriggerError> {
+        Err(ReportedTriggerError::Refused)
+    }
+
+    /// An `Err` out of a trigger must reach the client as its `Display` text.
+    /// `Result::expect` used to render it with `Debug`, which produced
+    /// `Trigger function panic: Refused` and lost the message entirely.
+    #[pg_test(error = "the trigger refused this row")]
+    fn a_returned_error_is_reported_with_its_display_message() {
+        Spi::run("CREATE TABLE tests.returned_trigger_error (id int)").expect("SPI failed");
+
+        Spi::run(
+            r#"
+            CREATE TRIGGER always_refuses
+                BEFORE INSERT ON tests.returned_trigger_error
+                FOR EACH ROW
+                EXECUTE PROCEDURE tests.always_refuses()
+        "#,
+        )
+        .expect("SPI failed");
+
+        Spi::run("INSERT INTO tests.returned_trigger_error (id) VALUES (1)").expect("SPI failed");
+    }
+
+    /// Calling a trigger function directly fails in `PgTrigger::from_fcinfo`, whose
+    /// `PgTriggerError::NotTrigger` message was likewise lost to `Debug`.
+    #[pg_test(
+        error = "`PgTrigger`s can only be built from `FunctionCallInfo` instances which `pgrx::pg_sys::CALLED_AS_TRIGGER!(fcinfo)` returns `true`"
+    )]
+    fn calling_a_trigger_as_a_function_reports_why() {
+        Spi::run("SELECT tests.always_refuses()").expect("SPI failed");
+    }
 }

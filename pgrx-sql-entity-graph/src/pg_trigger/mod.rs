@@ -80,7 +80,9 @@ impl PgTrigger {
                     fcinfo.as_ref().expect("fcinfo was NULL from Postgres")
                 };
                 let maybe_pg_trigger = unsafe { ::pgrx::trigger_support::PgTrigger::from_fcinfo(fcinfo_ref) };
-                let pg_trigger = maybe_pg_trigger.expect("PgTrigger::from_fcinfo failed");
+                // Report the error as Postgres would, as `#[pg_extern]` does for its own
+                // `Result`s, so the `Display` message survives instead of a `Debug` dump.
+                let pg_trigger = ::pgrx::pg_sys::panic::ErrorReportable::unwrap_or_report(maybe_pg_trigger);
                 let trigger_fn_result: Result<
                     Option<::pgrx::heap_tuple::PgHeapTuple<'_, _>>,
                     _,
@@ -89,7 +91,7 @@ impl PgTrigger {
 
                 // The trigger "protocol" allows a function to return the null pointer, but NOT to
                 // set the isnull result flag.  This is why we return `Datum::from(0)` in the None cases
-                let trigger_retval = trigger_fn_result.expect("Trigger function panic");
+                let trigger_retval = ::pgrx::pg_sys::panic::ErrorReportable::unwrap_or_report(trigger_fn_result);
                 match trigger_retval {
                     None => unsafe { ::pgrx::pg_sys::Datum::from(0) },
                     Some(trigger_retval) => match trigger_retval.into_trigger_datum() {
