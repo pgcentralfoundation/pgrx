@@ -117,7 +117,7 @@ const JOBS: &[(&str, Subjects)] = &[
     // A new extension from the template, built against pgrx-tests, which runs cargo-pgrx.
     ("init", Subjects::Artifacts(&["pgrx-tests"])),
     ("variants", Subjects::Packages(&["pgrx-unit-tests", "custom_types"])),
-    ("schema_release", Subjects::Packages(&["pgrx-unit-tests"])),
+    ("schema_release", Subjects::Packages(&["cargo-pgrx", "pgrx-unit-tests"])),
     ("cross_package", Subjects::Artifacts(&["cargo-pgrx", "versioned_so", "packaging"])),
     ("beta", Subjects::Any),
     ("package", Subjects::Packaging),
@@ -722,6 +722,14 @@ mod tests {
         assert_eq!(output(&plan, &graph, "pg"), "pgrx-pg-sys");
         assert_eq!(output(&plan, &graph, "crates"), "pgrx-c-macros");
         assert_eq!(output(&plan, &graph, "miri"), "true");
+    }
+
+    #[test]
+    fn schema_gc_test_changes_run_the_linker_matrix() {
+        let graph = graph();
+        let plan = Plan::new(&graph, Some(&files(&["cargo-pgrx/tests/schema_gc.rs"])));
+        assert_eq!(output(&plan, &graph, "schema_release"), "true");
+        assert_eq!(output(&plan, &graph, "pg"), "");
     }
 
     #[test]

@@ -280,6 +280,7 @@ fn generate_bundle(
         profile,
         features,
         EffectiveExtVersion(&version),
+        target_dir,
         cargo_flags,
     )?;
 
