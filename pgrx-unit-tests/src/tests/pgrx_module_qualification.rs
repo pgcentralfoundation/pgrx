@@ -129,7 +129,7 @@ mod pgrx_modqual_tests {
         _trigger: &'a ::pgrx::PgTrigger<'a>,
     ) -> Result<
         Option<::pgrx::heap_tuple::PgHeapTuple<'a, ::pgrx::pgbox::AllocatedByPostgres>>,
-        Box<dyn std::any::Any>,
+        Box<dyn std::error::Error>,
     > {
         todo!()
     }
